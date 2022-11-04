@@ -36,8 +36,12 @@ public class ImagesModule : BaseCommandModule {
     public async Task img(CommandContext ctx, string reddit = "no") {
         await ctx.TriggerTypingAsync();
         if (reddit == "reddit") {
+            var imgProvider = new RedditImageProvider();
+            await sendFancyEmbed(ctx, await imgProvider.getImageFromSub("yuri"), "Cute girls!");
+        }
+        else {
             var imgProvider = new BooruImageProvider();
-            await sendFancyEmbed(ctx, await imgProvider.getRandomYuri(), "Cute girls!");
+            await sendFancyEmbed(ctx, await imgProvider.getRandomYaoi(), "Cute boys!");
         }
     }
 
