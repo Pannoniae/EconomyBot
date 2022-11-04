@@ -20,17 +20,25 @@ public class ImagesModule : BaseCommandModule {
     }
 
     [Command("yaoi"), Description("Fetch a yaoi image.")]
-    public async Task yaoi(CommandContext ctx) {
+    public async Task yaoi(CommandContext ctx, string reddit = "no") {
         await ctx.TriggerTypingAsync();
-        var imgProvider = new RedditImageProvider();
-        await sendFancyEmbed(ctx, await imgProvider.getImageFromSub("yaoi"), "Cute boys!");
+        if (reddit == "reddit") {
+            var imgProvider = new RedditImageProvider();
+            await sendFancyEmbed(ctx, await imgProvider.getImageFromSub("yaoi"), "Cute boys!");
+        }
+        else {
+            var imgProvider = new BooruImageProvider();
+            await sendFancyEmbed(ctx, await imgProvider.getRandomYaoi(), "Cute boys!");
+        }
     }
 
     [Command("img"), Description("Fetch a wholesome image.")]
-    public async Task img(CommandContext ctx) {
+    public async Task img(CommandContext ctx, string reddit = "no") {
         await ctx.TriggerTypingAsync();
-        var imgProvider = new RedditImageProvider();
-        await sendFancyEmbed(ctx, await imgProvider.getRandomImage(), "Cute girls!");
+        if (reddit == "reddit") {
+            var imgProvider = new BooruImageProvider();
+            await sendFancyEmbed(ctx, await imgProvider.getRandomYuri(), "Cute girls!");
+        }
     }
 
     public async Task sendFancyEmbed(CommandContext ctx, string url, string title) {
