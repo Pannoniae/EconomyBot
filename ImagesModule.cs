@@ -1,10 +1,6 @@
 ﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using Reddit;
-using Reddit.Exceptions;
-using Post = Reddit.Controllers.Post;
-using Subreddit = Reddit.Controllers.Subreddit;
 
 namespace EconomyBot;
 
@@ -41,7 +37,7 @@ public class ImagesModule : BaseCommandModule {
         }
         else {
             var imgProvider = new BooruImageProvider();
-            await sendFancyEmbed(ctx, await imgProvider.getRandomYaoi(), "Cute boys!");
+            await sendFancyEmbed(ctx, await imgProvider.getRandomYuri(), "Cute girls!");
         }
     }
 

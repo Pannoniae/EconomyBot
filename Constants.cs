@@ -15,5 +15,11 @@ public static class Constants {
         // totally not a gross hack to do some deconstructing
         (redditappid, redditrefreshtoken, redditappsecret) =
             redditStuff.Split('\n') switch { var a => (a[0], a[1], a[2]) };
+        redditappid = redditappid.Trim();
+        redditrefreshtoken = redditrefreshtoken.Trim();
+        redditappsecret = redditappsecret.Trim();
+        Console.Out.WriteLine(redditappid);
+        Console.Out.WriteLine(redditrefreshtoken);
+        Console.Out.WriteLine(redditappsecret);
     }
 }
