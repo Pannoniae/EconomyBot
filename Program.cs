@@ -14,6 +14,7 @@ using DSharpPlus.Lavalink;
 using DSharpPlus.Net;
 using Emzi0767;
 using Microsoft.Extensions.DependencyInjection;
+using Optional = Emzi0767.Optional;
 
 namespace EconomyBot;
 
@@ -60,6 +61,7 @@ static class Program {
         commands.RegisterCommands<PartyModule>();
         commands.RegisterCommands<ChatModule>();
         commands.RegisterCommands<MusicModule>();
+        commands.RegisterCommands<ImagesModule>();
         discord.UseInteractivity(new InteractivityConfiguration {
             Timeout = TimeSpan.FromSeconds(180),
             PollBehaviour = PollBehaviour.KeepEmojis
@@ -81,13 +83,12 @@ static class Program {
                 var builder = new DiscordMessageBuilder();
                 var guid = Guid.NewGuid();
                 foreach (var a in e.Message.Attachments) {
-                    string path = "";
+                    var path = "";
                     try {
                         path = Directory.GetCurrentDirectory() + a.FileName;
                         var ext = Path.GetExtension(path);
                         path += guid + ext;
                         //slap the correct extension on it
-                        Console.Out.WriteLine(Path.GetExtension(path));
                         new WebClient().DownloadFile(a.Url, path);
                     }
                     catch (WebException exception) {
@@ -98,7 +99,7 @@ static class Program {
                         await e.Channel.SendMessageAsync("Penis happened!");
                     }
 
-                    FileStream file = new FileStream(path, FileMode.Open);
+                    var file = new FileStream(path, FileMode.Open);
                     builder = builder.WithFile(file);
                     await e.Guild.GetChannel(LOG).SendMessageAsync(builder);
                 }
@@ -109,9 +110,9 @@ static class Program {
     }
 
     private static async Task messageHandler(DiscordClient client, MessageCreateEventArgs e) {
-        //if (e.Message.Content.Contains("discord.gg") && e.Author != client.CurrentUser) {
-        //await e.Channel.SendMessageAsync($"Stupid bot deletes invite links so here it is: {e.Message.Content}");
-        //}
+        if (e.Message.Content.Contains("turkey", StringComparison.OrdinalIgnoreCase) && e.Author != client.CurrentUser) {
+            
+        }
     }
 
     private static async Task setup(DiscordClient client, ReadyEventArgs e, LavalinkExtension lavalink,
@@ -119,22 +120,27 @@ static class Program {
         //Constants.init();
         // dont do shit for the time being
         LavalinkNode = await lavalink.ConnectAsync(lavalinkConfig);
-        musicService = new MusicService(new SecureRandom(), lavalink);
+        musicService = new MusicService(new SecureRandom(), lavalink, LavalinkNode);
+        imagesModule = new ImagesModule();
         //await MusicModule.setup(client);
+        
+        
+        
         Console.WriteLine("Setup done!");
     }
 
     public static LavalinkNodeConnection LavalinkNode;
     public static MusicService musicService;
+    public static ImagesModule imagesModule;
 
     private static async Task errorHandler(CommandsNextExtension sender, CommandErrorEventArgs e) {
         switch (e.Exception) {
             // wrong number of arguments
             case ArgumentException when e.Exception.Message.Contains("overload"): {
-                var command = e.Command.Name;
+                var command = e.Command.Name;   
                 var suppliedArgumentsLength = e.Context.RawArgumentString.Split().Length;
 
-                // if args are empty, we don't have arguments
+                // if args are empty, we don't have arguments 
                 if (string.IsNullOrWhiteSpace(e.Context.RawArgumentString)) {
                     suppliedArgumentsLength = 0;
                 }
@@ -173,7 +179,7 @@ static class Program {
             }
             case CommandNotFoundException:
                 await sender.Client.SendMessageAsync(e.Context.Channel, new DiscordMessageBuilder().WithEmbed(
-                    new DiscordEmbedBuilder().WithColor(DiscordColor.HotPink).WithDescription("TBJ selymes hangja! uwu")
+                    new DiscordEmbedBuilder().WithColor(DiscordColor.HotPink).WithDescription("uwu")
                         .WithImageUrl("https://c.tenor.com/CR9Or4gKoAUAAAAC/menhera-menhera-chan.gif").Build()));
                 return;
             default:

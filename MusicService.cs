@@ -33,19 +33,27 @@ public sealed class MusicService {
     private SecureRandom RNG { get; }
     private ConcurrentDictionary<ulong, GuildMusicData> MusicData { get; }
     private DiscordClient Discord { get; }
+    
+    private LavalinkNodeConnection node { get; }
 
     /// <summary>
     /// Creates a new instance of this music service.
     /// </summary>
     /// <param name="rng">Cryptographically-secure random number generator implementaion.</param>
-    public MusicService(SecureRandom rng, LavalinkExtension lavalink) {
+    public MusicService(SecureRandom rng, LavalinkExtension lavalink, LavalinkNodeConnection theNode) {
         Lavalink = lavalink;
         RNG = rng;
         MusicData = new ConcurrentDictionary<ulong, GuildMusicData>();
-        Discord = lavalink.Client;
-        var node = lavalink.ConnectedNodes.Values.First();
+        Discord = lavalink.Client; 
+        node = theNode;
 
         node.TrackException += Lavalink_TrackExceptionThrown;
+
+        async Task playbackStarted(LavalinkGuildConnection con, TrackStartEventArgs e) {
+            Console.Out.WriteLine($"len/nodes: {lavalink.ConnectedNodes.Count}");
+        }
+
+        node.PlaybackStarted += playbackStarted;
     }
 
     /// <summary>
@@ -81,7 +89,7 @@ public sealed class MusicService {
     /// <param name="uri">URL to load tracks from.</param>
     /// <returns>Loaded tracks.</returns>
     public Task<LavalinkLoadResult> GetTracksAsync(Uri uri)
-        => Lavalink.ConnectedNodes.Values.First().Rest.GetTracksAsync(uri);
+        => node.Rest.GetTracksAsync(uri);
 
     /// <summary>
     /// Shuffles the supplied track list.
@@ -95,7 +103,7 @@ public sealed class MusicService {
         if (e.Player?.Guild == null)
             return;
 
-        if (!MusicData.TryGetValue(e.Player.Guild.Id, out var gmd))
+        if (!MusicData.TryGetValue(e.Player.Guild.Id, out var gmd)) 
             return;
 
         await gmd.CommandChannel.SendMessageAsync(

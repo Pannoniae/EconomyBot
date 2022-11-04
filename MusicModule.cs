@@ -5,6 +5,7 @@ using System.Text;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.CommandsNext.Converters;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
@@ -71,6 +72,7 @@ public class MusicModule : BaseCommandModule {
             GuildMusic.CommandChannel = ctx.Channel;
             return;
         }
+
         var vs = ctx.Member.VoiceState;
         var chn = vs?.Channel;
         if (chn == null) {
@@ -91,7 +93,7 @@ public class MusicModule : BaseCommandModule {
 
         await base.BeforeExecutionAsync(ctx);
     }
-    
+
     [Command("join"), Description("Joins the voice channel."), Priority(1)]
     public async Task JoinAsync(CommandContext ctx) {
         // yeet the bot in
@@ -456,6 +458,7 @@ public class MusicModule : BaseCommandModule {
             await GuildMusic.StopAsync();
             await ctx.RespondAsync(
                 $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
+            await Task.Delay(500); // wait for the next one
         }
     }
 
