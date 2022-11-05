@@ -10,11 +10,6 @@ public class RedditImageProvider : IImageProvider {
     public RedditImageProvider() {
         reddit = new RedditClient(Constants.redditappid, Constants.redditrefreshtoken,
             Constants.redditappsecret);
-        //reddit = new RedditClient("7JTAoUXqs9E0srSdgg8kKg", "58186334-OS51U_5Qf5EXAwaizPTSs1Y0eejEow",
-        //        "Z8IMiBtiQOFMy5jzCT9oxRu0i4RK6Q");
-        Console.Out.WriteLine(Constants.redditappid == "7JTAoUXqs9E0srSdgg8kKg");
-        Console.Out.WriteLine(Constants.redditrefreshtoken == "58186334-OS51U_5Qf5EXAwaizPTSs1Y0eejEow");
-        Console.Out.WriteLine(Constants.redditappsecret == "Z8IMiBtiQOFMy5jzCT9oxRu0i4RK6Q");
     }
 
     public async Task<string> getRandomImage() {

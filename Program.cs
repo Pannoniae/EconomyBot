@@ -66,7 +66,7 @@ static class Program {
             Timeout = TimeSpan.FromSeconds(180),
             PollBehaviour = PollBehaviour.KeepEmojis
         });
-        discord.MessageCreated += messageHandler;
+        //discord.MessageCreated += messageHandler;
         discord.Ready += (sender, args) => setup(sender, args, lavalink, lavalinkConfig);
         discord.MessageDeleted += messageDeleteHandler;
         discord.GetCommandsNext().UnregisterConverter<TimeSpan>();

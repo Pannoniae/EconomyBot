@@ -41,7 +41,7 @@ public class ImagesModule : BaseCommandModule {
         }
     }
 
-    public async Task sendFancyEmbed(CommandContext ctx, string url, string title) {
+    private async Task sendFancyEmbed(CommandContext ctx, string url, string title) {
         // send the image
         var messageBuilder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
             .WithColor(DiscordColor.Rose).WithDescription(title).WithImageUrl(url));
