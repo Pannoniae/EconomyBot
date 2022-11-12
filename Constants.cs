@@ -18,8 +18,5 @@ public static class Constants {
         redditappid = redditappid.Trim();
         redditrefreshtoken = redditrefreshtoken.Trim();
         redditappsecret = redditappsecret.Trim();
-        Console.Out.WriteLine(redditappid);
-        Console.Out.WriteLine(redditrefreshtoken);
-        Console.Out.WriteLine(redditappsecret);
     }
 }

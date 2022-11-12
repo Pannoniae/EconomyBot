@@ -5,7 +5,7 @@ using DSharpPlus.Entities;
 namespace EconomyBot;
 
 public class ImagesModule : BaseCommandModule {
-    [Command("muv"), Description("Ghost's gay shit lol")]
+    [Command("muv"), Description("Ghost's anime thing.")]
     public async Task muvluv(CommandContext ctx, string luv) {
         if (luv == "luv") {
             // thank you ghost lol
@@ -14,17 +14,28 @@ public class ImagesModule : BaseCommandModule {
             await sendFancyEmbed(ctx, await imgProvider.getImageFromSub("muvluv"), "Muv-Luv!");
         }
     }
-
-    [Command("yaoi"), Description("Fetch a yaoi image.")]
+    
+    // disabled
+    //[Command("yaoi"), Description("Fetch a yaoi image.")]
     public async Task yaoi(CommandContext ctx, string reddit = "no") {
         await ctx.TriggerTypingAsync();
         if (reddit == "reddit") {
             var imgProvider = new RedditImageProvider();
-            await sendFancyEmbed(ctx, await imgProvider.getImageFromSub("yaoi"), "Cute boys!");
+            var yaoi = await imgProvider.getImageFromSub("yaoi");
+            if (yaoi == "penis") {
+                await ctx.RespondAsync("The bot is currently cuddling, sorry.^^");
+                return;
+            }
+            await sendFancyEmbed(ctx, yaoi, "Cute boys!");
         }
         else {
             var imgProvider = new BooruImageProvider();
-            await sendFancyEmbed(ctx, await imgProvider.getRandomYaoi(), "Cute boys!");
+            var yaoi = await imgProvider.getRandomYaoi();
+            if (yaoi == "penis") {
+                await ctx.RespondAsync("The bot is currently cuddling, sorry.^^");
+                return;
+            }
+            await sendFancyEmbed(ctx, yaoi, "Cute boys!");
         }
     }
 
@@ -33,10 +44,20 @@ public class ImagesModule : BaseCommandModule {
         await ctx.TriggerTypingAsync();
         if (reddit == "reddit") {
             var imgProvider = new RedditImageProvider();
-            await sendFancyEmbed(ctx, await imgProvider.getImageFromSub("yuri"), "Cute girls!");
+            var yuri = await imgProvider.getImageFromSub("yuri");
+            if (yuri == "penis") {
+                await ctx.RespondAsync("The bot is currently cuddling, sorry.^^");
+                return;
+            }
+            await sendFancyEmbed(ctx, yuri, "Cute girls!");
         }
         else {
             var imgProvider = new BooruImageProvider();
+            var yuri = await imgProvider.getRandomYuri();
+            if (yuri == "penis") {
+                await ctx.RespondAsync("The bot is currently cuddling, sorry.^^");
+                return;
+            }
             await sendFancyEmbed(ctx, await imgProvider.getRandomYuri(), "Cute girls!");
         }
     }
