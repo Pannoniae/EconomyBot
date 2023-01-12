@@ -66,7 +66,7 @@ static class Program {
             Timeout = TimeSpan.FromSeconds(180),
             PollBehaviour = PollBehaviour.KeepEmojis
         });
-        //discord.MessageCreated += messageHandler;
+        discord.MessageCreated += messageHandler;
         discord.Ready += (sender, args) => setup(sender, args, lavalink, lavalinkConfig);
         discord.MessageDeleted += messageDeleteHandler;
         discord.GetCommandsNext().UnregisterConverter<TimeSpan>();
@@ -77,7 +77,7 @@ static class Program {
     }
 
     private static async Task messageDeleteHandler(DiscordClient sender, MessageDeleteEventArgs e) {
-        if (e.Message.Attachments.Count != 0) {
+        if (e.Message.Attachments.Count != 0 && e.Message.Channel.Id != LOG) {
             // long wait so wrap it in task.run
             Task.Run(async () => {
                 var builder = new DiscordMessageBuilder();
@@ -110,8 +110,8 @@ static class Program {
     }
 
     private static async Task messageHandler(DiscordClient client, MessageCreateEventArgs e) {
-        if (e.Message.Content.Contains("turkey", StringComparison.OrdinalIgnoreCase) && e.Author != client.CurrentUser) {
-            
+        if (e.Author.Id == 947229156448538634) {
+            await e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":pinkpill:"));
         }
     }
 
@@ -123,9 +123,8 @@ static class Program {
         musicService = new MusicService(new SecureRandom(), lavalink, LavalinkNode);
         imagesModule = new ImagesModule();
         //await MusicModule.setup(client);
-        
-        
-        
+
+
         Console.WriteLine("Setup done!");
     }
 
@@ -137,7 +136,7 @@ static class Program {
         switch (e.Exception) {
             // wrong number of arguments
             case ArgumentException when e.Exception.Message.Contains("overload"): {
-                var command = e.Command.Name;   
+                var command = e.Command.Name;
                 var suppliedArgumentsLength = e.Context.RawArgumentString.Split().Length;
 
                 // if args are empty, we don't have arguments 
@@ -192,8 +191,10 @@ static class Program {
 }
 
 public class CustomTimeSpanConverter : IArgumentConverter<TimeSpan> {
-    
-    private static Regex TimeSpanRegex { get; } = new("^(?<days>\\d+d\\s*)?(?<hours>\\d{1,2}h\\s*)?(?<minutes>\\d{1,2}m\\s*)?(?<seconds>\\d{1,2}s\\s*)?$", RegexOptions.Compiled | RegexOptions.ECMAScript);
+    private static Regex TimeSpanRegex { get; } =
+        new("^(?<days>\\d+d\\s*)?(?<hours>\\d{1,2}h\\s*)?(?<minutes>\\d{1,2}m\\s*)?(?<seconds>\\d{1,2}s\\s*)?$",
+            RegexOptions.Compiled | RegexOptions.ECMAScript);
+
     public Task<DSharpPlus.Entities.Optional<TimeSpan>> ConvertAsync(string value, CommandContext ctx) {
         if (value == "0")
             return Task.FromResult(DSharpPlus.Entities.Optional.FromValue(TimeSpan.Zero));
@@ -201,7 +202,7 @@ public class CustomTimeSpanConverter : IArgumentConverter<TimeSpan> {
             return Task.FromResult(DSharpPlus.Entities.Optional.FromNoValue<TimeSpan>());
         if (TimeSpan.TryParse(value, CultureInfo.InvariantCulture, out var result2)) {
             var _result2 = new TimeSpan(0, result2.Hours, result2.Minutes); // slash from h:m to m:s
-            
+
             return Task.FromResult(DSharpPlus.Entities.Optional.FromValue(_result2));
         }
 
