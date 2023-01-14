@@ -100,7 +100,7 @@ static class Program {
                     }
 
                     var file = new FileStream(path, FileMode.Open);
-                    builder = builder.WithFile(file);
+                    builder = builder.AddFile(file);
                     await e.Guild.GetChannel(LOG).SendMessageAsync(builder);
                 }
 
@@ -110,8 +110,32 @@ static class Program {
     }
 
     private static async Task messageHandler(DiscordClient client, MessageCreateEventArgs e) {
+        bool shouldRespondMeow = false;
+        if (client.CurrentUser.Id == e.Author.Id) {
+            return;
+        }
         if (e.Author.Id == 947229156448538634) {
             await e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":pinkpill:"));
+        }
+
+        if (e.Message.Content.Contains("cat", StringComparison.OrdinalIgnoreCase) || e.Message.Attachments.Any(e => e.Url.Contains("cat", StringComparison.OrdinalIgnoreCase))) {
+            shouldRespondMeow = true;
+        }
+        
+        if (e.Message.Content.Contains("kitty", StringComparison.OrdinalIgnoreCase) || e.Message.Attachments.Any(e => e.Url.Contains("kitty", StringComparison.OrdinalIgnoreCase))) {
+            shouldRespondMeow = true;
+        }
+        
+        if (e.Message.Content.Contains("kitten", StringComparison.OrdinalIgnoreCase) || e.Message.Attachments.Any(e => e.Url.Contains("kitten", StringComparison.OrdinalIgnoreCase))) {
+            shouldRespondMeow = true;
+        }
+        
+        if (e.Message.Content.Contains("meow", StringComparison.OrdinalIgnoreCase) || e.Message.Attachments.Any(e => e.Url.Contains("meow", StringComparison.OrdinalIgnoreCase))) {
+            shouldRespondMeow = true;
+        }
+
+        if (shouldRespondMeow) {
+            e.Message.RespondAsync("*meow*");
         }
     }
 
@@ -146,7 +170,8 @@ static class Program {
 
                 var minArgumentLength = int.MaxValue;
                 var maxArgumentLength = 0;
-                // too few arguments? loop through all overloads and check if we don't have enough
+                //
+                // o few arguments? loop through all overloads and check if we don't have enough
                 foreach (var overload in e.Command.Overloads) {
                     // too few
                     minArgumentLength = Math.Min(overload.Arguments.Count, minArgumentLength);
