@@ -107,6 +107,6 @@ public sealed class MusicService {
             return;
 
         await gmd.CommandChannel.SendMessageAsync(
-            $"{DiscordEmoji.FromName(Discord, ":msfrown:")} A problem occured while playing {Formatter.Bold(Formatter.Sanitize(e.Track.Title))} by {Formatter.Bold(Formatter.Sanitize(e.Track.Author))}:\n{e.Error}");
+            $"{DiscordEmoji.FromName(Discord, ":pinkpill:")} A problem occured while playing {Formatter.Bold(Formatter.Sanitize(e.Track.Title))} by {Formatter.Bold(Formatter.Sanitize(e.Track.Author))}:\n{e.Error}");
     }
 }

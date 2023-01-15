@@ -110,7 +110,7 @@ static class Program {
     }
 
     private static async Task messageHandler(DiscordClient client, MessageCreateEventArgs e) {
-        bool shouldRespondMeow = false;
+        var shouldRespondMeow = false;
         if (client.CurrentUser.Id == e.Author.Id) {
             return;
         }
