@@ -77,7 +77,7 @@ public sealed class MusicService {
         if (MusicData.TryGetValue(guild.Id, out var gmd))
             return gmd;
 
-        gmd = MusicData.AddOrUpdate(guild.Id, new GuildMusicData(guild, RNG, Lavalink),
+        gmd = MusicData.AddOrUpdate(guild.Id, new GuildMusicData(guild, RNG, Lavalink, node),
             (k, v) => v);
 
         return gmd;

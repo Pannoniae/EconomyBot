@@ -96,7 +96,7 @@ public class MusicModule : BaseCommandModule {
 
     [Command("join"), Description("Joins the voice channel."), Priority(1)]
     public async Task JoinAsync(CommandContext ctx) {
-        // yeet the bot in
+        // yeet the bot in 
         var vs = ctx.Member.VoiceState;
         var chn = vs.Channel;
         await GuildMusic.CreatePlayerAsync(chn);
@@ -488,9 +488,9 @@ public class MusicModule : BaseCommandModule {
     public async Task VolumeAsync(CommandContext ctx,
         [Description("Volume to set. Can be 0-150. Default 100.")]
         int volume = 100) {
-        if (volume is < 0 or > 150) {
+        if (volume is < 0 or > 1000) {
             await ctx.RespondAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Volume must be greater than 0, and less than or equal to 150.");
+                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Volume must be greater than 0, and less than or equal to 1000.");
             return;
         }
 

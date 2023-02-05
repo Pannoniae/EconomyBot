@@ -81,15 +81,18 @@ public sealed class GuildMusicData {
     private SecureRandom RNG { get; }
     public LavalinkExtension Lavalink { get; }
     public LavalinkGuildConnection Player { get; set; }
+    
+    public LavalinkNodeConnection Node { get; set; }
 
     /// <summary>
     /// Creates a new instance of playback data.
     /// </summary>
     /// <param name="guild">Guild to track data for.</param>
-    /// <param name="rng">Cryptographically-secure random number generator implementation.</param>
+    /// <param name="rng">Cryptographically-secure random number generator implementation.</param> 
     /// <param name="lavalink">Lavalink service.</param>
     /// <param name="redis">Redis service.</param>
-    public GuildMusicData(DiscordGuild guild, SecureRandom rng, LavalinkExtension lavalink) {
+    public GuildMusicData(DiscordGuild guild, SecureRandom rng, LavalinkExtension lavalink, LavalinkNodeConnection node) {
+        Node = node;
         Guild = guild;
         RNG = rng;
         Lavalink = lavalink;
@@ -308,7 +311,7 @@ public sealed class GuildMusicData {
         if (Player != null && Player.IsConnected)
             return;
 
-        var node = Lavalink.ConnectedNodes.Values.First();
+        var node = Node;
         Player = await node.ConnectAsync(channel);
 
         if (volume != 100)
@@ -407,8 +410,8 @@ public sealed class GuildMusicData {
 
         var tracks = new List<LavalinkLoadResult>();
         foreach (var file in randomFiles) {
-            tracks.Add(await Lavalink.ConnectedNodes.Values.First().Rest
-                .GetTracksAsync(file));
+            tracks.Add(Node.Rest
+                .GetTracksAsync(file).Result);
 
         }
 

@@ -50,7 +50,7 @@ public class RedditImageProvider : IImageProvider {
                 }
             }
         }
-        catch (Exception ex) when (ex is RedditGatewayTimeoutException || ex is RedditServiceUnavailableException) {
+        catch (Exception ex) when (ex is RedditGatewayTimeoutException or RedditServiceUnavailableException) {
             throw; // just throw anyway
         }
 
