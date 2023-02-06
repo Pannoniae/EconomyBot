@@ -119,7 +119,7 @@ static class Program {
         }
 
         var meowList = new List<string> {
-            "cat", "kitty", "kitten", "meow", "purr", "feline"
+            "cat", "kitty", "kitten", "meow", "purr", "feline", "nya"
         };
         if (meowList.Any(word =>
                 e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase) ||
