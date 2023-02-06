@@ -133,6 +133,10 @@ static class Program {
         if (e.Message.Content.Contains("meow", StringComparison.OrdinalIgnoreCase) || e.Message.Attachments.Any(e => e.Url.Contains("meow", StringComparison.OrdinalIgnoreCase))) {
             shouldRespondMeow = true;
         }
+        
+        if (e.Message.Content.Contains("purr", StringComparison.OrdinalIgnoreCase) || e.Message.Attachments.Any(e => e.Url.Contains("purr", StringComparison.OrdinalIgnoreCase))) {
+            shouldRespondMeow = true;
+        }
 
         if (shouldRespondMeow) {
             e.Message.RespondAsync("*meow*");
