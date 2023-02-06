@@ -110,35 +110,20 @@ static class Program {
     }
 
     private static async Task messageHandler(DiscordClient client, MessageCreateEventArgs e) {
-        var shouldRespondMeow = false;
         if (client.CurrentUser.Id == e.Author.Id) {
             return;
         }
+
         if (e.Author.Id == 947229156448538634) {
             await e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":pinkpill:"));
         }
 
-        if (e.Message.Content.Contains("cat", StringComparison.OrdinalIgnoreCase) || e.Message.Attachments.Any(e => e.Url.Contains("cat", StringComparison.OrdinalIgnoreCase))) {
-            shouldRespondMeow = true;
-        }
-        
-        if (e.Message.Content.Contains("kitty", StringComparison.OrdinalIgnoreCase) || e.Message.Attachments.Any(e => e.Url.Contains("kitty", StringComparison.OrdinalIgnoreCase))) {
-            shouldRespondMeow = true;
-        }
-        
-        if (e.Message.Content.Contains("kitten", StringComparison.OrdinalIgnoreCase) || e.Message.Attachments.Any(e => e.Url.Contains("kitten", StringComparison.OrdinalIgnoreCase))) {
-            shouldRespondMeow = true;
-        }
-        
-        if (e.Message.Content.Contains("meow", StringComparison.OrdinalIgnoreCase) || e.Message.Attachments.Any(e => e.Url.Contains("meow", StringComparison.OrdinalIgnoreCase))) {
-            shouldRespondMeow = true;
-        }
-        
-        if (e.Message.Content.Contains("purr", StringComparison.OrdinalIgnoreCase) || e.Message.Attachments.Any(e => e.Url.Contains("purr", StringComparison.OrdinalIgnoreCase))) {
-            shouldRespondMeow = true;
-        }
-
-        if (shouldRespondMeow) {
+        var meowList = new List<string> {
+            "cat", "kitty", "kitten", "meow", "purr", "feline"
+        };
+        if (meowList.Any(word =>
+                e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase) ||
+                e.Message.Attachments.Any(e => e.Url.Contains(word, StringComparison.OrdinalIgnoreCase)))) {
             e.Message.RespondAsync("*meow*");
         }
     }
