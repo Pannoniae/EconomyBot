@@ -625,7 +625,7 @@ public sealed class YouTubeSearchProvider {
     /// Creates a new YouTube search provider service instance.
     /// </summary>
     public YouTubeSearchProvider() {
-        ApiKey = "AIzaSyDvpKK1hnPKAWuxeVJmyy3UskJa1ZZdehU";
+        ApiKey = Constants.apikey;
         Http = new HttpClient {
             BaseAddress = new Uri("https://www.googleapis.com/youtube/v3/search")
         };

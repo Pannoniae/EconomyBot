@@ -14,7 +14,6 @@ using DSharpPlus.Lavalink;
 using DSharpPlus.Net;
 using Emzi0767;
 using Microsoft.Extensions.DependencyInjection;
-using Optional = Emzi0767.Optional;
 
 namespace EconomyBot;
 
@@ -114,6 +113,16 @@ static class Program {
             return;
         }
 
+        // csoki musicbot
+        if (e.Author.Id == 545252588753256469 && e.Message.Content.StartsWith('.')) {
+            e.Message.RespondAsync("shut up");
+        }
+
+        // Toxicity handler
+        if (!e.Message.Content.StartsWith('.')) {
+            toxicity.handleMessage(client, e.Message);
+        }
+
         if (e.Author.Id == 947229156448538634) {
             await e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":pinkpill:"));
         }
@@ -135,6 +144,7 @@ static class Program {
         LavalinkNode = await lavalink.ConnectAsync(lavalinkConfig);
         musicService = new MusicService(new SecureRandom(), lavalink, LavalinkNode);
         imagesModule = new ImagesModule();
+        toxicity = new ToxicityHandler();
         //await MusicModule.setup(client);
 
 
@@ -144,6 +154,7 @@ static class Program {
     public static LavalinkNodeConnection LavalinkNode;
     public static MusicService musicService;
     public static ImagesModule imagesModule;
+    private static ToxicityHandler toxicity;
 
     private static async Task errorHandler(CommandsNextExtension sender, CommandErrorEventArgs e) {
         switch (e.Exception) {
