@@ -10,6 +10,7 @@ using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Lavalink;
+using EconomyBot.CommandHandlers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -17,51 +18,17 @@ namespace EconomyBot;
 
 [ModuleLifespan(ModuleLifespan.Singleton)]
 public class MusicModule : BaseCommandModule {
-    private static ImmutableDictionary<int, DiscordEmoji> NumberMappings { get; }
-    private static ImmutableDictionary<DiscordEmoji, int> NumberMappingsReverse { get; }
-    private static ImmutableArray<DiscordEmoji> Numbers { get; }
 
     private MusicService Music { get; set; }
     private YouTubeSearchProvider YouTube { get; }
 
     public GuildMusicData GuildMusic { get; set; }
+    
+    public MusicCommon common;
 
     public MusicModule(YouTubeSearchProvider yt) {
         Music = Program.musicService;
         YouTube = yt;
-    }
-
-    static MusicModule() {
-        var iab = ImmutableArray.CreateBuilder<DiscordEmoji>();
-        iab.Add(DiscordEmoji.FromUnicode("1\u20e3"));
-        iab.Add(DiscordEmoji.FromUnicode("2\u20e3"));
-        iab.Add(DiscordEmoji.FromUnicode("3\u20e3"));
-        iab.Add(DiscordEmoji.FromUnicode("4\u20e3"));
-        iab.Add(DiscordEmoji.FromUnicode("5\u20e3"));
-        iab.Add(DiscordEmoji.FromUnicode("6\u20e3"));
-        iab.Add(DiscordEmoji.FromUnicode("7\u20e3"));
-        iab.Add(DiscordEmoji.FromUnicode("8\u20e3"));
-        iab.Add(DiscordEmoji.FromUnicode("9\u20e3"));
-        iab.Add(DiscordEmoji.FromName(Program.client, ":keycap_ten:"));
-        iab.Add(DiscordEmoji.FromUnicode("\u274c"));
-        Numbers = iab.ToImmutable();
-
-        var idb = ImmutableDictionary.CreateBuilder<int, DiscordEmoji>();
-        idb.Add(1, DiscordEmoji.FromUnicode("1\u20e3"));
-        idb.Add(2, DiscordEmoji.FromUnicode("2\u20e3"));
-        idb.Add(3, DiscordEmoji.FromUnicode("3\u20e3"));
-        idb.Add(4, DiscordEmoji.FromUnicode("4\u20e3"));
-        idb.Add(5, DiscordEmoji.FromUnicode("5\u20e3"));
-        idb.Add(6, DiscordEmoji.FromUnicode("6\u20e3"));
-        idb.Add(7, DiscordEmoji.FromUnicode("7\u20e3"));
-        idb.Add(8, DiscordEmoji.FromUnicode("8\u20e3"));
-        idb.Add(9, DiscordEmoji.FromUnicode("9\u20e3"));
-        idb.Add(10, DiscordEmoji.FromName(Program.client, ":keycap_ten:"));
-        idb.Add(-1, DiscordEmoji.FromUnicode("\u274c"));
-        NumberMappings = idb.ToImmutable();
-        var idb2 = ImmutableDictionary.CreateBuilder<DiscordEmoji, int>();
-        idb2.AddRange(NumberMappings.ToDictionary(x => x.Value, x => x.Key));
-        NumberMappingsReverse = idb2.ToImmutable();
     }
 
     public override async Task BeforeExecutionAsync(CommandContext ctx) {
@@ -239,7 +206,7 @@ public class MusicModule : BaseCommandModule {
         //var msgC = string.Join("\n",
         //    results.Select((x, i) => $"{NumberMappings[i + 1]} {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Tracks.First().Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Tracks.First().Author)))}"));
         var msgC =
-            $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {Numbers.Last()}.";
+            $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.Numbers.Last()}.";
         var msg = await ctx.RespondAsync(msgC);
 
         //foreach (var emoji in Numbers)
@@ -324,9 +291,9 @@ public class MusicModule : BaseCommandModule {
 
         var msgC = string.Join("\n",
             results.Select((x, i) =>
-                $"{NumberMappings[i + 1]} {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Author)))}"));
+                $"{MusicCommon.NumberMappings[i + 1]} {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Author)))}"));
         msgC =
-            $"{msgC}\n\nType a number 1-{results.Count()} to queue a track. To cancel, type cancel or {Numbers.Last()}.";
+            $"{msgC}\n\nType a number 1-{results.Count()} to queue a track. To cancel, type cancel or {MusicCommon.Numbers.Last()}.";
         var msg = await ctx.RespondAsync(msgC);
 
         //foreach (var emoji in Numbers)
@@ -355,13 +322,13 @@ public class MusicModule : BaseCommandModule {
                     return;
                 }
 
-                if (!NumberMappingsReverse.ContainsKey(em)) {
+                if (!MusicCommon.NumberMappingsReverse.ContainsKey(em)) {
                     await msg.ModifyAsync(
                         $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Invalid choice was made.");
                     return;
                 }
 
-                elInd = NumberMappingsReverse[em];
+                elInd = MusicCommon.NumberMappingsReverse[em];
             }
         }
         else if (elInd < 1) {
@@ -369,7 +336,7 @@ public class MusicModule : BaseCommandModule {
             return;
         }
 
-        if (!NumberMappings.ContainsKey(elInd)) {
+        if (!MusicCommon.NumberMappings.ContainsKey(elInd)) {
             await msg.ModifyAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Invalid choice was made.");
             return;
         }
