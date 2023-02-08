@@ -37,12 +37,12 @@ public sealed class GuildMusicData {
     /// <summary>
     /// Gets whether the queue for this guild is shuffled.
     /// </summary>
-    public bool isShuffled { get; private set; }
+    public bool isShuffled { get; set; }
 
     /// <summary>
     /// Gets whether a track is currently playing.
     /// </summary>
-    public bool isPlaying { get; private set; }
+    public bool isPlaying { get; set; }
 
     /// <summary>
     /// Gets the playback volume for this guild.

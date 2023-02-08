@@ -23,7 +23,7 @@ public class MusicModule : BaseCommandModule {
     private YouTubeSearchProvider YouTube { get; }
 
     public GuildMusicData GuildMusic { get; set; }
-    
+
     public MusicCommon common;
 
     public MusicModule(YouTubeSearchProvider yt) {
@@ -58,6 +58,15 @@ public class MusicModule : BaseCommandModule {
         GuildMusic.CommandChannel = ctx.Channel;
 
         await base.BeforeExecutionAsync(ctx);
+    }
+
+    [Command("reset"), Description("Reset the voice state.")]
+    public async Task ResetAsync(CommandContext ctx) {
+        await GuildMusic.DestroyPlayerAsync();
+        int rmd = GuildMusic.EmptyQueue();
+        GuildMusic.isJazz = false;
+        GuildMusic.isPlaying = false;
+        GuildMusic.isShuffled = false;
     }
 
     [Command("join"), Description("Joins the voice channel."), Priority(1)]
