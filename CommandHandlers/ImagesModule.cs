@@ -1,6 +1,7 @@
 ﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using Newtonsoft.Json.Linq;
 
 namespace EconomyBot;
 
@@ -12,30 +13,6 @@ public class ImagesModule : BaseCommandModule {
             await ctx.TriggerTypingAsync();
             var imgProvider = new RedditImageProvider();
             await sendFancyEmbed(ctx, await imgProvider.getImageFromSub("muvluv"), "Muv-Luv!");
-        }
-    }
-    
-    // disabled
-    //[Command("yaoi"), Description("Fetch a yaoi image.")]
-    public async Task yaoi(CommandContext ctx, string reddit = "no") {
-        await ctx.TriggerTypingAsync();
-        if (reddit == "reddit") {
-            var imgProvider = new RedditImageProvider();
-            var yaoi = await imgProvider.getImageFromSub("yaoi");
-            if (yaoi == "penis") {
-                await ctx.RespondAsync("The bot is currently cuddling, sorry.^^");
-                return;
-            }
-            await sendFancyEmbed(ctx, yaoi, "Cute boys!");
-        }
-        else {
-            var imgProvider = new BooruImageProvider();
-            var yaoi = await imgProvider.getRandomYaoi();
-            if (yaoi == "penis") {
-                await ctx.RespondAsync("The bot is currently cuddling, sorry.^^");
-                return;
-            }
-            await sendFancyEmbed(ctx, yaoi, "Cute boys!");
         }
     }
 
@@ -68,5 +45,22 @@ public class ImagesModule : BaseCommandModule {
         var messageBuilder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
             .WithColor(DiscordColor.Rose).WithDescription(title).WithImageUrl(url));
         await ctx.RespondAsync(messageBuilder);
+    }
+
+    [Command("a"), Description("I love you Msozod :3")]
+    public async Task img(CommandContext ctx) {
+        var client = new HttpClient();
+
+        var response = await client.GetAsync("https://en.wikipedia.org/api/rest_v1/page/random/summary");
+        var responseJson = JObject.Parse(await response.Content.ReadAsStringAsync());
+
+        var title = responseJson["title"].Value<string>();
+        var img = responseJson["originalimage"]["source"].Value<string>() ?? null;
+        var content = responseJson["extract"].Value<string>() ?? null;
+        var url = responseJson["content_urls"]["desktop"]["page"].Value<string>();
+
+        await ctx.RespondAsync(new DiscordEmbedBuilder().WithTitle(title).WithThumbnail(img).WithColor(DiscordColor.Rose).WithDescription(content).AddField("Link:", url).Build());
+
+
     }
 }

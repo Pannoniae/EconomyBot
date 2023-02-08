@@ -4,5 +4,6 @@
   &lt;Assembly Path="D:\dev\cs\EconomyBot\bin\Debug\net6.0\Newtonsoft.Json.dll" /&gt;&#xD;
   &lt;Assembly Path="C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\6.0.10\ref\net6.0\System.Collections.NonGeneric.dll" /&gt;&#xD;
   &lt;Assembly Path="C:\Users\prisz\.nuget\packages\boorusharp\3.5.5\lib\netstandard2.0\BooruSharp.dll" /&gt;&#xD;
+  &lt;Assembly Path="C:\Users\prisz\.nuget\packages\dsharpplus.slashcommands\4.3.0\lib\netstandard2.0\DSharpPlus.SlashCommands.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/Initialized/@EntryValue">True</s:Boolean></wpf:ResourceDictionary>

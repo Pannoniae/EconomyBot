@@ -12,6 +12,7 @@ using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Lavalink;
 using DSharpPlus.Net;
+using DSharpPlus.SlashCommands;
 using Emzi0767;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -55,9 +56,13 @@ static class Program {
             StringPrefixes = new[] { "." },
             Services = services
         });
+        var slashCommands = discord.UseSlashCommands(new SlashCommandsConfiguration {
+            Services = services
+        });
+        //slashCommands.RegisterCommands<ChatModuleSlash>();
+        slashCommands.RegisterCommands<MusicModuleSlash>();
+        slashCommands.RegisterCommands<ImagesModuleSlash>();
         commands.CommandErrored += errorHandler;
-        commands.RegisterCommands<EconomyModule>();
-        commands.RegisterCommands<PartyModule>();
         commands.RegisterCommands<ChatModule>();
         commands.RegisterCommands<MusicModule>();
         commands.RegisterCommands<ImagesModule>();
@@ -203,7 +208,7 @@ static class Program {
             }
             case CommandNotFoundException:
                 await sender.Client.SendMessageAsync(e.Context.Channel, new DiscordMessageBuilder().WithEmbed(
-                    new DiscordEmbedBuilder().WithColor(DiscordColor.HotPink).WithDescription("uwu")
+                    new DiscordEmbedBuilder().WithColor(DiscordColor.HotPink).WithDescription("I have no bloody idea what that command is")
                         .WithImageUrl("https://c.tenor.com/CR9Or4gKoAUAAAAC/menhera-menhera-chan.gif").Build()));
                 return;
             default:

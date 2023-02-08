@@ -1,5 +1,6 @@
 ﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using EconomyBot.CommandHandlers;
 
 namespace EconomyBot;
 
@@ -14,10 +15,7 @@ public class ChatModule : BaseCommandModule {
 
     [Command]
     public async Task test2(CommandContext ctx) {
-        var messages = await ctx.Guild.GetChannel(916804452193824809).GetMessagesAsync(1000);
-        foreach (var message in messages.Reverse()) {
-            await Console.Out.WriteLineAsync($"({message.Timestamp}) {message.Author}:{message.Content}");
-        }
+        await ChatHandler.test2(ctx.Guild);
     }
     
     [Command]
