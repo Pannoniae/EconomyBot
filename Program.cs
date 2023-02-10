@@ -122,8 +122,14 @@ static class Program {
         if (e.Author.Id == 545252588753256469 && e.Message.Content.StartsWith('.')) {
             e.Message.RespondAsync("shut up");
         }
+        
+        
+        // Makhno is annoying
+        if (e.Author.Id == 1035604993966866452 && e.Message.Content.Contains("trans")) {
+            (await e.Guild.GetMemberAsync(1035604993966866452)).TimeoutAsync(DateTimeOffset.Now.AddMinutes(20), "Stop talking about trans");
+        }
 
-        // Toxicity handler
+            // Toxicity handler
         if (!e.Message.Content.StartsWith('.')) {
             toxicity.handleMessage(client, e.Message);
         }

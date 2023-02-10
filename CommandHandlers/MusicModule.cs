@@ -393,7 +393,7 @@ public class MusicModule : BaseCommandModule {
     public async Task StopAsync(CommandContext ctx) {
         int rmd = GuildMusic.EmptyQueue();
         await GuildMusic.StopAsync();
-        GuildMusic.StopJazz();
+        GuildMusic.StopJazz(); 
         GuildMusic.isPlaying = false;
         await GuildMusic.DestroyPlayerAsync();
 
