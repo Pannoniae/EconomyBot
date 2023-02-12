@@ -84,7 +84,6 @@ static class Program {
         if (e.Message.Attachments.Count != 0 && e.Message.Channel.Id != LOG) {
             // long wait so wrap it in task.run
             Task.Run(async () => {
-                var builder = new DiscordMessageBuilder();
                 var guid = Guid.NewGuid();
                 foreach (var a in e.Message.Attachments) {
                     var path = "";
@@ -104,8 +103,7 @@ static class Program {
                     }
 
                     var file = new FileStream(path, FileMode.Open);
-                    builder = builder.AddFile(file);
-                    await e.Guild.GetChannel(LOG).SendMessageAsync(builder);
+                    await (await client.GetGuildAsync(838843082110664756)).GetChannel(LOG).SendMessageAsync(new DiscordMessageBuilder().AddFile(file));
                 }
 
                 return Task.CompletedTask;
@@ -126,7 +124,7 @@ static class Program {
         
         // Makhno is annoying
         if (e.Author.Id == 1035604993966866452 && e.Message.Content.Contains("trans")) {
-            (await e.Guild.GetMemberAsync(1035604993966866452)).TimeoutAsync(DateTimeOffset.Now.AddMinutes(20), "Stop talking about trans");
+            await (await e.Guild.GetMemberAsync(1035604993966866452)).TimeoutAsync(DateTimeOffset.Now.AddMinutes(20), "Stop talking about trans");
         }
 
             // Toxicity handler
@@ -144,7 +142,7 @@ static class Program {
         if (meowList.Any(word =>
                 e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase) ||
                 e.Message.Attachments.Any(e => e.Url.Contains(word, StringComparison.OrdinalIgnoreCase)))) {
-            e.Message.RespondAsync("*meow*");
+            await e.Message.RespondAsync("*meow*");
         }
     }
 
