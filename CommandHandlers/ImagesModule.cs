@@ -76,14 +76,26 @@ public class ImagesModule : BaseCommandModule {
         }
         catch (Exception e) {
             await ctx.RespondAsync("Failed to get XKCD.");
-            throw;
+            await Console.Out.WriteLineAsync(e.ToString());
+            return;
+        }
+        
+        var randomXKCD = new Random().Next(num);
+
+        string title;
+        string url;
+        try {
+            var randomComic = await client.GetAsync($"https://xkcd.com/{randomXKCD}/info.0.json");
+            var randomComicJson = JObject.Parse(await randomComic.Content.ReadAsStringAsync());
+            title = randomComicJson["title"].Value<string>();
+            url = randomComicJson["img"].Value<string>();
+        }
+        catch (Exception e) {
+            await ctx.RespondAsync("Failed to get XKCD.");
+            await Console.Out.WriteLineAsync(e.ToString());
+            return;
         }
 
-        var randomXKCD = new Random().Next(num);
-        var randomComic = await client.GetAsync($"https://xkcd.com/{randomXKCD}/info.0.json");
-        var randomComicJson = JObject.Parse(await randomComic.Content.ReadAsStringAsync());
-        var title = randomComicJson["title"].Value<string>();
-        var url = randomComicJson["img"].Value<string>();
 
         var embed = new DiscordEmbedBuilder().WithTitle(title).WithColor(DiscordColor.Purple).WithImageUrl(url).WithDescription($"XKCD #{num}");
         await ctx.RespondAsync(embed);
