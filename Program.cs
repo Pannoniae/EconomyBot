@@ -122,7 +122,7 @@ static class Program {
 
         // csoki musicbot
         if (e.Author.Id == 545252588753256469 && e.Message.Content.StartsWith('.')) {
-            e.Message.RespondAsync("shut up");
+            await e.Message.RespondAsync("shut up");
         }
         
         
@@ -153,13 +153,19 @@ static class Program {
     private static async Task setup(DiscordClient client, ReadyEventArgs e, LavalinkExtension lavalink,
         LavalinkConfiguration lavalinkConfig) {
         //Constants.init();
-        // dont do shit for the time being
+        // dont do shit for the time being 
         LavalinkNode = await lavalink.ConnectAsync(lavalinkConfig);
         musicService = new MusicService(new SecureRandom(), lavalink, LavalinkNode);
         imagesModule = new ImagesModule();
         toxicity = new ToxicityHandler();
         //await MusicModule.setup(client);
 
+        await Console.Out.WriteLineAsync($"Number of servers: {client.Guilds.Count}");
+        client.GuildDownloadCompleted += async (sender, args) => {
+            foreach (var guild in client.Guilds) {
+                await Console.Out.WriteLineAsync(guild.Value.Name);
+            }
+        };
 
         Console.WriteLine("Setup done!");
     }

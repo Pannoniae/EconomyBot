@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 namespace EconomyBot;
 
 public class ImagesModule : BaseCommandModule {
+    private HttpClient client = new HttpClient();
     [Command("muv"), Description("Ghost's anime thing.")]
     public async Task muvluv(CommandContext ctx, string luv) {
         if (luv == "luv") {
@@ -26,6 +27,7 @@ public class ImagesModule : BaseCommandModule {
                 await ctx.RespondAsync("The bot is currently cuddling, sorry.^^");
                 return;
             }
+
             await sendFancyEmbed(ctx, yuri, "Cute girls!");
         }
         else {
@@ -35,6 +37,7 @@ public class ImagesModule : BaseCommandModule {
                 await ctx.RespondAsync("The bot is currently cuddling, sorry.^^");
                 return;
             }
+
             await sendFancyEmbed(ctx, await imgProvider.getRandomYuri(), "Cute girls!");
         }
     }
@@ -48,8 +51,7 @@ public class ImagesModule : BaseCommandModule {
     }
 
     [Command("a"), Description("I love you Msozod :3")]
-    public async Task img(CommandContext ctx) {
-        var client = new HttpClient();
+    public async Task a(CommandContext ctx) {
 
         var response = await client.GetAsync("https://en.wikipedia.org/api/rest_v1/page/random/summary");
         var responseJson = JObject.Parse(await response.Content.ReadAsStringAsync());
@@ -59,8 +61,31 @@ public class ImagesModule : BaseCommandModule {
         var content = responseJson["extract"].Value<string>() ?? null;
         var url = responseJson["content_urls"]["desktop"]["page"].Value<string>();
 
-        await ctx.RespondAsync(new DiscordEmbedBuilder().WithTitle(title).WithThumbnail(img).WithColor(DiscordColor.Rose).WithDescription(content).AddField("Link:", url).Build());
+        await ctx.RespondAsync(new DiscordEmbedBuilder().WithTitle(title).WithThumbnail(img)
+            .WithColor(DiscordColor.Rose).WithDescription(content).AddField("Link:", url).Build());
+    }
 
+    [Command("xkcd"), Description("Gets a random XKCD.")]
+    public async Task xkcd(CommandContext ctx) {
+        
+        int num;
+        try {
+            var latestComic = await client.GetAsync("https://xkcd.com/info.0.json");
+            var latestComicJson = JObject.Parse(await latestComic.Content.ReadAsStringAsync());
+            num = latestComicJson["num"].Value<int>();
+        }
+        catch (Exception e) {
+            await ctx.RespondAsync("Failed to get XKCD.");
+            throw;
+        }
 
+        var randomXKCD = new Random().Next(num);
+        var randomComic = await client.GetAsync($"https://xkcd.com/{randomXKCD}/info.0.json");
+        var randomComicJson = JObject.Parse(await randomComic.Content.ReadAsStringAsync());
+        var title = randomComicJson["title"].Value<string>();
+        var url = randomComicJson["img"].Value<string>();
+
+        var embed = new DiscordEmbedBuilder().WithTitle(title).WithColor(DiscordColor.Purple).WithImageUrl(url).WithDescription($"XKCD #{num}");
+        await ctx.RespondAsync(embed);
     }
 }
