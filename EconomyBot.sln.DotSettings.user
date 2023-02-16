@@ -5,5 +5,7 @@
   &lt;Assembly Path="C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\6.0.10\ref\net6.0\System.Collections.NonGeneric.dll" /&gt;&#xD;
   &lt;Assembly Path="C:\Users\prisz\.nuget\packages\boorusharp\3.5.5\lib\netstandard2.0\BooruSharp.dll" /&gt;&#xD;
   &lt;Assembly Path="C:\Users\prisz\.nuget\packages\dsharpplus.slashcommands\4.3.0\lib\netstandard2.0\DSharpPlus.SlashCommands.dll" /&gt;&#xD;
+  &lt;Assembly Path="C:\Users\prisz\.nuget\packages\microsoft.extensions.dependencyinjection\5.0.1\lib\net5.0\Microsoft.Extensions.DependencyInjection.dll" /&gt;&#xD;
+  &lt;Assembly Path="C:\Users\prisz\.nuget\packages\microsoft.extensions.dependencyinjection.abstractions\5.0.0\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/Initialized/@EntryValue">True</s:Boolean></wpf:ResourceDictionary>

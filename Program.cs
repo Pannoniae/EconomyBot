@@ -25,11 +25,8 @@ static class Program {
 
     public static ulong LOG = 838920584879800343;
 
-    static void Main(string[] args) {
-        MainAsync().GetAwaiter().GetResult();
-    }
-
-    static async Task MainAsync() {
+    public static async Task Main(string[] args) {
+        
         Constants.init();
         var discord = new DiscordClient(new DiscordConfiguration {
             TokenType = TokenType.Bot,
@@ -76,6 +73,15 @@ static class Program {
         discord.GetCommandsNext().UnregisterConverter<TimeSpan>();
         discord.GetCommandsNext().RegisterConverter(new CustomTimeSpanConverter());
         await discord.ConnectAsync();
+        var timer = new PeriodicTimer(TimeSpan.FromMinutes(10));
+
+        while (await timer.WaitForNextTickAsync()) {
+
+            foreach (var file in Directory.GetParent(Directory.GetCurrentDirectory()).EnumerateFiles()) {
+                file.Delete();
+            }
+            await Console.Out.WriteLineAsync("Pruned cached images.");
+        }
         // hold console window
         await Task.Delay(-1);
     }
@@ -105,8 +111,6 @@ static class Program {
                     var file = new FileStream(path, FileMode.Open);
                     await (await client.GetGuildAsync(838843082110664756)).GetChannel(LOG).SendMessageAsync(new DiscordMessageBuilder().AddFile(file));
                 }
-
-                return Task.CompletedTask;
             });
         }
     }
