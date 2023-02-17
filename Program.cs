@@ -76,11 +76,16 @@ static class Program {
         var timer = new PeriodicTimer(TimeSpan.FromMinutes(10));
 
         while (await timer.WaitForNextTickAsync()) {
-
-            foreach (var file in Directory.GetParent(Directory.GetCurrentDirectory()).EnumerateFiles()) {
-                file.Delete();
+            try {
+                foreach (var file in Directory.GetParent(Directory.GetCurrentDirectory()).EnumerateFiles()) {
+                    file.Delete();
+                }
+                await Console.Out.WriteLineAsync("Pruned cached images.");
             }
-            await Console.Out.WriteLineAsync("Pruned cached images.");
+            catch (Exception e) { // file is in use, ignore
+                Console.WriteLine(e);
+            }
+            
         }
         // hold console window
         await Task.Delay(-1);
@@ -159,13 +164,6 @@ static class Program {
         imagesModule = new ImagesModule();
         toxicity = new ToxicityHandler();
         //await MusicModule.setup(client);
-
-        await Console.Out.WriteLineAsync($"Number of servers: {client.Guilds.Count}");
-        client.GuildDownloadCompleted += async (sender, args) => {
-            foreach (var guild in client.Guilds) {
-                await Console.Out.WriteLineAsync(guild.Value.Name);
-            }
-        };
 
         Console.WriteLine("Setup done!");
     }

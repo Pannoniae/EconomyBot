@@ -220,7 +220,7 @@ public class MusicModule : BaseCommandModule {
         //    ButtonPaginationBehavior.Ignore);
         foreach (var contentPage in content) {
             await ctx.RespondAsync(contentPage);
-        }
+        }   
         
 
         //var msgC = string.Join("\n",
