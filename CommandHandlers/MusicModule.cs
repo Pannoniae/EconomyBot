@@ -8,6 +8,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
+using DSharpPlus.Interactivity.EventHandling;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Lavalink;
 using EconomyBot.CommandHandlers;
@@ -18,7 +19,6 @@ namespace EconomyBot;
 
 [ModuleLifespan(ModuleLifespan.Singleton)]
 public class MusicModule : BaseCommandModule {
-
     private MusicService Music { get; set; }
     private YouTubeSearchProvider YouTube { get; }
 
@@ -198,7 +198,14 @@ public class MusicModule : BaseCommandModule {
             .GroupBy(x => x.index / 10)
             .Select(xg =>
                 new Page(
-                    $"{string.Join("\n", xg.Select(xa => $"`{xa.index + 1:00}` {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(xa.str.Tracks.First().Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(xa.str.Tracks.First().Author)))}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
+                    $"{string.Join("\n", xg.Select(xa => $"{MusicCommon.NumberMappings[xa.index + 1]} {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(xa.str.Tracks.First().Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(xa.str.Tracks.First().Author)))}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
+            .ToArray();
+        
+        var content = results.Select((x, i) => x)
+            .Select((s, i) => new { str = s, index = i })
+            .GroupBy(x => x.index / 10)
+            .Select(xg =>
+                $"{string.Join("\n", xg.Select(xa => $"{MusicCommon.NumberMappings[xa.index + 1]} {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(xa.str.Tracks.First().Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(xa.str.Tracks.First().Author)))}"))}\n\nPage {xg.Key + 1}/{pageCount}")
             .ToArray();
 
         var ems = new PaginationEmojis {
@@ -208,9 +215,13 @@ public class MusicModule : BaseCommandModule {
             Left = DiscordEmoji.FromUnicode("◀"),
             Right = DiscordEmoji.FromUnicode("▶")
         };
-        interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages, ems, PaginationBehaviour.Ignore,
-            PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2)).ConfigureAwait(false);
-
+        var buttons = new PaginationButtons();
+        //await interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages, buttons, TimeSpan.FromMinutes(2), PaginationBehaviour.Ignore,
+        //    ButtonPaginationBehavior.Ignore);
+        foreach (var contentPage in content) {
+            await ctx.RespondAsync(contentPage);
+        }
+        
 
         //var msgC = string.Join("\n",
         //    results.Select((x, i) => $"{NumberMappings[i + 1]} {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Tracks.First().Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Tracks.First().Author)))}"));
@@ -393,7 +404,7 @@ public class MusicModule : BaseCommandModule {
     public async Task StopAsync(CommandContext ctx) {
         int rmd = GuildMusic.EmptyQueue();
         await GuildMusic.StopAsync();
-        GuildMusic.StopJazz(); 
+        GuildMusic.StopJazz();
         GuildMusic.isPlaying = false;
         await GuildMusic.DestroyPlayerAsync();
 
@@ -626,7 +637,7 @@ public sealed class YouTubeSearchProvider {
 
         var json = "{}";
         using (var req = await Http.GetAsync(uri))
-        using (var res = await req.Content.ReadAsStreamAsync())
+        await using (var res = await req.Content.ReadAsStreamAsync())
         using (var sr = new StreamReader(res, Encoding.UTF8))
             json = await sr.ReadToEndAsync();
 
