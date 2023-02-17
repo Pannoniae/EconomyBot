@@ -371,7 +371,7 @@ public sealed class GuildMusicData {
     private async Task AddToJazz() {
         string path = "D:\\music\\fats";
         var rand = new Random();
-        var files = Directory.GetFiles(path, "*");
+        var files = Directory.GetFiles(path, "*", new EnumerationOptions { RecurseSubdirectories = true });
         var randomFile = new FileInfo(files[rand.Next(files.Length)]);
         var tracks_ = await Lavalink.ConnectedNodes.Values.First().Rest
             .GetTracksAsync(randomFile);
@@ -385,7 +385,7 @@ public sealed class GuildMusicData {
         isJazz = true;
         string path = "D:\\music\\fats";
         var rand = new Random();
-        var files = Directory.GetFiles(path, "*");
+        var files = Directory.GetFiles(path, "*", new EnumerationOptions { RecurseSubdirectories = true });
         var randomFiles = new FileInfo[6];
         for (int i = 0; i < 6; i++) {
             randomFiles[i] = new FileInfo(files[rand.Next(files.Length)]);
@@ -402,7 +402,7 @@ public sealed class GuildMusicData {
         isJazz = true;
         string path = "D:\\music\\fats";
         var rand = new Random();
-        var files = Directory.GetFiles(path, searchTerm); // max 9 lol
+        var files = Directory.GetFiles(path, searchTerm, new EnumerationOptions { RecurseSubdirectories = true }); // max 9 lol
         var randomFiles = new List<FileInfo>();
         foreach (var file in files) {
             randomFiles.Add(new FileInfo(file));

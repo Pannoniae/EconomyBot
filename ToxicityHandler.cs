@@ -10,7 +10,7 @@ public class ToxicityHandler {
     private static readonly HttpClient httpClient = new();
 
     public async void handleMessage(DiscordClient client, DiscordMessage message) {
-        if (String.IsNullOrEmpty(message.Content)) {
+        if (string.IsNullOrEmpty(message.Content)) {
             return;
         }
 
