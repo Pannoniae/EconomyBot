@@ -393,7 +393,7 @@ public sealed class GuildMusicData {
                 .GetTracksAsync(randomFiles[i]);
             foreach (var track in tracks_.Tracks) {
                 Enqueue(track);
-                await Console.Out.WriteLineAsync($"{DiscordEmoji.FromName(Lavalink.Client, ":cube:")} Enqueued {track.Title} at {track.Uri}");
+                await Console.Out.WriteLineAsync($"Enqueued {track.Title} at {track.Uri}");
             }
         }
     }
