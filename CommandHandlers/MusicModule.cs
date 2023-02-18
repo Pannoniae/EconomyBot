@@ -14,6 +14,7 @@ using DSharpPlus.Lavalink;
 using EconomyBot.CommandHandlers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SpotifyAPI.Web;
 
 namespace EconomyBot;
 
@@ -398,6 +399,36 @@ public class MusicModule : BaseCommandModule {
             await msg.ModifyAsync(
                 $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Added {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} to the playback queue.");
         }
+    }
+
+    [Command("artist"), Description("Plays tracks from an artist."), Aliases("a")]
+    public async Task ArtistAsync(CommandContext ctx, [RemainingText] string artist) {
+
+        GuildMusic.artist = artist;
+        GuildMusic.isRandom = true;
+        await GuildMusic.AddToRandom(artist);
+        var track_ = GuildMusic.Queue.First();
+
+        var vs = ctx.Member.VoiceState;
+        var chn = vs.Channel;
+        await GuildMusic.CreatePlayerAsync(chn);
+        await GuildMusic.PlayAsync();
+        await ctx.RespondAsync(
+            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Added {Formatter.Bold(Formatter.Sanitize(track_.Title))} by {Formatter.Bold(Formatter.Sanitize(track_.Author))} to the playback queue.");
+    }
+    
+    [Command("stopartist"), Description("Stops playing tracks from an artist."), Aliases("sa")]
+    public async Task StopArtistAsync(CommandContext ctx) {
+
+        GuildMusic.artist = null;
+
+        int rmd = GuildMusic.EmptyQueue();
+        await GuildMusic.StopAsync();
+        GuildMusic.isPlaying = false;
+        await GuildMusic.DestroyPlayerAsync();
+
+        await ctx.RespondAsync(
+            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Removed {rmd:#,##0} tracks from the queue.");
     }
 
     [Command("stop"), Description("Stops playback and quits the voice channel.")]

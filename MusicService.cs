@@ -90,6 +90,9 @@ public sealed class MusicService {
     /// <returns>Loaded tracks.</returns>
     public Task<LavalinkLoadResult> GetTracksAsync(Uri uri)
         => node.Rest.GetTracksAsync(uri);
+    
+    public Task<LavalinkLoadResult> GetTracksAsync(string search)
+        => node.Rest.GetTracksAsync(search);
 
     /// <summary>
     /// Shuffles the supplied track list.

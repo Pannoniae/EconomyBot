@@ -9,10 +9,12 @@ public static class Constants {
     public static string redditrefreshtoken;
     public static string redditappsecret;
     public static string apikey;
+    public static string spotifytoken;
 
     public static void init() {
         token = File.ReadAllText("token");
         apikey = File.ReadAllText("googletoken");
+        spotifytoken = File.ReadAllText("spotifytoken");
         var redditStuff = File.ReadAllText("reddittoken");
         // totally not a gross hack to do some deconstructing
         (redditappid, redditrefreshtoken, redditappsecret) =

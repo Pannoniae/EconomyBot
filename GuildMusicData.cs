@@ -1,11 +1,14 @@
 ﻿using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Net;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using DSharpPlus.Lavalink;
 using DSharpPlus.Lavalink.EventArgs;
 using Emzi0767;
 using Newtonsoft.Json;
+using SpotifyAPI.Web;
 
 namespace EconomyBot;
 // This file is a part of Music Turret project.
@@ -29,6 +32,12 @@ namespace EconomyBot;
 /// Represents data for the music playback in a discord guild.
 /// </summary>
 public sealed class GuildMusicData {
+    
+    /// <summary>
+    /// Current artist to play.
+    /// </summary>
+    public string artist;
+
     /// <summary>
     /// Gets the guild ID for this dataset.
     /// </summary>
@@ -63,6 +72,11 @@ public sealed class GuildMusicData {
     /// Is random jazz on?
     /// </summary>
     public bool isJazz { get; set; }
+    
+    /// <summary>
+    /// Is random on?
+    /// </summary>
+    public bool isRandom { get; set; }
 
     /// <summary>
     /// Gets the channel in which the music is played.
@@ -351,6 +365,10 @@ public sealed class GuildMusicData {
             await AddToJazz();
         }
 
+        else if (isRandom) {
+            await AddToRandom(artist);
+        }
+
         await PlayHandlerAsync();
     }
 
@@ -366,6 +384,45 @@ public sealed class GuildMusicData {
         NowPlaying = item;
         isPlaying = true;
         await Player.PlayAsync(item);
+    }
+    
+    public async Task AddToRandom(string artist) {
+        var spotify = new SpotifyClient(Constants.spotifytoken);
+
+        var results = (await spotify.Search.Item(new SearchRequest(SearchRequest.Types.Artist, $"artist:\"{artist}\"") {
+            Limit = 2
+        })).Artists.Items;
+        FullArtist result;
+        if (results.Any()) {
+            result = results[0];
+        }
+        else {
+            return;
+        }
+
+        var tracksList = (await spotify.Search.Item(new SearchRequest(SearchRequest.Types.Track, $"artist:\"{result.Name}\"") {
+            Limit = 1,
+            Offset = new Random().Next(1000)
+        })).Tracks;
+        FullTrack track;
+        if (tracksList.Items.Any()) {
+            track = tracksList.Items[0];
+        }
+        else {
+            var secondRequest = (await spotify.Search.Item(new SearchRequest(SearchRequest.Types.Track, $"artist:\"{result.Name}\"") {
+                Limit = 1,
+                Offset = new Random().Next(tracksList.Total.Value)
+            })).Tracks;
+            track = secondRequest.Items[0];
+        }
+
+        var trackLoad = await Node.Rest.GetTracksAsync(result.Name + " " + track.Name);
+        var tracks = trackLoad.Tracks;
+        if (trackLoad.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks.Any()) {
+            await Console.Out.WriteLineAsync("Error loading random track");
+        }
+        
+        Enqueue(tracks.First());
     }
 
     private async Task AddToJazz() {
@@ -424,6 +481,10 @@ public sealed class GuildMusicData {
 
     public void StopJazz() {
         isJazz = false;
+    }
+
+    public void StopRandom() {
+        isRandom = false;
     }
 }
 

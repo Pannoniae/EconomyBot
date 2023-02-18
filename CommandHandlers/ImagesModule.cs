@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 namespace EconomyBot;
 
 public class ImagesModule : BaseCommandModule {
-    private HttpClient client = new HttpClient();
+    private readonly HttpClient client = new();
     [Command("muv"), Description("Ghost's anime thing.")]
     public async Task muvluv(CommandContext ctx, string luv) {
         if (luv == "luv") {
@@ -50,8 +50,8 @@ public class ImagesModule : BaseCommandModule {
         await ctx.RespondAsync(messageBuilder);
     }
 
-    [Command("a"), Description("I love you Msozod :3")]
-    public async Task a(CommandContext ctx) {
+    [Command("b"), Description("I love you Msozod :3")]
+    public async Task b(CommandContext ctx) {
 
         var response = await client.GetAsync("https://en.wikipedia.org/api/rest_v1/page/random/summary");
         var responseJson = JObject.Parse(await response.Content.ReadAsStringAsync());
@@ -97,7 +97,7 @@ public class ImagesModule : BaseCommandModule {
         }
 
 
-        var embed = new DiscordEmbedBuilder().WithTitle(title).WithColor(DiscordColor.Purple).WithImageUrl(url).WithDescription($"XKCD #{num}");
+        var embed = new DiscordEmbedBuilder().WithTitle(title).WithColor(DiscordColor.Purple).WithImageUrl(url).WithDescription($"XKCD #{randomXKCD}");
         await ctx.RespondAsync(embed);
     }
 }

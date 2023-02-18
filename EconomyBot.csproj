@@ -18,6 +18,7 @@
       <PackageReference Include="DSharpPlus.VoiceNext" Version="4.3.0" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
       <PackageReference Include="Reddit" Version="1.5.2" />
+      <PackageReference Include="SpotifyAPI.Web" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -29,6 +30,9 @@
       </None>
       <None Update="googletoken">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="spotifytoken">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
 
