@@ -387,7 +387,10 @@ public sealed class GuildMusicData {
     }
     
     public async Task AddToRandom(string artist) {
-        var spotify = new SpotifyClient(Constants.spotifytoken);
+        var config = SpotifyClientConfig
+            .CreateDefault()
+            .WithAuthenticator(new ClientCredentialsAuthenticator(Constants.spotifytoken, Constants.spotifytoken2));
+        var spotify = new SpotifyClient(config);
 
         var results = (await spotify.Search.Item(new SearchRequest(SearchRequest.Types.Artist, $"artist:\"{artist}\"") {
             Limit = 2

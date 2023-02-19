@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Net;
 using System.Text;
 using DSharpPlus;
@@ -14,7 +13,6 @@ using DSharpPlus.Lavalink;
 using EconomyBot.CommandHandlers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SpotifyAPI.Web;
 
 namespace EconomyBot;
 
@@ -571,11 +569,11 @@ public class MusicModule : BaseCommandModule {
         var pageCount = GuildMusic.Queue.Count / 10 + 1;
         if (GuildMusic.Queue.Count % 10 == 0) pageCount--;
         var pages = GuildMusic.Queue.Select(x => x.ToTrackString())
-            .Select((s, i) => new { str = s, index = i })
-            .GroupBy(x => x.index / 10)
+            .Select((s, i) => (s, i))
+            .GroupBy(x => x.i / 10)
             .Select(xg =>
                 new Page(
-                    $"Now playing: {GuildMusic.NowPlaying.ToTrackString()}\n\n{string.Join("\n", xg.Select(xa => $"`{xa.index + 1:00}` {xa.str}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
+                    $"Now playing: {GuildMusic.NowPlaying.ToTrackString()}\n\n{string.Join("\n", xg.Select(xa => $"`{xa.i + 1:00}` {xa.s}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
             .ToArray();
 
         var trk = GuildMusic.NowPlaying;

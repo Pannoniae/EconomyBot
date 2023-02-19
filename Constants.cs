@@ -1,4 +1,6 @@
-﻿namespace EconomyBot;
+﻿using SpotifyAPI.Web;
+
+namespace EconomyBot;
 
 public static class Constants {
     public static ulong szerepjatek = 886722112310632499;
@@ -10,11 +12,16 @@ public static class Constants {
     public static string redditappsecret;
     public static string apikey;
     public static string spotifytoken;
+    public static string spotifytoken2;
 
     public static void init() {
         token = File.ReadAllText("token");
         apikey = File.ReadAllText("googletoken");
-        spotifytoken = File.ReadAllText("spotifytoken");
+        var spotifytokenstuff = File.ReadAllText("spotifytoken");
+        (spotifytoken, spotifytoken2) =
+            spotifytokenstuff.Split('\n') switch { var a => (a[0], a[1]) };
+        spotifytoken = spotifytoken.Trim();
+        spotifytoken2 = spotifytoken2.Trim();
         var redditStuff = File.ReadAllText("reddittoken");
         // totally not a gross hack to do some deconstructing
         (redditappid, redditrefreshtoken, redditappsecret) =
@@ -22,5 +29,9 @@ public static class Constants {
         redditappid = redditappid.Trim();
         redditrefreshtoken = redditrefreshtoken.Trim();
         redditappsecret = redditappsecret.Trim();
+    }
+
+    public static IToken getSpotifyToken() {
+        throw new NotImplementedException();
     }
 }
