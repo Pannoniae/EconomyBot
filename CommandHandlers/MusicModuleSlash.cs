@@ -67,7 +67,8 @@ public class MusicModuleSlash : ApplicationCommandModule {
     [SlashCommand("jazz", "Plays some jazz. :3")]
     public async Task PlayJazzAsync(InteractionContext ctx) {
         // yeet the bot in
-        await GuildMusic.StartJazz();
+        GuildMusic.addToQueue("_fats");
+        await GuildMusic.seedQueue();
         var vs = ctx.Member.VoiceState;
         var chn = vs.Channel;
         await GuildMusic.CreatePlayerAsync(chn);
@@ -77,7 +78,7 @@ public class MusicModuleSlash : ApplicationCommandModule {
 
     [SlashCommand("stopjazz", "Stops jazz.")]
     public async Task StopJazzAsync(InteractionContext ctx) {
-        GuildMusic.StopJazz();
+        GuildMusic.clearQueue();
         int rmd = GuildMusic.EmptyQueue();
         await GuildMusic.StopAsync();
         await ctx.CreateResponseAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Stopped jazz.");

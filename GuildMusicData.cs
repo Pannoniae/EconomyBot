@@ -1,13 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Net;
-using DSharpPlus;
-using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using DSharpPlus.Lavalink;
 using DSharpPlus.Lavalink.EventArgs;
 using Emzi0767;
-using Newtonsoft.Json;
 using SpotifyAPI.Web;
 
 namespace EconomyBot;
@@ -32,7 +28,6 @@ namespace EconomyBot;
 /// Represents data for the music playback in a discord guild.
 /// </summary>
 public sealed class GuildMusicData {
-    
     /// <summary>
     /// Current artist to play.
     /// </summary>
@@ -69,14 +64,9 @@ public sealed class GuildMusicData {
     public LavalinkTrack NowPlaying { get; private set; }
 
     /// <summary>
-    /// Is random jazz on?
+    /// The things being played right now. "_fats" is special-cased to the great collection.
     /// </summary>
-    public bool isJazz { get; set; }
-    
-    /// <summary>
-    /// Is random on?
-    /// </summary>
-    public bool isRandom { get; set; }
+    public List<string> artistQueue { get; }
 
     /// <summary>
     /// Gets the channel in which the music is played.
@@ -95,7 +85,7 @@ public sealed class GuildMusicData {
     private SecureRandom RNG { get; }
     public LavalinkExtension Lavalink { get; }
     public LavalinkGuildConnection Player { get; set; }
-    
+
     public LavalinkNodeConnection Node { get; set; }
 
     /// <summary>
@@ -105,7 +95,8 @@ public sealed class GuildMusicData {
     /// <param name="rng">Cryptographically-secure random number generator implementation.</param> 
     /// <param name="lavalink">Lavalink service.</param>
     /// <param name="redis">Redis service.</param>
-    public GuildMusicData(DiscordGuild guild, SecureRandom rng, LavalinkExtension lavalink, LavalinkNodeConnection node) {
+    public GuildMusicData(DiscordGuild guild, SecureRandom rng, LavalinkExtension lavalink,
+        LavalinkNodeConnection node) {
         Node = node;
         Guild = guild;
         RNG = rng;
@@ -114,6 +105,7 @@ public sealed class GuildMusicData {
         QueueInternalLock = new SemaphoreSlim(1, 1);
         QueueInternal = new List<LavalinkTrack>();
         Queue = new ReadOnlyCollection<LavalinkTrack>(QueueInternal);
+        artistQueue = new List<string>();
     }
 
     /// <summary>
@@ -361,13 +353,7 @@ public sealed class GuildMusicData {
     private async Task Player_PlaybackFinished(LavalinkGuildConnection con, TrackFinishEventArgs e) {
         await Task.Delay(500);
         isPlaying = false;
-        if (isJazz) {
-            await AddToJazz();
-        }
-
-        else if (isRandom) {
-            await AddToRandom(artist);
-        }
+        growQueue();
 
         await PlayHandlerAsync();
     }
@@ -385,7 +371,7 @@ public sealed class GuildMusicData {
         isPlaying = true;
         await Player.PlayAsync(item);
     }
-    
+
     public async Task AddToRandom(string artist) {
         var config = SpotifyClientConfig
             .CreateDefault()
@@ -403,19 +389,21 @@ public sealed class GuildMusicData {
             return;
         }
 
-        var tracksList = (await spotify.Search.Item(new SearchRequest(SearchRequest.Types.Track, $"artist:\"{result.Name}\"") {
-            Limit = 1,
-            Offset = new Random().Next(1000)
-        })).Tracks;
+        var tracksList = (await spotify.Search.Item(
+            new SearchRequest(SearchRequest.Types.Track, $"artist:\"{result.Name}\"") {
+                Limit = 1,
+                Offset = new Random().Next(1000)
+            })).Tracks;
         FullTrack track;
         if (tracksList.Items.Any()) {
             track = tracksList.Items[0];
         }
         else {
-            var secondRequest = (await spotify.Search.Item(new SearchRequest(SearchRequest.Types.Track, $"artist:\"{result.Name}\"") {
-                Limit = 1,
-                Offset = new Random().Next(tracksList.Total.Value)
-            })).Tracks;
+            var secondRequest = (await spotify.Search.Item(
+                new SearchRequest(SearchRequest.Types.Track, $"artist:\"{result.Name}\"") {
+                    Limit = 1,
+                    Offset = new Random().Next(tracksList.Total.Value)
+                })).Tracks;
             track = secondRequest.Items[0];
         }
 
@@ -424,11 +412,11 @@ public sealed class GuildMusicData {
         if (trackLoad.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks.Any()) {
             await Console.Out.WriteLineAsync("Error loading random track");
         }
-        
+
         Enqueue(tracks.First());
     }
 
-    private async Task AddToJazz() {
+    private async Task addToJazz() {
         string path = "D:\\music\\fats";
         var rand = new Random();
         var files = Directory.GetFiles(path, "*", new EnumerationOptions { RecurseSubdirectories = true });
@@ -441,28 +429,41 @@ public sealed class GuildMusicData {
         }
     }
 
-    public async Task StartJazz() {
-        isJazz = true;
-        string path = "D:\\music\\fats";
-        var rand = new Random();
-        var files = Directory.GetFiles(path, "*", new EnumerationOptions { RecurseSubdirectories = true });
-        var randomFiles = new FileInfo[6];
-        for (int i = 0; i < 6; i++) {
-            randomFiles[i] = new FileInfo(files[rand.Next(files.Length)]);
-            var tracks_ = await Lavalink.ConnectedNodes.Values.First().Rest
-                .GetTracksAsync(randomFiles[i]);
-            foreach (var track in tracks_.Tracks) {
-                Enqueue(track);
-                await Console.Out.WriteLineAsync($"Enqueued {track.Title} at {track.Uri}");
+    public void addToQueue(string music) {
+        artistQueue.Add(music);
+    }
+
+    public void clearQueue() {
+        artistQueue.Clear();
+    }
+
+    private async Task growQueue() {
+        var randomCount = artistQueue.Count;
+        var randomNumber = new Random().Next(randomCount);
+        var randomThing = artistQueue[randomNumber];
+
+        if (randomThing == "_fats") {
+            await addToJazz();
+        }
+        else {
+            await AddToRandom(randomThing);
+        }
+    }
+
+    public async Task seedQueue() {
+        // don't overqueue
+        for (var i = 0; i < 6; i++) {
+            while (Queue.Count < 6) {
+                await growQueue();
             }
         }
     }
-    
+
     public async Task<List<LavalinkLoadResult>> StartJazz(string searchTerm) {
-        isJazz = true;
         string path = "D:\\music\\fats";
         var rand = new Random();
-        var files = Directory.GetFiles(path, searchTerm, new EnumerationOptions { RecurseSubdirectories = true }); // max 9 lol
+        var files = Directory.GetFiles(path, searchTerm,
+            new EnumerationOptions { RecurseSubdirectories = true }); // max 9 lol
         var randomFiles = new List<FileInfo>();
         foreach (var file in files) {
             randomFiles.Add(new FileInfo(file));
@@ -472,7 +473,6 @@ public sealed class GuildMusicData {
         foreach (var file in randomFiles) {
             tracks.Add(Node.Rest
                 .GetTracksAsync(file).Result);
-
         }
 
         return tracks;
@@ -480,14 +480,6 @@ public sealed class GuildMusicData {
         //    Enqueue(track);
         //    await Console.Out.WriteLineAsync($"Enqueued {track.Title} at {track.Uri}");
         //}
-    }
-
-    public void StopJazz() {
-        isJazz = false;
-    }
-
-    public void StopRandom() {
-        isRandom = false;
     }
 }
 

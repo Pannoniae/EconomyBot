@@ -63,7 +63,7 @@ public class MusicModule : BaseCommandModule {
     public async Task ResetAsync(CommandContext ctx) {
         await GuildMusic.DestroyPlayerAsync();
         int rmd = GuildMusic.EmptyQueue();
-        GuildMusic.isJazz = false;
+        GuildMusic.clearQueue();
         GuildMusic.isPlaying = false;
         GuildMusic.isShuffled = false;
     }
@@ -89,7 +89,8 @@ public class MusicModule : BaseCommandModule {
     [Command("jazz"), Description("Plays some jazz. :3"), Aliases("j"), Priority(1)]
     public async Task PlayJazzAsync(CommandContext ctx) {
         // yeet the bot in
-        await GuildMusic.StartJazz();
+        GuildMusic.addToQueue("_fats");
+        GuildMusic.seedQueue();
         var vs = ctx.Member.VoiceState;
         var chn = vs.Channel;
         await GuildMusic.CreatePlayerAsync(chn);
@@ -99,7 +100,7 @@ public class MusicModule : BaseCommandModule {
 
     [Command("stopjazz"), Description("Stops jazz.")]
     public async Task StopJazzAsync(CommandContext ctx) {
-        GuildMusic.StopJazz();
+        GuildMusic.clearQueue();
         int rmd = GuildMusic.EmptyQueue();
         await GuildMusic.StopAsync();
         await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Stopped jazz.");
@@ -403,22 +404,22 @@ public class MusicModule : BaseCommandModule {
     public async Task ArtistAsync(CommandContext ctx, [RemainingText] string artist) {
 
         GuildMusic.artist = artist;
-        GuildMusic.isRandom = true;
-        await GuildMusic.AddToRandom(artist);
+        GuildMusic.addToQueue(artist);
+        await GuildMusic.seedQueue();
         var track_ = GuildMusic.Queue.First();
 
         var vs = ctx.Member.VoiceState;
         var chn = vs.Channel;
         await GuildMusic.CreatePlayerAsync(chn);
         await GuildMusic.PlayAsync();
-        await ctx.RespondAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Added {Formatter.Bold(Formatter.Sanitize(track_.Title))} by {Formatter.Bold(Formatter.Sanitize(track_.Author))} to the playback queue.");
+        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Started playing {artist}.");
     }
     
     [Command("stopartist"), Description("Stops playing tracks from an artist."), Aliases("sa")]
     public async Task StopArtistAsync(CommandContext ctx) {
 
         GuildMusic.artist = null;
+        GuildMusic.clearQueue();
 
         int rmd = GuildMusic.EmptyQueue();
         await GuildMusic.StopAsync();
@@ -433,7 +434,7 @@ public class MusicModule : BaseCommandModule {
     public async Task StopAsync(CommandContext ctx) {
         int rmd = GuildMusic.EmptyQueue();
         await GuildMusic.StopAsync();
-        GuildMusic.StopJazz();
+        GuildMusic.clearQueue();
         GuildMusic.isPlaying = false;
         await GuildMusic.DestroyPlayerAsync();
 
@@ -444,6 +445,7 @@ public class MusicModule : BaseCommandModule {
     [Command("clear"), Description("Clears the queue.")]
     public async Task ClearAsync(CommandContext ctx) {
         int rmd = GuildMusic.EmptyQueue();
+        GuildMusic.clearQueue();
 
         await ctx.RespondAsync(
             $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Removed {rmd:#,##0} tracks from the queue uwu");

@@ -24,6 +24,7 @@ static class Program {
     public static DiscordClient client;
 
     public static ulong LOG = 838920584879800343;
+    public static ulong HALLOFFAME = 1078991955633127474;
 
     public static async Task Main(string[] args) {
         
@@ -70,6 +71,7 @@ static class Program {
         discord.MessageCreated += messageHandler;
         discord.Ready += (sender, args) => setup(sender, args, lavalink, lavalinkConfig);
         discord.MessageDeleted += messageDeleteHandler;
+        discord.MessageReactionAdded += reactionHandler;
         discord.GetCommandsNext().UnregisterConverter<TimeSpan>();
         discord.GetCommandsNext().RegisterConverter(new CustomTimeSpanConverter());
         await discord.ConnectAsync();
@@ -118,6 +120,10 @@ static class Program {
                 }
             });
         }
+    }
+
+    private static async Task reactionHandler(DiscordClient sender, MessageReactionAddEventArgs e) {
+        
     }
 
     private static async Task messageHandler(DiscordClient client, MessageCreateEventArgs e) {
