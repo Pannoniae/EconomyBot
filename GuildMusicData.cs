@@ -499,14 +499,14 @@ public sealed class GuildMusicData {
         Console.Out.WriteLine("Enabled EQ");
         Player.AdjustEqualizerAsync(new[] {
             // -0.25 is -100%, +0.25 is +100%
-            new LavalinkBandAdjustment(0, 0.15f), //25 Hz
-            new LavalinkBandAdjustment(1, 0.13f), //40 Hz
-            new LavalinkBandAdjustment(2, 0.12f), //63 Hz
-            new LavalinkBandAdjustment(3, 0.10f), //100 Hz
-            new LavalinkBandAdjustment(4, 0.08f), //160 Hz
-            new LavalinkBandAdjustment(5, 0.05f), //250 Hz
-            new LavalinkBandAdjustment(6, 0.03f), //400 Hz
-            new LavalinkBandAdjustment(7, 0.02f), //630 Hz
+            new LavalinkBandAdjustment(0, 0.2f), //25 Hz
+            new LavalinkBandAdjustment(1, 0.2f), //40 Hz
+            new LavalinkBandAdjustment(2, 0.2f), //63 Hz
+            new LavalinkBandAdjustment(3, 0.2f), //100 Hz
+            new LavalinkBandAdjustment(4, 0.15f), //160 Hz
+            new LavalinkBandAdjustment(5, 0.12f), //250 Hz
+            new LavalinkBandAdjustment(6, 0.10f), //400 Hz
+            new LavalinkBandAdjustment(7, 0.05f), //630 Hz
             new LavalinkBandAdjustment(8, 0.00f), //1k Hz
             new LavalinkBandAdjustment(9, 0.00f), //1.6k Hz
             new LavalinkBandAdjustment(10, -0.02f), //2.5k Hz

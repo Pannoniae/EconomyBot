@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net;
+using System.Text;
 using System.Web;
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -64,6 +65,44 @@ public class ToxicityHandler {
         await Console.Out.WriteLineAsync(
             $"T:{toxicityScore}, ST:{severeToxicityScore}, A:{attackScore}, I:{insultScore}, P:{profanityScore}, TH:{threatScore}, S:{sexualScore}, F:{flirtingScore}");
 
+        const string API_URL =
+            "https://api-inference.huggingface.co/models/j-hartmann/emotion-english-distilroberta-base";
+
+        var h_json = $$"""
+        {
+            "inputs": "{{HttpUtility.JavaScriptStringEncode(message.Content)}}",
+        }
+        """;
+        var httpRequestMessage = new HttpRequestMessage {
+            Method = HttpMethod.Post,
+            RequestUri = new Uri(API_URL),
+            Headers = {
+                { HttpRequestHeader.Authorization.ToString(), $"Bearer {Constants.apikey_huggingface}" },
+                { HttpRequestHeader.Accept.ToString(), "application/json" },
+                { "X-Version", "1" }
+            },
+            Content = new StringContent(h_json, Encoding.UTF8, "application/json")
+        };
+        var h_response = await httpClient.SendAsync(httpRequestMessage);
+        var h_responseString = await h_response.Content.ReadAsStringAsync();
+        var h_responseJson = JArray.Parse(h_responseString);
+
+        var labels = new Dictionary<string, double>();
+
+        try {
+            attributes = h_responseJson.First;
+            foreach (var element in attributes) {
+                labels[element["label"].Value<string>()] = element["score"].Value<double>();
+            }
+        }
+        catch {
+            await Console.Out.WriteLineAsync(h_responseString);
+            return;
+        }
+
+        await Console.Out.WriteLineAsync(
+            $"J:{labels["joy"]}, N:{labels["neutral"]}, S:{labels["surprise"]}, SA:{labels["sadness"]}, A:{labels["anger"]}, D:{labels["disgust"]}, F:{labels["fear"]}");
+
         var toxic = false;
         var attack = false;
         var threat = false;
@@ -105,6 +144,10 @@ public class ToxicityHandler {
 
         if (flirtingScore > 0.7) {
             await message.RespondAsync($"cute! {DiscordEmoji.FromName(client, ":blue_heart:")}");
+        }
+
+        if (labels["sadness"] > 0.7 || labels["fear"] > 0.8) {
+            await message.RespondAsync("*hugs*");
         }
     }
 }

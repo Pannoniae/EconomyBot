@@ -11,12 +11,14 @@ public static class Constants {
     public static string redditrefreshtoken;
     public static string redditappsecret;
     public static string apikey;
+    public static string apikey_huggingface;
     public static string spotifytoken;
     public static string spotifytoken2;
 
     public static void init() {
         token = File.ReadAllText("token");
-        apikey = File.ReadAllText("googletoken");
+        var apikeystuff = File.ReadAllText("googletoken");
+        (apikey, apikey_huggingface) = apikeystuff.Split('\n') switch { var a => (a[0], a[1]) };
         var spotifytokenstuff = File.ReadAllText("spotifytoken");
         (spotifytoken, spotifytoken2) =
             spotifytokenstuff.Split('\n') switch { var a => (a[0], a[1]) };
