@@ -33,6 +33,12 @@ public sealed class GuildMusicData {
     /// </summary>
     public string artist;
 
+
+    /// <summary>
+    /// Is EQ enabled?
+    /// </summary>
+    private bool eq;
+
     /// <summary>
     /// Gets the guild ID for this dataset.
     /// </summary>
@@ -320,8 +326,14 @@ public sealed class GuildMusicData {
         var node = Node;
         Player = await node.ConnectAsync(channel);
 
-        if (volume != 100)
+        if (volume != 100) {
             await Player.SetVolumeAsync(volume);
+        }
+
+        if (!eq) {
+            enableEQ();
+        }
+
         Player.PlaybackFinished += Player_PlaybackFinished;
     }
 
@@ -480,6 +492,35 @@ public sealed class GuildMusicData {
         //    Enqueue(track);
         //    await Console.Out.WriteLineAsync($"Enqueued {track.Title} at {track.Uri}");
         //}
+    }
+
+    public void enableEQ() {
+        eq = true;
+        Console.Out.WriteLine("Enabled EQ");
+        Player.AdjustEqualizerAsync(new[] {
+            // -0.25 is -100%, +0.25 is +100%
+            new LavalinkBandAdjustment(0, 0.15f), //25 Hz
+            new LavalinkBandAdjustment(1, 0.13f), //40 Hz
+            new LavalinkBandAdjustment(2, 0.12f), //63 Hz
+            new LavalinkBandAdjustment(3, 0.10f), //100 Hz
+            new LavalinkBandAdjustment(4, 0.08f), //160 Hz
+            new LavalinkBandAdjustment(5, 0.05f), //250 Hz
+            new LavalinkBandAdjustment(6, 0.03f), //400 Hz
+            new LavalinkBandAdjustment(7, 0.02f), //630 Hz
+            new LavalinkBandAdjustment(8, 0.00f), //1k Hz
+            new LavalinkBandAdjustment(9, 0.00f), //1.6k Hz
+            new LavalinkBandAdjustment(10, -0.02f), //2.5k Hz
+            new LavalinkBandAdjustment(11, -0.02f), //4k Hz
+            new LavalinkBandAdjustment(12, -0.03f), //6.3k Hz
+            new LavalinkBandAdjustment(13, -0.04f), //10k Hz
+            new LavalinkBandAdjustment(14, -0.05f) //16k Hz
+        });
+    }
+
+    public void disableEQ() {
+        eq = false;
+        Console.Out.WriteLine("Disabled EQ");
+        Player.ResetEqualizerAsync();
     }
 }
 

@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Net;
+using System.Runtime.Serialization;
 using System.Text;
-using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
@@ -13,6 +13,7 @@ using DSharpPlus.Lavalink;
 using EconomyBot.CommandHandlers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Formatter = DSharpPlus.Formatter;
 
 namespace EconomyBot;
 
@@ -43,20 +44,32 @@ public class MusicModule : BaseCommandModule {
         if (chn == null) {
             await ctx.RespondAsync(
                 $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} You need to be in a voice channel.");
-            throw new Exception();
+            throw new IdiotException("user error");
         }
 
         var mbr = ctx.Guild.CurrentMember?.VoiceState?.Channel;
         if (mbr != null && chn != mbr) {
             await ctx.RespondAsync(
                 $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} You need to be in the same voice channel.");
-            throw new Exception();
+            throw new IdiotException("user error");
         }
 
         GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild);
         GuildMusic.CommandChannel = ctx.Channel;
 
         await base.BeforeExecutionAsync(ctx);
+    }
+
+    [Command("eq"), Description("Enable EQ.")]
+    public async Task eq(CommandContext ctx) {
+        GuildMusic.enableEQ();
+        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Enabled EQ.");
+    }
+    
+    [Command("deq"), Description("Disable EQ.")]
+    public async Task deq(CommandContext ctx) {
+        GuildMusic.disableEQ();
+        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Disabled EQ.");
     }
 
     [Command("reset"), Description("Reset the voice state.")]
@@ -200,7 +213,7 @@ public class MusicModule : BaseCommandModule {
                 new Page(
                     $"{string.Join("\n", xg.Select(xa => $"{MusicCommon.NumberMappings[xa.index + 1]} {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(xa.str.Tracks.First().Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(xa.str.Tracks.First().Author)))}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
             .ToArray();
-        
+
         var content = results.Select((x, i) => x)
             .Select((s, i) => new { str = s, index = i })
             .GroupBy(x => x.index / 10)
@@ -220,8 +233,8 @@ public class MusicModule : BaseCommandModule {
         //    ButtonPaginationBehavior.Ignore);
         foreach (var contentPage in content) {
             await ctx.RespondAsync(contentPage);
-        }   
-        
+        }
+
 
         //var msgC = string.Join("\n",
         //    results.Select((x, i) => $"{NumberMappings[i + 1]} {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Tracks.First().Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Tracks.First().Author)))}"));
@@ -402,7 +415,6 @@ public class MusicModule : BaseCommandModule {
 
     [Command("artist"), Description("Plays tracks from an artist."), Aliases("a")]
     public async Task ArtistAsync(CommandContext ctx, [RemainingText] string artist) {
-
         GuildMusic.artist = artist;
         GuildMusic.addToQueue(artist);
         await GuildMusic.seedQueue();
@@ -414,10 +426,9 @@ public class MusicModule : BaseCommandModule {
         await GuildMusic.PlayAsync();
         await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Started playing {artist}.");
     }
-    
+
     [Command("stopartist"), Description("Stops playing tracks from an artist."), Aliases("sa")]
     public async Task StopArtistAsync(CommandContext ctx) {
-
         GuildMusic.artist = null;
         GuildMusic.clearQueue();
 
@@ -615,6 +626,19 @@ public class MusicModule : BaseCommandModule {
     public async Task PlayerInfoAsync(CommandContext ctx) {
         await ctx.RespondAsync(
             $"Queue length: {GuildMusic.Queue.Count}\nIs shuffled? {(GuildMusic.isShuffled ? "Yes" : "No")}\nVolume: {GuildMusic.volume}%");
+    }
+}
+
+[Serializable]
+// when the user is an idiot
+public class IdiotException : Exception {
+    public IdiotException() {
+    }
+
+    public IdiotException(string message) : base(message) {
+    }
+
+    protected IdiotException(SerializationInfo info, StreamingContext ctx) {
     }
 }
 

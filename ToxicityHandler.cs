@@ -2,6 +2,7 @@
 using System.Web;
 using DSharpPlus;
 using DSharpPlus.Entities;
+using DSharpPlus.Lavalink;
 using Newtonsoft.Json.Linq;
 
 namespace EconomyBot;
@@ -84,26 +85,26 @@ public class ToxicityHandler {
 
         // if it is hostile, don't process flirting
         if (threat) {
-            message.RespondAsync("This user glows");
+            await message.RespondAsync("This user glows");
             return;
         }
 
         if (attack) {
-            message.RespondAsync("Fuck you too!");
+            await message.RespondAsync("Fuck you too!");
             return;
         }
 
         if (toxic) {
-            message.RespondAsync("shut up");
+            await message.RespondAsync("shut up");
             return;
         }
 
         if (sexualScore > 0.7) {
-            message.RespondAsync(DiscordEmoji.FromName(client, ":flushed:"));
+            await message.RespondAsync(DiscordEmoji.FromName(client, ":flushed:"));
         }
 
         if (flirtingScore > 0.7) {
-            message.RespondAsync($"cute! {DiscordEmoji.FromName(client, ":blue_heart:")}");
+            await message.RespondAsync($"cute! {DiscordEmoji.FromName(client, ":blue_heart:")}");
         }
     }
 }
