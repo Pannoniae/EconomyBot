@@ -138,13 +138,14 @@ static class Program {
         
         
         // Makhno is annoying
-        if (e.Author.Id == 1035604993966866452 && e.Message.Content.Contains("trans")) {
-            await (await e.Guild.GetMemberAsync(1035604993966866452)).TimeoutAsync(DateTimeOffset.Now.AddMinutes(20), "Stop talking about trans");
-        }
+        //if (e.Author.Id == 1035604993966866452 && e.Message.Content.Contains("trans")) {
+        //    await (await e.Guild.GetMemberAsync(1035604993966866452)).TimeoutAsync(DateTimeOffset.Now.AddMinutes(20), "Stop talking about trans");
+        //}
 
+        //await Console.Out.WriteLineAsync(e.Message.Content);
             // Toxicity handler
-        if (!e.Message.Content.StartsWith('.')) {
-            toxicity.handleMessage(client, e.Message);
+        if (!e.Message.Content.StartsWith('.') && !e.Message.Content.StartsWith('/')) {
+            await toxicity.handleMessage(client, e.Message);
         }
 
         if (e.Author.Id == 947229156448538634) {
