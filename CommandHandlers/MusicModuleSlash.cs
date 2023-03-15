@@ -39,14 +39,14 @@ public class MusicModuleSlash : ApplicationCommandModule {
         if (chn == null) {
             await ctx.CreateResponseAsync(
                 $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} You need to be in a voice channel.");
-            throw new Exception();
+            throw new IdiotException("user error");
         }
 
         var mbr = ctx.Guild.CurrentMember?.VoiceState?.Channel;
         if (mbr != null && chn != mbr) {
             await ctx.CreateResponseAsync(
                 $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} You need to be in the same voice channel.");
-            throw new Exception();
+            throw new IdiotException("user error");
         }
 
         GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild);
@@ -135,18 +135,15 @@ public class MusicModuleSlash : ApplicationCommandModule {
             return;
         }
 
-        if (results.Count == 1) {
+        if (results.Count() == 1) {
             // only one result
-            var el_ = results[0];
+            var el_ = results.First();
             var tracks_ = el_.Tracks;
             if (el_.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks_.Any()) {
                 await ctx.CreateResponseAsync(
                     $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} No tracks were found at specified link.");
                 return;
             }
-
-            if (GuildMusic.isShuffled)
-                tracks_ = Music.Shuffle(tracks_);
             var trackCount_ = tracks_.Count();
             foreach (var track in tracks_)
                 GuildMusic.Enqueue(track);
@@ -169,8 +166,8 @@ public class MusicModuleSlash : ApplicationCommandModule {
             return;
         }
 
-        var pageCount = results.Count / 10 + 1;
-        if (results.Count % 10 == 0) pageCount--;
+        var pageCount = results.Count() / 10 + 1;
+        if (results.Count() % 10 == 0) pageCount--;
         var pages = results.Select((x, i) => x)
             .Select((s, i) => new { str = s, index = i })
             .GroupBy(x => x.index / 10)
@@ -186,19 +183,12 @@ public class MusicModuleSlash : ApplicationCommandModule {
             Left = DiscordEmoji.FromUnicode("◀"),
             Right = DiscordEmoji.FromUnicode("▶")
         };
-        interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages, ems, PaginationBehaviour.Ignore,
-            PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2)).ConfigureAwait(false);
+        await interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages, ems, PaginationBehaviour.Ignore,
+            PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
 
-
-        //var msgC = string.Join("\n",
-        //    results.Select((x, i) => $"{NumberMappings[i + 1]} {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Tracks.First().Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Tracks.First().Author)))}"));
         var msgC =
-            $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.Numbers.Last()}.";
+            $"Type a number 1-{results.Count()} to queue a track. To cancel, type cancel or {MusicCommon.Numbers.Last()}.";
         await ctx.CreateResponseAsync(msgC);
-
-        //foreach (var emoji in Numbers)
-        //    await msg.CreateReactionAsync(emoji);
-        //var res = await interactivity.WaitForMessageReactionAsync(x => NumberMappingsReverse.ContainsKey(x), msg, ctx.User, TimeSpan.FromSeconds(30));
 
         var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User, TimeSpan.FromMinutes(2));
         if (res.TimedOut || res.Result == null) {
@@ -212,27 +202,20 @@ public class MusicModuleSlash : ApplicationCommandModule {
                 elInd = -1;
             }
             else {
-                if (elInd < 0 || elInd > results.Count) {
+                if (elInd < 0 || elInd > results.Count()) {
                     await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(
                         $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Invalid choice was made."));
                     return;
                 }
             }
         }
-
-        //var elInd = NumberMappingsReverse[res.Emoji];
+        
         if (elInd == -1) {
             await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Choice cancelled."));
             return;
         }
 
         var el = results.ElementAt(elInd - 1);
-        //var url = new Uri($"https://youtu.be/{el.Id}");
-        //var url = el.Uri;
-        //Console.Out.WriteLine(e);
-
-        //var trackLoad = await Music.GetTracksAsync(url);
-        //var tracks = trackLoad.Tracks;
         var tracks = el.Tracks;
 
 
@@ -241,9 +224,6 @@ public class MusicModuleSlash : ApplicationCommandModule {
                 $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} No tracks were found at specified link."));
             return;
         }
-
-        if (GuildMusic.isShuffled)
-            tracks = Music.Shuffle(tracks);
         var trackCount = tracks.Count();
         foreach (var track in tracks)
             GuildMusic.Enqueue(track);
@@ -345,8 +325,6 @@ public class MusicModuleSlash : ApplicationCommandModule {
             return;
         }
 
-        if (GuildMusic.isShuffled)
-            tracks = Music.Shuffle(tracks);
         var trackCount = tracks.Count();
         foreach (var track in tracks)
             GuildMusic.Enqueue(track);
@@ -468,24 +446,6 @@ public class MusicModuleSlash : ApplicationCommandModule {
             $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} restarted.");
     }
 
-    [SlashCommand("shuffle", "Toggles shuffle mode.")]
-    public async Task ShuffleAsync(InteractionContext ctx) {
-        if (GuildMusic.isShuffled) {
-            GuildMusic.StopShuffle();
-            await ctx.CreateResponseAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Queue is no longer shuffled.");
-        }
-        else {
-            GuildMusic.Shuffle();
-            await ctx.CreateResponseAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Queue is now shuffled.");
-        }
-    }
-
-    [SlashCommand("reshuffle", "Reshuffles the queue. If queue is not shuffled, it won't enable shuffle mode.")]
-    public async Task ReshuffleAsync(InteractionContext ctx) {
-        GuildMusic.Reshuffle();
-        await ctx.CreateResponseAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Queue reshuffled.");
-    }
-
     [SlashCommand("remove", "Removes a track from playback queue.")]
     public async Task RemoveAsync(InteractionContext ctx,
         [Option("remove", "Which track to remove.")]
@@ -507,7 +467,7 @@ public class MusicModuleSlash : ApplicationCommandModule {
 
         var pageCount = GuildMusic.Queue.Count / 10 + 1;
         if (GuildMusic.Queue.Count % 10 == 0) pageCount--;
-        var pages = GuildMusic.Queue.Select(x => x.ToTrackString())
+        var pages = GuildMusic.Queue.Select(x => x.track.ToTrackString())
             .Select((s, i) => new { str = s, index = i })
             .GroupBy(x => x.index / 10)
             .Select(xg =>
@@ -551,6 +511,6 @@ public class MusicModuleSlash : ApplicationCommandModule {
     [SlashCommand("playerinfo", "Displays information about current player.")]
     public async Task PlayerInfoAsync(InteractionContext ctx) {
         await ctx.CreateResponseAsync(
-            $"Queue length: {GuildMusic.Queue.Count}\nIs shuffled? {(GuildMusic.isShuffled ? "Yes" : "No")}\nVolume: {GuildMusic.volume}%");
+            $"Queue length: {GuildMusic.Queue.Count}\nVolume: {GuildMusic.volume}%");
     }
 }

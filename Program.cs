@@ -1,4 +1,7 @@
-﻿using System.Globalization;
+﻿global using LanguageExt;
+global using static LanguageExt.Prelude;
+
+using System.Globalization;
 using System.Net;
 using System.Text.RegularExpressions;
 using DSharpPlus;
@@ -79,7 +82,7 @@ static class Program {
 
         while (await timer.WaitForNextTickAsync()) {
             try {
-                foreach (var file in Directory.GetParent(Directory.GetCurrentDirectory()).EnumerateFiles()) {
+                foreach (var file in Directory.GetParent(Directory.GetCurrentDirectory())!.EnumerateFiles()) {
                     file.Delete();
                 }
                 await Console.Out.WriteLineAsync("Pruned cached images.");
@@ -167,7 +170,7 @@ static class Program {
         //Constants.init();
         // dont do shit for the time being 
         LavalinkNode = await lavalink.ConnectAsync(lavalinkConfig);
-        musicService = new MusicService(new SecureRandom(), lavalink, LavalinkNode);
+        musicService = new MusicService(lavalink, LavalinkNode);
         imagesModule = new ImagesModule();
         toxicity = new ToxicityHandler();
         //await MusicModule.setup(client);
@@ -211,24 +214,28 @@ static class Program {
                 if (suppliedArgumentsLength > maxArgumentLength) {
                     await sender.Client.SendMessageAsync(e.Context.Channel,
                         $"Too many arguments for command `{command}`!");
+                    await Console.Out.WriteLineAsync(e.Exception.ToString());
                     return;
                 }
 
                 if (suppliedArgumentsLength < minArgumentLength) {
                     await sender.Client.SendMessageAsync(e.Context.Channel,
                         $"Too few arguments for command `{command}`!");
+                    await Console.Out.WriteLineAsync(e.Exception.ToString());
                     return;
                 }
 
                 // if correct number of arguments but bad type; print info
 
                 await sender.Client.SendMessageAsync(e.Context.Channel, $"Wrong parameters for command `{command}`!");
+                await Console.Out.WriteLineAsync(e.Exception.ToString());
                 return;
             }
             case CommandNotFoundException:
                 await sender.Client.SendMessageAsync(e.Context.Channel, new DiscordMessageBuilder().WithEmbed(
-                    new DiscordEmbedBuilder().WithColor(DiscordColor.HotPink).WithDescription("I have no bloody idea what that command is")
-                        .WithImageUrl("https://c.tenor.com/CR9Or4gKoAUAAAAC/menhera-menhera-chan.gif").Build()));
+                    new DiscordEmbedBuilder().WithColor(DiscordColor.HotPink).WithDescription("I have no bloody idea what that command is, sorry")
+                        //.WithImageUrl("https://c.tenor.com/CR9Or4gKoAUAAAAC/menhera-menhera-chan.gif").Build()));
+                        .Build()));
                 return;
             default:
                 Console.WriteLine(e.Exception);

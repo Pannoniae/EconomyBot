@@ -30,7 +30,6 @@ namespace EconomyBot;
 /// </summary>
 public sealed class MusicService {
     private LavalinkExtension Lavalink { get; }
-    private SecureRandom RNG { get; }
     private ConcurrentDictionary<ulong, GuildMusicData> MusicData { get; }
     private DiscordClient Discord { get; }
     
@@ -40,9 +39,8 @@ public sealed class MusicService {
     /// Creates a new instance of this music service.
     /// </summary>
     /// <param name="rng">Cryptographically-secure random number generator implementaion.</param>
-    public MusicService(SecureRandom rng, LavalinkExtension lavalink, LavalinkNodeConnection theNode) {
+    public MusicService(LavalinkExtension lavalink, LavalinkNodeConnection theNode) {
         Lavalink = lavalink;
-        RNG = rng;
         MusicData = new ConcurrentDictionary<ulong, GuildMusicData>();
         Discord = lavalink.Client; 
         node = theNode;
@@ -61,11 +59,8 @@ public sealed class MusicService {
     /// </summary>
     /// <param name="guild">Guild to save data for.</param>
     /// <returns></returns>
-    public Task SaveDataForAsync(DiscordGuild guild) {
-        if (MusicData.TryGetValue(guild.Id, out var gmd)) {
-            
-        }
-        return Task.CompletedTask;
+    public void SaveDataForAsync(DiscordGuild guild) {
+        MusicData.TryGetValue(guild.Id, out var _);
     }
 
     /// <summary>
@@ -77,7 +72,7 @@ public sealed class MusicService {
         if (MusicData.TryGetValue(guild.Id, out var gmd))
             return gmd;
 
-        gmd = MusicData.AddOrUpdate(guild.Id, new GuildMusicData(guild, RNG, Lavalink, node),
+        gmd = MusicData.AddOrUpdate(guild.Id, new GuildMusicData(guild, Lavalink, node),
             (k, v) => v);
 
         return gmd;
@@ -93,14 +88,6 @@ public sealed class MusicService {
     
     public Task<LavalinkLoadResult> GetTracksAsync(string search)
         => node.Rest.GetTracksAsync(search);
-
-    /// <summary>
-    /// Shuffles the supplied track list.
-    /// </summary>
-    /// <param name="tracks">Collection of tracks to shuffle.</param>
-    /// <returns>Shuffled track collection.</returns>
-    public IEnumerable<LavalinkTrack> Shuffle(IEnumerable<LavalinkTrack> tracks)
-        => tracks.OrderBy(x => RNG.Next());
 
     private async Task Lavalink_TrackExceptionThrown(LavalinkGuildConnection con, TrackExceptionEventArgs e) {
         if (e.Player?.Guild == null)

@@ -16,6 +16,7 @@ public class MusicCommon {
     static MusicCommon() {
         instance = new MusicCommon();
         var iab = ImmutableArray.CreateBuilder<DiscordEmoji>();
+        iab.Add(DiscordEmoji.FromUnicode("0\u20e3"));
         iab.Add(DiscordEmoji.FromUnicode("1\u20e3"));
         iab.Add(DiscordEmoji.FromUnicode("2\u20e3"));
         iab.Add(DiscordEmoji.FromUnicode("3\u20e3"));
@@ -30,6 +31,7 @@ public class MusicCommon {
         Numbers = iab.ToImmutable();
 
         var idb = ImmutableDictionary.CreateBuilder<int, DiscordEmoji>();
+        idb.Add(0, DiscordEmoji.FromUnicode("0\u20e3"));
         idb.Add(1, DiscordEmoji.FromUnicode("1\u20e3"));
         idb.Add(2, DiscordEmoji.FromUnicode("2\u20e3"));
         idb.Add(3, DiscordEmoji.FromUnicode("3\u20e3"));

@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Globalization;
 using DSharpPlus.Entities;
 using DSharpPlus.Lavalink;
 using DSharpPlus.Lavalink.EventArgs;
@@ -29,30 +28,9 @@ namespace EconomyBot;
 /// </summary>
 public sealed class GuildMusicData {
     /// <summary>
-    /// Current artist to play.
-    /// </summary>
-    public string artist;
-
-
-    /// <summary>
     /// Is EQ enabled?
     /// </summary>
     private bool eq;
-
-    /// <summary>
-    /// Gets the guild ID for this dataset.
-    /// </summary>
-    public string Identifier { get; }
-
-    /// <summary>
-    /// Gets whether the queue for this guild is shuffled.
-    /// </summary>
-    public bool isShuffled { get; set; }
-
-    /// <summary>
-    /// Gets whether a track is currently playing.
-    /// </summary>
-    public bool isPlaying { get; set; }
 
     /// <summary>
     /// Gets the playback volume for this guild.
@@ -62,37 +40,55 @@ public sealed class GuildMusicData {
     /// <summary>
     /// Gets the current music queue.
     /// </summary>
-    public IReadOnlyCollection<LavalinkTrack> Queue { get; }
+    public IReadOnlyCollection<Track> Queue { get; }
 
     /// <summary>
     /// Gets the currently playing item.
     /// </summary>
-    public LavalinkTrack NowPlaying { get; private set; }
+    public LavalinkTrack? NowPlaying { get; private set; }
+
+    /// <summary>
+    /// Gets the currently playing item.
+    /// </summary>
+    public string? NowPlayingArtist { get; private set; }
 
     /// <summary>
     /// The things being played right now. "_fats" is special-cased to the great collection.
     /// </summary>
     public List<string> artistQueue { get; }
 
-    /// <summary>
-    /// Gets the channel in which the music is played.
-    /// </summary>
-    public DiscordChannel Channel => Player?.Channel;
 
     /// <summary>
     /// Gets or sets the channel in which commands are executed.
     /// </summary>
     public DiscordChannel CommandChannel { get; set; }
 
-    private List<LavalinkTrack> QueueInternal { get; }
+    private List<Track> QueueInternal { get; }
     private SemaphoreSlim QueueInternalLock { get; }
-    private string QueueSerialized { get; set; }
     private DiscordGuild Guild { get; }
-    private SecureRandom RNG { get; }
     public LavalinkExtension Lavalink { get; }
     public LavalinkGuildConnection Player { get; set; }
 
-    public LavalinkNodeConnection Node { get; set; }
+    public LavalinkNodeConnection Node { get; }
+
+    private static readonly Dictionary<string, Artist> artistMappings = new() {
+        { "_fats", new Artist("G:\\music\\fats", 1.2) },
+        { "ella", new Artist("G:\\music\\ella", 0.8) },
+        { "slim", new Artist("G:\\music\\slim", 0.8) },
+        { "jordan", new Artist("G:\\music\\jordan", 0.6) },
+        { "caravan palace", new Artist("G:\\music\\caravan palace", 0.6) },
+        { "tape5", new Artist("G:\\music\\tape5", 0.6) }
+    };
+
+    public static readonly Dictionary<string, double> artistWeights = new();
+
+    /// <summary>
+    /// Gets the actual volume to set.
+    /// </summary>
+    public int effectiveVolume =>
+        (int)(volume * (artistMappings.GetValueOrDefault(NowPlayingArtist ?? "missing")?.volume ?? 1));
+
+    public double artistVolume => artistMappings.GetValueOrDefault(NowPlayingArtist ?? "missing")?.volume ?? 1;
 
     /// <summary>
     /// Creates a new instance of playback data.
@@ -101,17 +97,25 @@ public sealed class GuildMusicData {
     /// <param name="rng">Cryptographically-secure random number generator implementation.</param> 
     /// <param name="lavalink">Lavalink service.</param>
     /// <param name="redis">Redis service.</param>
-    public GuildMusicData(DiscordGuild guild, SecureRandom rng, LavalinkExtension lavalink,
-        LavalinkNodeConnection node) {
+    /// <param name="node">The Lavalink node this guild is connected to.</param>
+    public GuildMusicData(DiscordGuild guild, LavalinkExtension lavalink, LavalinkNodeConnection node) {
         Node = node;
         Guild = guild;
-        RNG = rng;
         Lavalink = lavalink;
-        Identifier = Guild.Id.ToString(CultureInfo.InvariantCulture);
         QueueInternalLock = new SemaphoreSlim(1, 1);
-        QueueInternal = new List<LavalinkTrack>();
-        Queue = new ReadOnlyCollection<LavalinkTrack>(QueueInternal);
+        QueueInternal = new List<Track>();
+        Queue = new ReadOnlyCollection<Track>(QueueInternal);
         artistQueue = new List<string>();
+
+        foreach (var artist in artistMappings) {
+            // get the count of files at the directory
+            int fCount = Directory
+                .GetFiles(artist.Value.path, "*", new EnumerationOptions { RecurseSubdirectories = true })
+                .Length;
+            artistWeights[artist.Key] = fCount;
+        }
+
+        Console.Out.WriteLine("Initialised artist weights.");
     }
 
     /// <summary>
@@ -133,6 +137,7 @@ public sealed class GuildMusicData {
             return;
 
         NowPlaying = default;
+        NowPlayingArtist = default;
         await Player.StopAsync();
     }
 
@@ -143,7 +148,6 @@ public sealed class GuildMusicData {
         if (Player == null || !Player.IsConnected)
             return;
 
-        isPlaying = false;
         await Player.PauseAsync();
     }
 
@@ -154,7 +158,6 @@ public sealed class GuildMusicData {
         if (Player == null || !Player.IsConnected)
             return;
 
-        isPlaying = true;
         await Player.ResumeAsync();
     }
 
@@ -165,8 +168,8 @@ public sealed class GuildMusicData {
         if (Player == null || !Player.IsConnected)
             return;
 
-        await Player.SetVolumeAsync(volume);
         this.volume = volume;
+        await Player.SetVolumeAsync(effectiveVolume);
     }
 
     /// <summary>
@@ -181,7 +184,7 @@ public sealed class GuildMusicData {
 
         await QueueInternalLock.WaitAsync();
         try {
-            QueueInternal.Insert(0, NowPlaying);
+            QueueInternal.Insert(0, new Track(NowPlaying, NowPlayingArtist));
             await Player.StopAsync();
         }
         finally {
@@ -217,50 +220,16 @@ public sealed class GuildMusicData {
     }
 
     /// <summary>
-    /// Shuffles the playback queue.
-    /// </summary>
-    public void Shuffle() {
-        if (isShuffled)
-            return;
-
-        isShuffled = true;
-        Reshuffle();
-    }
-
-    /// <summary>
-    /// Reshuffles the playback queue.
-    /// </summary>
-    public void Reshuffle() {
-        lock (QueueInternal) {
-            QueueInternal.Sort(new Shuffler<LavalinkTrack>(RNG));
-        }
-    }
-
-    /// <summary>
-    /// Causes the queue to no longer be shuffled.
-    /// </summary>
-    public void StopShuffle() {
-        isShuffled = false;
-    }
-
-    /// <summary>
     /// Enqueues a music track for playback.
     /// </summary>
     /// <param name="item">Music track to enqueue.</param>
-    public void Enqueue(LavalinkTrack item) {
+    public void Enqueue(LavalinkTrack item, string? artist = null) {
         lock (QueueInternal) {
-            //if (this.RepeatMode == RepeatMode.All && QueueInternal.Count == 1) {
-            //    QueueInternal.Insert(0, item);
-            //}
             if (QueueInternal.Count == 1) {
-                QueueInternal.Insert(0, item);
+                QueueInternal.Insert(0, new Track(item, artist));
             }
-            else if (!isShuffled || !QueueInternal.Any()) {
-                QueueInternal.Add(item);
-            }
-            else if (isShuffled) {
-                var index = RNG.Next(0, QueueInternal.Count);
-                QueueInternal.Insert(index, item);
+            else {
+                QueueInternal.Add(new Track(item, artist));
             }
         }
     }
@@ -269,7 +238,7 @@ public sealed class GuildMusicData {
     /// Dequeues next music item for playback.
     /// </summary>
     /// <returns>Dequeued item, or null if dequeueing fails.</returns>
-    public LavalinkTrack? Dequeue() {
+    public Track? Dequeue() {
         lock (QueueInternal) {
             if (QueueInternal.Count == 0)
                 return null;
@@ -277,27 +246,7 @@ public sealed class GuildMusicData {
             var item = QueueInternal[0];
             QueueInternal.RemoveAt(0);
             return item;
-
-            //if (this.RepeatMode == RepeatMode.None) {
-            //    var item = QueueInternal[0];
-            //    QueueInternal.RemoveAt(0);
-            //    return item;
-            //}
-
-            //if (this.RepeatMode == RepeatMode.Single) {
-            //    var item = QueueInternal[0];
-            //    return item;
-            //}
-
-            //if (this.RepeatMode == RepeatMode.All) {
-            //    var item = QueueInternal[0];
-            //    QueueInternal.RemoveAt(0);
-            //    QueueInternal.Add(item);
-            //    return item;
-            //}
         }
-
-        return null;
     }
 
     /// <summary>
@@ -311,7 +260,7 @@ public sealed class GuildMusicData {
 
             var item = QueueInternal[index];
             QueueInternal.RemoveAt(index);
-            return item;
+            return item.track;
         }
     }
 
@@ -335,6 +284,7 @@ public sealed class GuildMusicData {
         }
 
         Player.PlaybackFinished += Player_PlaybackFinished;
+        Player.PlaybackStarted += Player_PlaybackStarted;
     }
 
     /// <summary>
@@ -364,10 +314,17 @@ public sealed class GuildMusicData {
 
     private async Task Player_PlaybackFinished(LavalinkGuildConnection con, TrackFinishEventArgs e) {
         await Task.Delay(500);
-        isPlaying = false;
-        growQueue();
+        if (artistQueue.Any() && Queue.Count < 6) {
+            await growQueue();
+        }
 
         await PlayHandlerAsync();
+    }
+
+    private async Task Player_PlaybackStarted(LavalinkGuildConnection sender, TrackStartEventArgs e) {
+        if (NowPlayingArtist != null) {
+            await Player.SetVolumeAsync(effectiveVolume);
+        }
     }
 
 
@@ -375,13 +332,14 @@ public sealed class GuildMusicData {
         var itemN = Dequeue();
         if (itemN == null) {
             NowPlaying = default;
+            NowPlayingArtist = default;
             return;
         }
 
         var item = itemN;
-        NowPlaying = item;
-        isPlaying = true;
-        await Player.PlayAsync(item);
+        NowPlaying = item.track;
+        NowPlayingArtist = item.artist;
+        await Player.PlayAsync(item.track);
     }
 
     public async Task AddToRandom(string artist) {
@@ -425,19 +383,25 @@ public sealed class GuildMusicData {
             await Console.Out.WriteLineAsync("Error loading random track");
         }
 
-        Enqueue(tracks.First());
+        Enqueue(tracks.First(), artist);
     }
 
-    private async Task addToJazz() {
-        string path = "D:\\music\\fats";
+    private async Task addToJazz(string artist, string path) {
         var rand = new Random();
         var files = Directory.GetFiles(path, "*", new EnumerationOptions { RecurseSubdirectories = true });
         var randomFile = new FileInfo(files[rand.Next(files.Length)]);
         var tracks_ = await Lavalink.ConnectedNodes.Values.First().Rest
             .GetTracksAsync(randomFile);
         foreach (var track in tracks_.Tracks) {
-            Enqueue(track);
+            //Console.Out.WriteLine(tracks_.Tracks.Count());
+            Enqueue(track, artist);
             await Console.Out.WriteLineAsync($"Enqueued {track.Title} at {track.Uri}");
+        }
+    }
+
+    public void addAllToQueue() {
+        foreach (var key in artistMappings.Keys) {
+            artistQueue.Add(key);
         }
     }
 
@@ -450,15 +414,16 @@ public sealed class GuildMusicData {
     }
 
     private async Task growQueue() {
-        var randomCount = artistQueue.Count;
-        var randomNumber = new Random().Next(randomCount);
-        var randomThing = artistQueue[randomNumber];
-
-        if (randomThing == "_fats") {
-            await addToJazz();
+        var max = artistWeights.Values.Max();
+        // return the online artist with the max. frequency of all played since we don't know the number of total songs
+        var randomElement =
+            artistQueue.randomElementByWeight(e => artistWeights.ContainsKey(e) ? artistWeights[e] : max);
+        if (artistMappings.ContainsKey(randomElement)) {
+            await addToJazz(randomElement, artistMappings[randomElement].path);
         }
+
         else {
-            await AddToRandom(randomThing);
+            await AddToRandom(randomElement);
         }
     }
 
@@ -471,50 +436,33 @@ public sealed class GuildMusicData {
         }
     }
 
-    public async Task<List<LavalinkLoadResult>> StartJazz(string searchTerm) {
-        string path = "D:\\music\\fats";
-        var rand = new Random();
-        var files = Directory.GetFiles(path, searchTerm,
-            new EnumerationOptions { RecurseSubdirectories = true }); // max 9 lol
-        var randomFiles = new List<FileInfo>();
-        foreach (var file in files) {
-            randomFiles.Add(new FileInfo(file));
-        }
-
-        var tracks = new List<LavalinkLoadResult>();
-        foreach (var file in randomFiles) {
-            tracks.Add(Node.Rest
-                .GetTracksAsync(file).Result);
-        }
-
-        return tracks;
-        //foreach (var track in tracks_.Tracks) {
-        //    Enqueue(track);
-        //    await Console.Out.WriteLineAsync($"Enqueued {track.Title} at {track.Uri}");
-        //}
+    public async Task<IEnumerable<LavalinkLoadResult>> StartJazz(string searchTerm) {
+        return artistMappings.SelectMany(
+                artist => Directory.GetFiles(artist.Value.path, searchTerm,
+                    new EnumerationOptions { RecurseSubdirectories = true }))
+            .Select(file => new FileInfo(file))
+            .Select(file =>Node.Rest.GetTracksAsync(file).Result);
     }
 
     public void enableEQ() {
         eq = true;
         Console.Out.WriteLine("Enabled EQ");
-        Player.AdjustEqualizerAsync(new[] {
-            // -0.25 is -100%, +0.25 is +100%
-            new LavalinkBandAdjustment(0, 0.2f), //25 Hz
-            new LavalinkBandAdjustment(1, 0.2f), //40 Hz
-            new LavalinkBandAdjustment(2, 0.2f), //63 Hz
-            new LavalinkBandAdjustment(3, 0.2f), //100 Hz
-            new LavalinkBandAdjustment(4, 0.15f), //160 Hz
-            new LavalinkBandAdjustment(5, 0.12f), //250 Hz
-            new LavalinkBandAdjustment(6, 0.10f), //400 Hz
-            new LavalinkBandAdjustment(7, 0.05f), //630 Hz
-            new LavalinkBandAdjustment(8, 0.00f), //1k Hz
-            new LavalinkBandAdjustment(9, 0.00f), //1.6k Hz
-            new LavalinkBandAdjustment(10, -0.02f), //2.5k Hz
-            new LavalinkBandAdjustment(11, -0.02f), //4k Hz
-            new LavalinkBandAdjustment(12, -0.03f), //6.3k Hz
-            new LavalinkBandAdjustment(13, -0.04f), //10k Hz
-            new LavalinkBandAdjustment(14, -0.05f) //16k Hz
-        });
+        Player.AdjustEqualizerAsync(
+            new LavalinkBandAdjustment(0, 0.2f),
+            new LavalinkBandAdjustment(1, 0.2f),
+            new LavalinkBandAdjustment(2, 0.2f),
+            new LavalinkBandAdjustment(3, 0.2f),
+            new LavalinkBandAdjustment(4, 0.15f),
+            new LavalinkBandAdjustment(5, 0.12f),
+            new LavalinkBandAdjustment(6, 0.10f),
+            new LavalinkBandAdjustment(7, 0.05f),
+            new LavalinkBandAdjustment(8, 0.00f),
+            new LavalinkBandAdjustment(9, 0.00f),
+            new LavalinkBandAdjustment(10, -0.02f),
+            new LavalinkBandAdjustment(11, -0.02f),
+            new LavalinkBandAdjustment(12, -0.03f),
+            new LavalinkBandAdjustment(13, -0.04f),
+            new LavalinkBandAdjustment(14, -0.05f));
     }
 
     public void disableEQ() {
@@ -524,31 +472,26 @@ public sealed class GuildMusicData {
     }
 }
 
-public class Shuffler<T> : IComparer<T> {
-    public SecureRandom RNG { get; }
+public record Artist(string path, double volume);
 
-    /// <summary>
-    /// Creates a new shuffler.
-    /// </summary>
-    /// <param name="rng">Cryptographically-secure random number generator.</param>
-    public Shuffler(SecureRandom rng) {
-        RNG = rng;
-    }
+public record Track(LavalinkTrack track, string? artist);
 
-    /// <summary>
-    /// Returns a random order for supplied items.
-    /// </summary>
-    /// <param name="x">First item.</param>
-    /// <param name="y">Second item.</param>
-    /// <returns>Random order for the items.</returns>
-    public int Compare(T? x, T? y) {
-        var val1 = RNG.Next();
-        var val2 = RNG.Next();
+public static class IEnumerableExtensions {
+    public static T randomElementByWeight<T>(this IEnumerable<T> sequence, Func<T, double> weightSelector) {
+        double totalWeight = sequence.Sum(weightSelector);
+        // The weight we are after...
+        double itemWeightIndex = new Random().NextDouble() * totalWeight;
+        double currentWeightIndex = 0;
 
-        if (val1 > val2)
-            return 1;
-        if (val1 < val2)
-            return -1;
-        return 0;
+        foreach (var item in from weightedItem in sequence
+                 select new { Value = weightedItem, Weight = weightSelector(weightedItem) }) {
+            currentWeightIndex += item.Weight;
+
+            // If we've hit or passed the weight we are after for this item then it's the one we want....
+            if (currentWeightIndex >= itemWeightIndex)
+                return item.Value;
+        }
+
+        return default;
     }
 }

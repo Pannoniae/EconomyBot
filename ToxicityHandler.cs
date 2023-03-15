@@ -2,9 +2,7 @@
 using System.Text;
 using System.Web;
 using DSharpPlus;
-using DSharpPlus.Entities;
-using DSharpPlus.Lavalink;
-using EconomyBot;
+using DSharpPlus.Entities; 
 using Newtonsoft.Json.Linq;
 
 namespace EconomyBot;
