@@ -2,7 +2,6 @@
 using DSharpPlus.Entities;
 using DSharpPlus.Lavalink;
 using DSharpPlus.Lavalink.EventArgs;
-using Emzi0767;
 using SpotifyAPI.Web;
 
 namespace EconomyBot;
@@ -275,9 +274,7 @@ public sealed class GuildMusicData {
         var node = Node;
         Player = await node.ConnectAsync(channel);
 
-        if (volume != 100) {
-            await Player.SetVolumeAsync(volume);
-        }
+        SetVolumeAsync(volume);
 
         if (!eq) {
             enableEQ();
@@ -441,7 +438,7 @@ public sealed class GuildMusicData {
                 artist => Directory.GetFiles(artist.Value.path, searchTerm,
                     new EnumerationOptions { RecurseSubdirectories = true }))
             .Select(file => new FileInfo(file))
-            .Select(file =>Node.Rest.GetTracksAsync(file).Result);
+            .Select(file => Node.Rest.GetTracksAsync(file).Result);
     }
 
     public void enableEQ() {

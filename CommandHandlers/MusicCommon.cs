@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Immutable;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 
 namespace EconomyBot.CommandHandlers; 
@@ -47,5 +48,13 @@ public class MusicCommon {
         var idb2 = ImmutableDictionary.CreateBuilder<DiscordEmoji, int>();
         idb2.AddRange(NumberMappings.ToDictionary(x => x.Value, x => x.Key));
         NumberMappingsReverse = idb2.ToImmutable();
+    }
+
+    public async Task respond(CommandContext ctx, string response) {
+        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} {response}");
+    }
+    
+    public async Task modify(CommandContext ctx, DiscordMessage msg, string response) {
+        await msg.ModifyAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} {response}");
     }
 }

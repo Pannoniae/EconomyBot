@@ -1,5 +1,4 @@
 ﻿using DSharpPlus.Entities;
-using DSharpPlus.SlashCommands;
 
 namespace EconomyBot.CommandHandlers; 
 

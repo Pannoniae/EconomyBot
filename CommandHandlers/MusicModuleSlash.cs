@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Net;
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -26,6 +25,10 @@ public class MusicModuleSlash : ApplicationCommandModule {
         Music = Program.musicService;
         YouTube = yt;
     }
+    
+    private static DiscordChannel getChannel(InteractionContext ctx) {
+        return ctx.Member!.VoiceState.Channel;
+    }
 
     public override async Task<bool> BeforeSlashExecutionAsync(InteractionContext ctx) {
         if (ctx.CommandName == "join") {
@@ -34,8 +37,7 @@ public class MusicModuleSlash : ApplicationCommandModule {
             return false;
         }
 
-        var vs = ctx.Member.VoiceState;
-        var chn = vs?.Channel;
+        var chn = getChannel(ctx);
         if (chn == null) {
             await ctx.CreateResponseAsync(
                 $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} You need to be in a voice channel.");
@@ -58,8 +60,7 @@ public class MusicModuleSlash : ApplicationCommandModule {
     [SlashCommand("join", "Joins the voice channel.")]
     public async Task JoinAsync(InteractionContext ctx) {
         // yeet the bot in 
-        var vs = ctx.Member.VoiceState;
-        var chn = vs.Channel;
+        var chn = getChannel(ctx);
         await GuildMusic.CreatePlayerAsync(chn);
         await ctx.CreateResponseAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Joined the channel.");
     }
@@ -79,270 +80,9 @@ public class MusicModuleSlash : ApplicationCommandModule {
     [SlashCommand("stopjazz", "Stops jazz.")]
     public async Task StopJazzAsync(InteractionContext ctx) {
         GuildMusic.clearQueue();
-        int rmd = GuildMusic.EmptyQueue();
+        GuildMusic.EmptyQueue();
         await GuildMusic.StopAsync();
         await ctx.CreateResponseAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Stopped jazz.");
-    }
-
-    /*[SlashCommand("play", "Plays supplied URL or searches for specified keywords.")]
-    public async Task PlayAsync(InteractionContext ctx,
-        [Option("url", "URL to play from.")] Uri uri) {
-        var trackLoad = await Music.GetTracksAsync(uri);
-        var tracks = trackLoad.Tracks;
-        if (trackLoad.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks.Any()) {
-            await ctx.CreateResponseAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} No tracks were found at specified link.");
-            return;
-        }
-
-        if (GuildMusic.isShuffled) {
-            tracks = Music.Shuffle(tracks);
-        }
-        else if (trackLoad.LoadResultType == LavalinkLoadResultType.PlaylistLoaded &&
-                 trackLoad.PlaylistInfo.SelectedTrack > 0) {
-            var index = trackLoad.PlaylistInfo.SelectedTrack;
-            tracks = tracks.Skip(index).Concat(tracks.Take(index));
-        }
-
-        var trackCount = tracks.Count();
-        foreach (var track in tracks)
-            GuildMusic.Enqueue(track);
-
-        var vs = ctx.Member.VoiceState;
-        var chn = vs.Channel;
-        await GuildMusic.CreatePlayerAsync(chn);
-        await GuildMusic.PlayAsync();
-
-        if (trackCount > 1)
-            await ctx.CreateResponseAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Added {trackCount:#,##0} tracks to playback queue.");
-        else {
-            var track = tracks.First();
-            await ctx.CreateResponseAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Added {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} to the playback queue.");
-        }
-    }*/
-
-    [SlashCommand("searchjazz", "Plays jazz. :3")]
-    public async Task PlayJazzAsync(InteractionContext ctx,
-        [Option("search", "Terms to search for.")]
-        string term) {
-        var interactivity = ctx.Client.GetInteractivity();
-
-        var results = await GuildMusic.StartJazz("*" + term + "*");
-        if (!results.Any()) {
-            await ctx.CreateResponseAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Nothing was found.");
-            return;
-        }
-
-        if (results.Count() == 1) {
-            // only one result
-            var el_ = results.First();
-            var tracks_ = el_.Tracks;
-            if (el_.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks_.Any()) {
-                await ctx.CreateResponseAsync(
-                    $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} No tracks were found at specified link.");
-                return;
-            }
-            var trackCount_ = tracks_.Count();
-            foreach (var track in tracks_)
-                GuildMusic.Enqueue(track);
-
-            var vs_ = ctx.Member.VoiceState;
-            var chn_ = vs_.Channel;
-            await GuildMusic.CreatePlayerAsync(chn_);
-            await GuildMusic.PlayAsync();
-
-            if (trackCount_ > 1) {
-                await ctx.CreateResponseAsync(
-                    $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Added {trackCount_:#,##0} tracks to playback queue.");
-            }
-            else {
-                var track = tracks_.First();
-                await ctx.CreateResponseAsync(
-                    $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Added {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} to the playback queue.");
-            }
-
-            return;
-        }
-
-        var pageCount = results.Count() / 10 + 1;
-        if (results.Count() % 10 == 0) pageCount--;
-        var pages = results.Select((x, i) => x)
-            .Select((s, i) => new { str = s, index = i })
-            .GroupBy(x => x.index / 10)
-            .Select(xg =>
-                new Page(
-                    $"{string.Join("\n", xg.Select(xa => $"`{xa.index + 1:00}` {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(xa.str.Tracks.First().Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(xa.str.Tracks.First().Author)))}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
-            .ToArray();
-
-        var ems = new PaginationEmojis {
-            SkipLeft = null,
-            SkipRight = null,
-            Stop = DiscordEmoji.FromUnicode("⏹"),
-            Left = DiscordEmoji.FromUnicode("◀"),
-            Right = DiscordEmoji.FromUnicode("▶")
-        };
-        await interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages, ems, PaginationBehaviour.Ignore,
-            PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
-
-        var msgC =
-            $"Type a number 1-{results.Count()} to queue a track. To cancel, type cancel or {MusicCommon.Numbers.Last()}.";
-        await ctx.CreateResponseAsync(msgC);
-
-        var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User, TimeSpan.FromMinutes(2));
-        if (res.TimedOut || res.Result == null) {
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} No choice was made."));
-            return;
-        }
-
-        var resInd = res.Result.Content.Trim();
-        if (!int.TryParse(resInd, NumberStyles.Integer, CultureInfo.InvariantCulture, out var elInd)) {
-            if (resInd.ToLowerInvariant() == "cancel") {
-                elInd = -1;
-            }
-            else {
-                if (elInd < 0 || elInd > results.Count()) {
-                    await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(
-                        $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Invalid choice was made."));
-                    return;
-                }
-            }
-        }
-        
-        if (elInd == -1) {
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Choice cancelled."));
-            return;
-        }
-
-        var el = results.ElementAt(elInd - 1);
-        var tracks = el.Tracks;
-
-
-        if (el.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks.Any()) {
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} No tracks were found at specified link."));
-            return;
-        }
-        var trackCount = tracks.Count();
-        foreach (var track in tracks)
-            GuildMusic.Enqueue(track);
-
-        var vs = ctx.Member.VoiceState;
-        var chn = vs.Channel;
-        await GuildMusic.CreatePlayerAsync(chn);
-        await GuildMusic.PlayAsync();
-
-        if (trackCount > 1) {
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Added {trackCount:#,##0} tracks to playback queue."));
-        }
-        else {
-            var track = tracks.First();
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Added {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} to the playback queue."));
-        }
-    }
-
-    [SlashCommand("play", "Play a song.")]
-    public async Task PlayAsync(InteractionContext ctx,
-        [Option("search", "Terms to search for.")]
-        string term) {
-        var interactivity = ctx.Client.GetInteractivity();
-
-        var results = await YouTube.SearchAsync(term);
-        if (!results.Any()) {
-            await ctx.CreateResponseAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Nothing was found.");
-            return;
-        }
-
-        var msgC = string.Join("\n",
-            results.Select((x, i) =>
-                $"{MusicCommon.NumberMappings[i + 1]} {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Author)))}"));
-        msgC =
-            $"{msgC}\n\nType a number 1-{results.Count()} to queue a track. To cancel, type cancel or {MusicCommon.Numbers.Last()}.";
-        await ctx.CreateResponseAsync(msgC);
-
-        //foreach (var emoji in Numbers)
-        //    await msg.CreateReactionAsync(emoji);
-        //var res = await interactivity.WaitForMessageReactionAsync(x => NumberMappingsReverse.ContainsKey(x), msg, ctx.User, TimeSpan.FromSeconds(30));
-
-        var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User, TimeSpan.FromSeconds(30));
-        if (res.TimedOut || res.Result == null) {
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} No choice was made."));
-            return;
-        }
-
-        var resInd = res.Result.Content.Trim();
-        if (!int.TryParse(resInd, NumberStyles.Integer, CultureInfo.InvariantCulture, out var elInd)) {
-            if (resInd.ToLowerInvariant() == "cancel") {
-                elInd = -1;
-            }
-            else {
-                DiscordEmoji? em;
-                try {
-                    em = DiscordEmoji.FromUnicode(resInd);
-                }
-                catch (ArgumentException e) {
-                    await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(
-                        $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Invalid choice was made."));
-                    return;
-                }
-
-                if (!MusicCommon.NumberMappingsReverse.ContainsKey(em)) {
-                    await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(
-                        $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Invalid choice was made."));
-                    return;
-                }
-
-                elInd = MusicCommon.NumberMappingsReverse[em];
-            }
-        }
-        else if (elInd < 1) {
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Invalid choice was made."));
-            return;
-        }
-
-        if (!MusicCommon.NumberMappings.ContainsKey(elInd)) {
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Invalid choice was made."));
-            return;
-        }
-
-        //var elInd = NumberMappingsReverse[res.Emoji];
-        if (elInd == -1) {
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Choice cancelled."));
-            return;
-        }
-
-        var el = results.ElementAt(elInd - 1);
-        var url = new Uri($"https://youtu.be/{el.Id}");
-
-        var trackLoad = await Music.GetTracksAsync(url);
-        var tracks = trackLoad.Tracks;
-        if (trackLoad.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks.Any()) {
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} No tracks were found at specified link."));
-            return;
-        }
-
-        var trackCount = tracks.Count();
-        foreach (var track in tracks)
-            GuildMusic.Enqueue(track);
-
-        var vs = ctx.Member.VoiceState;
-        var chn = vs.Channel;
-        await GuildMusic.CreatePlayerAsync(chn);
-        await GuildMusic.PlayAsync();
-
-        if (trackCount > 1) {
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Added {trackCount:#,##0} tracks to playback queue."));
-        }
-        else {
-            var track = tracks.First();
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Added {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} to the playback queue."));
-        }
     }
 
     [SlashCommand("stop", "Stops playback and quits the voice channel.")]

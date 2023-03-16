@@ -6,14 +6,14 @@ public static class Constants {
     public static ulong szerepjatek = 886722112310632499;
     public static ulong server = 828296966324224020;
 
-    public static string token;
-    public static string redditappid;
-    public static string redditrefreshtoken;
-    public static string redditappsecret;
-    public static string apikey;
-    public static string apikey_huggingface;
-    public static string spotifytoken;
-    public static string spotifytoken2;
+    public static string? token;
+    public static string? redditappid;
+    public static string? redditrefreshtoken;
+    public static string? redditappsecret;
+    public static string? apikey;
+    public static string? apikey_huggingface;
+    public static string? spotifytoken;
+    public static string? spotifytoken2;
 
     public static void init() {
         token = File.ReadAllText("token");

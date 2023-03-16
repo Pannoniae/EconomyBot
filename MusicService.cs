@@ -38,7 +38,6 @@ public sealed class MusicService {
     /// <summary>
     /// Creates a new instance of this music service.
     /// </summary>
-    /// <param name="rng">Cryptographically-secure random number generator implementaion.</param>
     public MusicService(LavalinkExtension lavalink, LavalinkNodeConnection theNode) {
         Lavalink = lavalink;
         MusicData = new ConcurrentDictionary<ulong, GuildMusicData>();
@@ -48,7 +47,7 @@ public sealed class MusicService {
         node.TrackException += Lavalink_TrackExceptionThrown;
 
         async Task playbackStarted(LavalinkGuildConnection con, TrackStartEventArgs e) {
-            Console.Out.WriteLine($"len/nodes: {lavalink.ConnectedNodes.Count}");
+            await Console.Out.WriteLineAsync($"len/nodes: {lavalink.ConnectedNodes.Count}");
         }
 
         node.PlaybackStarted += playbackStarted;
@@ -73,7 +72,7 @@ public sealed class MusicService {
             return gmd;
 
         gmd = MusicData.AddOrUpdate(guild.Id, new GuildMusicData(guild, Lavalink, node),
-            (k, v) => v);
+            (_, v) => v);
 
         return gmd;
     }

@@ -16,6 +16,7 @@
         <PackageReference Include="DSharpPlus.Lavalink" Version="4.3.0" />
         <PackageReference Include="DSharpPlus.SlashCommands" Version="4.3.0" />
         <PackageReference Include="DSharpPlus.VoiceNext" Version="4.3.0" />
+        <PackageReference Include="FuzzierSharp" Version="3.0.1" />
         <PackageReference Include="LanguageExt.Core" Version="4.4.2" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
         <PackageReference Include="Reddit" Version="1.5.2" />

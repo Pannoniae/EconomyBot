@@ -2,7 +2,7 @@
 using System.Text;
 using System.Web;
 using DSharpPlus;
-using DSharpPlus.Entities; 
+using DSharpPlus.Entities;
 using Newtonsoft.Json.Linq;
 
 namespace EconomyBot;
@@ -55,6 +55,19 @@ public class ToxicityHandler {
         if (toxic) {
             await message.RespondAsync("shut up");
             return;
+        }
+
+        // postprocess false positive
+        var content = message.Content;
+
+        // don't say child porn is cute
+        if (ActualFuzz.partialFuzz("loli", content) > 80 || ActualFuzz.partialFuzz("child", content) > 80) {
+            values.sexualScore -= 0.5;
+        }
+
+        // don't say "cute" to every bloody sexual reference ever
+        if (ActualFuzz.partialFuzz(new[] { "sex", "penis", "vagina", "cunt" }, content) > 90) {
+            values.sexualScore -= 0.25;
         }
 
         if (values.sexualScore > 0.7) {
@@ -111,7 +124,7 @@ public class ToxicityValues {
         var responseStringFlirt = await JSONParser.getJSON(
             $"https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key={Constants.apikey}",
             jsonFlirt);
-        ;
+        
         var responseJson = JObject.Parse(responseString);
         var responseJsonFlirt = JObject.Parse(responseStringFlirt);
 

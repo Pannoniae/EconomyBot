@@ -21,13 +21,19 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace EconomyBot;
 
-static class Program {
+class Program {
     private static IServiceProvider services { get; set; }
 
     public static DiscordClient client;
 
     public static ulong LOG = 838920584879800343;
     public static ulong HALLOFFAME = 1078991955633127474;
+    
+    // shut up compiler
+    private Program() {
+        Main(null!);
+    }
+
 
     public static async Task Main(string[] args) {
         
@@ -72,7 +78,7 @@ static class Program {
             PollBehaviour = PollBehaviour.KeepEmojis
         });
         discord.MessageCreated += messageHandler;
-        discord.Ready += (sender, args) => setup(sender, args, lavalink, lavalinkConfig);
+        discord.Ready += (sender, _) => setup(sender, lavalink, lavalinkConfig);
         discord.MessageDeleted += messageDeleteHandler;
         discord.MessageReactionAdded += reactionHandler;
         discord.GetCommandsNext().UnregisterConverter<TimeSpan>();
@@ -114,7 +120,7 @@ static class Program {
                         Console.WriteLine(exception);
                         throw;
                     }
-                    catch (Exception exception) {
+                    catch (Exception) {
                         await e.Channel.SendMessageAsync("Penis happened!");
                     }
 
@@ -154,18 +160,17 @@ static class Program {
         if (e.Author.Id == 947229156448538634) {
             await e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":pinkpill:"));
         }
-
         var meowList = new List<string> {
             "cat", "kitty", "kitten", "meow", "purr", "feline", "nya"
         };
         if (meowList.Any(word =>
                 e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase) ||
-                e.Message.Attachments.Any(e => e.Url.Contains(word, StringComparison.OrdinalIgnoreCase)))) {
+                e.Message.Attachments.Any(a => a.Url.Contains(word, StringComparison.OrdinalIgnoreCase)))) {
             await e.Message.RespondAsync("*meow*");
         }
     }
 
-    private static async Task setup(DiscordClient client, ReadyEventArgs e, LavalinkExtension lavalink,
+    private static async Task setup(DiscordClient client, LavalinkExtension lavalink,
         LavalinkConfiguration lavalinkConfig) {
         //Constants.init();
         // dont do shit for the time being 

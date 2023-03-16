@@ -2,13 +2,11 @@
 using System.Net;
 using System.Runtime.Serialization;
 using System.Text;
-using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
-using DSharpPlus.Interactivity.EventHandling;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Lavalink;
 using EconomyBot.CommandHandlers;
@@ -20,38 +18,39 @@ namespace EconomyBot;
 
 [ModuleLifespan(ModuleLifespan.Singleton)]
 public class MusicModule : BaseCommandModule {
-    private MusicService Music { get; set; }
+    private MusicService Music { get; }
     private YouTubeSearchProvider YouTube { get; }
 
     public GuildMusicData GuildMusic { get; set; }
-
-    public MusicCommon common;
+    
+    private MusicCommon common;
 
     public MusicModule(YouTubeSearchProvider yt) {
+        common = new MusicCommon();
         Music = Program.musicService;
         YouTube = yt;
     }
 
+    private static DiscordChannel getChannel(CommandContext ctx) {
+        return ctx.Member!.VoiceState.Channel;
+    }
+
     public override async Task BeforeExecutionAsync(CommandContext ctx) {
-        Music = Program.musicService;
         if (ctx.Command.Name == "join") {
             GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild);
             GuildMusic.CommandChannel = ctx.Channel;
             return;
         }
 
-        var vs = ctx.Member.VoiceState;
-        var chn = vs?.Channel;
+        var chn = getChannel(ctx);
         if (chn == null) {
-            await ctx.RespondAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} You need to be in a voice channel.");
+            await common.respond(ctx, "You need to be in a voice channel.");
             throw new IdiotException("user error");
         }
 
         var mbr = ctx.Guild.CurrentMember?.VoiceState?.Channel;
         if (mbr != null && chn != mbr) {
-            await ctx.RespondAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} You need to be in the same voice channel.");
+            await common.respond(ctx, "You need to be in the same voice channel.");
             throw new IdiotException("user error");
         }
 
@@ -64,38 +63,36 @@ public class MusicModule : BaseCommandModule {
     [Command("eq"), Description("Enable EQ.")]
     public async Task eq(CommandContext ctx) {
         GuildMusic.enableEQ();
-        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Enabled EQ.");
+        await common.respond(ctx, "Enabled EQ.");
     }
 
     [Command("deq"), Description("Disable EQ.")]
     public async Task deq(CommandContext ctx) {
         GuildMusic.disableEQ();
-        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Disabled EQ.");
+        await common.respond(ctx, "Disabled EQ.");
     }
 
     [Command("reset"), Description("Reset the voice state.")]
     public async Task ResetAsync(CommandContext ctx) {
         await GuildMusic.DestroyPlayerAsync();
-        int rmd = GuildMusic.EmptyQueue();
+        GuildMusic.EmptyQueue();
         GuildMusic.clearQueue();
     }
 
     [Command("join"), Description("Joins the voice channel."), Priority(1)]
     public async Task JoinAsync(CommandContext ctx) {
         // yeet the bot in 
-        var vs = ctx.Member.VoiceState;
-        var chn = vs.Channel;
+        var chn = getChannel(ctx);
         await GuildMusic.CreatePlayerAsync(chn);
-        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Joined the channel.");
+        await common.respond(ctx, "Joined the channel.");
     }
 
     [Command("join"), Description("Joins the voice channel."), Priority(0)]
     public async Task JoinAsync(CommandContext ctx, DiscordMember member) {
         // yeet the bot in
-        var vs = member.VoiceState;
-        var chn = vs.Channel;
+        var chn = getChannel(ctx);
         await GuildMusic.CreatePlayerAsync(chn);
-        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Joined the channel.");
+        await common.respond(ctx, "Joined the channel.");
     }
 
     [Command("jazz"), Description("Plays some jazz. :3"), Aliases("j"), Priority(1)]
@@ -103,11 +100,10 @@ public class MusicModule : BaseCommandModule {
         // yeet the bot in
         GuildMusic.addToQueue("_fats");
         await GuildMusic.seedQueue();
-        var vs = ctx.Member.VoiceState;
-        var chn = vs.Channel;
+        var chn = getChannel(ctx);
         await GuildMusic.CreatePlayerAsync(chn);
         await GuildMusic.PlayAsync();
-        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Started playing jazz.");
+        await common.respond(ctx, "Started playing jazz.");
     }
 
     [Command("analyse"), Description("Analyse the frequency of artists."), Aliases("an")]
@@ -120,27 +116,25 @@ public class MusicModule : BaseCommandModule {
             weightsp.Add($"{weight.Key}: {(weight.Value / sum) * 100:#.##}%");
         }
 
-        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Weights:\n{string.Join("\n", weights)}");
-        await ctx.RespondAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Weights (percent):\n{string.Join("\n", weightsp)}");
+        await common.respond(ctx, $"Weights:\n{string.Join("\n", weights)}");
+        await common.respond(ctx, $"Weights (percent):\n{string.Join("\n", weightsp)}");
     }
 
     [Command("stopjazz"), Description("Stops jazz.")]
     public async Task StopJazzAsync(CommandContext ctx) {
         GuildMusic.clearQueue();
-        int rmd = GuildMusic.EmptyQueue();
+        GuildMusic.EmptyQueue();
         await GuildMusic.StopAsync();
-        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Stopped jazz.");
+        await common.respond(ctx, "Stopped jazz.");
     }
 
     [Command("play"), Description("Plays supplied URL or searches for specified keywords."), Aliases("p"), Priority(1)]
     public async Task PlayAsync(CommandContext ctx,
         [Description("URL to play from.")] Uri uri) {
         var trackLoad = await Music.GetTracksAsync(uri);
-        var tracks = trackLoad.Tracks;
+        var tracks = trackLoad.Tracks.ToSeq();
         if (trackLoad.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks.Any()) {
-            await ctx.RespondAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} No tracks were found at specified link.");
+            await common.respond(ctx, "No tracks were found at specified link.");
             return;
         }
         else if (trackLoad.LoadResultType == LavalinkLoadResultType.PlaylistLoaded &&
@@ -154,18 +148,15 @@ public class MusicModule : BaseCommandModule {
             GuildMusic.Enqueue(track);
         }
 
-        var vs = ctx.Member.VoiceState;
-        var chn = vs.Channel;
+        var chn = getChannel(ctx);
         await GuildMusic.CreatePlayerAsync(chn);
         await GuildMusic.PlayAsync();
 
         if (trackCount > 1)
-            await ctx.RespondAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Added {trackCount:#,##0} tracks to playback queue.");
+            await common.respond(ctx, $"Added {trackCount:#,##0} tracks to playback queue.");
         else {
             var track = tracks.First();
-            await ctx.RespondAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Added {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} to the playback queue.");
+            await common.respond(ctx, $"Added {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} to the playback queue.");
         }
     }
 
@@ -178,30 +169,27 @@ public class MusicModule : BaseCommandModule {
             await GuildMusic.seedQueue();
             var track_ = GuildMusic.Queue.First();
 
-            var vs_ = ctx.Member.VoiceState;
-            var chn_ = vs_.Channel;
+            var chn_ = getChannel(ctx);
             await GuildMusic.CreatePlayerAsync(chn_);
             await GuildMusic.PlayAsync();
-            await ctx.RespondAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Started playing {GuildMusic.artistQueue.Count} cats.");
+            await common.respond(ctx, $"Started playing {GuildMusic.artistQueue.Count} cats.");
             return;
         }
 
         var interactivity = ctx.Client.GetInteractivity();
 
-        var results = await GuildMusic.StartJazz("*" + term + "*");
+        var results = (await GuildMusic.StartJazz("*" + term + "*")).ToSeq();
         if (!results.Any()) {
-            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Nothing was found.");
+            await common.respond(ctx, "Nothing was found.");
             return;
         }
 
         if (results.Count() == 1) {
             // only one result
             var el_ = results.First();
-            var tracks_ = el_.Tracks;
+            var tracks_ = el_.Tracks.ToSeq();
             if (el_.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks_.Any()) {
-                await ctx.RespondAsync(
-                    $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} No tracks were found at specified link.");
+                await common.respond(ctx, "No tracks were found at specified link.");
                 return;
             }
 
@@ -209,19 +197,16 @@ public class MusicModule : BaseCommandModule {
             foreach (var track in tracks_)
                 GuildMusic.Enqueue(track);
 
-            var vs_ = ctx.Member.VoiceState;
-            var chn_ = vs_.Channel;
+            var chn_ = getChannel(ctx);
             await GuildMusic.CreatePlayerAsync(chn_);
             await GuildMusic.PlayAsync();
 
             if (trackCount_ > 1) {
-                await ctx.RespondAsync(
-                    $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Added {trackCount_:#,##0} tracks to playback queue.");
+                await common.respond(ctx, $"Added {trackCount_:#,##0} tracks to playback queue.");
             }
             else {
                 var track = tracks_.First();
-                await ctx.RespondAsync(
-                    $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Added {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} to the playback queue.");
+                await common.respond(ctx, $"Added {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} to the playback queue.");
             }
 
             return;
@@ -246,7 +231,7 @@ public class MusicModule : BaseCommandModule {
         _ = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, content, ems,
             PaginationBehaviour.Ignore,
             PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
-        
+
         var msgC =
             $"Type a number 1-{results.Count()} to queue a track. To cancel, type cancel or {MusicCommon.Numbers.Last()}.";
         var msg = await ctx.RespondAsync(msgC);
@@ -264,25 +249,23 @@ public class MusicModule : BaseCommandModule {
             }
             else {
                 if (elInd < 0 || elInd > results.Count()) {
-                    await msg.ModifyAsync(
-                        $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Invalid choice was made.");
+                    await common.modify(ctx, msg, "Invalid choice was made.");
                     return;
                 }
             }
         }
 
         if (elInd == -1) {
-            await msg.ModifyAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Choice cancelled.");
+            await common.modify(ctx, msg, "Choice cancelled.");
             return;
         }
 
         var el = results.ElementAt(elInd - 1);
-        var tracks = el.Tracks;
+        var tracks = el.Tracks.ToSeq();
 
 
         if (el.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks.Any()) {
-            await msg.ModifyAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} No tracks were found at specified link.");
+            await common.modify(ctx, msg, "No tracks were found at specified link.");
             return;
         }
 
@@ -290,19 +273,16 @@ public class MusicModule : BaseCommandModule {
         foreach (var track in tracks)
             GuildMusic.Enqueue(track);
 
-        var vs = ctx.Member.VoiceState;
-        var chn = vs.Channel;
+        var chn = getChannel(ctx);
         await GuildMusic.CreatePlayerAsync(chn);
         await GuildMusic.PlayAsync();
 
         if (trackCount > 1) {
-            await msg.ModifyAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Added {trackCount:#,##0} tracks to playback queue.");
+            await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
         }
         else {
             var track = tracks.First();
-            await msg.ModifyAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Added {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} to the playback queue.");
+            await common.modify(ctx, msg, $"Added {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} to the playback queue.");
         }
     }
 
@@ -312,9 +292,9 @@ public class MusicModule : BaseCommandModule {
         string term) {
         var interactivity = ctx.Client.GetInteractivity();
 
-        var results = await YouTube.SearchAsync(term);
+        var results = (await YouTube.SearchAsync(term)).ToSeq();
         if (!results.Any()) {
-            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Nothing was found.");
+            await common.respond(ctx, "Nothing was found.");
             return;
         }
 
@@ -327,7 +307,7 @@ public class MusicModule : BaseCommandModule {
 
         var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User, TimeSpan.FromSeconds(30));
         if (res.TimedOut || res.Result == null) {
-            await msg.ModifyAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} No choice was made.");
+            await common.modify(ctx, msg, "No choice was made.");
             return;
         }
 
@@ -338,16 +318,17 @@ public class MusicModule : BaseCommandModule {
             }
         }
         else if (elInd < 1) {
-            await msg.ModifyAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Invalid choice was made.");
+            await common.modify(ctx, msg, "Invalid choice was made.");
             return;
         }
 
         if (!MusicCommon.NumberMappings.ContainsKey(elInd)) {
-            await msg.ModifyAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Invalid choice was made.");
+            await common.modify(ctx, msg, "Invalid choice was made.");
             return;
         }
+
         if (elInd == -1) {
-            await msg.ModifyAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Choice cancelled.");
+            await common.modify(ctx, msg, "Choice cancelled.");
             return;
         }
 
@@ -355,10 +336,9 @@ public class MusicModule : BaseCommandModule {
         var url = new Uri($"https://youtu.be/{el.Id}");
 
         var trackLoad = await Music.GetTracksAsync(url);
-        var tracks = trackLoad.Tracks;
+        var tracks = trackLoad.Tracks.ToSeq();
         if (trackLoad.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks.Any()) {
-            await msg.ModifyAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} No tracks were found at specified link.");
+            await common.modify(ctx, msg, "No tracks were found at specified link.");
             return;
         }
 
@@ -366,19 +346,16 @@ public class MusicModule : BaseCommandModule {
         foreach (var track in tracks)
             GuildMusic.Enqueue(track);
 
-        var vs = ctx.Member.VoiceState;
-        var chn = vs.Channel;
+        var chn = getChannel(ctx);
         await GuildMusic.CreatePlayerAsync(chn);
         await GuildMusic.PlayAsync();
 
         if (trackCount > 1) {
-            await msg.ModifyAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Added {trackCount:#,##0} tracks to playback queue.");
+            await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
         }
         else {
             var track = tracks.First();
-            await msg.ModifyAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Added {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} to the playback queue.");
+            await common.modify(ctx, msg, $"Added {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} to the playback queue.");
         }
     }
 
@@ -389,11 +366,10 @@ public class MusicModule : BaseCommandModule {
         await GuildMusic.seedQueue();
         var track_ = GuildMusic.Queue.First();
 
-        var vs = ctx.Member.VoiceState;
-        var chn = vs.Channel;
+        var chn = getChannel(ctx);
         await GuildMusic.CreatePlayerAsync(chn);
         await GuildMusic.PlayAsync();
-        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Started playing {artist}.");
+        await common.respond(ctx, $"Started playing {artist}.");
     }
 
     [Command("stopartist"), Description("Stops playing tracks from an artist."), Aliases("sa")]
@@ -404,8 +380,7 @@ public class MusicModule : BaseCommandModule {
         await GuildMusic.StopAsync();
         await GuildMusic.DestroyPlayerAsync();
 
-        await ctx.RespondAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Removed {rmd:#,##0} tracks from the queue.");
+        await common.respond(ctx, $"Removed {rmd:#,##0} tracks from the queue.");
     }
 
     [Command("stop"), Description("Stops playback and quits the voice channel.")]
@@ -415,8 +390,7 @@ public class MusicModule : BaseCommandModule {
         GuildMusic.clearQueue();
         await GuildMusic.DestroyPlayerAsync();
 
-        await ctx.RespondAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Removed {rmd:#,##0} tracks from the queue.");
+        await common.respond(ctx, $"Removed {rmd:#,##0} tracks from the queue.");
     }
 
     [Command("clear"), Description("Clears the queue.")]
@@ -424,29 +398,26 @@ public class MusicModule : BaseCommandModule {
         int rmd = GuildMusic.EmptyQueue();
         GuildMusic.clearQueue();
 
-        await ctx.RespondAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Removed {rmd:#,##0} tracks from the queue uwu");
+        await common.respond(ctx, $"Removed {rmd:#,##0} tracks from the queue uwu");
     }
 
     [Command("pause"), Description("Pauses playback.")]
     public async Task PauseAsync(CommandContext ctx) {
         await GuildMusic.PauseAsync();
-        await ctx.RespondAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Playback paused. Use {Formatter.InlineCode($"{ctx.Prefix}resume")} to resume playback.");
+        await common.respond(ctx, $"Playback paused. Use {Formatter.InlineCode($"{ctx.Prefix}resume")} to resume playback.");
     }
 
     [Command("resume"), Description("Resumes playback."), Aliases("unpause")]
     public async Task ResumeAsync(CommandContext ctx) {
         await GuildMusic.ResumeAsync();
-        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Playback resumed.");
+        await common.respond(ctx, "Playback resumed.");
     }
 
     [Command("skip"), Description("Skips current track."), Aliases("next")]
     public async Task SkipAsync(CommandContext ctx) {
         var track = GuildMusic.NowPlaying;
         await GuildMusic.StopAsync();
-        await ctx.RespondAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
+        await common.respond(ctx, $"{Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
     }
 
     [Command("skip"), Description("Skips current track.")]
@@ -454,8 +425,7 @@ public class MusicModule : BaseCommandModule {
         for (int i = 0; i < num; i++) {
             var track = GuildMusic.NowPlaying;
             await GuildMusic.StopAsync();
-            await ctx.RespondAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
+            await common.respond(ctx, $"{Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
             await Task.Delay(500); // wait for the next one
         }
     }
@@ -463,22 +433,19 @@ public class MusicModule : BaseCommandModule {
     [Command("seek"), Description("Seeks to specified time in current track.")]
     public async Task SeekAsync(CommandContext ctx, [Description("Which time point to seek to.")] TimeSpan position) {
         await GuildMusic.SeekAsync(position, false);
-        await ctx.RespondAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Seeking to {position.ToDurationString()}...");
+        await common.respond(ctx, $"Seeking to {position.ToDurationString()}...");
     }
 
     [Command("forward"), Description("Forwards the track by specified amount of time.")]
     public async Task ForwardAsync(CommandContext ctx, [Description("By how much to forward.")] TimeSpan offset) {
         await GuildMusic.SeekAsync(offset, true);
-        await ctx.RespondAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Seeking forward by {offset.ToDurationString()}...");
+        await common.respond(ctx, $"Seeking forward by {offset.ToDurationString()}...");
     }
 
     [Command("rewind"), Description("Rewinds the track by specified amount of time.")]
     public async Task RewindAsync(CommandContext ctx, [Description("By how much to rewind.")] TimeSpan offset) {
         await GuildMusic.SeekAsync(-offset, true);
-        await ctx.RespondAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Seeking backward by {offset.ToDurationString()}...");
+        await common.respond(ctx, $"Seeking backward by {offset.ToDurationString()}...");
     }
 
     [Command("volume"), Description("Sets playback volume."), Aliases("v")]
@@ -486,41 +453,36 @@ public class MusicModule : BaseCommandModule {
         [Description("Volume to set. Can be 0-150. Default 100.")]
         int volume) {
         if (volume is < 0 or > 1000) {
-            await ctx.RespondAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Volume must be greater than 0, and less than or equal to 1000.");
+            await common.respond(ctx, "Volume must be greater than 0, and less than or equal to 1000.");
             return;
         }
 
         await GuildMusic.SetVolumeAsync(volume);
-        await ctx.RespondAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Volume set to {GuildMusic.effectiveVolume}%.");
+        await common.respond(ctx, $"Volume set to {GuildMusic.effectiveVolume}%.");
     }
 
     [Command("volume"), Description("Gets playback volume.")]
     public async Task GetVolumeAsync(CommandContext ctx) {
-        await ctx.RespondAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Volume is {GuildMusic.volume} * {GuildMusic.artistVolume} = {GuildMusic.effectiveVolume}%.");
+        await common.respond(ctx, $"Volume is {GuildMusic.volume} * {GuildMusic.artistVolume} = {GuildMusic.effectiveVolume}%.");
     }
 
     [Command("restart"), Description("Restarts the playback of the current track.")]
     public async Task RestartAsync(CommandContext ctx) {
         var track = GuildMusic.NowPlaying;
         await GuildMusic.RestartAsync();
-        await ctx.RespondAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} restarted.");
+        await common.respond(ctx, $"{Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} restarted.");
     }
 
     [Command("remove"), Description("Removes a track from playback queue."), Aliases("del", "rm")]
     public async Task RemoveAsync(CommandContext ctx, [Description("Which track to remove.")] int index) {
         var itemN = GuildMusic.Remove(index - 1);
         if (itemN == null) {
-            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} No such track.");
+            await common.respond(ctx, "No such track.");
             return;
         }
 
         var track = itemN;
-        await ctx.RespondAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} removed.");
+        await common.respond(ctx, $"{Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} removed.");
     }
 
     [Command("queue"), Description("Displays current playback queue."), Aliases("q")]
@@ -540,9 +502,9 @@ public class MusicModule : BaseCommandModule {
         var trk = GuildMusic.NowPlaying;
         if (!pages.Any()) {
             if (trk?.TrackString == null)
-                await ctx.RespondAsync("Queue is empty!");
+                await common.respond(ctx, "Queue is empty!");
             else
-                await ctx.RespondAsync($"Now playing: {GuildMusic.NowPlaying.ToTrackString()}");
+                await common.respond(ctx, $"Now playing: {GuildMusic.NowPlaying.ToTrackString()}");
 
             return;
         }
@@ -562,18 +524,16 @@ public class MusicModule : BaseCommandModule {
     public async Task NowPlayingAsync(CommandContext ctx) {
         var track = GuildMusic.NowPlaying;
         if (GuildMusic.NowPlaying?.TrackString == null) {
-            await ctx.RespondAsync("Not playing.");
+            await common.respond(ctx, "Not playing.");
         }
         else {
-            await ctx.RespondAsync(
-                $"Now playing: {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{GuildMusic.NowPlaying.Length.ToDurationString()}].");
+            await common.respond(ctx, $"Now playing: {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{GuildMusic.NowPlaying.Length.ToDurationString()}].");
         }
     }
 
     [Command("playerinfo"), Description("Displays information about current player."), Aliases("pinfo", "pinf"), Hidden]
     public async Task PlayerInfoAsync(CommandContext ctx) {
-        await ctx.RespondAsync(
-            $"Queue length: {GuildMusic.Queue.Count}\nVolume: {GuildMusic.volume}%");
+        await common.respond(ctx, $"Queue length: {GuildMusic.Queue.Count}\nVolume: {GuildMusic.volume}%");
     }
 }
 
