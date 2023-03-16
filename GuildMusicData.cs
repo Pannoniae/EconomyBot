@@ -268,13 +268,13 @@ public sealed class GuildMusicData {
     /// </summary>
     /// <returns></returns>
     public async Task CreatePlayerAsync(DiscordChannel channel) {
-        if (Player != null && Player.IsConnected)
+        if (Player != null && Player.IsConnected) {
             return;
+        }
 
-        var node = Node;
-        Player = await node.ConnectAsync(channel);
+        Player = await Node.ConnectAsync(channel);
 
-        SetVolumeAsync(volume);
+        await SetVolumeAsync(volume);
 
         if (!eq) {
             enableEQ();
