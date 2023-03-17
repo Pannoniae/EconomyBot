@@ -12,11 +12,10 @@ public class MusicCommon {
     public static ImmutableDictionary<int, DiscordEmoji> NumberMappings { get; }
 
     public static ImmutableDictionary<DiscordEmoji, int> NumberMappingsReverse { get; }
-    public static ImmutableArray<DiscordEmoji> Numbers { get; }
 
     static MusicCommon() {
         instance = new MusicCommon();
-        var iab = ImmutableArray.CreateBuilder<DiscordEmoji>();
+        /*var iab = ImmutableArray.CreateBuilder<DiscordEmoji>();
         iab.Add(DiscordEmoji.FromUnicode("0\u20e3"));
         iab.Add(DiscordEmoji.FromUnicode("1\u20e3"));
         iab.Add(DiscordEmoji.FromUnicode("2\u20e3"));
@@ -29,7 +28,7 @@ public class MusicCommon {
         iab.Add(DiscordEmoji.FromUnicode("9\u20e3"));
         iab.Add(DiscordEmoji.FromName(Program.client, ":keycap_ten:"));
         iab.Add(DiscordEmoji.FromUnicode("\u274c"));
-        Numbers = iab.ToImmutable();
+        Numbers = iab.ToImmutable();*/
 
         var idb = ImmutableDictionary.CreateBuilder<int, DiscordEmoji>();
         idb.Add(0, DiscordEmoji.FromUnicode("0\u20e3"));

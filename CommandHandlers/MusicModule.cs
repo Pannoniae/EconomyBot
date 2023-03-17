@@ -18,7 +18,7 @@ namespace EconomyBot;
 
 [ModuleLifespan(ModuleLifespan.Singleton)]
 public class MusicModule : BaseCommandModule {
-    private MusicService Music { get; }
+    private MusicService Music { get; set; }
     private YouTubeSearchProvider YouTube { get; }
 
     public GuildMusicData GuildMusic { get; set; }
@@ -47,6 +47,7 @@ public class MusicModule : BaseCommandModule {
     }
 
     public override async Task BeforeExecutionAsync(CommandContext ctx) {
+        Music = Program.musicService;
         if (ctx.Command.Name == "join") {
             GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild);
             GuildMusic.CommandChannel = ctx.Channel;
@@ -117,8 +118,7 @@ public class MusicModule : BaseCommandModule {
     public async Task AnalyseAsync(CommandContext ctx) {
         var sum = GuildMusicData.artistWeights.Values.Sum();
 
-        var weights = GuildMusicData.artistWeights.Select(
-            w => $"{w.Key}: {w.Value}");
+        var weights = GuildMusicData.artistWeights.Select(w => $"{w.Key}: {w.Value}");
         var weightsp = GuildMusicData.artistWeights.Select(
             w => $"{w.Key}: {(w.Value / sum) * 100:#.##}%");
 
@@ -237,7 +237,7 @@ public class MusicModule : BaseCommandModule {
             PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
 
         var msgC =
-            $"Type a number 1-{results.Count()} to queue a track. To cancel, type cancel or {MusicCommon.Numbers.Last()}.";
+            $"Type a number 1-{results.Count()} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last().Key}.";
         var msg = await ctx.RespondAsync(msgC);
 
         var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User, TimeSpan.FromMinutes(2));
@@ -306,7 +306,7 @@ public class MusicModule : BaseCommandModule {
             results.Select((x, i) =>
                 $"{MusicCommon.NumberMappings[i + 1]} {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Author)))}"));
         msgC =
-            $"{msgC}\n\nType a number 1-{results.Count()} to queue a track. To cancel, type cancel or {MusicCommon.Numbers.Last()}.";
+            $"{msgC}\n\nType a number 1-{results.Count()} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last().Key}.";
         var msg = await ctx.RespondAsync(msgC);
 
         var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User, TimeSpan.FromSeconds(30));

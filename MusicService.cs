@@ -72,7 +72,7 @@ public sealed class MusicService {
             return gmd;
 
         gmd = MusicData.AddOrUpdate(guild.Id, new GuildMusicData(guild, Lavalink, node),
-            (_, v) => v);
+            (k, v) => v);
 
         return gmd;
     }
