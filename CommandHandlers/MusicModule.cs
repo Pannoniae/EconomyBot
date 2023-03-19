@@ -237,7 +237,7 @@ public class MusicModule : BaseCommandModule {
             PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
 
         var msgC =
-            $"Type a number 1-{results.Count()} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last().Key}.";
+            $"Type a number 1-{results.Count()} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
         var msg = await ctx.RespondAsync(msgC);
 
         var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User, TimeSpan.FromMinutes(2));
@@ -306,7 +306,7 @@ public class MusicModule : BaseCommandModule {
             results.Select((x, i) =>
                 $"{MusicCommon.NumberMappings[i + 1]} {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Author)))}"));
         msgC =
-            $"{msgC}\n\nType a number 1-{results.Count()} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last().Key}.";
+            $"{msgC}\n\nType a number 1-{results.Count()} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
         var msg = await ctx.RespondAsync(msgC);
 
         var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User, TimeSpan.FromSeconds(30));
@@ -496,6 +496,10 @@ public class MusicModule : BaseCommandModule {
 
     [Command("queue"), Description("Displays current playback queue."), Aliases("q")]
     public async Task QueueAsync(CommandContext ctx) {
+        var trk = GuildMusic.NowPlaying;
+        if (trk?.TrackString == null) {
+            await common.respond(ctx, "Queue is empty!");
+        }
         var interactivity = ctx.Client.GetInteractivity();
 
         var pageCount = GuildMusic.Queue.Count / 10 + 1;
@@ -508,13 +512,9 @@ public class MusicModule : BaseCommandModule {
                     $"Now playing: {GuildMusic.NowPlaying.ToTrackString()}\n\n{string.Join("\n", xg.Select(xa => $"`{xa.i + 1:00}` {xa.s}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
             .ToArray();
 
-        var trk = GuildMusic.NowPlaying;
+        
         if (!pages.Any()) {
-            if (trk?.TrackString == null)
-                await common.respond(ctx, "Queue is empty!");
-            else
-                await common.respond(ctx, $"Now playing: {GuildMusic.NowPlaying.ToTrackString()}");
-
+            await common.respond(ctx, $"Now playing: {GuildMusic.NowPlaying.ToTrackString()}");
             return;
         }
 
@@ -531,8 +531,8 @@ public class MusicModule : BaseCommandModule {
 
     [Command("nowplaying"), Description("Displays information about currently-played track."), Aliases("np")]
     public async Task NowPlayingAsync(CommandContext ctx) {
-        var track = GuildMusic.NowPlaying;
-        if (GuildMusic.NowPlaying?.TrackString == null) {
+        var track = GuildMusic.NowPlaying; 
+        if (track == null) {
             await common.respond(ctx, "Not playing.");
         }
         else {
