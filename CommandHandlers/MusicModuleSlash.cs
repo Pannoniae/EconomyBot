@@ -1,13 +1,9 @@
-﻿using System.Globalization;
-using System.Net;
-using DSharpPlus;
+﻿using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
-using DSharpPlus.Lavalink;
 using DSharpPlus.SlashCommands;
-using EconomyBot.CommandHandlers;
 
 namespace EconomyBot;
 

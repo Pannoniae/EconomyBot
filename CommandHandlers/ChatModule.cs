@@ -28,4 +28,10 @@ public class ChatModule : BaseCommandModule {
         var num = new Random().Next(1, sides+1);
         await ctx.RespondAsync($"You rolled {num}!");
     }
+
+    [Command]
+    public async Task save(CommandContext ctx) {
+        var names = (await ctx.Guild.GetAllMembersAsync()).Select(member => member.ToString()).ToList();
+        await File.WriteAllLinesAsync(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/names.txt", names);
+    }
 }

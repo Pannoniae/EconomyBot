@@ -9,7 +9,6 @@ using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Lavalink;
-using EconomyBot.CommandHandlers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Formatter = DSharpPlus.Formatter;
@@ -86,7 +85,7 @@ public class MusicModule : BaseCommandModule {
 
     [Command("reset"), Description("Reset the voice state.")]
     public async Task ResetAsync(CommandContext ctx) {
-        reset();
+        await reset();
         await GuildMusic.DestroyPlayerAsync();
     }
 
@@ -128,7 +127,7 @@ public class MusicModule : BaseCommandModule {
 
     [Command("stopjazz"), Description("Stops jazz.")]
     public async Task StopJazzAsync(CommandContext ctx) {
-        reset();
+        await reset();
         await common.respond(ctx, "Stopped jazz.");
     }
 

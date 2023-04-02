@@ -93,9 +93,7 @@ public sealed class GuildMusicData {
     /// Creates a new instance of playback data.
     /// </summary>
     /// <param name="guild">Guild to track data for.</param>
-    /// <param name="rng">Cryptographically-secure random number generator implementation.</param> 
     /// <param name="lavalink">Lavalink service.</param>
-    /// <param name="redis">Redis service.</param>
     /// <param name="node">The Lavalink node this guild is connected to.</param>
     public GuildMusicData(DiscordGuild guild, LavalinkExtension lavalink, LavalinkNodeConnection node) {
         Node = node;

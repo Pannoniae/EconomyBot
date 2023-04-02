@@ -16,7 +16,6 @@ using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Lavalink;
 using DSharpPlus.Net;
 using DSharpPlus.SlashCommands;
-using Emzi0767;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EconomyBot;
@@ -55,7 +54,6 @@ class Program {
             SocketEndpoint = endpoint
         };
         services = new ServiceCollection()
-            .AddTransient<SecureRandom>()
             .AddSingleton(new YouTubeSearchProvider())
             .BuildServiceProvider(true);
         var lavalink = discord.UseLavalink();
