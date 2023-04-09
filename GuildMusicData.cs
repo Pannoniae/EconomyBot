@@ -70,13 +70,15 @@ public sealed class GuildMusicData {
 
     public LavalinkNodeConnection Node { get; }
 
-    private static readonly Dictionary<string, Artist> artistMappings = new() {
-        { "_fats", new Artist("G:\\music\\fats", 1.2) },
-        { "ella", new Artist("G:\\music\\ella", 0.8) },
-        { "slim", new Artist("G:\\music\\slim", 0.8) },
-        { "jordan", new Artist("G:\\music\\jordan", 0.6) },
-        { "caravan palace", new Artist("G:\\music\\caravan palace", 0.6) },
-        { "tape5", new Artist("G:\\music\\tape5", 0.6) }
+    public static readonly Dictionary<string, Artist> artistMappings = new() {
+        { "_fats", new Artist("G:\\music\\Fats Waller", 1.2) },
+        { "ella", new Artist("G:\\music\\Ella Mae Morse", 0.8) },
+        { "slim", new Artist("G:\\music\\Slim Gaillard", 0.8) },
+        { "jordan", new Artist("G:\\music\\Louis Jordan", 0.6) },
+        { "caravan palace", new Artist("G:\\music\\Caravan Palace", 0.6, 2) },
+        { "tape5", new Artist("G:\\music\\Tape Five", 0.6) },
+        { "emerald", new Artist("G:\\music\\Caro Emerald", 0.6) },
+        { "berry", new Artist("G:\\music\\Chuck Berry", 0.6) }
     };
 
     public static readonly Dictionary<string, double> artistWeights = new();
@@ -109,7 +111,7 @@ public sealed class GuildMusicData {
             int fCount = Directory
                 .GetFiles(artist.Value.path, "*", new EnumerationOptions { RecurseSubdirectories = true })
                 .Length;
-            artistWeights[artist.Key] = fCount;
+            artistWeights[artist.Key] = fCount * artist.Value.weight;
         }
 
         Console.Out.WriteLine("Initialised artist weights.");
@@ -388,7 +390,6 @@ public sealed class GuildMusicData {
         var tracks_ = await Lavalink.ConnectedNodes.Values.First().Rest
             .GetTracksAsync(randomFile);
         foreach (var track in tracks_.Tracks) {
-            //Console.Out.WriteLine(tracks_.Tracks.Count());
             Enqueue(track, artist);
             await Console.Out.WriteLineAsync($"Enqueued {track.Title} at {track.Uri}");
         }
@@ -412,9 +413,9 @@ public sealed class GuildMusicData {
         var max = artistWeights.Values.Max();
         // return the online artist with the max. frequency of all played since we don't know the number of total songs
         var randomElement =
-            artistQueue.randomElementByWeight(e => artistWeights.ContainsKey(e) ? artistWeights[e] : max);
-        if (artistMappings.ContainsKey(randomElement)) {
-            await addToJazz(randomElement, artistMappings[randomElement].path);
+            artistQueue.randomElementByWeight(e => artistWeights.TryGetValue(e, out var element) ? element : max);
+        if (artistMappings.TryGetValue(randomElement, out var artist)) {
+            await addToJazz(randomElement, artist.path);
         }
 
         else {
@@ -424,10 +425,8 @@ public sealed class GuildMusicData {
 
     public async Task seedQueue() {
         // don't overqueue
-        for (var i = 0; i < 6; i++) {
-            while (Queue.Count < 6) {
-                await growQueue();
-            }
+        while (Queue.Count < 6) {
+            await growQueue();
         }
     }
 
@@ -467,7 +466,7 @@ public sealed class GuildMusicData {
     }
 }
 
-public record Artist(string path, double volume);
+public record Artist(string path, double volume, double weight = 1.0);
 
 public record Track(LavalinkTrack track, string? artist);
 

@@ -363,18 +363,19 @@ public class MusicModule : BaseCommandModule {
         }
     }
 
-    [Command("artist"), Description("Plays tracks from an artist."), Aliases("a")]
+    [Command("artist"), Description("Plays tracks from an matchedArtist."), Aliases("a")]
     public async Task ArtistAsync(CommandContext ctx, [RemainingText] string artist) {
-        GuildMusic.addToQueue(artist);
+        string matchedArtist = GuildMusicData.artistMappings.Keys.MaxBy(values => ActualFuzz.partialFuzz(artist, values))!;
+        GuildMusic.addToQueue(matchedArtist);
 
         await GuildMusic.seedQueue();
 
         await startPlayer(ctx);
         await GuildMusic.PlayAsync();
-        await common.respond(ctx, $"Started playing {artist}.");
+        await common.respond(ctx, $"Started playing {matchedArtist}.");
     }
 
-    [Command("stopartist"), Description("Stops playing tracks from an artist."), Aliases("sa")]
+    [Command("stopartist"), Description("Stops playing tracks from an matchedArtist."), Aliases("sa")]
     public async Task StopArtistAsync(CommandContext ctx) {
         GuildMusic.clearQueue();
 
@@ -385,7 +386,7 @@ public class MusicModule : BaseCommandModule {
         await common.respond(ctx, $"Removed {rmd:#,##0} tracks from the queue.");
     }
 
-    [Command("stop"), Description("Stops playback and quits the voice channel.")]
+    [Command("stop"), Description("Stops playback and quits the voice channel.")] 
     public async Task StopAsync(CommandContext ctx) {
         int rmd = GuildMusic.EmptyQueue();
         await GuildMusic.StopAsync();
