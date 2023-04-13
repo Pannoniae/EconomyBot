@@ -1,12 +1,15 @@
-﻿using DSharpPlus.CommandsNext;
+﻿using DSharpPlus;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using DSharpPlus.Net.Serialization;
 using Newtonsoft.Json.Linq;
 
 namespace EconomyBot;
 
 public class ImagesModule : BaseCommandModule {
     private readonly HttpClient client = new();
+
     [Command("muv"), Description("Ghost's anime thing.")]
     public async Task muvluv(CommandContext ctx, string luv) {
         if (luv == "luv") {
@@ -52,8 +55,7 @@ public class ImagesModule : BaseCommandModule {
 
     [Command("b"), Description("I love you Msozod :3")]
     public async Task b(CommandContext ctx) {
-
-        var response = await client.GetAsync("https://en.wikipedia.org/api/rest_v1/page/random/summary");
+        var response = await client.GetAsync("https://en. wikipedia.org/api/rest_v1/page/random/summary");
         var responseJson = JObject.Parse(await response.Content.ReadAsStringAsync());
 
         var title = responseJson["title"].Value<string>();
@@ -67,7 +69,6 @@ public class ImagesModule : BaseCommandModule {
 
     [Command("xkcd"), Description("Gets a random XKCD.")]
     public async Task xkcd(CommandContext ctx) {
-        
         int num;
         try {
             var latestComic = await client.GetAsync("https://xkcd.com/info.0.json");
@@ -79,16 +80,18 @@ public class ImagesModule : BaseCommandModule {
             await Console.Out.WriteLineAsync(e.ToString());
             return;
         }
-        
+
         var randomXKCD = new Random().Next(num);
 
         string title;
         string url;
+        string alt;
         try {
             var randomComic = await client.GetAsync($"https://xkcd.com/{randomXKCD}/info.0.json");
             var randomComicJson = JObject.Parse(await randomComic.Content.ReadAsStringAsync());
             title = randomComicJson["title"].Value<string>();
             url = randomComicJson["img"].Value<string>();
+            alt = randomComicJson["alt"].Value<string>();
         }
         catch (Exception e) {
             await ctx.RespondAsync("Failed to get XKCD.");
@@ -97,7 +100,14 @@ public class ImagesModule : BaseCommandModule {
         }
 
 
-        var embed = new DiscordEmbedBuilder().WithTitle(title).WithColor(DiscordColor.Purple).WithImageUrl(url).WithDescription($"XKCD #{randomXKCD}");
+        var embed = new DiscordEmbedBuilder().WithTitle(title).WithColor(DiscordColor.Purple).WithImageUrl(url)
+            .WithDescription(
+                Formatter.MaskedUrl($"XKCD #{randomXKCD}",
+                    new Uri($"https://xkcd.com/{randomXKCD}"),
+                    "Two little squirrels!")
+                + Environment.NewLine
+                + alt);
+
         await ctx.RespondAsync(embed);
     }
 }

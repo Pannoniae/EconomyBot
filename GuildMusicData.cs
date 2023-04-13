@@ -70,15 +70,20 @@ public sealed class GuildMusicData {
 
     public LavalinkNodeConnection Node { get; }
 
+    // TODO implement a *proper* music weighting system
+
     public static readonly Dictionary<string, Artist> artistMappings = new() {
         { "_fats", new Artist("G:\\music\\Fats Waller", 1.2) },
-        { "ella", new Artist("G:\\music\\Ella Mae Morse", 0.8) },
-        { "slim", new Artist("G:\\music\\Slim Gaillard", 0.8) },
-        { "jordan", new Artist("G:\\music\\Louis Jordan", 0.6) },
+        { "ella mae morse", new Artist("G:\\music\\Ella Mae Morse", 0.8) },
+        { "slim gaillard", new Artist("G:\\music\\Slim Gaillard", 0.8) },
+        { "louis jordan", new Artist("G:\\music\\Louis Jordan", 0.6) },
         { "caravan palace", new Artist("G:\\music\\Caravan Palace", 0.6, 2) },
-        { "tape5", new Artist("G:\\music\\Tape Five", 0.6) },
-        { "emerald", new Artist("G:\\music\\Caro Emerald", 0.6) },
-        { "berry", new Artist("G:\\music\\Chuck Berry", 0.6) }
+        { "tape five", new Artist("G:\\music\\Tape Five", 0.6) },
+        { "caro emerald", new Artist("G:\\music\\Caro Emerald", 0.6) },
+        { "chuck berry", new Artist("G:\\music\\Chuck Berry", 0.6, 0.5) }, // most of this is trash
+        { "jamie berry", new Artist("G:\\music\\Jamie Berry", 0.5) },
+        { "sim gretina", new Artist("G:\\music\\Sim Gretina", 0.6, 0) }, // too much earrape
+        { "freshly squeezed", new Artist("G:\\music\\Freshly Squeezed Music", 0.6, 0.25) }
     };
 
     public static readonly Dictionary<string, double> artistWeights = new();
@@ -312,7 +317,7 @@ public sealed class GuildMusicData {
     private async Task Player_PlaybackFinished(LavalinkGuildConnection con, TrackFinishEventArgs e) {
         await Task.Delay(500);
         if (artistQueue.Any() && Queue.Count < 6) {
-            await growQueue();
+            await seedQueue();
         }
 
         await PlayHandlerAsync();
