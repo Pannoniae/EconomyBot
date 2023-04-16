@@ -77,6 +77,7 @@ public sealed class MusicService {
             (k, v) => v);
 
         await getDBForGuild(guild);
+        await gmd.setupWebhooks();
 
         return gmd;
     }

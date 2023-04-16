@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.Lavalink;
 using DSharpPlus.Lavalink.EventArgs;
@@ -26,6 +27,10 @@ namespace EconomyBot;
 /// Represents data for the music playback in a discord guild.
 /// </summary>
 public sealed class GuildMusicData {
+    
+    private WebhookCache webhookCache;
+    
+    
     /// <summary>
     /// Is EQ enabled?
     /// </summary>
@@ -118,8 +123,22 @@ public sealed class GuildMusicData {
                 .Length;
             artistWeights[artist.Key] = fCount * artist.Value.weight;
         }
+        webhookCache = new WebhookCache(Guild);
 
         Console.Out.WriteLine("Initialised artist weights.");
+    }
+
+    public async Task setupWebhooks() {
+        await webhookCache.setup();
+    }
+
+    public async Task setupForChannel(DiscordChannel channel) {
+        await webhookCache.setupForChannel(channel);
+    }
+
+    public async Task<DiscordWebhook> getWebhook(DiscordChannel channel) {
+        await webhookCache.setupForChannel(channel);
+        return webhookCache.getWebhook(channel);
     }
 
     /// <summary>

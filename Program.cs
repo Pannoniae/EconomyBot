@@ -143,16 +143,13 @@ class Program {
             await e.Message.RespondAsync("shut up");
         }
         
+        // Funny replacement handling
+        // todo
         
-        // Makhno is annoying
-        //if (e.Author.Id == 1035604993966866452 && e.Message.Content.Contains("trans")) {
-        //    await (await e.Guild.GetMemberAsync(1035604993966866452)).TimeoutAsync(DateTimeOffset.Now.AddMinutes(20), "Stop talking about trans");
-        //}
-
-        //await Console.Out.WriteLineAsync(e.Message.Content);
-            // Toxicity handler
+        // Toxicity handler
         if (!e.Message.Content.StartsWith('.') && !e.Message.Content.StartsWith('/')) {
             await toxicity.handleMessage(client, e.Message);
+            await wiltery.handleMessage(client, e.Message);
         }
 
         if (e.Author.Id == 947229156448538634) {
@@ -176,6 +173,7 @@ class Program {
         musicService = new MusicService(lavalink, LavalinkNode);
         imagesModule = new ImagesModule();
         toxicity = new ToxicityHandler();
+        wiltery = new WilteryHandler();
         //await MusicModule.setup(client);
 
         Console.WriteLine("Setup done!");
@@ -184,7 +182,8 @@ class Program {
     public static LavalinkNodeConnection LavalinkNode;
     public static MusicService musicService;
     public static ImagesModule imagesModule;
-    private static ToxicityHandler toxicity;
+    public static ToxicityHandler toxicity;
+    public static WilteryHandler wiltery;
 
     private static async Task errorHandler(CommandsNextExtension sender, CommandErrorEventArgs e) {
         switch (e.Exception) {

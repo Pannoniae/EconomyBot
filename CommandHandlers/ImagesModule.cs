@@ -97,7 +97,7 @@ public class ImagesModule : BaseCommandModule {
             await ctx.RespondAsync("Failed to get XKCD.");
             await Console.Out.WriteLineAsync(e.ToString());
             return;
-        }
+        } 
 
 
         var embed = new DiscordEmbedBuilder().WithTitle(title).WithColor(DiscordColor.Purple).WithImageUrl(url)
@@ -107,7 +107,7 @@ public class ImagesModule : BaseCommandModule {
                     "Two little squirrels!")
                 + Environment.NewLine
                 + alt);
-
+    
         await ctx.RespondAsync(embed);
     }
 }
