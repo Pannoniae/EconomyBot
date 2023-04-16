@@ -20,14 +20,14 @@ public class WebhookCache {
     /// <summary>
     /// Setup webhook mappings from channel to webhook.
     /// </summary>
-    public async Task setup() {
-        foreach (var (id, channel) in Guild.Channels.Where(chn =>
-                     chn.Value.Type != ChannelType.Category && chn.Value.Type != ChannelType.Voice && // not invalid channel
-                     chn.Value.Name != "admin" && // not admin
-                     (chn.Value.Parent == null || !chn.Value.Parent.Name.ToLower().Contains("archive"))) // not in archive
-                 ) {
-            await setupForChannel(channel);
-        }
+    public void setup() {
+        var enumerable = Guild.Channels.AsParallel().Where(chn =>
+            chn.Value.Type != ChannelType.Category &&
+            chn.Value.Type != ChannelType.Voice && // not invalid channel
+            chn.Value.Name != "admin" && // not admin
+            (chn.Value.Parent == null || !chn.Value.Parent.Name.ToLower().Contains("archive")));
+        Parallel.ForEach(enumerable,
+            chn => _ = setupForChannel(chn.Value)); // not in archive
     }
 
     public async Task setupForChannel(DiscordChannel channel) {
@@ -35,6 +35,7 @@ public class WebhookCache {
         if (channel.Type is ChannelType.PrivateThread or ChannelType.PublicThread) {
             effectiveChannel = channel.Parent;
         }
+
         await Console.Out.WriteLineAsync($"{effectiveChannel.Id}, {effectiveChannel.Name}");
         var webhooksForChannel = await effectiveChannel.GetWebhooksAsync();
         var ourWebhook = webhooksForChannel.FirstOrDefault(webhook => webhook.Name == "jazz");
