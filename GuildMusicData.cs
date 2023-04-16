@@ -129,7 +129,7 @@ public sealed class GuildMusicData {
     }
 
     public async Task setupWebhooks() {
-        await webhookCache.setup();
+        webhookCache.setup();
     }
 
     public async Task setupForChannel(DiscordChannel channel) {
