@@ -10,7 +10,7 @@ namespace EconomyBot;
 public class WebhookCache {
     private DiscordGuild Guild;
 
-    private Dictionary<DiscordChannel, DiscordWebhook> webhooks = new();
+    private readonly Dictionary<DiscordChannel, DiscordWebhook> webhooks = new();
 
     public WebhookCache(DiscordGuild guild) {
         Guild = guild;
@@ -25,12 +25,15 @@ public class WebhookCache {
             chn.Value.Type != ChannelType.Category &&
             chn.Value.Type != ChannelType.Voice && // not invalid channel
             chn.Value.Name != "admin" && // not admin
-            (chn.Value.Parent == null || !chn.Value.Parent.Name.ToLower().Contains("archive")));
-        Parallel.ForEach(enumerable,
-            chn => _ = setupForChannel(chn.Value)); // not in archive
+            (chn.Value.Parent == null || !chn.Value.Parent.Name.ToLower().Contains("archive"))); // not in archive
+        Parallel.ForEachAsync(enumerable,
+            async (chn, token) => await setupForChannel(chn.Value));
     }
 
     public async Task setupForChannel(DiscordChannel channel) {
+        if (webhooks.TryGetValue(channel, out var w)) {
+            return; // already initialised
+        }
         var effectiveChannel = channel;
         if (channel.Type is ChannelType.PrivateThread or ChannelType.PublicThread) {
             effectiveChannel = channel.Parent;
