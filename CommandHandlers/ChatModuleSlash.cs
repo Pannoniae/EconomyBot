@@ -8,6 +8,8 @@ public class ChatModuleSlash : ApplicationCommandModule {
     [SlashCommand("purge", "")]
     public async Task purge(InteractionContext ctx, [Option("amt", "Amount")] long amt) {
         var messages = await ctx.Channel.GetMessagesAsync((int)amt);
+        var message = string.Join("\n", messages.Select(m => $"{m.Timestamp} {m.Author}: {m.Content}"));
+        await ctx.Guild.GetChannel(Program.LOG).SendMessageAsync(message);
         await ctx.Channel.DeleteMessagesAsync(messages);
         await ctx.CreateResponseAsync($"Deleted {amt} messages!");
     }

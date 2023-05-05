@@ -8,10 +8,8 @@ namespace EconomyBot;
 
 [ModuleLifespan(ModuleLifespan.Singleton)]
 public class ChatModule : BaseCommandModule {
-
-    
     private MusicService Music { get; set; }
-    
+
     /// <summary>
     /// I know the name is bad, will refactor.
     /// </summary>
@@ -29,6 +27,11 @@ public class ChatModule : BaseCommandModule {
 
         //await GuildMusic.setupForChannel(ctx.Channel);
     }
+    
+    static IEnumerable<string> ChunksUpTo(string str, int maxChunkSize) {
+        for (int i = 0; i < str.Length; i += maxChunkSize) 
+            yield return str.Substring(i, Math.Min(maxChunkSize, str.Length-i));
+    }
 
     /// <summary>
     /// Retards abused it so it's manage messages-only. Thank you.
@@ -37,7 +40,22 @@ public class ChatModule : BaseCommandModule {
     [Command]
     [RequirePermissions(Permissions.ManageMessages)]
     public async Task purge(CommandContext ctx, int amt) {
-        var messages = await ctx.Channel.GetMessagesAsync(amt);
+        IReadOnlyList<DiscordMessage> messages;
+        if (ctx.Message.Reference != null) {
+            await Console.Out.WriteLineAsync("Purging from given message!");
+            messages = await ctx.Channel.GetMessagesBeforeAsync(ctx.Message.Reference.Message.Id, amt);
+        }
+        else {
+            messages = await ctx.Channel.GetMessagesAsync(amt);
+        }
+        
+        var message = string.Join("\n",
+            messages.Select(m => $"{m.Timestamp} {m.Author.Username}#{m.Author.Discriminator}: {m.Content}").Reverse());
+        var logMessages = ChunksUpTo(message, 1984);
+        foreach (var msg in logMessages) {
+            await ctx.Guild.GetChannel(Program.LOG).SendMessageAsync(msg);
+
+        }
         await ctx.Channel.DeleteMessagesAsync(messages);
         await ctx.RespondAsync($"Deleted {amt} messages!");
     }
@@ -85,14 +103,12 @@ public class ChatModule : BaseCommandModule {
     }
 
     [Command("webhook")]
-    public async Task sendWebhook(CommandContext ctx, string message) {
+    public async Task sendWebhook(CommandContext ctx, [RemainingText] string message) {
         await Program.wiltery.sendWebhookToChannel(ctx.Channel, message);
     }
-    
+
     [Command("user")]
-    public async Task userWebhook(CommandContext ctx, string message) {
+    public async Task userWebhook(CommandContext ctx, [RemainingText] string message) {
         await Program.wiltery.sendWebhookToChannelAsUser(ctx.Channel, message, ctx.Member);
     }
-
-    
 }

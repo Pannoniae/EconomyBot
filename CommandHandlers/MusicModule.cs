@@ -30,8 +30,8 @@ public class MusicModule : BaseCommandModule {
         YouTube = yt;
     }
 
-    private static DiscordChannel getChannel(CommandContext ctx) {
-        return ctx.Member!.VoiceState.Channel;
+    private static DiscordChannel? getChannel(CommandContext ctx) {
+        return ctx.Member?.VoiceState?.Channel;
     }
 
     private async Task startPlayer(CommandContext ctx) {
@@ -135,7 +135,7 @@ public class MusicModule : BaseCommandModule {
     public async Task PlayAsync(CommandContext ctx,
         [Description("URL to play from.")] Uri uri) {
         var trackLoad = await Music.GetTracksAsync(uri);
-        var tracks = trackLoad.Tracks.ToSeq();
+        var tracks = toSeq(trackLoad.Tracks);
         if (trackLoad.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks.Any()) {
             await common.respond(ctx, "No tracks were found at specified link.");
             return;
@@ -157,7 +157,7 @@ public class MusicModule : BaseCommandModule {
         await GuildMusic.PlayAsync();
 
         if (trackCount > 1)
-            await common.respond(ctx, $"Added {trackCount:#,##0} tracks to playback queue.");
+            await common.respond(ctx, $"Added {trackCount:#,##} tracks to playback queue.");
         else {
             var track = tracks.First();
             await common.respond(ctx,
@@ -250,12 +250,10 @@ public class MusicModule : BaseCommandModule {
             if (resInd.ToLowerInvariant() == "cancel") {
                 elInd = -1;
             }
-            else {
-                if (elInd < 0 || elInd > results.Count()) {
-                    await common.modify(ctx, msg, "Invalid choice was made.");
-                    return;
-                }
-            }
+        }
+        else if (elInd < 0 || elInd > results.Count()) {
+            await common.modify(ctx, msg, "Invalid choice was made.");
+            return;
         }
 
         if (elInd == -1) {
@@ -365,7 +363,8 @@ public class MusicModule : BaseCommandModule {
 
     [Command("artist"), Description("Plays tracks from an matchedArtist."), Aliases("a")]
     public async Task ArtistAsync(CommandContext ctx, [RemainingText] string artist) {
-        string matchedArtist = GuildMusicData.artistMappings.Keys.MaxBy(values => ActualFuzz.partialFuzz(artist, values))!;
+        string matchedArtist =
+            GuildMusicData.artistMappings.Keys.MaxBy(values => ActualFuzz.partialFuzz(artist, values))!;
         GuildMusic.addToQueue(matchedArtist);
 
         await GuildMusic.seedQueue();
@@ -386,7 +385,7 @@ public class MusicModule : BaseCommandModule {
         await common.respond(ctx, $"Removed {rmd:#,##0} tracks from the queue.");
     }
 
-    [Command("stop"), Description("Stops playback and quits the voice channel.")] 
+    [Command("stop"), Description("Stops playback and quits the voice channel.")]
     public async Task StopAsync(CommandContext ctx) {
         int rmd = GuildMusic.EmptyQueue();
         await GuildMusic.StopAsync();
@@ -500,6 +499,7 @@ public class MusicModule : BaseCommandModule {
         if (trk?.TrackString == null) {
             await common.respond(ctx, "Queue is empty!");
         }
+
         var interactivity = ctx.Client.GetInteractivity();
 
         var pageCount = GuildMusic.Queue.Count / 10 + 1;
@@ -512,7 +512,7 @@ public class MusicModule : BaseCommandModule {
                     $"Now playing: {GuildMusic.NowPlaying.ToTrackString()}\n\n{string.Join("\n", xg.Select(xa => $"`{xa.i + 1:00}` {xa.s}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
             .ToArray();
 
-        
+
         if (!pages.Any()) {
             await common.respond(ctx, $"Now playing: {GuildMusic.NowPlaying.ToTrackString()}");
             return;
@@ -531,7 +531,7 @@ public class MusicModule : BaseCommandModule {
 
     [Command("nowplaying"), Description("Displays information about currently-played track."), Aliases("np")]
     public async Task NowPlayingAsync(CommandContext ctx) {
-        var track = GuildMusic.NowPlaying; 
+        var track = GuildMusic.NowPlaying;
         if (track == null) {
             await common.respond(ctx, "Not playing.");
         }

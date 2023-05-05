@@ -78,17 +78,21 @@ public sealed class GuildMusicData {
     // TODO implement a *proper* music weighting system
 
     public static readonly Dictionary<string, Artist> artistMappings = new() {
-        { "_fats", new Artist("G:\\music\\Fats Waller", 1.2) },
-        { "ella mae morse", new Artist("G:\\music\\Ella Mae Morse", 0.8) },
-        { "slim gaillard", new Artist("G:\\music\\Slim Gaillard", 0.8) },
-        { "louis jordan", new Artist("G:\\music\\Louis Jordan", 0.6) },
-        { "caravan palace", new Artist("G:\\music\\Caravan Palace", 0.6, 2) },
-        { "tape five", new Artist("G:\\music\\Tape Five", 0.6) },
-        { "caro emerald", new Artist("G:\\music\\Caro Emerald", 0.6) },
-        { "chuck berry", new Artist("G:\\music\\Chuck Berry", 0.6, 0.5) }, // most of this is trash
-        { "jamie berry", new Artist("G:\\music\\Jamie Berry", 0.5) },
-        { "sim gretina", new Artist("G:\\music\\Sim Gretina", 0.6, 0) }, // too much earrape
-        { "freshly squeezed", new Artist("G:\\music\\Freshly Squeezed Music", 0.6, 0.25) }
+        { "_fats", new Artist("G:\\music\\Fats Waller", 1.5) },
+        { "ella mae morse", new Artist("G:\\music\\Ella Mae Morse", 1.2) },
+        { "slim gaillard", new Artist("G:\\music\\Slim Gaillard", 1.0) },
+        { "louis jordan", new Artist("G:\\music\\Louis Jordan", 1.0) },
+        { "caravan palace", new Artist("G:\\music\\Caravan Palace", 1.0, 2) },
+        { "tape five", new Artist("G:\\music\\Tape Five", 1.0) },
+        { "caro emerald", new Artist("G:\\music\\Caro Emerald", 1.0) },
+        { "chuck berry", new Artist("G:\\music\\Chuck Berry", 1.0, 0.5) }, // most of this is trash
+        { "jamie berry", new Artist("G:\\music\\Jamie Berry", 0.8) },
+        { "sim gretina", new Artist("G:\\music\\Sim Gretina", 0.8, 0) }, // too much earrape
+        { "freshly squeezed", new Artist("G:\\music\\Freshly Squeezed Music", 0.8, 0.5) },
+        { "puppini sisters", new Artist("G:\\music\\Puppini Sisters", 1.0) },
+        { "11 acorn lane", new Artist("G:\\music\\11 Acorn Lane", 1.0) },
+        { "electric swing circus", new Artist("G:\\music\\Electric Swing Circus", 1.0) },
+        { "the speakeasies swing band", new Artist("G:\\music\\The Speakeasies Swing Band", 1.0) },
     };
 
     public static readonly Dictionary<string, double> artistWeights = new();
@@ -411,7 +415,7 @@ public sealed class GuildMusicData {
         var rand = new Random();
         var files = Directory.GetFiles(path, "*", new EnumerationOptions { RecurseSubdirectories = true });
         var randomFile = new FileInfo(files[rand.Next(files.Length)]);
-        var tracks_ = await Lavalink.ConnectedNodes.Values.First().Rest
+        var tracks_ = await Lavalink.GetIdealNodeConnection().Rest
             .GetTracksAsync(randomFile);
         foreach (var track in tracks_.Tracks) {
             Enqueue(track, artist);
