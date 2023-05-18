@@ -77,6 +77,7 @@ class Program {
         });
         discord.MessageCreated += messageHandler;
         discord.Ready += (sender, _) => setup(sender, lavalink, lavalinkConfig);
+        discord.GuildDownloadCompleted += (sender, _) => setupB(sender, lavalink, lavalinkConfig);
         discord.MessageDeleted += messageDeleteHandler;
         discord.MessageReactionAdded += reactionHandler;
         discord.GetCommandsNext().UnregisterConverter<TimeSpan>();
@@ -100,10 +101,10 @@ class Program {
         await Task.Delay(-1);
     }
 
-    private static async Task messageDeleteHandler(DiscordClient sender, MessageDeleteEventArgs e) {
+    private static Task messageDeleteHandler(DiscordClient sender, MessageDeleteEventArgs e) {
         if (e.Message.Attachments.Count != 0 && e.Message.Channel.Id != LOG) {
             // long wait so wrap it in task.run
-            Task.Run(async () => {
+            _ = Task.Run(async () => {
                 var guid = Guid.NewGuid();
                 foreach (var a in e.Message.Attachments) {
                     var path = "";
@@ -127,6 +128,8 @@ class Program {
                 }
             });
         }
+
+        return Task.CompletedTask;
     }
 
     private static async Task reactionHandler(DiscordClient sender, MessageReactionAddEventArgs e) {
@@ -159,7 +162,7 @@ class Program {
             "cat", "kitty", "kitten", "meow", "purr", "feline", "nya"
         };
         if (meowList.Any(word =>
-                e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase) ||
+                e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase) || 
                 e.Message.Attachments.Any(a => a.Url.Contains(word, StringComparison.OrdinalIgnoreCase)))) {
             await e.Message.RespondAsync("*meow*");
         }
@@ -167,7 +170,7 @@ class Program {
 
     private static async Task setup(DiscordClient client, LavalinkExtension lavalink,
         LavalinkConfiguration lavalinkConfig) {
-        
+
         // Wait a bit with lavalink init, Lavalink seems to start slower than the bot. Lazy solution is pretty much a sleep
         await Task.Delay(1000);
         LavalinkNode = await lavalink.ConnectAsync(lavalinkConfig);
@@ -178,6 +181,13 @@ class Program {
         //await MusicModule.setup(client);
 
         Console.WriteLine("Setup done!");
+    }
+
+    private static async Task setupB(DiscordClient client, LavalinkExtension lavalink,
+        LavalinkConfiguration lavalinkConfig) {
+        foreach (var guild in client.Guilds) {
+            await Console.Out.WriteLineAsync($"{guild.Value.Name}, {guild.Value.JoinedAt.ToString()}");
+        }
     }
 
     public static LavalinkNodeConnection LavalinkNode;
