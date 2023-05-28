@@ -17,11 +17,14 @@ using DSharpPlus.Lavalink;
 using DSharpPlus.Net;
 using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.DependencyInjection;
+using NLog;
 
 namespace EconomyBot;
 
 class Program {
     private static IServiceProvider services { get; set; }
+    
+    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     public static DiscordClient client;
 
@@ -36,7 +39,14 @@ class Program {
 
     public static async Task Main(string[] args) {
         
+        // logging
+        LogManager.Setup().LoadConfiguration(builder => {
+            builder.ForLogger().FilterMinLevel(LogLevel.Info).WriteToConsole();
+            builder.ForLogger().FilterMinLevel(LogLevel.Debug).WriteToFile(fileName: "file.txt");
+        });
+        
         Constants.init();
+
         var discord = new DiscordClient(new DiscordConfiguration {
             TokenType = TokenType.Bot,
             Token = Constants.token,
@@ -90,7 +100,7 @@ class Program {
                 foreach (var file in Directory.GetParent(Directory.GetCurrentDirectory())!.EnumerateFiles()) {
                     file.Delete();
                 }
-                await Console.Out.WriteLineAsync("Pruned cached images.");
+                logger.Info("Pruned cached images.");
             }
             catch (Exception e) { // file is in use, ignore
                 Console.WriteLine(e);
@@ -116,7 +126,7 @@ class Program {
                         new WebClient().DownloadFile(a.Url, path);
                     }
                     catch (WebException exception) {
-                        Console.WriteLine(exception);
+                        logger.Warn(exception);
                         throw;
                     }
                     catch (Exception) {
@@ -177,16 +187,16 @@ class Program {
         musicService = new MusicService(lavalink, LavalinkNode);
         imagesModule = new ImagesModule();
         toxicity = new ToxicityHandler();
-        wiltery = new WilteryHandler();
+        wiltery = new WilteryHandler(Program.client);
         //await MusicModule.setup(client);
 
-        Console.WriteLine("Setup done!");
+        logger.Info("Setup done!");
     }
 
     private static async Task setupB(DiscordClient client, LavalinkExtension lavalink,
         LavalinkConfiguration lavalinkConfig) {
         foreach (var guild in client.Guilds) {
-            await Console.Out.WriteLineAsync($"{guild.Value.Name}, {guild.Value.JoinedAt.ToString()}");
+            logger.Debug($"{guild.Value.Name}, {guild.Value.JoinedAt.ToString()}");
         }
     }
 
@@ -220,28 +230,28 @@ class Program {
                 }
 
                 // professional logging:tm:
-                Console.WriteLine(suppliedArgumentsLength);
-                Console.WriteLine(maxArgumentLength);
-                Console.WriteLine(minArgumentLength);
+                logger.Debug(suppliedArgumentsLength);
+                logger.Debug(maxArgumentLength);
+                logger.Debug(minArgumentLength);
 
                 if (suppliedArgumentsLength > maxArgumentLength) {
                     await sender.Client.SendMessageAsync(e.Context.Channel,
                         $"Too many arguments for command `{command}`!");
-                    await Console.Out.WriteLineAsync(e.Exception.ToString());
+                    logger.Warn(e.Exception.ToString());
                     return;
                 }
 
                 if (suppliedArgumentsLength < minArgumentLength) {
                     await sender.Client.SendMessageAsync(e.Context.Channel,
                         $"Too few arguments for command `{command}`!");
-                    await Console.Out.WriteLineAsync(e.Exception.ToString());
+                    logger.Warn(e.Exception.ToString());
                     return;
                 }
 
                 // if correct number of arguments but bad type; print info
 
                 await sender.Client.SendMessageAsync(e.Context.Channel, $"Wrong parameters for command `{command}`!");
-                await Console.Out.WriteLineAsync(e.Exception.ToString());
+                logger.Warn(e.Exception.ToString());
                 return;
             }
             case CommandNotFoundException:
@@ -251,7 +261,7 @@ class Program {
                         .Build()));
                 return;
             default:
-                Console.WriteLine(e.Exception);
+                logger.Warn(e.Exception);
                 await sender.Client.SendMessageAsync(e.Context.Channel,
                     $"Exception occurred, details below:\n```{e.Exception}```");
                 break;
@@ -259,12 +269,14 @@ class Program {
     }
 }
 
-public class CustomTimeSpanConverter : IArgumentConverter<TimeSpan> {
+public partial class CustomTimeSpanConverter : IArgumentConverter<TimeSpan> {
     private static Regex TimeSpanRegex { get; } =
-        new("^(?<days>\\d+d\\s*)?(?<hours>\\d{1,2}h\\s*)?(?<minutes>\\d{1,2}m\\s*)?(?<seconds>\\d{1,2}s\\s*)?$",
-            RegexOptions.Compiled | RegexOptions.ECMAScript);
+        MyRegex();
+    
+    [GeneratedRegex("^(?<days>\\d+d\\s*)?(?<hours>\\d{1,2}h\\s*)?(?<minutes>\\d{1,2}m\\s*)?(?<seconds>\\d{1,2}s\\s*)?$", RegexOptions.Compiled | RegexOptions.ECMAScript)]
+    private static partial Regex MyRegex();
 
-    public Task<DSharpPlus.Entities.Optional<TimeSpan>> ConvertAsync(string value, CommandContext ctx) {
+    public Task<Optional<TimeSpan>> ConvertAsync(string value, CommandContext ctx) {
         if (value == "0")
             return Task.FromResult(DSharpPlus.Entities.Optional.FromValue(TimeSpan.Zero));
         if (int.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result1))

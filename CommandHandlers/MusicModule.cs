@@ -40,9 +40,9 @@ public class MusicModule : BaseCommandModule {
     }
 
     private async Task reset() {
-        GuildMusic.clearQueue();
-        GuildMusic.EmptyQueue();
-        await GuildMusic.StopAsync();
+        GuildMusic.queue.clearQueue();
+        GuildMusic.queue.EmptyQueue();
+        await GuildMusic.queue.StopAsync(GuildMusic);
     }
 
     public override async Task BeforeExecutionAsync(CommandContext ctx) {
@@ -106,10 +106,10 @@ public class MusicModule : BaseCommandModule {
     [Command("jazz"), Description("Plays some jazz. :3"), Aliases("j"), Priority(1)]
     public async Task PlayJazzAsync(CommandContext ctx) {
         // yeet the bot in
-        GuildMusic.addToQueue("_fats");
-        await GuildMusic.seedQueue();
+        GuildMusic.queue.addToQueue("_fats");
+        await GuildMusic.queue.seedQueue();
         await startPlayer(ctx);
-        await GuildMusic.PlayAsync();
+        await GuildMusic.queue.PlayAsync();
         await common.respond(ctx, "Started playing jazz.");
     }
 
@@ -149,12 +149,12 @@ public class MusicModule : BaseCommandModule {
 
         var trackCount = tracks.Count();
         foreach (var track in tracks) {
-            GuildMusic.Enqueue(track);
+            GuildMusic.queue.Enqueue(track);
         }
 
         var chn = getChannel(ctx);
         await GuildMusic.CreatePlayerAsync(chn);
-        await GuildMusic.PlayAsync();
+        await GuildMusic.queue.PlayAsync();
 
         if (trackCount > 1)
             await common.respond(ctx, $"Added {trackCount:#,##} tracks to playback queue.");
@@ -170,12 +170,12 @@ public class MusicModule : BaseCommandModule {
         [RemainingText, Description("Terms to search for.")]
         string term) {
         if (term == "all") {
-            GuildMusic.addAllToQueue();
-            await GuildMusic.seedQueue();
+            GuildMusic.queue.addAllToQueue();
+            await GuildMusic.queue.seedQueue();
 
             await startPlayer(ctx);
-            await GuildMusic.PlayAsync();
-            await common.respond(ctx, $"Started playing {GuildMusic.artistQueue.Count} cats.");
+            await GuildMusic.queue.PlayAsync();
+            await common.respond(ctx, $"Started playing {GuildMusic.queue.artistQueue.Count} cats.");
             return;
         }
 
@@ -198,10 +198,10 @@ public class MusicModule : BaseCommandModule {
 
             var trackCount_ = tracks_.Count();
             foreach (var track in tracks_)
-                GuildMusic.Enqueue(track);
+                GuildMusic.queue.Enqueue(track);
 
             await startPlayer(ctx);
-            await GuildMusic.PlayAsync();
+            await GuildMusic.queue.PlayAsync();
 
             if (trackCount_ > 1) {
                 await common.respond(ctx, $"Added {trackCount_:#,##0} tracks to playback queue.");
@@ -239,7 +239,7 @@ public class MusicModule : BaseCommandModule {
             $"Type a number 1-{results.Count()} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
         var msg = await ctx.RespondAsync(msgC);
 
-        var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User, TimeSpan.FromMinutes(2));
+        var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User && x.Channel == ctx.Channel,  TimeSpan.FromMinutes(2));
         if (res.TimedOut || res.Result == null) {
             await msg.ModifyAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} No choice was made.");
             return;
@@ -272,10 +272,10 @@ public class MusicModule : BaseCommandModule {
 
         var trackCount = tracks.Count();
         foreach (var track in tracks)
-            GuildMusic.Enqueue(track);
+            GuildMusic.queue.Enqueue(track);
 
         await startPlayer(ctx);
-        await GuildMusic.PlayAsync();
+        await GuildMusic.queue.PlayAsync();
 
         if (trackCount > 1) {
             await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
@@ -345,11 +345,11 @@ public class MusicModule : BaseCommandModule {
 
         var trackCount = tracks.Count();
         foreach (var track in tracks) {
-            GuildMusic.Enqueue(track);
+            GuildMusic.queue.Enqueue(track);
         }
 
         await startPlayer(ctx);
-        await GuildMusic.PlayAsync();
+        await GuildMusic.queue.PlayAsync();
 
         if (trackCount > 1) {
             await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
@@ -365,21 +365,21 @@ public class MusicModule : BaseCommandModule {
     public async Task ArtistAsync(CommandContext ctx, [RemainingText] string artist) {
         string matchedArtist =
             GuildMusicData.artistMappings.Keys.MaxBy(values => ActualFuzz.partialFuzz(artist, values))!;
-        GuildMusic.addToQueue(matchedArtist);
+        GuildMusic.queue.addToQueue(matchedArtist);
 
-        await GuildMusic.seedQueue();
+        await GuildMusic.queue.seedQueue();
 
         await startPlayer(ctx);
-        await GuildMusic.PlayAsync();
+        await GuildMusic.queue.PlayAsync();
         await common.respond(ctx, $"Started playing {matchedArtist}.");
     }
 
     [Command("stopartist"), Description("Stops playing tracks from an matchedArtist."), Aliases("sa")]
     public async Task StopArtistAsync(CommandContext ctx) {
-        GuildMusic.clearQueue();
+        GuildMusic.queue.clearQueue();
 
-        int rmd = GuildMusic.EmptyQueue();
-        await GuildMusic.StopAsync();
+        int rmd = GuildMusic.queue.EmptyQueue();
+        await GuildMusic.queue.StopAsync(GuildMusic);
         await GuildMusic.DestroyPlayerAsync();
 
         await common.respond(ctx, $"Removed {rmd:#,##0} tracks from the queue.");
@@ -387,9 +387,9 @@ public class MusicModule : BaseCommandModule {
 
     [Command("stop"), Description("Stops playback and quits the voice channel.")]
     public async Task StopAsync(CommandContext ctx) {
-        int rmd = GuildMusic.EmptyQueue();
-        await GuildMusic.StopAsync();
-        GuildMusic.clearQueue();
+        int rmd = GuildMusic.queue.EmptyQueue();
+        await GuildMusic.queue.StopAsync(GuildMusic);
+        GuildMusic.queue.clearQueue();
         await GuildMusic.DestroyPlayerAsync();
 
         await common.respond(ctx, $"Removed {rmd:#,##0} tracks from the queue.");
@@ -397,8 +397,8 @@ public class MusicModule : BaseCommandModule {
 
     [Command("clear"), Description("Clears the queue.")]
     public async Task ClearAsync(CommandContext ctx) {
-        int rmd = GuildMusic.EmptyQueue();
-        GuildMusic.clearQueue();
+        int rmd = GuildMusic.queue.EmptyQueue();
+        GuildMusic.queue.clearQueue();
 
         await common.respond(ctx, $"Removed {rmd:#,##0} tracks from the queue uwu");
     }
@@ -418,8 +418,8 @@ public class MusicModule : BaseCommandModule {
 
     [Command("skip"), Description("Skips current track."), Aliases("next")]
     public async Task SkipAsync(CommandContext ctx) {
-        var track = GuildMusic.NowPlaying;
-        await GuildMusic.StopAsync();
+        var track = GuildMusic.queue.NowPlaying;
+        await GuildMusic.queue.StopAsync(GuildMusic);
         await common.respond(ctx,
             $"{Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
     }
@@ -427,8 +427,8 @@ public class MusicModule : BaseCommandModule {
     [Command("skip"), Description("Skips current track.")]
     public async Task SkipAsync(CommandContext ctx, int num) {
         for (int i = 0; i < num; i++) {
-            var track = GuildMusic.NowPlaying;
-            await GuildMusic.StopAsync();
+            var track = GuildMusic.queue.NowPlaying;
+            await GuildMusic.queue.StopAsync(GuildMusic);
             await common.respond(ctx,
                 $"{Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
             await Task.Delay(500); // wait for the next one
@@ -474,15 +474,15 @@ public class MusicModule : BaseCommandModule {
 
     [Command("restart"), Description("Restarts the playback of the current track.")]
     public async Task RestartAsync(CommandContext ctx) {
-        var track = GuildMusic.NowPlaying;
-        await GuildMusic.RestartAsync();
+        var track = GuildMusic.queue.NowPlaying;
+        await GuildMusic.queue.RestartAsync();
         await common.respond(ctx,
             $"{Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} restarted.");
     }
 
     [Command("remove"), Description("Removes a track from playback queue."), Aliases("del", "rm")]
     public async Task RemoveAsync(CommandContext ctx, [Description("Which track to remove.")] int index) {
-        var itemN = GuildMusic.Remove(index - 1);
+        var itemN = GuildMusic.queue.Remove(index - 1);
         if (itemN == null) {
             await common.respond(ctx, "No such track.");
             return;
@@ -495,26 +495,26 @@ public class MusicModule : BaseCommandModule {
 
     [Command("queue"), Description("Displays current playback queue."), Aliases("q")]
     public async Task QueueAsync(CommandContext ctx) {
-        var trk = GuildMusic.NowPlaying;
+        var trk = GuildMusic.queue.NowPlaying;
         if (trk?.TrackString == null) {
             await common.respond(ctx, "Queue is empty!");
         }
 
         var interactivity = ctx.Client.GetInteractivity();
-
-        var pageCount = GuildMusic.Queue.Count / 10 + 1;
-        if (GuildMusic.Queue.Count % 10 == 0) pageCount--;
-        var pages = GuildMusic.Queue.Select(x => x.track.ToTrackString())
+        var queue = GuildMusic.queue.getCombinedQueue();
+        var pageCount = queue.Count / 10 + 1;
+        if (queue.Count % 10 == 0) pageCount--;
+        var pages = queue.Select(x => x.track.ToTrackString())
             .Select((s, i) => (s, i))
             .GroupBy(x => x.i / 10)
             .Select(xg =>
                 new Page(
-                    $"Now playing: {GuildMusic.NowPlaying.ToTrackString()}\n\n{string.Join("\n", xg.Select(xa => $"`{xa.i + 1:00}` {xa.s}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
+                    $"Now playing: {GuildMusic.queue.NowPlaying.ToTrackString()}\n\n{string.Join("\n", xg.Select(xa => $"`{xa.i + 1:00}` {xa.s}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
             .ToArray();
 
 
         if (!pages.Any()) {
-            await common.respond(ctx, $"Now playing: {GuildMusic.NowPlaying.ToTrackString()}");
+            await common.respond(ctx, $"Now playing: {GuildMusic.queue.NowPlaying.ToTrackString()}");
             return;
         }
 
@@ -531,19 +531,19 @@ public class MusicModule : BaseCommandModule {
 
     [Command("nowplaying"), Description("Displays information about currently-played track."), Aliases("np")]
     public async Task NowPlayingAsync(CommandContext ctx) {
-        var track = GuildMusic.NowPlaying;
+        var track = GuildMusic.queue.NowPlaying;
         if (track == null) {
             await common.respond(ctx, "Not playing.");
         }
         else {
             await common.respond(ctx,
-                $"Now playing: {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{GuildMusic.NowPlaying.Length.ToDurationString()}].");
+                $"Now playing: {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{GuildMusic.queue.NowPlaying.Length.ToDurationString()}].");
         }
     }
 
     [Command("playerinfo"), Description("Displays information about current player."), Aliases("pinfo", "pinf"), Hidden]
     public async Task PlayerInfoAsync(CommandContext ctx) {
-        await common.respond(ctx, $"Queue length: {GuildMusic.Queue.Count}\nVolume: {GuildMusic.volume}%");
+        await common.respond(ctx, $"Queue length: {GuildMusic.queue.getCombinedQueue().Count}\nVolume: {GuildMusic.volume}%");
     }
 }
 

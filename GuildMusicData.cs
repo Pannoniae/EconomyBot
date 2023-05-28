@@ -27,10 +27,9 @@ namespace EconomyBot;
 /// Represents data for the music playback in a discord guild.
 /// </summary>
 public sealed class GuildMusicData {
-    
     private WebhookCache webhookCache;
-    
-    
+
+
     /// <summary>
     /// Is EQ enabled?
     /// </summary>
@@ -41,34 +40,13 @@ public sealed class GuildMusicData {
     /// </summary>
     public int volume { get; private set; } = 100;
 
-    /// <summary>
-    /// Gets the current music queue.
-    /// </summary>
-    public IReadOnlyCollection<Track> Queue { get; }
-
-    /// <summary>
-    /// Gets the currently playing item.
-    /// </summary>
-    public LavalinkTrack? NowPlaying { get; private set; }
-
-    /// <summary>
-    /// Gets the currently playing item.
-    /// </summary>
-    public string? NowPlayingArtist { get; private set; }
-
-    /// <summary>
-    /// The things being played right now. "_fats" is special-cased to the great collection.
-    /// </summary>
-    public List<string> artistQueue { get; }
-
+    public MusicQueue queue;
 
     /// <summary>
     /// Gets or sets the channel in which commands are executed.
     /// </summary>
     public DiscordChannel CommandChannel { get; set; }
 
-    private List<Track> QueueInternal { get; }
-    private SemaphoreSlim QueueInternalLock { get; }
     private DiscordGuild Guild { get; }
     public LavalinkExtension Lavalink { get; }
     public LavalinkGuildConnection Player { get; set; }
@@ -101,9 +79,9 @@ public sealed class GuildMusicData {
     /// Gets the actual volume to set.
     /// </summary>
     public int effectiveVolume =>
-        (int)(volume * (artistMappings.GetValueOrDefault(NowPlayingArtist ?? "missing")?.volume ?? 1));
+        (int)(volume * (artistMappings.GetValueOrDefault(queue.NowPlayingArtist ?? "missing")?.volume ?? 1));
 
-    public double artistVolume => artistMappings.GetValueOrDefault(NowPlayingArtist ?? "missing")?.volume ?? 1;
+    public double artistVolume => artistMappings.GetValueOrDefault(queue.NowPlayingArtist ?? "missing")?.volume ?? 1;
 
     /// <summary>
     /// Creates a new instance of playback data.
@@ -115,10 +93,7 @@ public sealed class GuildMusicData {
         Node = node;
         Guild = guild;
         Lavalink = lavalink;
-        QueueInternalLock = new SemaphoreSlim(1, 1);
-        QueueInternal = new List<Track>();
-        Queue = new ReadOnlyCollection<Track>(QueueInternal);
-        artistQueue = new List<string>();
+        queue = new(this);
 
         foreach (var artist in artistMappings) {
             // get the count of files at the directory
@@ -127,6 +102,7 @@ public sealed class GuildMusicData {
                 .Length;
             artistWeights[artist.Key] = fCount * artist.Value.weight;
         }
+
         webhookCache = new WebhookCache(Guild);
 
         Console.Out.WriteLine("Initialised artist weights.");
@@ -143,29 +119,6 @@ public sealed class GuildMusicData {
     public async Task<DiscordWebhook> getWebhook(DiscordChannel channel) {
         await webhookCache.setupForChannel(channel);
         return webhookCache.getWebhook(channel);
-    }
-
-    /// <summary>
-    /// Begins playback.
-    /// </summary>
-    public async Task PlayAsync() {
-        if (Player == null || !Player.IsConnected)
-            return;
-
-        if (NowPlaying?.TrackString == null)
-            await PlayHandlerAsync();
-    }
-
-    /// <summary>
-    /// Stops the playback.
-    /// </summary>
-    public async Task StopAsync() {
-        if (Player == null || !Player.IsConnected)
-            return;
-
-        NowPlaying = default;
-        NowPlayingArtist = default;
-        await Player.StopAsync();
     }
 
     /// <summary>
@@ -200,26 +153,6 @@ public sealed class GuildMusicData {
     }
 
     /// <summary>
-    /// Restarts current track.
-    /// </summary>
-    public async Task RestartAsync() {
-        if (Player == null || !Player.IsConnected)
-            return;
-
-        if (NowPlaying.TrackString == null)
-            return;
-
-        await QueueInternalLock.WaitAsync();
-        try {
-            QueueInternal.Insert(0, new Track(NowPlaying, NowPlayingArtist));
-            await Player.StopAsync();
-        }
-        finally {
-            QueueInternalLock.Release();
-        }
-    }
-
-    /// <summary>
     /// Seeks the currently-playing track.
     /// </summary>
     /// <param name="target">Where or how much to seek by.</param>
@@ -232,63 +165,6 @@ public sealed class GuildMusicData {
             await Player.SeekAsync(target);
         else
             await Player.SeekAsync(Player.CurrentState.PlaybackPosition + target);
-    }
-
-    /// <summary>
-    /// Empties the playback queue.
-    /// </summary>
-    /// <returns>Number of cleared items.</returns>
-    public int EmptyQueue() {
-        lock (QueueInternal) {
-            var itemCount = QueueInternal.Count;
-            QueueInternal.Clear();
-            return itemCount;
-        }
-    }
-
-    /// <summary>
-    /// Enqueues a music track for playback.
-    /// </summary>
-    /// <param name="item">Music track to enqueue.</param>
-    public void Enqueue(LavalinkTrack item, string? artist = null) {
-        lock (QueueInternal) {
-            if (QueueInternal.Count == 1) {
-                QueueInternal.Insert(0, new Track(item, artist));
-            }
-            else {
-                QueueInternal.Add(new Track(item, artist));
-            }
-        }
-    }
-
-    /// <summary>
-    /// Dequeues next music item for playback.
-    /// </summary>
-    /// <returns>Dequeued item, or null if dequeueing fails.</returns>
-    public Track? Dequeue() {
-        lock (QueueInternal) {
-            if (QueueInternal.Count == 0)
-                return null;
-
-            var item = QueueInternal[0];
-            QueueInternal.RemoveAt(0);
-            return item;
-        }
-    }
-
-    /// <summary>
-    /// Removes a track from the queue.
-    /// </summary>
-    /// <param name="index">Index of the track to remove.</param>
-    public LavalinkTrack? Remove(int index) {
-        lock (QueueInternal) {
-            if (index < 0 || index >= QueueInternal.Count)
-                return null;
-
-            var item = QueueInternal[index];
-            QueueInternal.RemoveAt(index);
-            return item.track;
-        }
     }
 
     /// <summary>
@@ -308,8 +184,8 @@ public sealed class GuildMusicData {
             enableEQ();
         }
 
-        Player.PlaybackFinished += Player_PlaybackFinished;
-        Player.PlaybackStarted += Player_PlaybackStarted;
+        Player.PlaybackFinished += (con, e) => queue.Player_PlaybackFinished(con, e);
+        Player.PlaybackStarted += (sender, e) => queue.Player_PlaybackStarted(sender, e);
     }
 
     /// <summary>
@@ -331,41 +207,12 @@ public sealed class GuildMusicData {
     /// </summary>
     /// <returns>Position in the track.</returns>
     public TimeSpan GetCurrentPosition() {
-        if (NowPlaying.TrackString == null)
+        if (queue.NowPlaying?.TrackString == null)
             return TimeSpan.Zero;
 
         return Player.CurrentState.PlaybackPosition;
     }
 
-    private async Task Player_PlaybackFinished(LavalinkGuildConnection con, TrackFinishEventArgs e) {
-        await Task.Delay(500);
-        if (artistQueue.Any() && Queue.Count < 6) {
-            await seedQueue();
-        }
-
-        await PlayHandlerAsync();
-    }
-
-    private async Task Player_PlaybackStarted(LavalinkGuildConnection sender, TrackStartEventArgs e) {
-        if (NowPlayingArtist != null) {
-            await Player.SetVolumeAsync(effectiveVolume);
-        }
-    }
-
-
-    private async Task PlayHandlerAsync() {
-        var itemN = Dequeue();
-        if (itemN == null) {
-            NowPlaying = default;
-            NowPlayingArtist = default;
-            return;
-        }
-
-        var item = itemN;
-        NowPlaying = item.track;
-        NowPlayingArtist = item.artist;
-        await Player.PlayAsync(item.track);
-    }
 
     public async Task AddToRandom(string artist) {
         var config = SpotifyClientConfig
@@ -408,54 +255,7 @@ public sealed class GuildMusicData {
             await Console.Out.WriteLineAsync("Error loading random track");
         }
 
-        Enqueue(tracks.First(), artist);
-    }
-
-    private async Task addToJazz(string artist, string path) {
-        var rand = new Random();
-        var files = Directory.GetFiles(path, "*", new EnumerationOptions { RecurseSubdirectories = true });
-        var randomFile = new FileInfo(files[rand.Next(files.Length)]);
-        var tracks_ = await Lavalink.GetIdealNodeConnection().Rest
-            .GetTracksAsync(randomFile);
-        foreach (var track in tracks_.Tracks) {
-            Enqueue(track, artist);
-            await Console.Out.WriteLineAsync($"Enqueued {track.Title} at {track.Uri}");
-        }
-    }
-
-    public void addAllToQueue() {
-        foreach (var key in artistMappings.Keys) {
-            artistQueue.Add(key);
-        }
-    }
-
-    public void addToQueue(string music) {
-        artistQueue.Add(music);
-    }
-
-    public void clearQueue() {
-        artistQueue.Clear();
-    }
-
-    private async Task growQueue() {
-        var max = artistWeights.Values.Max();
-        // return the online artist with the max. frequency of all played since we don't know the number of total songs
-        var randomElement =
-            artistQueue.randomElementByWeight(e => artistWeights.TryGetValue(e, out var element) ? element : max);
-        if (artistMappings.TryGetValue(randomElement, out var artist)) {
-            await addToJazz(randomElement, artist.path);
-        }
-
-        else {
-            await AddToRandom(randomElement);
-        }
-    }
-
-    public async Task seedQueue() {
-        // don't overqueue
-        while (Queue.Count < 6) {
-            await growQueue();
-        }
+        queue.Enqueue(tracks.First(), artist);
     }
 
     public async Task<IEnumerable<LavalinkLoadResult>> StartJazz(string searchTerm) {

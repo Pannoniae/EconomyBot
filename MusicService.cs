@@ -129,6 +129,13 @@ public class GuildDB : DbContext {
 
     public GuildDB() {
         var folder = Environment.CurrentDirectory;
+        Console.Out.WriteLine($"Current directory is {folder} ");
+        //if "bin" is present, remove all the path starting from "bin" word
+        if (folder.Contains("bin"))
+        {
+            int index = folder.IndexOf("bin", StringComparison.Ordinal);
+            folder = folder[..index];
+        }
         DBPath = Path.Join(folder, "bot.db");
     }
 
