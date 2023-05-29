@@ -175,10 +175,10 @@ public class MusicQueue {
     }
 
     /// <summary>
-    /// Get the combined queue of the bot. WARNING: removing/modifying this collection does nothing. Don't do that.
-    /// Modify the individual queues instead.
+    /// Get the combined queue of the bot. Removing/modifying this collection does nothing. So you can't do that.
+    /// Modify the individual queues instead and call this method again.
     /// </summary>
-    public List<Track> getCombinedQueue() {
+    public IReadOnlyCollection<Track> getCombinedQueue() {
         var combinedQueue = new List<Track>();
         combinedQueue.AddRange(Queue);
         combinedQueue.AddRange(autoQueue);
