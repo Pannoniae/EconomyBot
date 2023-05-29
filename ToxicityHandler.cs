@@ -4,11 +4,14 @@ using System.Web;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using Newtonsoft.Json.Linq;
+using NLog;
 
 namespace EconomyBot;
 
 public class ToxicityHandler {
     private static readonly HttpClient httpClient = new();
+    
+    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     public async Task handleMessage(DiscordClient client, DiscordMessage message) {
         if (string.IsNullOrEmpty(message.Content)) {
@@ -86,6 +89,7 @@ public class ToxicityHandler {
 }
 
 public class ToxicityValues {
+    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     public double toxicityScore;
     public double severeToxicityScore;
     public double attackScore;
@@ -129,11 +133,11 @@ public class ToxicityValues {
         var responseJsonFlirt = JObject.Parse(responseStringFlirt);
 
         if (responseJson["message"] != null || responseJson["details"] != null) {
-            await Console.Out.WriteLineAsync(responseString);
+            logger.Warn(responseString);
         }
 
         if (responseJsonFlirt["message"] != null || responseJsonFlirt["details"] != null) {
-            await Console.Out.WriteLineAsync(responseStringFlirt);
+            logger.Warn(responseStringFlirt);
         }
 
         JToken? attributes;
@@ -151,12 +155,12 @@ public class ToxicityValues {
             inst.flirtingScore = attributesFlirt["FLIRTATION"]["summaryScore"]["value"].Value<double>();
         }
         catch (Exception e) {
-            await Console.Out.WriteLineAsync(responseString);
-            await Console.Out.WriteLineAsync(e.ToString());
+            logger.Error(responseString);
+            logger.Error(e.ToString());
             return null;
         }
 
-        await Console.Out.WriteLineAsync(
+        logger.Info(
             $"T:{inst.toxicityScore}, ST:{inst.severeToxicityScore}, A:{inst.attackScore}, I:{inst.insultScore}, P:{inst.profanityScore}, TH:{inst.threatScore}, S:{inst.sexualScore}, F:{inst.flirtingScore}");
 
         const string API_URL =
@@ -190,7 +194,7 @@ public class ToxicityValues {
                 return inst;
             }
 
-            await Console.Out.WriteLineAsync(h_responseString);
+            logger.Error(h_responseString);
             return inst;
         }
 
@@ -201,7 +205,7 @@ public class ToxicityValues {
             }
         }
         catch {
-            await Console.Out.WriteLineAsync(h_responseString);
+            logger.Error(h_responseString);
             return inst;
         }
 
@@ -213,7 +217,7 @@ public class ToxicityValues {
         inst.disgust = labels["disgust"];
         inst.fear = labels["fear"];
 
-        await Console.Out.WriteLineAsync(
+        logger.Info(
             $"J:{inst.joy}, N:{inst.neutral}, S:{inst.surprise}, SA:{inst.sadness}, A:{inst.anger}, D:{inst.disgust}, F:{inst.fear}");
         return inst;
     }

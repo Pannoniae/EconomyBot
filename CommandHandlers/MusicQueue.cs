@@ -1,5 +1,6 @@
 ﻿using DSharpPlus.Lavalink;
 using DSharpPlus.Lavalink.EventArgs;
+using NLog;
 
 namespace EconomyBot;
 
@@ -10,6 +11,8 @@ public class MusicQueue {
         artistQueue = new List<string>();
         gmd = guildMusic;
     }
+    
+    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     public GuildMusicData gmd;
 
@@ -204,7 +207,7 @@ public class MusicQueue {
             .GetTracksAsync(randomFile);
         foreach (var track in tracks_.Tracks) {
             Enqueue(track, artist);
-            await Console.Out.WriteLineAsync($"Enqueued {track.Title} at {track.Uri}");
+            logger.Info($"Enqueued {track.Title} at {track.Uri}");
         }
     }
 
