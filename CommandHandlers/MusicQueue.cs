@@ -1,4 +1,5 @@
-﻿using DSharpPlus.Lavalink;
+﻿using System.Collections.ObjectModel;
+using DSharpPlus.Lavalink;
 using DSharpPlus.Lavalink.EventArgs;
 using NLog;
 
@@ -178,7 +179,7 @@ public class MusicQueue {
     /// Get the combined queue of the bot. Removing/modifying this collection does nothing. So you can't do that.
     /// Modify the individual queues instead and call this method again.
     /// </summary>
-    public IReadOnlyCollection<Track> getCombinedQueue() {
+    public List<Track> getCombinedQueue() {
         var combinedQueue = new List<Track>();
         combinedQueue.AddRange(Queue);
         combinedQueue.AddRange(autoQueue);
