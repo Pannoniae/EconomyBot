@@ -1,13 +1,15 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
 using LanguageExt.Pipes;
+using NLog;
 
-namespace EconomyBot; 
+namespace EconomyBot;
 
 public class WilteryHandler {
     
+    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     private MusicService Music { get; set; }
-    
+
     /// <summary>
     /// I know the name is bad, will refactor.
     /// </summary>
@@ -15,12 +17,12 @@ public class WilteryHandler {
 
     public DiscordClient client;
 
-    private List<MessageHandler> messageHandlers = new List<MessageHandler>();
+    private List<MessageHandler> messageHandlers = new();
 
     //noop
     public WilteryHandler(DiscordClient client) {
         this.client = client;
-        
+
         messageHandlers.Add(new WordMessageHandler("ball", DiscordEmoji.FromName(client, ":chestnut:")));
         messageHandlers.Add(new ResponseWordMessageHandler("anal", "Have fun getting HIV"));
     }
@@ -42,7 +44,7 @@ public class WilteryHandler {
             Content = message
         });
     }
-    
+
     public async Task sendWebhookToChannelAsUser(DiscordChannel channel, string message, DiscordMember user) {
         Music = Program.musicService;
         GuildMusic = await Music.GetOrCreateDataAsync(channel.Guild);
@@ -69,25 +71,29 @@ public class WilteryHandler {
         // ensure everything is set up
         Music = Program.musicService;
         GuildMusic = await Music.GetOrCreateDataAsync(message.Channel.Guild);
-        
-        
+
+
         // process handlers
         foreach (var handler in messageHandlers) {
             if (handler.shouldProcess(message)) {
                 handler.process(this, message);
             }
         }
-        
     }
 
     public async Task replaceMessage(DiscordMessage message, string from, string to) {
         string contents = message.Content;
         DiscordChannel channel = message.Channel;
         DiscordMember user = (DiscordMember)message.Author;
-        // yeet
-        await message.DeleteAsync();
-        var newMessage = contents.Replace(from, to, StringComparison.CurrentCultureIgnoreCase);
-        await sendWebhookToChannelAsUser(channel, newMessage, user);
+        try {
+            // yeet
+            await message.DeleteAsync();
+            var newMessage = contents.Replace(from, to, StringComparison.CurrentCultureIgnoreCase);
+            await sendWebhookToChannelAsUser(channel, newMessage, user);
+        }
+        catch (Exception e) {
+            logger.Error(e.ToString());
+        }
     }
 }
 
@@ -98,11 +104,10 @@ public interface MessageHandler {
 }
 
 public class WordMessageHandler : MessageHandler {
-
     private string target;
     private string replacement;
-    
-    
+
+
     public WordMessageHandler(string target, string replacement) {
         this.target = target;
         this.replacement = replacement;
@@ -118,11 +123,10 @@ public class WordMessageHandler : MessageHandler {
 }
 
 public class ResponseWordMessageHandler : WordMessageHandler {
-
     private string target;
     private string response;
-    
-    
+
+
     public ResponseWordMessageHandler(string target, string response) : base(target, response) {
         this.target = target;
         this.response = response;

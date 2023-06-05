@@ -183,7 +183,7 @@ public sealed class GuildMusicData {
             enableEQ();
         }
 
-        Player.PlaybackFinished += (con, e) => queue.Player_PlaybackFinished(con, e);
+        Player.PlaybackFinished += (con, e) => queue. Player_PlaybackFinished(con, e);
         Player.PlaybackStarted += (sender, e) => queue.Player_PlaybackStarted(sender, e);
     }
 

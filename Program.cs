@@ -18,6 +18,7 @@ using DSharpPlus.Net;
 using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.DependencyInjection;
 using NLog;
+using NLog.Targets;
 
 namespace EconomyBot;
 
@@ -40,10 +41,13 @@ class Program {
     public static async Task Main(string[] args) {
         
         // logging
-        LogManager.Setup().LoadConfiguration(builder => {
-            builder.ForLogger().FilterMinLevel(LogLevel.Info).WriteToConsole();
-            builder.ForLogger().FilterMinLevel(LogLevel.Debug).WriteToFile(fileName: "file.txt");
-        });
+        var config = new NLog.Config.LoggingConfiguration();
+        var logconsole = new ColoredConsoleTarget("logconsole");
+        var logfile = new FileTarget("logfile");
+        logfile.FileName = "file.txt";
+        // Rules for mapping loggers to targets
+        config.AddRule(LogLevel.Info, LogLevel.Fatal, logconsole);
+        LogManager.Configuration = config;
         
         Constants.init();
 
@@ -188,7 +192,6 @@ class Program {
         imagesModule = new ImagesModule();
         toxicity = new ToxicityHandler();
         wiltery = new WilteryHandler(Program.client);
-        //await MusicModule.setup(client);
 
         logger.Info("Setup done!");
     }

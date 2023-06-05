@@ -11,12 +11,12 @@
 
     <ItemGroup>
         <PackageReference Include="BooruSharp" Version="4.0.0-beta" />
-        <PackageReference Include="DSharpPlus" Version="5.0.0" />
-        <PackageReference Include="DSharpPlus.CommandsNext" Version="5.0.0" />
-        <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0" />
-        <PackageReference Include="DSharpPlus.Lavalink" Version="5.0.0" />
-        <PackageReference Include="DSharpPlus.SlashCommands" Version="5.0.0" />
-        <PackageReference Include="DSharpPlus.VoiceNext" Version="5.0.0" />
+        <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-01581" />
+        <PackageReference Include="DSharpPlus.CommandsNext" Version="5.0.0-nightly-01581" />
+        <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-01581" />
+        <PackageReference Include="DSharpPlus.Lavalink" Version="5.0.0-nightly-01581" />
+        <PackageReference Include="DSharpPlus.SlashCommands" Version="5.0.0-nightly-01581" />
+        <PackageReference Include="DSharpPlus.VoiceNext" Version="5.0.0-nightly-01581" />
         <PackageReference Include="FuzzierSharp" Version="3.0.1" />
         <PackageReference Include="LanguageExt.Core" Version="4.4.3" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.4.23259.3">
@@ -25,7 +25,7 @@
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0-preview.4.23259.3" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="NLog" Version="5.1.4" />
+        <PackageReference Include="NLog" Version="5.2.0" />
         <PackageReference Include="Reddit" Version="1.5.2" />
         <PackageReference Include="SpotifyAPI.Web" Version="7.0.0" />
     </ItemGroup>
