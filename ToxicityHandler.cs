@@ -14,7 +14,7 @@ public class ToxicityHandler {
 
     private const int globalCd = 15;
     private const int categoryCd = 30;
-    private const int msgCd = 60;
+    private const int msgCd = 45;
 
     private DateTime? globalCooldown = new();
     private readonly Dictionary<string, DateTime?> categoryCooldowns = new();
@@ -128,7 +128,7 @@ public class ToxicityHandler {
     
     public bool checkMsgCooldown(DateTime now, string msg) {
         var cooldown = msgCooldowns.GetValueOrDefault(msg);
-        if (cooldown != null && now - cooldown < TimeSpan.FromSeconds(categoryCd)) {
+        if (cooldown != null && now - cooldown < TimeSpan.FromSeconds(msgCd)) {
             logger.Info($"Hit {msg} msg cooldown ({now - globalCooldown})");
             msgCooldowns[msg] = now;
             return true;
