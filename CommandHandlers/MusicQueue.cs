@@ -45,13 +45,13 @@ public class MusicQueue {
     /// <summary>
     /// Stops the playback.
     /// </summary>
-    public async Task StopAsync(GuildMusicData guildMusicData) {
-        if (guildMusicData.Player == null || !guildMusicData.Player.IsConnected)
+    public async Task StopAsync() {
+        if (gmd.Player == null || !gmd.Player.IsConnected)
             return;
 
         NowPlaying = default;
         NowPlayingArtist = default;
-        await guildMusicData.Player.StopAsync();
+        await gmd.Player.StopAsync();
     }
 
     /// <summary>

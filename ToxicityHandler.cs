@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Web;
 using DSharpPlus;
@@ -10,11 +11,28 @@ namespace EconomyBot;
 
 public class ToxicityHandler {
     private static readonly HttpClient httpClient = new();
-    
+
+    private const int globalCd = 15;
+    private const int categoryCd = 30;
+    private const int msgCd = 60;
+
+    private DateTime? globalCooldown = new();
+    private readonly Dictionary<string, DateTime?> categoryCooldowns = new();
+    private readonly Dictionary<string, DateTime?> msgCooldowns = new();
+
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     public async Task handleMessage(DiscordClient client, DiscordMessage message) {
         if (string.IsNullOrEmpty(message.Content)) {
+            return;
+        }
+
+        // setup cooldown for user
+        var user = message.Author;
+        var now = DateTime.Now;
+
+        // check global cooldown
+        if (checkGlobalCooldown(now)) {
             return;
         }
 
@@ -45,17 +63,17 @@ public class ToxicityHandler {
 
 
         // if it is hostile, don't process flirting
-        if (threat) {
+        if (threat && !checkMsgCooldown(now, "threat")) {
             await message.RespondAsync("This user glows");
             return;
         }
 
-        if (attack) {
+        if (attack && !checkMsgCooldown(now, "attack")) {
             await message.RespondAsync("Fuck you too!");
             return;
         }
 
-        if (toxic) {
+        if (toxic && !checkMsgCooldown(now, "toxic")) {
             await message.RespondAsync("shut up");
             return;
         }
@@ -73,18 +91,78 @@ public class ToxicityHandler {
             values.sexualScore -= 0.25;
         }
 
-        if (values.sexualScore > 0.7) {
+        if (values.sexualScore > 0.7 && !checkMsgCooldown(now, "sexual")) {
             await message.RespondAsync(DiscordEmoji.FromName(client, ":flushed:"));
         }
 
-        if (values.flirtingScore > 0.7) {
+        if (values.flirtingScore > 0.7 && !checkMsgCooldown(now, "love")) {
             await message.RespondAsync($"cute! {DiscordEmoji.FromName(client, ":blue_heart:")}");
         }
 
         // they could be 0 (default value) if the second API errors but the condition of >0.7 covers that anyway
-        if (values.sadness > 0.7 || values.fear > 0.8) {
+        if ((values.sadness > 0.7 || values.fear > 0.8) && !checkMsgCooldown(now, "fear")) {
             await message.RespondAsync("*hugs*");
         }
+    }
+
+    public bool checkGlobalCooldown(DateTime now) {
+        if (globalCooldown != null && now - globalCooldown < TimeSpan.FromSeconds(globalCd)) {
+            logger.Info($"Hit global cooldown ({now - globalCooldown})");
+            globalCooldown = now;
+            return true;
+        }
+        globalCooldown = now;
+        return false;
+    }
+    
+    public bool checkCategoryCooldown(DateTime now, string category) {
+        var cooldown = categoryCooldowns.GetValueOrDefault(category);
+        if (cooldown != null && now - cooldown < TimeSpan.FromSeconds(categoryCd)) {
+            logger.Info($"Hit {category} category cooldown ({now - globalCooldown})");
+            categoryCooldowns[category] = now;
+            return true;
+        }
+        categoryCooldowns[category] = now;
+        return false;
+    }
+    
+    public bool checkMsgCooldown(DateTime now, string msg) {
+        var cooldown = msgCooldowns.GetValueOrDefault(msg);
+        if (cooldown != null && now - cooldown < TimeSpan.FromSeconds(categoryCd)) {
+            logger.Info($"Hit {msg} msg cooldown ({now - globalCooldown})");
+            msgCooldowns[msg] = now;
+            return true;
+        }
+        msgCooldowns[msg] = now;
+        return false;
+    }
+}
+
+public static class DictionaryExtensions {
+    /// <summary>
+    /// Adds a key/value pair to the dictionary by using the specified function
+    /// if the key does not already exist. Returns the new value, or the
+    /// existing value if the key exists.
+    /// </summary>
+    public static TValue GetOrAdd<TKey, TValue>(
+        this Dictionary<TKey, TValue> dictionary,
+        TKey key,
+        Func<TKey, TValue> valueFactory) where TKey : notnull {
+        ArgumentNullException.ThrowIfNull(dictionary);
+        ArgumentNullException.ThrowIfNull(valueFactory);
+
+        ref TValue value = ref CollectionsMarshal
+            .GetValueRefOrAddDefault(dictionary, key, out bool exists)!;
+        if (exists) return value;
+        try {
+            value = valueFactory(key);
+        }
+        catch {
+            dictionary.Remove(key);
+            throw;
+        }
+
+        return value;
     }
 }
 
@@ -128,7 +206,7 @@ public class ToxicityValues {
         var responseStringFlirt = await JSONParser.getJSON(
             $"https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key={Constants.apikey}",
             jsonFlirt);
-        
+
         var responseJson = JObject.Parse(responseString);
         var responseJsonFlirt = JObject.Parse(responseStringFlirt);
 

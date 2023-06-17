@@ -22,7 +22,8 @@ public class MusicModule : BaseCommandModule {
 
     public GuildMusicData GuildMusic { get; set; }
 
-    private MusicCommon common;
+    private readonly MusicCommon common;
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
 
     public MusicModule(YouTubeSearchProvider yt) {
         common = new MusicCommon();
@@ -42,7 +43,7 @@ public class MusicModule : BaseCommandModule {
     private async Task reset() {
         GuildMusic.queue.clearQueue();
         GuildMusic.queue.EmptyQueue();
-        await GuildMusic.queue.StopAsync(GuildMusic);
+        await GuildMusic.queue.StopAsync();
     }
 
     public override async Task BeforeExecutionAsync(CommandContext ctx) {
@@ -239,7 +240,8 @@ public class MusicModule : BaseCommandModule {
             $"Type a number 1-{results.Count()} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
         var msg = await ctx.RespondAsync(msgC);
 
-        var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User && x.Channel == ctx.Channel,  TimeSpan.FromMinutes(2));
+        var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User && x.Channel == ctx.Channel,
+            TimeSpan.FromMinutes(2));
         if (res.TimedOut || res.Result == null) {
             await msg.ModifyAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} No choice was made.");
             return;
@@ -379,7 +381,7 @@ public class MusicModule : BaseCommandModule {
         GuildMusic.queue.clearQueue();
 
         int rmd = GuildMusic.queue.EmptyQueue();
-        await GuildMusic.queue.StopAsync(GuildMusic);
+        await GuildMusic.queue.StopAsync();
         await GuildMusic.DestroyPlayerAsync();
 
         await common.respond(ctx, $"Removed {rmd:#,##0} tracks from the queue.");
@@ -388,7 +390,7 @@ public class MusicModule : BaseCommandModule {
     [Command("stop"), Description("Stops playback and quits the voice channel.")]
     public async Task StopAsync(CommandContext ctx) {
         int rmd = GuildMusic.queue.EmptyQueue();
-        await GuildMusic.queue.StopAsync(GuildMusic);
+        await GuildMusic.queue.StopAsync();
         GuildMusic.queue.clearQueue();
         await GuildMusic.DestroyPlayerAsync();
 
@@ -418,20 +420,34 @@ public class MusicModule : BaseCommandModule {
 
     [Command("skip"), Description("Skips current track."), Aliases("next")]
     public async Task SkipAsync(CommandContext ctx) {
-        var track = GuildMusic.queue.NowPlaying;
-        await GuildMusic.queue.StopAsync(GuildMusic);
-        await common.respond(ctx,
-            $"{Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
+        // don't allow skipping more at the same time
+        try {
+            await _semaphore.WaitAsync();
+            var track = GuildMusic.queue.NowPlaying;
+            await GuildMusic.queue.StopAsync();
+            await common.respond(ctx,
+                $"{Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
+        }
+        finally {
+            _semaphore.Release();
+        }
     }
 
     [Command("skip"), Description("Skips current track.")]
     public async Task SkipAsync(CommandContext ctx, int num) {
-        for (int i = 0; i < num; i++) {
-            var track = GuildMusic.queue.NowPlaying;
-            await GuildMusic.queue.StopAsync(GuildMusic);
-            await common.respond(ctx,
-                $"{Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
-            await Task.Delay(500); // wait for the next one
+        // don't allow skipping more at the same time
+        try {
+            await _semaphore.WaitAsync();
+            for (int i = 0; i < num; i++) {
+                var track = GuildMusic.queue.NowPlaying;
+                await GuildMusic.queue.StopAsync();
+                await common.respond(ctx,
+                    $"{Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
+                await Task.Delay(500); // wait for the next one
+            }
+        }
+        finally {
+            _semaphore.Release();
         }
     }
 
@@ -543,7 +559,8 @@ public class MusicModule : BaseCommandModule {
 
     [Command("playerinfo"), Description("Displays information about current player."), Aliases("pinfo", "pinf"), Hidden]
     public async Task PlayerInfoAsync(CommandContext ctx) {
-        await common.respond(ctx, $"Queue length: {GuildMusic.queue.getCombinedQueue().Count}\nVolume: {GuildMusic.volume}%");
+        await common.respond(ctx,
+            $"Queue length: {GuildMusic.queue.getCombinedQueue().Count}\nVolume: {GuildMusic.volume}%");
     }
 }
 

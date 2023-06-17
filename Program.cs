@@ -173,7 +173,7 @@ class Program {
             await e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":pinkpill:"));
         }
         var meowList = new List<string> {
-            "cat", "kitty", "kitten", "meow", "purr", "feline", "nya"
+            "cat", "kitty", "kitten", "meow", "purr", "feline", "nya", "miau"
         };
         if (meowList.Any(word =>
                 e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase) || 

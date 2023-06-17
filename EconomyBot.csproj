@@ -11,19 +11,23 @@
 
     <ItemGroup>
         <PackageReference Include="BooruSharp" Version="4.0.0-beta" />
-        <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-01581" />
-        <PackageReference Include="DSharpPlus.CommandsNext" Version="5.0.0-nightly-01581" />
-        <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-01581" />
-        <PackageReference Include="DSharpPlus.Lavalink" Version="5.0.0-nightly-01581" />
-        <PackageReference Include="DSharpPlus.SlashCommands" Version="5.0.0-nightly-01581" />
-        <PackageReference Include="DSharpPlus.VoiceNext" Version="5.0.0-nightly-01581" />
+        <PackageReference Include="Catalyst" Version="1.0.39229" />
+        <PackageReference Include="Catalyst.ConceptNet" Version="1.0.31050" />
+        <PackageReference Include="Catalyst.ConceptNet.English" Version="1.0.31050" />
+        <PackageReference Include="Catalyst.Models.English" Version="1.0.30952" />
+        <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-01586" />
+        <PackageReference Include="DSharpPlus.CommandsNext" Version="5.0.0-nightly-01586" />
+        <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-01586" />
+        <PackageReference Include="DSharpPlus.Lavalink" Version="5.0.0-nightly-01586" />
+        <PackageReference Include="DSharpPlus.SlashCommands" Version="5.0.0-nightly-01586" />
+        <PackageReference Include="DSharpPlus.VoiceNext" Version="5.0.0-nightly-01586" />
         <PackageReference Include="FuzzierSharp" Version="3.0.1" />
         <PackageReference Include="LanguageExt.Core" Version="4.4.3" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.4.23259.3">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.5.23280.1">
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0-preview.4.23259.3" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0-preview.5.23280.1" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="NLog" Version="5.2.0" />
         <PackageReference Include="Reddit" Version="1.5.2" />

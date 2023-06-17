@@ -77,14 +77,14 @@ public class MusicModuleSlash : ApplicationCommandModule {
     public async Task StopJazzAsync(InteractionContext ctx) {
         GuildMusic.queue.clearQueue();
         GuildMusic.queue.EmptyQueue();
-        await GuildMusic.queue.StopAsync(GuildMusic);
+        await GuildMusic.queue.StopAsync();
         await ctx.CreateResponseAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Stopped jazz.");
     }
 
     [SlashCommand("stop", "Stops playback and quits the voice channel.")]
     public async Task StopAsync(InteractionContext ctx) {
         int rmd = GuildMusic.queue.EmptyQueue();
-        await GuildMusic.queue.StopAsync(GuildMusic);
+        await GuildMusic.queue.StopAsync();
         await GuildMusic.DestroyPlayerAsync();
 
         await ctx.CreateResponseAsync(
@@ -115,7 +115,7 @@ public class MusicModuleSlash : ApplicationCommandModule {
     [SlashCommand("skip", "Skips current track.")]
     public async Task SkipAsync(InteractionContext ctx) {
         var track = GuildMusic.queue.NowPlaying;
-        await GuildMusic.queue.StopAsync(GuildMusic);
+        await GuildMusic.queue.StopAsync();
         await ctx.CreateResponseAsync(
             $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
     }
@@ -124,7 +124,7 @@ public class MusicModuleSlash : ApplicationCommandModule {
     public async Task SkipAsync(InteractionContext ctx, [Option("tracks", "How many tracks to skip.")] long num) {
         for (int i = 0; i < num; i++) {
             var track = GuildMusic.queue.NowPlaying;
-            await GuildMusic.queue.StopAsync(GuildMusic);
+            await GuildMusic.queue.StopAsync();
             await ctx.CreateResponseAsync(
                 $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
             await Task.Delay(500); // wait for the next one
