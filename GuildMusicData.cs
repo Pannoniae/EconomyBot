@@ -50,7 +50,7 @@ public sealed class GuildMusicData {
     public LavalinkExtension Lavalink { get; }
     public LavalinkGuildConnection Player { get; set; }
 
-    public LavalinkNodeConnection Node { get; }
+    private LavalinkNodeConnection Node { get; }
 
     // TODO implement a *proper* music weighting system
 
@@ -183,7 +183,7 @@ public sealed class GuildMusicData {
             enableEQ();
         }
 
-        Player.PlaybackFinished += (con, e) => queue. Player_PlaybackFinished(con, e);
+        Player.PlaybackFinished += (con, e) => queue.Player_PlaybackFinished(con, e);
         Player.PlaybackStarted += (sender, e) => queue.Player_PlaybackStarted(sender, e);
     }
 

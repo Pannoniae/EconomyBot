@@ -44,9 +44,11 @@ class Program {
         var config = new NLog.Config.LoggingConfiguration();
         var logconsole = new ColoredConsoleTarget("logconsole");
         var logfile = new FileTarget("logfile");
-        logfile.FileName = "file.txt";
+        logfile.FileName = "log.txt";
+        logfile.ArchiveAboveSize = 1 * 1024 * 1024 * 1024; // 1 MiB
         // Rules for mapping loggers to targets
         config.AddRule(LogLevel.Info, LogLevel.Fatal, logconsole);
+        config.AddRule(LogLevel.Info, LogLevel.Fatal, logfile);
         LogManager.Configuration = config;
         
         Constants.init();

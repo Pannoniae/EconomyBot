@@ -55,7 +55,7 @@ public class ImagesModule : BaseCommandModule {
 
     [Command("b"), Description("I love you Msozod :3")]
     public async Task b(CommandContext ctx) {
-        var response = await client.GetAsync("https://en. wikipedia.org/api/rest_v1/page/random/summary");
+        var response = await client.GetAsync("https://en.wikipedia.org/api/rest_v1/page/random/summary");
         var responseJson = JObject.Parse(await response.Content.ReadAsStringAsync());
 
         var title = responseJson["title"].Value<string>();

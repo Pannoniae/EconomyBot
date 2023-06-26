@@ -22,7 +22,7 @@ public class ToxicityHandler {
 
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    public async Task handleMessage(DiscordClient client, DiscordMessage message) {
+    public async Task handleMessage(DiscordClient client, DiscordMessage message) { 
         if (string.IsNullOrEmpty(message.Content)) {
             return;
         }
