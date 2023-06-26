@@ -204,8 +204,7 @@ public class MusicQueue {
         var rand = new Random();
         var files = Directory.GetFiles(path, "*", new EnumerationOptions { RecurseSubdirectories = true });
         var randomFile = new FileInfo(files[rand.Next(files.Length)]);
-        var tracks_ = await gmd.Lavalink.GetIdealNodeConnection().Rest
-            .GetTracksAsync(randomFile);
+        var tracks_ = await gmd.getTracksAsync(gmd.Node.Rest, randomFile);
         foreach (var track in tracks_.Tracks) {
             Enqueue(track, artist);
             logger.Info($"Enqueued {track.Title} at {track.Uri}");

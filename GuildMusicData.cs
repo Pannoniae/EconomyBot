@@ -1,4 +1,5 @@
-﻿using DSharpPlus.Entities;
+﻿using System.Reflection;
+using DSharpPlus.Entities;
 using DSharpPlus.Lavalink;
 using NLog;
 using SpotifyAPI.Web;
@@ -50,7 +51,7 @@ public sealed class GuildMusicData {
     public LavalinkExtension Lavalink { get; }
     public LavalinkGuildConnection Player { get; set; }
 
-    private LavalinkNodeConnection Node { get; }
+    public LavalinkNodeConnection Node { get; }
 
     // TODO implement a *proper* music weighting system
 
@@ -262,7 +263,18 @@ public sealed class GuildMusicData {
                 artist => Directory.GetFiles(artist.Value.path, searchTerm,
                     new EnumerationOptions { RecurseSubdirectories = true }))
             .Select(file => new FileInfo(file))
-            .Select(file => Node.Rest.GetTracksAsync(file).Result);
+            .Select(file => getTracksAsync(Node.Rest, file).Result);
+    }
+    
+    public async Task<LavalinkLoadResult> getTracksAsync(LavalinkRestClient client, FileInfo file) {
+        var tracks = await client.GetTracksAsync(file);
+        foreach (var track in tracks.Tracks) {
+            if (track.Title == "Unknown title") {
+                track.GetType().GetProperty("Title")!.SetValue(track, file.Name);
+            }
+        }
+
+        return tracks;
     }
 
     public void enableEQ() {
