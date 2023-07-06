@@ -268,10 +268,8 @@ public sealed class GuildMusicData {
     
     public async Task<LavalinkLoadResult> getTracksAsync(LavalinkRestClient client, FileInfo file) {
         var tracks = await client.GetTracksAsync(file);
-        foreach (var track in tracks.Tracks) {
-            if (track.Title == "Unknown title") {
-                track.GetType().GetProperty("Title")!.SetValue(track, file.Name);
-            }
+        foreach (var track in tracks.Tracks.Where(track => track.Title == "Unknown title")) {
+            track.GetType().GetProperty("Title")!.SetValue(track, file.Name);
         }
 
         return tracks;

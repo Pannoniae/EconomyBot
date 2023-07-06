@@ -53,7 +53,7 @@ public class ChatModule : BaseCommandModule {
             messages.Select(m => $"{m.Timestamp} {m.Author.Username}#{m.Author.Discriminator}: {m.Content}").Reverse());
         var logMessages = ChunksUpTo(message, 1984);
         foreach (var msg in logMessages) {
-            await ctx.Guild.GetChannel(Program.LOG).SendMessageAsync(msg);
+            await (await ctx.Client.GetGuildAsync(838843082110664756)).GetChannel(Program.LOG).SendMessageAsync(msg);
 
         }
         await ctx.Channel.DeleteMessagesAsync(messages);

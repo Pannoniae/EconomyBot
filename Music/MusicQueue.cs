@@ -1,7 +1,6 @@
-﻿using System.Collections.ObjectModel;
-using DSharpPlus.Lavalink;
+﻿using DSharpPlus.Lavalink;
 using DSharpPlus.Lavalink.EventArgs;
-using NLog;
+using EconomyBot.Logging;
 
 namespace EconomyBot;
 
@@ -13,9 +12,9 @@ public class MusicQueue {
         gmd = guildMusic;
     }
     
-    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger logger = Logger.getClassLogger("MusicQueue");
 
-    public GuildMusicData gmd;
+    private readonly GuildMusicData gmd;
 
     /// <summary>
     /// Gets the currently playing item.
@@ -207,7 +206,7 @@ public class MusicQueue {
         var tracks_ = await gmd.getTracksAsync(gmd.Node.Rest, randomFile);
         foreach (var track in tracks_.Tracks) {
             Enqueue(track, artist);
-            logger.Info($"Enqueued {track.Title} at {track.Uri}");
+            logger.info($"Enqueued {track.Title} at {track.Uri}");
         }
     }
 

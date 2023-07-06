@@ -18,14 +18,16 @@ using DSharpPlus.Net;
 using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.DependencyInjection;
 using NLog;
+using NLog.Conditions;
 using NLog.Targets;
+using Logger = EconomyBot.Logging.Logger;
 
 namespace EconomyBot;
 
 class Program {
     private static IServiceProvider services { get; set; }
     
-    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger logger = Logger.getClassLogger("Main");
 
     public static DiscordClient client;
 
@@ -43,6 +45,10 @@ class Program {
         // logging
         var config = new NLog.Config.LoggingConfiguration();
         var logconsole = new ColoredConsoleTarget("logconsole");
+        var highlightRule = new ConsoleRowHighlightingRule();
+        highlightRule.Condition = ConditionParser.ParseExpression("level == LogLevel.Warn");
+        highlightRule.ForegroundColor = ConsoleOutputColor.DarkYellow;
+        logconsole.RowHighlightingRules.Add(highlightRule);
         var logfile = new FileTarget("logfile");
         logfile.FileName = "log.txt";
         logfile.ArchiveAboveSize = 1 * 1024 * 1024 * 1024; // 1 MiB
@@ -50,6 +56,8 @@ class Program {
         config.AddRule(LogLevel.Info, LogLevel.Fatal, logconsole);
         config.AddRule(LogLevel.Info, LogLevel.Fatal, logfile);
         LogManager.Configuration = config;
+        
+        Logging.Logger.setLogLevel(Logging.LogLevel.INFO);
         
         Constants.init();
 
@@ -106,7 +114,7 @@ class Program {
                 foreach (var file in Directory.GetParent(Directory.GetCurrentDirectory())!.EnumerateFiles()) {
                     file.Delete();
                 }
-                logger.Info("Pruned cached images.");
+                logger.info("Pruned cached images.");
             }
             catch (Exception e) { // file is in use, ignore
                 Console.WriteLine(e);
@@ -132,7 +140,7 @@ class Program {
                         new WebClient().DownloadFile(a.Url, path);
                     }
                     catch (WebException exception) {
-                        logger.Warn(exception);
+                        logger.warn(exception);
                         throw;
                     }
                     catch (Exception) {
@@ -195,13 +203,13 @@ class Program {
         toxicity = new ToxicityHandler();
         wiltery = new WilteryHandler(Program.client);
 
-        logger.Info("Setup done!");
+        logger.info("Setup done!");
     }
 
     private static async Task setupB(DiscordClient client, LavalinkExtension lavalink,
         LavalinkConfiguration lavalinkConfig) {
         foreach (var guild in client.Guilds) {
-            logger.Debug($"{guild.Value.Name}, {guild.Value.JoinedAt.ToString()}");
+            logger.debug($"{guild.Value.Name}, {guild.Value.JoinedAt.ToString()}");
         }
     }
 
@@ -235,38 +243,42 @@ class Program {
                 }
 
                 // professional logging:tm:
-                logger.Debug(suppliedArgumentsLength);
-                logger.Debug(maxArgumentLength);
-                logger.Debug(minArgumentLength);
+                logger.debug(suppliedArgumentsLength);
+                logger.debug(maxArgumentLength);
+                logger.debug(minArgumentLength);
 
                 if (suppliedArgumentsLength > maxArgumentLength) {
                     await sender.Client.SendMessageAsync(e.Context.Channel,
                         $"Too many arguments for command `{command}`!");
-                    logger.Warn(e.Exception.ToString());
+                    logger.warn(e.Exception);
                     return;
                 }
 
                 if (suppliedArgumentsLength < minArgumentLength) {
                     await sender.Client.SendMessageAsync(e.Context.Channel,
                         $"Too few arguments for command `{command}`!");
-                    logger.Warn(e.Exception.ToString());
+                    logger.warn(e.Exception);
                     return;
                 }
 
                 // if correct number of arguments but bad type; print info
 
                 await sender.Client.SendMessageAsync(e.Context.Channel, $"Wrong parameters for command `{command}`!");
-                logger.Warn(e.Exception.ToString());
+                logger.warn(e.Exception.ToString());
                 return;
             }
             case CommandNotFoundException:
+                if (!e.Command.Name.All(char.IsLetterOrDigit)) {
+                    // ignore "command"...
+                    break;
+                }
                 await sender.Client.SendMessageAsync(e.Context.Channel, new DiscordMessageBuilder().WithEmbed(
                     new DiscordEmbedBuilder().WithColor(DiscordColor.HotPink).WithDescription("I have no bloody idea what that command is, sorry")
                         //.WithImageUrl("https://c.tenor.com/CR9Or4gKoAUAAAAC/menhera-menhera-chan.gif").Build()));
                         .Build()));
                 return;
             default:
-                logger.Warn(e.Exception);
+                logger.warn(e.Exception);
                 await sender.Client.SendMessageAsync(e.Context.Channel,
                     $"Exception occurred, details below:\n```{e.Exception}```");
                 break;
