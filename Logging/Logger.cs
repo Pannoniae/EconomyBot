@@ -25,28 +25,28 @@ public class Logger {
     // Of course, this doesn't matter much for this homemade logging solution:tm:, but if anyone else sees it or use it, this is a high-priority issue.
 
     public void debug<T>(T msg) {
-        log(LogLevel.DEBUG, "#FFFFFF", msg);
+        log(LogLevel.DEBUG, null, msg);
     }
 
     public void debug(string msg) {
-        log(LogLevel.DEBUG, "#FFFFFF", msg);
+        log(LogLevel.DEBUG, null, msg);
     }
 
     public void debug(Exception ex) {
-        logException(LogLevel.DEBUG, "#FFFFFF", ex);
+        logException(LogLevel.DEBUG, null, ex);
     }
 
 
     public void info<T>(T msg) {
-        log(LogLevel.INFO, "#FFFFFF", msg);
+        log(LogLevel.INFO, null, msg);
     }
 
     public void info(string msg) {
-        log(LogLevel.INFO, "#FFFFFF", msg);
+        log(LogLevel.INFO, null, msg);
     }
 
     public void info(Exception ex) {
-        logException(LogLevel.INFO, "#FFFFFF", ex);
+        logException(LogLevel.INFO, null, ex);
     }
 
 
@@ -62,34 +62,34 @@ public class Logger {
         logException(LogLevel.WARNING, "#FF2288", ex);
     }
 
-    private void log(LogLevel logLevel, string colour, string msg) {
+    private void log(LogLevel logLevel, string? colour, string msg) {
         if (logLevel < Logger.logLevel) {
             return;
         }
 
         var time = DateTime.Now;
-        AnsiConsole.MarkupLine($"[{colour}]{time} [[{logLevel}]] {name}: {msg}[/]");
+        AnsiConsole.MarkupLine($"[{colour ?? "default"}]{time} [[{logLevel}]] {name}: {msg}[/]");
     }
 
-    private void log<T>(LogLevel logLevel, string colour, T msg) {
+    private void log<T>(LogLevel logLevel, string? colour, T msg) {
         if (logLevel < Logger.logLevel) {
             return;
         }
 
         var time = DateTime.Now;
-        AnsiConsole.MarkupLine($"[{colour}]{time} [[{logLevel}]] {name}: {msg}[/]");
+        AnsiConsole.MarkupLine($"[{colour ?? "default"}]{time} [[{logLevel}]] {name}: {msg}[/]");
     }
 
 
-    private void logException(LogLevel logLevel, string colour, Exception msg) {
+    private void logException(LogLevel logLevel, string? colour, Exception msg) {
         if (logLevel < Logger.logLevel) {
             return;
         }
 
         var time = DateTime.Now;
-        AnsiConsole.Markup($"[{colour}]{time} [[{logLevel}]] {name}:");
+        AnsiConsole.Markup($"[{colour ?? "default"}]{time} [[{logLevel}]] {name}:[/]");
         AnsiConsole.WriteException(msg);
-        AnsiConsole.WriteLine("[/]");
+        AnsiConsole.WriteLine();
     }
 }
 
