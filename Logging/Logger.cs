@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Spectre.Console;
+﻿using Spectre.Console;
 
 namespace EconomyBot.Logging;
 
@@ -75,7 +74,7 @@ public class Logger {
         if (logLevel < Logger.logLevel) {
             return;
         }
-
+        
         var time = DateTime.Now;
         AnsiConsole.MarkupLine($"[{colour ?? "default"}]{time} [[{logLevel}]] {name}: {msg?.ToString().EscapeMarkup()}[/]");
     }
@@ -90,6 +89,18 @@ public class Logger {
         AnsiConsole.Markup($"[{colour ?? "default"}]{time} [[{logLevel}]] {name}:[/]");
         AnsiConsole.WriteException(msg);
         AnsiConsole.WriteLine();
+    }
+
+    public void error<T>(T msg) {
+        log(LogLevel.ERROR, "#FF0000", msg);
+    }
+
+    public void error(string msg) {
+        log(LogLevel.ERROR, "#FF0000", msg);
+    }
+
+    public void error(Exception ex) {
+        logException(LogLevel.ERROR, "#FF0000", ex);
     }
 }
 

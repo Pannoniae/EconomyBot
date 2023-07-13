@@ -1,6 +1,5 @@
 ﻿global using LanguageExt;
 global using static LanguageExt.Prelude;
-
 using System.Globalization;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -16,24 +15,22 @@ using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Lavalink;
 using DSharpPlus.Net;
 using DSharpPlus.SlashCommands;
+using EconomyBot.Logging;
 using Microsoft.Extensions.DependencyInjection;
-using NLog;
-using NLog.Conditions;
-using NLog.Targets;
-using Logger = EconomyBot.Logging.Logger;
+using Spectre.Console;
 
 namespace EconomyBot;
 
 class Program {
     private static IServiceProvider services { get; set; }
-    
+
     private static readonly Logger logger = Logger.getClassLogger("Main");
 
     public static DiscordClient client;
 
     public static ulong LOG = 838920584879800343;
     public static ulong HALLOFFAME = 1078991955633127474;
-    
+
     // shut up compiler
     private Program() {
         Main(null!);
@@ -41,24 +38,10 @@ class Program {
 
 
     public static async Task Main(string[] args) {
-        
         // logging
-        var config = new NLog.Config.LoggingConfiguration();
-        var logconsole = new ColoredConsoleTarget("logconsole");
-        var highlightRule = new ConsoleRowHighlightingRule();
-        highlightRule.Condition = ConditionParser.ParseExpression("level == LogLevel.Warn");
-        highlightRule.ForegroundColor = ConsoleOutputColor.DarkYellow;
-        logconsole.RowHighlightingRules.Add(highlightRule);
-        var logfile = new FileTarget("logfile");
-        logfile.FileName = "log.txt";
-        logfile.ArchiveAboveSize = 1 * 1024 * 1024 * 1024; // 1 MiB
-        // Rules for mapping loggers to targets
-        config.AddRule(LogLevel.Info, LogLevel.Fatal, logconsole);
-        config.AddRule(LogLevel.Info, LogLevel.Fatal, logfile);
-        LogManager.Configuration = config;
-        
-        Logging.Logger.setLogLevel(Logging.LogLevel.INFO);
-        
+
+        Logger.setLogLevel(LogLevel.INFO);
+
         Constants.init();
 
         var discord = new DiscordClient(new DiscordConfiguration {
@@ -100,7 +83,8 @@ class Program {
             PollBehaviour = PollBehaviour.KeepEmojis
         });
         discord.MessageCreated += messageHandler;
-        discord.Ready += (sender, _) => setup(sender, lavalink, lavalinkConfig);
+        discord.MessagesBulkDeleted += messageDeleteHandler;
+        discord.SessionCreated += (sender, _) => setup(sender, lavalink, lavalinkConfig);
         discord.GuildDownloadCompleted += (sender, _) => setupB(sender, lavalink, lavalinkConfig);
         discord.MessageDeleted += messageDeleteHandler;
         discord.MessageReactionAdded += reactionHandler;
@@ -114,23 +98,31 @@ class Program {
                 foreach (var file in Directory.GetParent(Directory.GetCurrentDirectory())!.EnumerateFiles()) {
                     file.Delete();
                 }
+
                 logger.info("Pruned cached images.");
             }
-            catch (Exception e) { // file is in use, ignore
-                Console.WriteLine(e);
+            catch (Exception e) {
+                // file is in use, ignore
+                AnsiConsole.WriteException(e);
             }
-            
         }
+
         // hold console window
         await Task.Delay(-1);
     }
 
-    private static Task messageDeleteHandler(DiscordClient sender, MessageDeleteEventArgs e) {
-        if (e.Message.Attachments.Count != 0 && e.Message.Channel.Id != LOG) {
+    private static async Task messageDeleteHandler(DiscordClient sender, MessageBulkDeleteEventArgs e) {
+        foreach (var message in e.Messages) {
+            await actualMessageDeleteHandler(e.Channel, message);
+        }
+    }
+
+    private static async Task actualMessageDeleteHandler(DiscordChannel channel, DiscordMessage message) {
+        if (message.Attachments.Count != 0 && message.Channel.Id != LOG) {
             // long wait so wrap it in task.run
             _ = Task.Run(async () => {
                 var guid = Guid.NewGuid();
-                foreach (var a in e.Message.Attachments) {
+                foreach (var a in message.Attachments) {
                     var path = "";
                     try {
                         path = Directory.GetCurrentDirectory() + a.FileName;
@@ -144,20 +136,35 @@ class Program {
                         throw;
                     }
                     catch (Exception) {
-                        await e.Channel.SendMessageAsync("Penis happened!");
+                        await channel.SendMessageAsync("Penis happened!");
                     }
 
                     var file = new FileStream(path, FileMode.Open);
-                    await (await client.GetGuildAsync(838843082110664756)).GetChannel(LOG).SendMessageAsync(new DiscordMessageBuilder().AddFile(file));
+                    await (await client.GetGuildAsync(838843082110664756)).GetChannel(LOG)
+                        .SendMessageAsync(new DiscordMessageBuilder().AddFile(file));
                 }
             });
         }
 
-        return Task.CompletedTask;
+        if (message.Author == client.CurrentUser) {
+            var server = await client.GetGuildAsync(838843082110664756);
+            _ = Task.Run(async () => {
+                await Task.Delay(3000); // stupid discord doesnt update logs immediately
+                var logs = await server.GetAuditLogsAsync(10, action_type: AuditLogActionType.MessageDelete);
+                var deleter = logs.FirstOrDefault(log =>
+                        log is DiscordAuditLogMessageEntry entry && entry.Target.Id == message.Id)?
+                    .UserResponsible?.Username ?? "unknown";
+                await server.GetChannel(LOG)
+                    .SendMessageAsync($"{message.Content} deleted by {deleter}");
+            });
+        }
+    }
+
+    private static async Task messageDeleteHandler(DiscordClient sender, MessageDeleteEventArgs e) {
+        await actualMessageDeleteHandler(e.Channel, e.Message);
     }
 
     private static async Task reactionHandler(DiscordClient sender, MessageReactionAddEventArgs e) {
-        
     }
 
     private static async Task messageHandler(DiscordClient client, MessageCreateEventArgs e) {
@@ -165,14 +172,19 @@ class Program {
             return;
         }
 
+        // Don't reply to webhooks with embeds. The bot might have sent them
+        if (e.Message.WebhookMessage && e.Message.Embeds.Count > 0) {
+            return;
+        }
+
         // csoki musicbot
         if (e.Author.Id == 545252588753256469 && e.Message.Content.StartsWith('.')) {
             await e.Message.RespondAsync("shut up");
         }
-        
+
         // Funny replacement handling
         // todo
-        
+
         // Toxicity handler
         if (!e.Message.Content.StartsWith('.') && !e.Message.Content.StartsWith('/')) {
             await toxicity.handleMessage(client, e.Message);
@@ -182,11 +194,12 @@ class Program {
         if (e.Author.Id == 947229156448538634) {
             await e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":pinkpill:"));
         }
+
         var meowList = new List<string> {
             "cat", "kitty", "kitten", "meow", "purr", "feline", "nya", "miau"
         };
         if (meowList.Any(word =>
-                e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase) || 
+                e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase) ||
                 e.Message.Attachments.Any(a => a.Url.Contains(word, StringComparison.OrdinalIgnoreCase)))) {
             await e.Message.RespondAsync("*meow*");
         }
@@ -194,7 +207,6 @@ class Program {
 
     private static async Task setup(DiscordClient client, LavalinkExtension lavalink,
         LavalinkConfiguration lavalinkConfig) {
-
         // Wait a bit with lavalink init, Lavalink seems to start slower than the bot. Lazy solution is pretty much a sleep
         await Task.Delay(1000);
         LavalinkNode = await lavalink.ConnectAsync(lavalinkConfig);
@@ -264,7 +276,7 @@ class Program {
                 // if correct number of arguments but bad type; print info
 
                 await sender.Client.SendMessageAsync(e.Context.Channel, $"Wrong parameters for command `{command}`!");
-                logger.warn(e.Exception.ToString());
+                logger.warn(e.Exception);
                 return;
             }
             case CommandNotFoundException:
@@ -272,8 +284,10 @@ class Program {
                     // ignore "command"...
                     break;
                 }
+
                 await sender.Client.SendMessageAsync(e.Context.Channel, new DiscordMessageBuilder().WithEmbed(
-                    new DiscordEmbedBuilder().WithColor(DiscordColor.HotPink).WithDescription("I have no bloody idea what that command is, sorry")
+                    new DiscordEmbedBuilder().WithColor(DiscordColor.HotPink)
+                        .WithDescription("I have no bloody idea what that command is, sorry")
                         //.WithImageUrl("https://c.tenor.com/CR9Or4gKoAUAAAAC/menhera-menhera-chan.gif").Build()));
                         .Build()));
                 return;
@@ -289,8 +303,9 @@ class Program {
 public partial class CustomTimeSpanConverter : IArgumentConverter<TimeSpan> {
     private static Regex TimeSpanRegex { get; } =
         MyRegex();
-    
-    [GeneratedRegex("^(?<days>\\d+d\\s*)?(?<hours>\\d{1,2}h\\s*)?(?<minutes>\\d{1,2}m\\s*)?(?<seconds>\\d{1,2}s\\s*)?$", RegexOptions.Compiled | RegexOptions.ECMAScript)]
+
+    [GeneratedRegex("^(?<days>\\d+d\\s*)?(?<hours>\\d{1,2}h\\s*)?(?<minutes>\\d{1,2}m\\s*)?(?<seconds>\\d{1,2}s\\s*)?$",
+        RegexOptions.Compiled | RegexOptions.ECMAScript)]
     private static partial Regex MyRegex();
 
     public Task<Optional<TimeSpan>> ConvertAsync(string value, CommandContext ctx) {

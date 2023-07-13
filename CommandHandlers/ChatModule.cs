@@ -8,29 +8,10 @@ namespace EconomyBot;
 
 [ModuleLifespan(ModuleLifespan.Singleton)]
 public class ChatModule : BaseCommandModule {
-    private MusicService Music { get; set; }
 
-    /// <summary>
-    /// I know the name is bad, will refactor.
-    /// </summary>
-    public GuildMusicData GuildMusic { get; set; }
-
-
-    public ChatModule() {
-        Music = Program.musicService;
-    }
-
-    public override async Task BeforeExecutionAsync(CommandContext ctx) {
-        Music = Program.musicService;
-        GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild);
-        await base.BeforeExecutionAsync(ctx);
-
-        //await GuildMusic.setupForChannel(ctx.Channel);
-    }
-    
     static IEnumerable<string> ChunksUpTo(string str, int maxChunkSize) {
-        for (int i = 0; i < str.Length; i += maxChunkSize) 
-            yield return str.Substring(i, Math.Min(maxChunkSize, str.Length-i));
+        for (int i = 0; i < str.Length; i += maxChunkSize)
+            yield return str.Substring(i, Math.Min(maxChunkSize, str.Length - i));
     }
 
     /// <summary>
@@ -48,14 +29,14 @@ public class ChatModule : BaseCommandModule {
         else {
             messages = await ctx.Channel.GetMessagesAsync(amt);
         }
-        
+
         var message = string.Join("\n",
             messages.Select(m => $"{m.Timestamp} {m.Author.Username}#{m.Author.Discriminator}: {m.Content}").Reverse());
         var logMessages = ChunksUpTo(message, 1984);
         foreach (var msg in logMessages) {
             await (await ctx.Client.GetGuildAsync(838843082110664756)).GetChannel(Program.LOG).SendMessageAsync(msg);
-
         }
+
         await ctx.Channel.DeleteMessagesAsync(messages);
         await ctx.RespondAsync($"Deleted {amt} messages!");
     }
@@ -110,5 +91,15 @@ public class ChatModule : BaseCommandModule {
     [Command("user")]
     public async Task userWebhook(CommandContext ctx, [RemainingText] string message) {
         await Program.wiltery.sendWebhookToChannelAsUser(ctx.Channel, message, ctx.Member);
+    }
+
+    [Command("squish")]
+    public async Task squish(CommandContext ctx, DiscordMember member) {
+        var cat = "https://cdn.discordapp.com/attachments/1101712131222683659/1128320701456195594/image.png";
+        await ctx.Message.DeleteAsync();
+        await Program.wiltery.sendWebhookToChannelWithCustomUser(ctx.Channel, new DiscordMessageBuilder()
+            .WithContent($"{member.DisplayName} was squished by a giant kitten.").WithEmbed(
+                new DiscordEmbedBuilder().WithImageUrl(
+                    cat)), cat, "Giant cat");
     }
 }

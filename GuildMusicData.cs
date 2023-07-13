@@ -1,7 +1,6 @@
-﻿using System.Reflection;
-using DSharpPlus.Entities;
+﻿using DSharpPlus.Entities;
 using DSharpPlus.Lavalink;
-using NLog;
+using EconomyBot.Logging;
 using SpotifyAPI.Web;
 
 namespace EconomyBot;
@@ -27,8 +26,8 @@ namespace EconomyBot;
 /// </summary>
 public sealed class GuildMusicData {
     private WebhookCache webhookCache;
-    
-    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
+    private static readonly Logger logger = Logger.getClassLogger("GuildMusicData");
 
     /// <summary>
     /// Is EQ enabled?
@@ -105,7 +104,7 @@ public sealed class GuildMusicData {
 
         webhookCache = new WebhookCache(Guild);
 
-        logger.Info("Initialised artist weights.");
+        logger.info("Initialised artist weights.");
     }
 
     public async Task setupWebhooks() {
@@ -252,7 +251,7 @@ public sealed class GuildMusicData {
         var trackLoad = await Node.Rest.GetTracksAsync(result.Name + " " + track.Name);
         var tracks = trackLoad.Tracks;
         if (trackLoad.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks.Any()) {
-            logger.Error("Error loading random track");
+            logger.error("Error loading random track");
         }
 
         queue.Enqueue(tracks.First(), artist);
@@ -277,7 +276,7 @@ public sealed class GuildMusicData {
 
     public void enableEQ() {
         eq = true;
-        logger.Info("Enabled EQ");
+        logger.info("Enabled EQ");
         Player.AdjustEqualizerAsync(
             new LavalinkBandAdjustment(0, 0.2f),
             new LavalinkBandAdjustment(1, 0.2f),
@@ -298,7 +297,7 @@ public sealed class GuildMusicData {
 
     public void disableEQ() {
         eq = false;
-        logger.Info("Disabled EQ");
+        logger.info("Disabled EQ");
         Player.ResetEqualizerAsync();
     }
 }

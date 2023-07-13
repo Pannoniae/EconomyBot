@@ -4,8 +4,8 @@ using System.Text;
 using System.Web;
 using DSharpPlus;
 using DSharpPlus.Entities;
+using EconomyBot.Logging;
 using Newtonsoft.Json.Linq;
-using NLog;
 
 namespace EconomyBot;
 
@@ -20,7 +20,7 @@ public class ToxicityHandler {
     private readonly Dictionary<string, DateTime?> categoryCooldowns = new();
     private readonly Dictionary<string, DateTime?> msgCooldowns = new();
 
-    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger logger = Logger.getClassLogger("ToxicityHandler");
 
     public async Task handleMessage(DiscordClient client, DiscordMessage message) { 
         if (string.IsNullOrEmpty(message.Content)) {
@@ -107,7 +107,7 @@ public class ToxicityHandler {
 
     public bool checkGlobalCooldown(DateTime now) {
         if (globalCooldown != null && now - globalCooldown < TimeSpan.FromSeconds(globalCd)) {
-            logger.Info($"Hit global cooldown ({now - globalCooldown})");
+            logger.info($"Hit global cooldown ({now - globalCooldown})");
             globalCooldown = now;
             return true;
         }
@@ -118,7 +118,7 @@ public class ToxicityHandler {
     public bool checkCategoryCooldown(DateTime now, string category) {
         var cooldown = categoryCooldowns.GetValueOrDefault(category);
         if (cooldown != null && now - cooldown < TimeSpan.FromSeconds(categoryCd)) {
-            logger.Info($"Hit {category} category cooldown ({now - globalCooldown})");
+            logger.info($"Hit {category} category cooldown ({now - globalCooldown})");
             categoryCooldowns[category] = now;
             return true;
         }
@@ -129,7 +129,7 @@ public class ToxicityHandler {
     public bool checkMsgCooldown(DateTime now, string msg) {
         var cooldown = msgCooldowns.GetValueOrDefault(msg);
         if (cooldown != null && now - cooldown < TimeSpan.FromSeconds(msgCd)) {
-            logger.Info($"Hit {msg} msg cooldown ({now - globalCooldown})");
+            logger.info($"Hit {msg} msg cooldown ({now - globalCooldown})");
             msgCooldowns[msg] = now;
             return true;
         }
@@ -167,7 +167,7 @@ public static class DictionaryExtensions {
 }
 
 public class ToxicityValues {
-    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger logger = Logger.getClassLogger("ToxicityValues");
     public double toxicityScore;
     public double severeToxicityScore;
     public double attackScore;
@@ -211,11 +211,11 @@ public class ToxicityValues {
         var responseJsonFlirt = JObject.Parse(responseStringFlirt);
 
         if (responseJson["message"] != null || responseJson["details"] != null) {
-            logger.Warn(responseString);
+            logger.warn(responseString);
         }
 
         if (responseJsonFlirt["message"] != null || responseJsonFlirt["details"] != null) {
-            logger.Warn(responseStringFlirt);
+            logger.warn(responseStringFlirt);
         }
 
         JToken? attributes;
@@ -233,12 +233,12 @@ public class ToxicityValues {
             inst.flirtingScore = attributesFlirt["FLIRTATION"]["summaryScore"]["value"].Value<double>();
         }
         catch (Exception e) {
-            logger.Error(responseString);
-            logger.Error(e.ToString());
+            logger.error(responseString);
+            logger.error(e.ToString());
             return null;
         }
 
-        logger.Info(
+        logger.info(
             $"T:{inst.toxicityScore}, ST:{inst.severeToxicityScore}, A:{inst.attackScore}, I:{inst.insultScore}, P:{inst.profanityScore}, TH:{inst.threatScore}, S:{inst.sexualScore}, F:{inst.flirtingScore}");
 
         const string API_URL =
@@ -272,7 +272,7 @@ public class ToxicityValues {
                 return inst;
             }
 
-            logger.Error(h_responseString);
+            logger.error(h_responseString);
             return inst;
         }
 
@@ -283,7 +283,7 @@ public class ToxicityValues {
             }
         }
         catch {
-            logger.Error(h_responseString);
+            logger.error(h_responseString);
             return inst;
         }
 
@@ -295,7 +295,7 @@ public class ToxicityValues {
         inst.disgust = labels["disgust"];
         inst.fear = labels["fear"];
 
-        logger.Info(
+        logger.info(
             $"J:{inst.joy}, N:{inst.neutral}, S:{inst.surprise}, SA:{inst.sadness}, A:{inst.anger}, D:{inst.disgust}, F:{inst.fear}");
         return inst;
     }

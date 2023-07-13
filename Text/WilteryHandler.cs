@@ -1,13 +1,11 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
-using LanguageExt.Pipes;
-using NLog;
+using EconomyBot.Logging;
 
 namespace EconomyBot;
 
 public class WilteryHandler {
-    
-    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger logger = Logger.getClassLogger("WilteryHandler");
     private MusicService Music { get; set; }
 
     /// <summary>
@@ -46,25 +44,30 @@ public class WilteryHandler {
     }
 
     public async Task sendWebhookToChannelAsUser(DiscordChannel channel, string message, DiscordMember user) {
+        await sendWebhookToChannelWithCustomUser(channel, new DiscordMessageBuilder().WithContent(message), user.GetGuildAvatarUrl(ImageFormat.Auto), user.DisplayName);
+    }
+
+    public async Task sendWebhookToChannelWithCustomUser(DiscordChannel channel, DiscordMessageBuilder message, string avatarURL,
+        string username) {
         Music = Program.musicService;
         GuildMusic = await Music.GetOrCreateDataAsync(channel.Guild);
         var webhook = await GuildMusic.getWebhook(channel);
         // we are in a thread/forum
         if (channel.Id != webhook.ChannelId) {
             await webhook.ExecuteAsync(new DiscordWebhookBuilder {
-                Content = message,
+                Content = message.Content,
                 ThreadId = channel.Id,
-                AvatarUrl = new Optional<string>(user.GetGuildAvatarUrl(ImageFormat.Auto)),
-                Username = new Optional<string>(user.DisplayName)
-            });
+                AvatarUrl = new Optional<string>(avatarURL),
+                Username = new Optional<string>(username)
+            }.AddEmbeds(message.Embeds));
             return;
         }
 
         await webhook.ExecuteAsync(new DiscordWebhookBuilder {
-            Content = message,
-            AvatarUrl = new Optional<string>(user.GetGuildAvatarUrl(ImageFormat.Auto)),
-            Username = new Optional<string>(user.DisplayName)
-        });
+            Content = message.Content,
+            AvatarUrl = new Optional<string>(avatarURL),
+            Username = new Optional<string>(username)
+        }.AddEmbeds(message.Embeds));
     }
 
     public async Task handleMessage(DiscordClient client, DiscordMessage message) {
@@ -92,7 +95,7 @@ public class WilteryHandler {
             await sendWebhookToChannelAsUser(channel, newMessage, user);
         }
         catch (Exception e) {
-            logger.Error(e.ToString());
+            logger.error(e);
         }
     }
 }
