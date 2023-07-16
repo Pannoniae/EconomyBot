@@ -50,15 +50,15 @@ public class Logger {
 
 
     public void warn<T>(T msg) {
-        log(LogLevel.WARNING, "#FF2288", msg);
+        log(LogLevel.WARNING, "#FF6600", msg);
     }
 
     public void warn(string msg) {
-        log(LogLevel.WARNING, "#FF2288", msg);
+        log(LogLevel.WARNING, "#FF6600", msg);
     }
 
     public void warn(Exception ex) {
-        logException(LogLevel.WARNING, "#FF2288", ex);
+        logException(LogLevel.WARNING, "#FF6600", ex);
     }
 
     private void log(LogLevel logLevel, string? colour, string msg) {
