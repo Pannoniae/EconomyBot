@@ -11,7 +11,7 @@ public class MusicQueue {
         artistQueue = new List<string>();
         gmd = guildMusic;
     }
-    
+
     private static readonly Logger logger = Logger.getClassLogger("MusicQueue");
 
     private readonly GuildMusicData gmd;
@@ -225,10 +225,9 @@ public class MusicQueue {
     }
 
     public async Task growQueue() {
-        var max = GuildMusicData.artistWeights.Values.Max();
         // return the online artist with the max. frequency of all played since we don't know the number of total songs
         var randomElement =
-            artistQueue.randomElementByWeight(e => GuildMusicData.artistWeights.TryGetValue(e, out var element) ? element : max);
+            selectNextSong();
         if (GuildMusicData.artistMappings.TryGetValue(randomElement, out var artist)) {
             await addToJazz(randomElement, artist.path);
         }
@@ -236,6 +235,20 @@ public class MusicQueue {
         else {
             await gmd.AddToRandom(randomElement);
         }
+    }
+
+    private string selectNextSong() {
+        var max = GuildMusicData.artistWeights.Values.Max();
+        return artistQueue.randomElementByWeight(e => {
+            
+            var weight = GuildMusicData.artistWeights.TryGetValue(e, out var element) ? element : max;
+            GuildMusicData.artistMappings.TryGetValue(e, out var artist);
+            if (autoQueue.Select(i => i.artist).Contains(e)) {
+                weight *= artist!.repeatPenalty;
+            }
+
+            return weight;
+        });
     }
 
     public async Task seedQueue() {

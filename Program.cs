@@ -280,7 +280,7 @@ class Program {
                 return;
             }
             case CommandNotFoundException:
-                if (!e.Command.Name.All(char.IsLetterOrDigit)) {
+                if (e.Command is not null && !e.Command.Name.All(char.IsLetterOrDigit)) {
                     // ignore "command"...
                     break;
                 }

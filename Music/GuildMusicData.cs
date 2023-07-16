@@ -4,22 +4,6 @@ using EconomyBot.Logging;
 using SpotifyAPI.Web;
 
 namespace EconomyBot;
-// This file is a part of Music Turret project.
-// 
-// Copyright (C) 2018-2021 Emzi0767
-// 
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-// 
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 /// <summary>
 /// Represents data for the music playback in a discord guild.
@@ -48,7 +32,7 @@ public sealed class GuildMusicData {
 
     private DiscordGuild Guild { get; }
     public LavalinkExtension Lavalink { get; }
-    public LavalinkGuildConnection Player { get; set; }
+    public LavalinkGuildConnection? Player { get; set; }
 
     public LavalinkNodeConnection Node { get; }
 
@@ -65,7 +49,7 @@ public sealed class GuildMusicData {
         { "chuck berry", new Artist("G:\\music\\Chuck Berry", 1.0, 0.5) }, // most of this is trash
         { "jamie berry", new Artist("G:\\music\\Jamie Berry", 0.8) },
         { "sim gretina", new Artist("G:\\music\\Sim Gretina", 0.8, 0) }, // too much earrape
-        { "freshly squeezed", new Artist("G:\\music\\Freshly Squeezed Music", 0.8, 0.5) },
+        { "freshly squeezed", new Artist("G:\\music\\Freshly Squeezed Music", 0.8, 0.8, 0.5) },
         { "puppini sisters", new Artist("G:\\music\\Puppini Sisters", 1.0) },
         { "11 acorn lane", new Artist("G:\\music\\11 Acorn Lane", 1.0) },
         { "electric swing circus", new Artist("G:\\music\\Electric Swing Circus", 1.0) },
@@ -257,7 +241,7 @@ public sealed class GuildMusicData {
         queue.Enqueue(tracks.First(), artist);
     }
 
-    public async Task<IEnumerable<LavalinkLoadResult>> StartJazz(string searchTerm) {
+    public async Task<IEnumerable<LavalinkLoadResult>> getJazz(string searchTerm) {
         return artistMappings.SelectMany(
                 artist => Directory.GetFiles(artist.Value.path, searchTerm,
                     new EnumerationOptions { RecurseSubdirectories = true }))
@@ -302,7 +286,14 @@ public sealed class GuildMusicData {
     }
 }
 
-public record Artist(string path, double volume, double weight = 1.0);
+/// <summary>
+/// Stores artist information which is used for song selection.
+/// </summary>
+/// <param name="path">The path of the music files for the artist.</param>
+/// <param name="volume">The volume modifier for the artist.</param>
+/// <param name="weight">The rarity multiplier for the artist in the random selection.</param>
+/// <param name="repeatPenalty">If the queue already contains the artist, the chance of selecting the artist again will be multiplied by the value.</param>
+public record Artist(string path, double volume, double weight = 1.0, double repeatPenalty = 1.0);
 
 public record Track(LavalinkTrack track, string? artist);
 

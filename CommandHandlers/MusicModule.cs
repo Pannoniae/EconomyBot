@@ -182,7 +182,7 @@ public class MusicModule : BaseCommandModule {
 
         var interactivity = ctx.Client.GetInteractivity();
 
-        var results = (await GuildMusic.StartJazz("*" + term + "*")).ToSeq();
+        var results = (await GuildMusic.getJazz("*" + term + "*")).ToSeq();
         if (!results.Any()) {
             await common.respond(ctx, "Nothing was found.");
             return;

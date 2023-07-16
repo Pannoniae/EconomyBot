@@ -8,6 +8,17 @@ namespace EconomyBot;
 
 [ModuleLifespan(ModuleLifespan.Singleton)]
 public class ChatModule : BaseCommandModule {
+    
+    private MusicService Music { get; set; }
+
+    /// <summary>
+    /// I know the name is bad, will refactor.
+    /// </summary>
+    public GuildMusicData GuildMusic { get; set; }
+    public override async Task BeforeExecutionAsync(CommandContext ctx) {
+        Music = Program.musicService;
+        GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild);
+    }
 
     static IEnumerable<string> ChunksUpTo(string str, int maxChunkSize) {
         for (int i = 0; i < str.Length; i += maxChunkSize)
