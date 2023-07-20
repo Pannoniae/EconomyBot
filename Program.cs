@@ -177,16 +177,11 @@ class Program {
             return;
         }
 
-        // csoki musicbot
-        if (e.Author.Id == 545252588753256469 && e.Message.Content.StartsWith('.')) {
-            await e.Message.RespondAsync("shut up");
-        }
-
         // Funny replacement handling
         // todo
 
         // Toxicity handler
-        if (!e.Message.Content.StartsWith('.') && !e.Message.Content.StartsWith('/')) {
+        if (!e.Message.Content.StartsWith('.') && !e.Message.Content.StartsWith('/') && e.Message.Embeds.Count ==  0 && e.Message.Attachments.Count == 0) {
             await toxicity.handleMessage(client, e.Message);
             await wiltery.handleMessage(client, e.Message);
         }

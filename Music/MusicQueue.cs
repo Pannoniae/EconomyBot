@@ -247,6 +247,10 @@ public class MusicQueue {
                 weight *= artist!.repeatPenalty;
             }
 
+            if (autoQueue.FirstOrDefault()?.artist == e) {
+                weight *= artist!.doubleRepeatPenalty;
+            }
+
             return weight;
         });
     }

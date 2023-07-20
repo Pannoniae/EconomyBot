@@ -49,11 +49,13 @@ public sealed class GuildMusicData {
         { "chuck berry", new Artist("G:\\music\\Chuck Berry", 1.0, 0.5) }, // most of this is trash
         { "jamie berry", new Artist("G:\\music\\Jamie Berry", 0.8) },
         { "sim gretina", new Artist("G:\\music\\Sim Gretina", 0.8, 0) }, // too much earrape
-        { "freshly squeezed", new Artist("G:\\music\\Freshly Squeezed Music", 0.8, 0.8, 0.5) },
+        { "freshly squeezed", new Artist("G:\\music\\Freshly Squeezed Music", 0.8, 0.8, 0.75, 0.5) },
         { "puppini sisters", new Artist("G:\\music\\Puppini Sisters", 1.0) },
         { "11 acorn lane", new Artist("G:\\music\\11 Acorn Lane", 1.0) },
         { "electric swing circus", new Artist("G:\\music\\Electric Swing Circus", 1.0) },
         { "the speakeasies swing band", new Artist("G:\\music\\The Speakeasies Swing Band", 1.0) },
+        { "donald lambert", new Artist("G:\\music\\Donald Lambert", 1.5) },
+        { "newport", new Artist("G:\\music\\Newport Jazz Festival", 1.5) }, // 1960 Newport Jazz Festival, full recording
     };
 
     public static readonly Dictionary<string, double> artistWeights = new();
@@ -293,7 +295,12 @@ public sealed class GuildMusicData {
 /// <param name="volume">The volume modifier for the artist.</param>
 /// <param name="weight">The rarity multiplier for the artist in the random selection.</param>
 /// <param name="repeatPenalty">If the queue already contains the artist, the chance of selecting the artist again will be multiplied by the value.</param>
-public record Artist(string path, double volume, double weight = 1.0, double repeatPenalty = 1.0);
+/// <param name="doubleRepeatPenalty">If the previous track is the same artist, the chance of selecting the artist again will be multiplied by the value.</param>
+public record Artist(string path, 
+    double volume, 
+    double weight = 1.0, 
+    double repeatPenalty = 1.0,
+    double doubleRepeatPenalty = 1.0);
 
 public record Track(LavalinkTrack track, string? artist);
 
@@ -313,6 +320,6 @@ public static class IEnumerableExtensions {
                 return item.Value;
         }
 
-        return default;
+        return default!;
     }
 }
