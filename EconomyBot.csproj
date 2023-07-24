@@ -54,6 +54,7 @@
 
     <ItemGroup>
       <Folder Include="lua\" />
+      <Folder Include="py\" />
     </ItemGroup>
 
 </Project>

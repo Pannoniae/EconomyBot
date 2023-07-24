@@ -1,4 +1,5 @@
-﻿using DSharpPlus.Entities;
+﻿using System.Numerics;
+using DSharpPlus.Entities;
 using DSharpPlus.Lavalink;
 using EconomyBot.Logging;
 using SpotifyAPI.Web;
@@ -46,10 +47,10 @@ public sealed class GuildMusicData {
         { "caravan palace", new Artist("G:\\music\\Caravan Palace", 1.0, 2) },
         { "tape five", new Artist("G:\\music\\Tape Five", 1.0) },
         { "caro emerald", new Artist("G:\\music\\Caro Emerald", 1.0) },
-        { "chuck berry", new Artist("G:\\music\\Chuck Berry", 1.0, 0.5) }, // most of this is trash
+        { "chuck berry", new Artist("G:\\music\\Chuck Berry", 1.0, 0.25) }, // most of this is trash
         { "jamie berry", new Artist("G:\\music\\Jamie Berry", 0.8) },
         { "sim gretina", new Artist("G:\\music\\Sim Gretina", 0.8, 0) }, // too much earrape
-        { "freshly squeezed", new Artist("G:\\music\\Freshly Squeezed Music", 0.8, 0.8, 0.75, 0.5) },
+        { "freshly squeezed", new Artist("G:\\music\\Freshly Squeezed Music", 0.8, 0.5, 0.5, 0.3) },
         { "puppini sisters", new Artist("G:\\music\\Puppini Sisters", 1.0) },
         { "11 acorn lane", new Artist("G:\\music\\11 Acorn Lane", 1.0) },
         { "electric swing circus", new Artist("G:\\music\\Electric Swing Circus", 1.0) },
