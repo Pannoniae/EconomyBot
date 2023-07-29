@@ -8,8 +8,8 @@ from unittest import mock
 
 import pytest
 
-from helloworld import __name__ as prog
-from helloworld import cli
+from langue import __name__ as prog
+from langue import cli
 
 
 def run(capsys, args: str) -> Tuple[int, List[str], List[str]]:
