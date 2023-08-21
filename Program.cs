@@ -26,6 +26,14 @@ class Program {
 
     private static readonly Logger logger = Logger.getClassLogger("Main");
 
+    public static LavalinkNodeConnection LavalinkNode;
+    public static MusicService musicService;
+    public static ImagesModule imagesModule;
+    public static ToxicityHandler toxicity;
+    public static WilteryHandler wiltery;
+
+    public static bool lavalinkInit = false;
+
     public static DiscordClient client;
 
     public static ulong LOG = 838920584879800343;
@@ -206,6 +214,7 @@ class Program {
         await Task.Delay(1000);
         LavalinkNode = await lavalink.ConnectAsync(lavalinkConfig);
         musicService = new MusicService(lavalink, LavalinkNode);
+        lavalinkInit = true;
         imagesModule = new ImagesModule();
         toxicity = new ToxicityHandler();
         wiltery = new WilteryHandler(Program.client);
@@ -219,12 +228,6 @@ class Program {
             logger.debug($"{guild.Value.Name}, {guild.Value.JoinedAt.ToString()}");
         }
     }
-
-    public static LavalinkNodeConnection LavalinkNode;
-    public static MusicService musicService;
-    public static ImagesModule imagesModule;
-    public static ToxicityHandler toxicity;
-    public static WilteryHandler wiltery;
 
     private static async Task errorHandler(CommandsNextExtension sender, CommandErrorEventArgs e) {
         switch (e.Exception) {

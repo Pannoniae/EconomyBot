@@ -16,20 +16,14 @@ using Formatter = DSharpPlus.Formatter;
 namespace EconomyBot;
 
 [ModuleLifespan(ModuleLifespan.Singleton)]
-public class MusicModule : BaseCommandModule {
-    private MusicService Music { get; set; }
-    private YouTubeSearchProvider YouTube { get; }
+public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
+    private MusicService Music { get; set; } = Program.musicService;
+    private YouTubeSearchProvider YouTube { get; } = yt;
 
     public GuildMusicData GuildMusic { get; set; }
 
-    private readonly MusicCommon common;
+    private readonly MusicCommon common = new();
     private readonly SemaphoreSlim _semaphore = new(1, 1);
-
-    public MusicModule(YouTubeSearchProvider yt) {
-        common = new MusicCommon();
-        Music = Program.musicService;
-        YouTube = yt;
-    }
 
     private static DiscordChannel? getChannel(CommandContext ctx) {
         return ctx.Member?.VoiceState?.Channel;
@@ -47,6 +41,12 @@ public class MusicModule : BaseCommandModule {
     }
 
     public override async Task BeforeExecutionAsync(CommandContext ctx) {
+
+        if (!Program.lavalinkInit) {
+            await common.respond(ctx, "Lavalink not initialised, can't play music right now. (Check output for details)");
+            return;
+        }
+
         Music = Program.musicService;
         if (ctx.Command.Name == "join") {
             GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild);
