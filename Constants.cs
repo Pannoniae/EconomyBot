@@ -21,7 +21,14 @@ public static class Constants {
     public static string? spotifytoken2;
 
     public static void init() {
-        var json = JObject.Parse(File.ReadAllText("config.json"));
+        JObject json;
+        try {
+            json = JObject.Parse(File.ReadAllText("config.json"));
+        }
+        catch (FileNotFoundException e) {
+            logger.error("The bot doesn't work without a config.json file, please create one.");
+            return;
+        }
 
         token = json["token"]?.Value<string>();
         if (token is null) {
