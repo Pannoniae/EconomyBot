@@ -270,7 +270,8 @@ public sealed class GuildMusicData {
             // Not to mention that we are literally reflecting the Track object because the stupid authors thought
             // their autodetection was infallible thus they haven't provided a way to properly set the track's name which will be displayed.
             // The end-user is probably not very delighted at seeing "unknown author" or "unknown title" so we make a best-effort guess here.
-            track.GetType().GetProperty("Author")!.SetValue(track, Path.GetFileName(Path.GetDirectoryName(file.Name)));
+            logger.warn(Path.GetFileName(Path.GetDirectoryName(file.Name)));
+            track.GetType().GetProperty("Author")!.SetValue(track, file.Directory.Name);
         }
 
         return tracks;
