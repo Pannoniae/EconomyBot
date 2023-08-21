@@ -254,8 +254,23 @@ public sealed class GuildMusicData {
     
     public async Task<LavalinkLoadResult> getTracksAsync(LavalinkRestClient client, FileInfo file) {
         var tracks = await client.GetTracksAsync(file);
+
+        // This is a typical example of bad cargo-cult programming. I am leaving it in because it doesn't matter,
+        // but this is how programs get slow.
+        // The naive programmer would think that filtering with where is cheap.
+        // The naive programmer doesn't think about the fact that it traverses the entire array or list.
+        // Instead of converting it to a proper imperative loop, writing a helper for concatenating the two conditions,
+        // or using a better language, we just copypaste the loop and hope for the best.
         foreach (var track in tracks.Tracks.Where(track => track.Title == "Unknown title")) {
             track.GetType().GetProperty("Title")!.SetValue(track, Path.GetFileNameWithoutExtension(file.Name));
+        }
+        foreach (var track in tracks.Tracks.Where(track => track.Author == "Unknown artist")) {
+            // Here's another terrible hack due to .NET's abysmal directory handling.
+            // This just gets the directory of the file, then misuses GetFileName to return the last part of it (the parent directory's name)
+            // Not to mention that we are literally reflecting the Track object because the stupid authors thought
+            // their autodetection was infallible thus they haven't provided a way to properly set the track's name which will be displayed.
+            // The end-user is probably not very delighted at seeing "unknown author" or "unknown title" so we make a best-effort guess here.
+            track.GetType().GetProperty("Author")!.SetValue(track, Path.GetFileName(Path.GetDirectoryName(file.Name)));
         }
 
         return tracks;
