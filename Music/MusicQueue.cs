@@ -4,17 +4,8 @@ using EconomyBot.Logging;
 
 namespace EconomyBot;
 
-public class MusicQueue {
-    public MusicQueue(GuildMusicData guildMusic) {
-        Queue = new List<Track>();
-        autoQueue = new List<Track>();
-        artistQueue = new List<string>();
-        gmd = guildMusic;
-    }
-
+public class MusicQueue(GuildMusicData guildMusic) {
     private static readonly Logger logger = Logger.getClassLogger("MusicQueue");
-
-    private readonly GuildMusicData gmd;
 
     /// <summary>
     /// Gets the currently playing item.
@@ -29,53 +20,53 @@ public class MusicQueue {
     /// <summary>
     /// Gets the current manual music queue.
     /// </summary>
-    public List<Track> Queue { get; }
+    public List<Track> Queue { get; } = new();
 
     /// <summary>
     /// Gets the current auto-played music queue.
     /// </summary>
-    public List<Track> autoQueue { get; }
+    public List<Track> autoQueue { get; } = new();
 
     /// <summary>
     /// The things being played right now. "_fats" is special-cased to the great collection.
     /// </summary>
-    public List<string> artistQueue { get; }
+    public List<string> artistQueue { get; } = new();
 
     /// <summary>
     /// Stops the playback.
     /// </summary>
     public async Task StopAsync() {
-        if (gmd.Player == null || !gmd.Player.IsConnected)
+        if (guildMusic.Player == null || !guildMusic.Player.IsConnected)
             return;
 
         NowPlaying = default;
         NowPlayingArtist = default;
-        await gmd.Player.StopAsync();
+        await guildMusic.Player.StopAsync();
     }
 
     /// <summary>
     /// Begins playback.
     /// </summary>
     public async Task PlayAsync() {
-        if (gmd.Player == null || !gmd.Player.IsConnected)
+        if (guildMusic.Player == null || !guildMusic.Player.IsConnected)
             return;
 
         if (NowPlaying?.TrackString == null)
-            await gmd.queue.PlayHandlerAsync();
+            await guildMusic.queue.PlayHandlerAsync();
     }
 
     /// <summary>
     /// Restarts current track.
     /// </summary>
     public async Task RestartAsync() {
-        if (gmd.Player == null || !gmd.Player.IsConnected)
+        if (guildMusic.Player == null || !guildMusic.Player.IsConnected)
             return;
 
         if (NowPlaying.TrackString == null)
             return;
 
         insert(0, new Track(NowPlaying, NowPlayingArtist));
-        await gmd.Player.StopAsync();
+        await guildMusic.Player.StopAsync();
     }
 
     /// <summary>
@@ -196,14 +187,14 @@ public class MusicQueue {
         var item = itemN;
         NowPlaying = item.track;
         NowPlayingArtist = item.artist;
-        await gmd.Player.PlayAsync(item.track);
+        await guildMusic.Player.PlayAsync(item.track);
     }
 
     public async Task addToJazz(string artist, string path) {
         var rand = new Random();
         var files = Directory.GetFiles(path, "*", new EnumerationOptions { RecurseSubdirectories = true });
         var randomFile = new FileInfo(files[rand.Next(files.Length)]);
-        var tracks_ = await gmd.getTracksAsync(gmd.Node.Rest, randomFile);
+        var tracks_ = await guildMusic.getTracksAsync(guildMusic.Node.Rest, randomFile);
         foreach (var track in tracks_.Tracks) {
             Enqueue(track, artist);
             logger.info($"Enqueued {track.Title} at {track.Uri}");
@@ -233,7 +224,7 @@ public class MusicQueue {
         }
 
         else {
-            await gmd.AddToRandom(randomElement);
+            await guildMusic.AddToRandom(randomElement);
         }
     }
 
@@ -273,7 +264,7 @@ public class MusicQueue {
 
     public async Task Player_PlaybackStarted(LavalinkGuildConnection sender, TrackStartEventArgs e) {
         if (NowPlayingArtist != null) {
-            await gmd.Player.SetVolumeAsync(gmd.effectiveVolume);
+            await guildMusic.Player.SetVolumeAsync(guildMusic.effectiveVolume);
         }
     }
 }

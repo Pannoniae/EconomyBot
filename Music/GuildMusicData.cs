@@ -265,8 +265,6 @@ public sealed class GuildMusicData {
             track.GetType().GetProperty("Title")!.SetValue(track, Path.GetFileNameWithoutExtension(file.Name));
         }
         foreach (var track in tracks.Tracks.Where(track => track.Author == "Unknown artist")) {
-            // Here's another terrible hack due to .NET's abysmal directory handling.
-            // This just gets the directory of the file, then misuses GetFileName to return the last part of it (the parent directory's name)
             // Not to mention that we are literally reflecting the Track object because the stupid authors thought
             // their autodetection was infallible thus they haven't provided a way to properly set the track's name which will be displayed.
             // The end-user is probably not very delighted at seeing "unknown author" or "unknown title" so we make a best-effort guess here.
@@ -322,18 +320,19 @@ public record Track(LavalinkTrack track, string? artist);
 
 public static class IEnumerableExtensions {
     public static T randomElementByWeight<T>(this IEnumerable<T> sequence, Func<T, double> weightSelector) {
-        double totalWeight = sequence.Sum(weightSelector);
+        var elements = sequence.ToList();
+        double totalWeight = elements.Sum(weightSelector);
         // The weight we are after...
         double itemWeightIndex = new Random().NextDouble() * totalWeight;
         double currentWeightIndex = 0;
 
-        foreach (var item in from weightedItem in sequence
-                 select new { Value = weightedItem, Weight = weightSelector(weightedItem) }) {
-            currentWeightIndex += item.Weight;
+        foreach (var item in elements) {
+            var weight = weightSelector(item);
+            currentWeightIndex += weight;
 
             // If we've hit or passed the weight we are after for this item then it's the one we want....
             if (currentWeightIndex >= itemWeightIndex)
-                return item.Value;
+                return item;
         }
 
         return default!;

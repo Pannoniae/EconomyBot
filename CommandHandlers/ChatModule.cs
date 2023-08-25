@@ -8,7 +8,7 @@ namespace EconomyBot;
 
 [ModuleLifespan(ModuleLifespan.Singleton)]
 public class ChatModule : BaseCommandModule {
-    
+
     private MusicService Music { get; set; }
 
     /// <summary>
@@ -33,6 +33,8 @@ public class ChatModule : BaseCommandModule {
     [RequirePermissions(Permissions.ManageMessages)]
     public async Task purge(CommandContext ctx, int amt) {
         IReadOnlyList<DiscordMessage> messages;
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        // the library is stupid
         if (ctx.Message.Reference != null) {
             await Console.Out.WriteLineAsync("Purging from given message!");
             messages = await ctx.Channel.GetMessagesBeforeAsync(ctx.Message.Reference.Message.Id, amt);
