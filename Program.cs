@@ -211,7 +211,7 @@ class Program {
     private static async Task setup(DiscordClient client, LavalinkExtension lavalink,
         LavalinkConfiguration lavalinkConfig) {
         // Wait a bit with lavalink init, Lavalink seems to start slower than the bot. Lazy solution is pretty much a sleep
-        await Task.Delay(1000);
+        await Task.Delay(4000);
         LavalinkNode = await lavalink.ConnectAsync(lavalinkConfig);
         musicService = new MusicService(lavalink, LavalinkNode);
         lavalinkInit = true;
@@ -277,15 +277,16 @@ class Program {
                 logger.warn(e.Exception);
                 return;
             }
-            case CommandNotFoundException:
+            case CommandNotFoundException ex:
                 if (e.Command is not null && !e.Command.Name.All(char.IsLetterOrDigit)) {
                     // ignore "command"...
-                    break;
+                    return;
                 }
 
+                var closestCommand = ActualFuzz.partialFuzzItem(ex.CommandName, e.Context.CommandsNext.RegisteredCommands.Keys);
                 await sender.Client.SendMessageAsync(e.Context.Channel, new DiscordMessageBuilder().WithEmbed(
                     new DiscordEmbedBuilder().WithColor(DiscordColor.HotPink)
-                        .WithDescription("I have no bloody idea what that command is, sorry")
+                        .WithDescription($"I have no bloody idea what that command is, sorry, did you mean {closestCommand}?")
                         //.WithImageUrl("https://c.tenor.com/CR9Or4gKoAUAAAAC/menhera-menhera-chan.gif").Build()));
                         .Build()));
                 return;
