@@ -114,7 +114,7 @@ public class MusicModuleSlash : ApplicationCommandModule {
 
     [SlashCommand("skip", "Skips current track.")]
     public async Task SkipAsync(InteractionContext ctx) {
-        var track = GuildMusic.queue.NowPlaying;
+        var track = GuildMusic.queue.NowPlaying.track;
         await GuildMusic.queue.StopAsync();
         await ctx.CreateResponseAsync(
             $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
@@ -123,7 +123,7 @@ public class MusicModuleSlash : ApplicationCommandModule {
     [SlashCommand("skipnum", "Skips current track.")]
     public async Task SkipAsync(InteractionContext ctx, [Option("tracks", "How many tracks to skip.")] long num) {
         for (int i = 0; i < num; i++) {
-            var track = GuildMusic.queue.NowPlaying;
+            var track = GuildMusic.queue.NowPlaying.track;
             await GuildMusic.queue.StopAsync();
             await ctx.CreateResponseAsync(
                 $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
@@ -176,7 +176,7 @@ public class MusicModuleSlash : ApplicationCommandModule {
 
     [SlashCommand("restart", "Restarts the playback of the current track.")]
     public async Task RestartAsync(InteractionContext ctx) {
-        var track = GuildMusic.queue.NowPlaying;
+        var track = GuildMusic.queue.NowPlaying.track;
         await GuildMusic.queue.RestartAsync();
         await ctx.CreateResponseAsync(
             $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} restarted.");
@@ -208,15 +208,15 @@ public class MusicModuleSlash : ApplicationCommandModule {
             .GroupBy(x => x.index / 10)
             .Select(xg =>
                 new Page(
-                    $"Now playing: {GuildMusic.queue.NowPlaying?.ToTrackString()}\n\n{string.Join("\n", xg.Select(xa => $"`{xa.index + 1:00}` {xa.str}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
+                    $"Now playing: {GuildMusic.queue.NowPlaying?.track.ToTrackString()}\n\n{string.Join("\n", xg.Select(xa => $"`{xa.index + 1:00}` {xa.str}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
             .ToArray();
 
         var trk = GuildMusic.queue.NowPlaying;
         if (!pages.Any()) {
-            if (trk?.TrackString == null)
+            if (trk?.track.TrackString == null)
                 await ctx.CreateResponseAsync("Queue is empty!");
             else
-                await ctx.CreateResponseAsync($"Now playing: {GuildMusic.queue.NowPlaying?.ToTrackString()}");
+                await ctx.CreateResponseAsync($"Now playing: {GuildMusic.queue.NowPlaying?.track.ToTrackString()}");
 
             return;
         }
@@ -235,12 +235,12 @@ public class MusicModuleSlash : ApplicationCommandModule {
     [SlashCommand("nowplaying", "Displays information about currently-played track.")]
     public async Task NowPlayingAsync(InteractionContext ctx) {
         var track = GuildMusic.queue.NowPlaying;
-        if (GuildMusic.queue.NowPlaying?.TrackString == null) {
+        if (GuildMusic.queue.NowPlaying?.track.TrackString == null) {
             await ctx.CreateResponseAsync("Not playing.");
         }
         else {
             await ctx.CreateResponseAsync(
-                $"Now playing: {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{GuildMusic.queue.NowPlaying.Length.ToDurationString()}].");
+                $"Now playing: {Formatter.Bold(Formatter.Sanitize(track.track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.track.Author))} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{GuildMusic.queue.NowPlaying.track.Length.ToDurationString()}].");
         }
     }
 

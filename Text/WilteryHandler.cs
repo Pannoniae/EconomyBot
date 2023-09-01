@@ -106,16 +106,7 @@ public interface MessageHandler {
     void process(WilteryHandler handler, DiscordMessage message);
 }
 
-public class WordMessageHandler : MessageHandler {
-    private string target;
-    private string replacement;
-
-
-    public WordMessageHandler(string target, string replacement) {
-        this.target = target;
-        this.replacement = replacement;
-    }
-
+public class WordMessageHandler(string target, string replacement) : MessageHandler {
     public virtual bool shouldProcess(DiscordMessage message) {
         return message.Content.Contains(target, StringComparison.CurrentCultureIgnoreCase);
     }
@@ -125,16 +116,7 @@ public class WordMessageHandler : MessageHandler {
     }
 }
 
-public class ResponseWordMessageHandler : WordMessageHandler {
-    private string target;
-    private string response;
-
-
-    public ResponseWordMessageHandler(string target, string response) : base(target, response) {
-        this.target = target;
-        this.response = response;
-    }
-
+public class ResponseWordMessageHandler(string target, string response) : WordMessageHandler(target, response) {
     public override async void process(WilteryHandler handler, DiscordMessage message) {
         await message.RespondAsync(response);
     }

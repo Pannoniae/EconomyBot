@@ -33,6 +33,7 @@ class Program {
     public static WilteryHandler wiltery;
 
     public static bool lavalinkInit = false;
+    public static bool hasSetup = false;
 
     public static DiscordClient client;
 
@@ -95,7 +96,6 @@ class Program {
         discord.SessionCreated += (sender, _) => setup(sender, lavalink, lavalinkConfig);
         discord.GuildDownloadCompleted += (sender, _) => setupB(sender, lavalink, lavalinkConfig);
         discord.MessageDeleted += messageDeleteHandler;
-        discord.MessageReactionAdded += reactionHandler;
         discord.GetCommandsNext().UnregisterConverter<TimeSpan>();
         discord.GetCommandsNext().RegisterConverter(new CustomTimeSpanConverter());
         await discord.ConnectAsync();
@@ -172,10 +172,11 @@ class Program {
         await actualMessageDeleteHandler(e.Channel, e.Message);
     }
 
-    private static async Task reactionHandler(DiscordClient sender, MessageReactionAddEventArgs e) {
-    }
-
     private static async Task messageHandler(DiscordClient client, MessageCreateEventArgs e) {
+        if (!hasSetup) {
+            return;
+        }
+
         if (client.CurrentUser.Id == e.Author.Id) {
             return;
         }
@@ -211,7 +212,7 @@ class Program {
     private static async Task setup(DiscordClient client, LavalinkExtension lavalink,
         LavalinkConfiguration lavalinkConfig) {
         // Wait a bit with lavalink init, Lavalink seems to start slower than the bot. Lazy solution is pretty much a sleep
-        await Task.Delay(4000);
+        await Task.Delay(7000);
         LavalinkNode = await lavalink.ConnectAsync(lavalinkConfig);
         musicService = new MusicService(lavalink, LavalinkNode);
         lavalinkInit = true;
@@ -219,6 +220,7 @@ class Program {
         toxicity = new ToxicityHandler();
         wiltery = new WilteryHandler(Program.client);
 
+        hasSetup = true;
         logger.info("Setup done!");
     }
 
@@ -243,8 +245,7 @@ class Program {
 
                 var minArgumentLength = int.MaxValue;
                 var maxArgumentLength = 0;
-                //
-                // o few arguments? loop through all overloads and check if we don't have enough
+                // too few arguments? loop through all overloads and check if we don't have enough
                 foreach (var overload in e.Command.Overloads) {
                     // too few
                     minArgumentLength = Math.Min(overload.Arguments.Count, minArgumentLength);
@@ -303,7 +304,7 @@ public partial class CustomTimeSpanConverter : IArgumentConverter<TimeSpan> {
     private static Regex TimeSpanRegex { get; } =
         MyRegex();
 
-    [GeneratedRegex("^(?<days>\\d+d\\s*)?(?<hours>\\d{1,2}h\\s*)?(?<minutes>\\d{1,2}m\\s*)?(?<seconds>\\d{1,2}s\\s*)?$",
+    [GeneratedRegex(@"^(?<days>\d+d\s*)?(?<hours>\d{1,2}h\s*)?(?<minutes>\d{1,2}m\s*)?(?<seconds>\d{1,2}s\s*)?$",
         RegexOptions.Compiled | RegexOptions.ECMAScript)]
     private static partial Regex MyRegex();
 

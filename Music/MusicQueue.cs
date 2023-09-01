@@ -10,17 +10,19 @@ public class MusicQueue(GuildMusicData guildMusic) {
     /// <summary>
     /// Gets the currently playing item.
     /// </summary>
-    public LavalinkTrack? NowPlaying { get; private set; }
+    public Track? NowPlaying { get; private set; }
 
     /// <summary>
-    /// Gets the currently playing item.
+    /// It's like <see cref="NowPlaying"/> but doesn't get cleared when playback stops. Used for implementing repeat.
     /// </summary>
-    public string? NowPlayingArtist { get; private set; }
+    public Track? repeatHolder { get; private set; }
 
     /// <summary>
     /// Gets the current manual music queue.
     /// </summary>
     public List<Track> Queue { get; } = new();
+
+    public bool repeatQueue { get; set; } = false;
 
     /// <summary>
     /// Gets the current auto-played music queue.
@@ -40,7 +42,6 @@ public class MusicQueue(GuildMusicData guildMusic) {
             return;
 
         NowPlaying = default;
-        NowPlayingArtist = default;
         await guildMusic.Player.StopAsync();
     }
 
@@ -51,7 +52,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
         if (guildMusic.Player == null || !guildMusic.Player.IsConnected)
             return;
 
-        if (NowPlaying?.TrackString == null)
+        if (NowPlaying == default)
             await guildMusic.queue.PlayHandlerAsync();
     }
 
@@ -62,10 +63,10 @@ public class MusicQueue(GuildMusicData guildMusic) {
         if (guildMusic.Player == null || !guildMusic.Player.IsConnected)
             return;
 
-        if (NowPlaying.TrackString == null)
+        if (NowPlaying == default)
             return;
 
-        insert(0, new Track(NowPlaying, NowPlayingArtist));
+        insert(0, NowPlaying);
         await guildMusic.Player.StopAsync();
     }
 
@@ -140,6 +141,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
         else {
             item = Queue[0];
             Queue.RemoveAt(0);
+            repeatHolder = item;
             return item;
         }
     }
@@ -178,16 +180,13 @@ public class MusicQueue(GuildMusicData guildMusic) {
 
     public async Task PlayHandlerAsync() {
         var itemN = Dequeue();
-        if (itemN == null) {
+        if (itemN == default) {
             NowPlaying = default;
-            NowPlayingArtist = default;
             return;
         }
 
-        var item = itemN;
-        NowPlaying = item.track;
-        NowPlayingArtist = item.artist;
-        await guildMusic.Player.PlayAsync(item.track);
+        NowPlaying = itemN;
+        await guildMusic.Player.PlayAsync(itemN.track);
     }
 
     public async Task addToJazz(string artist, string path) {
@@ -231,7 +230,6 @@ public class MusicQueue(GuildMusicData guildMusic) {
     private string selectNextSong() {
         var max = GuildMusicData.artistWeights.Values.Max();
         return artistQueue.randomElementByWeight(e => {
-            
             var weight = GuildMusicData.artistWeights.TryGetValue(e, out var element) ? element : max;
             GuildMusicData.artistMappings.TryGetValue(e, out var artist);
             if (autoQueue.Select(i => i.artist).Contains(e)) {
@@ -254,8 +252,12 @@ public class MusicQueue(GuildMusicData guildMusic) {
     }
 
     public async Task Player_PlaybackFinished(LavalinkGuildConnection con, TrackFinishEventArgs e) {
+        // requeue if there are items in the queue
+        if (repeatQueue && Queue.Count != 0 && repeatHolder != null) {
+            Queue.Add(repeatHolder);
+        }
         await Task.Delay(500);
-        if (artistQueue.Any() && autoQueue.Count < 6) {
+        if (artistQueue.Count != 0 && autoQueue.Count < 6) {
             await seedQueue();
         }
 
@@ -263,8 +265,6 @@ public class MusicQueue(GuildMusicData guildMusic) {
     }
 
     public async Task Player_PlaybackStarted(LavalinkGuildConnection sender, TrackStartEventArgs e) {
-        if (NowPlayingArtist != null) {
-            await guildMusic.Player.SetVolumeAsync(guildMusic.effectiveVolume);
-        }
+        await guildMusic.Player.SetVolumeAsync(guildMusic.effectiveVolume);
     }
 }

@@ -7,21 +7,15 @@ namespace EconomyBot;
 /// The DSharpPlus library is stupid, you can't get a webhook directly, only all webhooks for a channel.
 /// So here we just cache all the webhooks, screw you.
 /// </summary>
-public class WebhookCache {
-    private DiscordGuild Guild;
-
+public class WebhookCache(DiscordGuild guild) {
     private readonly Dictionary<DiscordChannel, DiscordWebhook> webhooks = new();
-
-    public WebhookCache(DiscordGuild guild) {
-        Guild = guild;
-    }
 
 
     /// <summary>
     /// Setup webhook mappings from channel to webhook.
     /// </summary>
     public async Task setup() {
-        var enumerable = Guild.Channels.AsParallel().Where(chn =>
+        var enumerable = guild.Channels.AsParallel().Where(chn =>
             chn.Value.Type != ChannelType.Category &&
             chn.Value.Type != ChannelType.Voice && // not invalid channel
             chn.Value.Name != "admin" && // not admin

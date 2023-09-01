@@ -17,7 +17,7 @@ public sealed class GuildMusicData {
     /// <summary>
     /// Is EQ enabled?
     /// </summary>
-    private bool eq;
+    public bool eq;
 
     /// <summary>
     /// Gets the playback volume for this guild.
@@ -57,6 +57,7 @@ public sealed class GuildMusicData {
         { "the speakeasies swing band", new Artist("G:\\music\\The Speakeasies Swing Band", 1.0) },
         { "donald lambert", new Artist("G:\\music\\Donald Lambert", 1.5) },
         { "newport", new Artist("G:\\music\\Newport Jazz Festival", 1.5) }, // 1960 Newport Jazz Festival, full recording
+        { "hot sardines", new Artist("G:\\music\\The Hot Sardines", 1.0) }
     };
 
     public static readonly Dictionary<string, double> artistWeights = new();
@@ -65,9 +66,9 @@ public sealed class GuildMusicData {
     /// Gets the actual volume to set.
     /// </summary>
     public int effectiveVolume =>
-        (int)(volume * (artistMappings.GetValueOrDefault(queue.NowPlayingArtist ?? "missing")?.volume ?? 1));
+        (int)(volume * (artistMappings.GetValueOrDefault(queue.NowPlaying?.artist ?? "missing")?.volume ?? 1));
 
-    public double artistVolume => artistMappings.GetValueOrDefault(queue.NowPlayingArtist ?? "missing")?.volume ?? 1;
+    public double artistVolume => artistMappings.GetValueOrDefault(queue.NowPlaying?.artist ?? "missing")?.volume ?? 1;
 
     /// <summary>
     /// Creates a new instance of playback data.
@@ -193,7 +194,7 @@ public sealed class GuildMusicData {
     /// </summary>
     /// <returns>Position in the track.</returns>
     public TimeSpan GetCurrentPosition() {
-        if (queue.NowPlaying?.TrackString == null)
+        if (queue.NowPlaying?.track.TrackString == null)
             return TimeSpan.Zero;
 
         return Player.CurrentState.PlaybackPosition;
@@ -299,6 +300,15 @@ public sealed class GuildMusicData {
         eq = false;
         logger.info("Disabled EQ");
         Player.ResetEqualizerAsync();
+    }
+
+    public void toggleEQ() {
+        if (eq) {
+            disableEQ();
+        }
+        else {
+            enableEQ();
+        }
     }
 }
 

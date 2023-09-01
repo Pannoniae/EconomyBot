@@ -22,6 +22,7 @@
         <PackageReference Include="DSharpPlus.SlashCommands" Version="5.0.0-nightly-01690" />
         <PackageReference Include="DSharpPlus.VoiceNext" Version="5.0.0-nightly-01690" />
         <PackageReference Include="FuzzierSharp" Version="3.0.1" />
+        <PackageReference Include="JetBrains.Annotations" Version="2023.3.0-eap1" />
         <PackageReference Include="LanguageExt.Core" Version="4.4.3" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.5.23280.1">
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
