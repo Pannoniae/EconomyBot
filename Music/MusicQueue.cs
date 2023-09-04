@@ -193,7 +193,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
         var rand = new Random();
         var files = Directory.GetFiles(path, "*", new EnumerationOptions { RecurseSubdirectories = true });
         var randomFile = new FileInfo(files[rand.Next(files.Length)]);
-        var tracks_ = await guildMusic.getTracksAsync(guildMusic.Node.Rest, randomFile);
+        var tracks_ = await GuildMusicData.getTracksAsync(guildMusic.Node.Rest, randomFile);
         foreach (var track in tracks_.Tracks) {
             Enqueue(track, artist);
             logger.info($"Enqueued {track.Title} at {track.Uri}");

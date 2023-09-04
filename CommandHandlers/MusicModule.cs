@@ -49,6 +49,11 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
 
         Music = Program.musicService;
+
+        if (ctx.Member.Roles.Any(r => r.Name.Contains("No music", StringComparison.OrdinalIgnoreCase))) {
+            throw new Exception("Leave me alone...");
+        }
+
         if (ctx.Command.Name == "join") {
             GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild);
             GuildMusic.CommandChannel = ctx.Channel;
@@ -198,8 +203,10 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             }
 
             var trackCount_ = tracks_.Count();
-            foreach (var track in tracks_)
+            foreach (var track in tracks_) {
                 GuildMusic.queue.Enqueue(track);
+            }
+
 
             await startPlayer(ctx);
             await GuildMusic.queue.PlayAsync();
@@ -217,7 +224,9 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
 
         var pageCount = results.Count() / 10 + 1;
-        if (results.Count() % 10 == 0) pageCount--;
+        if (results.Count() % 10 == 0) {
+            pageCount--;
+        }
 
         var content = results.Select((x, i) => (x, i))
             .GroupBy(e => e.i / 10)
@@ -256,6 +265,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
                 return;
             }
         }
+
         else if (elInd < 0 || elInd > results.Count()) {
             await common.modify(ctx, msg, "Invalid choice was made.");
             return;
@@ -528,9 +538,8 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             return;
         }
 
-        var track = itemN;
         await common.respond(ctx,
-            $"{Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} removed.");
+            $"{Formatter.Bold(Formatter.Sanitize(itemN.Title))} by {Formatter.Bold(Formatter.Sanitize(itemN.Author))} removed.");
     }
 
     [Command("queue"), Description("Displays current playback queue."), Aliases("q")]
@@ -541,7 +550,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             return;
         }
 
-        var isPlaying = track == default;
+        var isPlaying = track != default;
         var interactivity = ctx.Client.GetInteractivity();
         var queue = GuildMusic.queue.getCombinedQueue();
         var pageCount = queue.Count / 10 + 1;
@@ -551,7 +560,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             .GroupBy(x => x.i / 10)
             .Select(xg =>
                 new Page(
-                    $"Now playing: {(isPlaying ? track.track.ToTrackString() : "Nothing")}\n\n{string.Join("\n", xg.Select(xa => $"`{xa.i + 1:00}` {xa.s}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
+                    $"Now playing: {(isPlaying ? track.track.ToTrackString() : Formatter.Bold("Nothing"))}\n\n{string.Join("\n", xg.Select(xa => $"`{xa.i + 1:00}` {xa.s}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
             .ToArray();
 
         var ems = new PaginationEmojis {
@@ -568,7 +577,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
     [Command("nowplaying"), Description("Displays information about currently-played track."), Aliases("np")]
     public async Task NowPlayingAsync(CommandContext ctx) {
         var track = GuildMusic.queue.NowPlaying;
-        if (track == null) {
+        if (track == default) {
             await common.respond(ctx, "Not playing.");
         }
         else {

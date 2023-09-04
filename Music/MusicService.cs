@@ -44,7 +44,7 @@ public sealed class MusicService {
     /// <param name="guild">Guild to save data for.</param>
     /// <returns></returns>
     public void SaveDataForAsync(DiscordGuild guild) {
-        MusicData.TryGetValue(guild.Id, out var _);
+        MusicData.TryGetValue(guild.Id, out _);
     }
 
     /// <summary>
@@ -60,7 +60,7 @@ public sealed class MusicService {
             (k, v) => v);
 
         await getDBForGuild(guild);
-        await gmd.setupWebhooks();
+        gmd.setupWebhooks();
 
         return gmd;
     }
@@ -95,7 +95,7 @@ public sealed class MusicService {
         => node.Rest.GetTracksAsync(search);
 
     private async Task Lavalink_TrackExceptionThrown(LavalinkGuildConnection con, TrackExceptionEventArgs e) {
-        if (e.Player?.Guild == null)
+        if (e.Player?.Guild is null)
             return;
 
         if (!MusicData.TryGetValue(e.Player.Guild.Id, out var gmd))

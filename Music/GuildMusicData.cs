@@ -17,7 +17,8 @@ public sealed class GuildMusicData {
     /// <summary>
     /// Is EQ enabled?
     /// </summary>
-    public bool eq;
+    public
+        bool eq;
 
     /// <summary>
     /// Gets the playback volume for this guild.
@@ -32,32 +33,32 @@ public sealed class GuildMusicData {
     public DiscordChannel CommandChannel { get; set; }
 
     private DiscordGuild Guild { get; }
-    public LavalinkExtension Lavalink { get; }
-    public LavalinkGuildConnection? Player { get; set; }
+    private LavalinkExtension Lavalink { get; }
+    public LavalinkGuildConnection? Player { get; private set; }
 
     public LavalinkNodeConnection Node { get; }
 
     // TODO implement a *proper* music weighting system
 
     public static readonly Dictionary<string, Artist> artistMappings = new() {
-        { "_fats", new Artist("G:\\music\\Fats Waller", 1.5) },
-        { "ella mae morse", new Artist("G:\\music\\Ella Mae Morse", 1.2) },
-        { "slim gaillard", new Artist("G:\\music\\Slim Gaillard", 1.0) },
-        { "louis jordan", new Artist("G:\\music\\Louis Jordan", 1.0) },
-        { "caravan palace", new Artist("G:\\music\\Caravan Palace", 1.0, 2) },
-        { "tape five", new Artist("G:\\music\\Tape Five", 1.0) },
-        { "caro emerald", new Artist("G:\\music\\Caro Emerald", 1.0) },
-        { "chuck berry", new Artist("G:\\music\\Chuck Berry", 1.0, 0.25) }, // most of this is trash
-        { "jamie berry", new Artist("G:\\music\\Jamie Berry", 0.8) },
-        { "sim gretina", new Artist("G:\\music\\Sim Gretina", 0.8, 0) }, // too much earrape
-        { "freshly squeezed", new Artist("G:\\music\\Freshly Squeezed Music", 0.8, 0.5, 0.5, 0.3) },
-        { "puppini sisters", new Artist("G:\\music\\Puppini Sisters", 1.0) },
-        { "11 acorn lane", new Artist("G:\\music\\11 Acorn Lane", 1.0) },
-        { "electric swing circus", new Artist("G:\\music\\Electric Swing Circus", 1.0) },
-        { "the speakeasies swing band", new Artist("G:\\music\\The Speakeasies Swing Band", 1.0) },
-        { "donald lambert", new Artist("G:\\music\\Donald Lambert", 1.5) },
-        { "newport", new Artist("G:\\music\\Newport Jazz Festival", 1.5) }, // 1960 Newport Jazz Festival, full recording
-        { "hot sardines", new Artist("G:\\music\\The Hot Sardines", 1.0) }
+        { "_fats", new Artist(@"G:\music\Fats Waller", 1.5) },
+        { "ella mae morse", new Artist(@"G:\music\Ella Mae Morse", 1.2) },
+        { "slim gaillard", new Artist(@"G:\music\Slim Gaillard", 1.0) },
+        { "louis jordan", new Artist(@"G:\music\Louis Jordan", 1.0) },
+        { "caravan palace", new Artist(@"G:\music\Caravan Palace", 1.0, 2) },
+        { "tape five", new Artist(@"G:\music\Tape Five", 1.0) },
+        { "caro emerald", new Artist(@"G:\music\Caro Emerald", 1.0) },
+        { "chuck berry", new Artist(@"G:\music\Chuck Berry", 1.0, 0.25) }, // most of this is trash
+        { "jamie berry", new Artist(@"G:\music\Jamie Berry", 0.8) },
+        { "sim gretina", new Artist(@"G:\music\Sim Gretina", 0.8, 0) }, // too much earrape
+        { "freshly squeezed", new Artist(@"G:\music\Freshly Squeezed Music", 0.8, 0.5, 0.5, 0.3) },
+        { "puppini sisters", new Artist(@"G:\music\Puppini Sisters", 1.0) },
+        { "11 acorn lane", new Artist(@"G:\music\11 Acorn Lane", 1.0) },
+        { "electric swing circus", new Artist(@"G:\music\Electric Swing Circus", 1.0) },
+        { "the speakeasies swing band", new Artist(@"G:\music\The Speakeasies Swing Band", 1.0) },
+        { "donald lambert", new Artist(@"G:\music\Donald Lambert", 1.5) },
+        { "newport", new Artist(@"G:\music\Newport Jazz Festival", 1.5) }, // 1960 Newport Jazz Festival, full recording
+        { "hot sardines", new Artist(@"G:\music\The Hot Sardines", 1.0) }
     };
 
     public static readonly Dictionary<string, double> artistWeights = new();
@@ -80,7 +81,7 @@ public sealed class GuildMusicData {
         Node = node;
         Guild = guild;
         Lavalink = lavalink;
-        queue = new(this);
+        queue = new MusicQueue(this);
 
         foreach (var artist in artistMappings) {
             // get the count of files at the directory
@@ -95,8 +96,8 @@ public sealed class GuildMusicData {
         logger.info("Initialised artist weights.");
     }
 
-    public async Task setupWebhooks() {
-        webhookCache.setup();
+    public void setupWebhooks() {
+        _ = webhookCache.setup();
     }
 
     public async Task setupForChannel(DiscordChannel channel) {
@@ -131,11 +132,11 @@ public sealed class GuildMusicData {
     /// <summary>
     /// Sets playback volume.
     /// </summary>
-    public async Task SetVolumeAsync(int volume) {
+    public async Task SetVolumeAsync(int vol) {
         if (Player == null || !Player.IsConnected)
             return;
 
-        this.volume = volume;
+        volume = vol;
         await Player.SetVolumeAsync(effectiveVolume);
     }
 
@@ -194,10 +195,7 @@ public sealed class GuildMusicData {
     /// </summary>
     /// <returns>Position in the track.</returns>
     public TimeSpan GetCurrentPosition() {
-        if (queue.NowPlaying?.track.TrackString == null)
-            return TimeSpan.Zero;
-
-        return Player.CurrentState.PlaybackPosition;
+        return queue.NowPlaying == default ? TimeSpan.Zero : Player.CurrentState.PlaybackPosition;
     }
 
 
@@ -253,7 +251,7 @@ public sealed class GuildMusicData {
             .Select(file => getTracksAsync(Node.Rest, file).Result);
     }
     
-    public async Task<LavalinkLoadResult> getTracksAsync(LavalinkRestClient client, FileInfo file) {
+    public static async Task<LavalinkLoadResult> getTracksAsync(LavalinkRestClient client, FileInfo file) {
         var tracks = await client.GetTracksAsync(file);
 
         // This is a typical example of bad cargo-cult programming. I am leaving it in because it doesn't matter,
@@ -269,7 +267,7 @@ public sealed class GuildMusicData {
             // Not to mention that we are literally reflecting the Track object because the stupid authors thought
             // their autodetection was infallible thus they haven't provided a way to properly set the track's name which will be displayed.
             // The end-user is probably not very delighted at seeing "unknown author" or "unknown title" so we make a best-effort guess here.
-            track.GetType().GetProperty("Author")!.SetValue(track, file.Directory.Name);
+            track.GetType().GetProperty("Author")!.SetValue(track, file.Directory!.Name);
         }
 
         return tracks;

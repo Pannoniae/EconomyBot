@@ -177,6 +177,11 @@ class Program {
             return;
         }
 
+        // gore protection
+        if (e.Message.Content.Contains("Screenshot_20230901_160903") || e.Message.Attachments.Any(f => f.Url.Contains("Screenshot_20230901_160903"))) {
+            await e.Guild.BanMemberAsync(e.Author as DiscordMember, 6);
+        }
+
         if (client.CurrentUser.Id == e.Author.Id) {
             return;
         }
