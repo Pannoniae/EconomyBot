@@ -19,6 +19,7 @@ public static class Constants {
     public static string? apikey_huggingface;
     public static string? spotifytoken;
     public static string? spotifytoken2;
+    public static string? detectlanguagetoken;
 
     public static void init() {
         JObject json;
@@ -47,6 +48,11 @@ public static class Constants {
             (json["reddit1"]?.Value<string>(), json["reddit2"]?.Value<string>(), json["reddit3"]?.Value<string>());
         if (redditappid is null || redditrefreshtoken is null || redditappsecret is null) {
             logger.warn("Reddit tokens not found.");
+        }
+
+        detectlanguagetoken = json["detecttoken"].Value<string>();
+        if (detectlanguagetoken is null) {
+            logger.warn("Language detection API token not found.");
         }
         logger.info("Constants setup!");
     }

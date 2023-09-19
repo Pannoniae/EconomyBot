@@ -3,6 +3,7 @@ global using static LanguageExt.Prelude;
 using System.Globalization;
 using System.Net;
 using System.Text.RegularExpressions;
+using DetectLanguage;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
@@ -31,14 +32,17 @@ class Program {
     public static ImagesModule imagesModule;
     public static ToxicityHandler toxicity;
     public static WilteryHandler wiltery;
+    
+    public static DetectLanguageClient languageClient;
 
     public static bool lavalinkInit = false;
     public static bool hasSetup = false;
 
     public static DiscordClient client;
 
-    public static ulong LOG = 838920584879800343;
+    public const ulong LOG = 838920584879800343;
     public static ulong HALLOFFAME = 1078991955633127474;
+    public const ulong UKRAYINSKIJ_KANAL = 1153439320435335278;
 
     // shut up compiler
     private Program() {
@@ -74,7 +78,9 @@ class Program {
             .BuildServiceProvider(true);
         var lavalink = discord.UseLavalink();
         var commands = discord.UseCommandsNext(new CommandsNextConfiguration {
-            StringPrefixes = new[] { "." },
+            StringPrefixes = new[] {
+                "."
+            },
             Services = services
         });
         var slashCommands = discord.UseSlashCommands(new SlashCommandsConfiguration {
@@ -154,7 +160,7 @@ class Program {
             });
         }
 
-        if (message.Author == client.CurrentUser) {
+        if (message.Author == client.CurrentUser && message.Channel.Id != LOG) {
             var server = await client.GetGuildAsync(838843082110664756);
             _ = Task.Run(async () => {
                 await Task.Delay(3000); // stupid discord doesnt update logs immediately
@@ -193,9 +199,24 @@ class Program {
 
         // Funny replacement handling
         // todo
+        
+        
+        // Ukrainian language promotion handler, don't trigger if it's a quote
+        if (e.Channel.Id == UKRAYINSKIJ_KANAL && !e.Message.Content.Contains('"') && e.Message.Content.Length > 10) {
+            var results = await languageClient.DetectAsync(e.Message.Content);
+            bool isRussian = results.Any(r => r.language == "ru" && r.confidence > 1 && r.reliable);
+            bool isNotUkrainian = results.All(r => r.language != "uk");
+            logger.info($"Language analysis:");
+            foreach (var result in results) {
+                logger.info($"    {result.language}, {result.confidence}, {result.reliable}");
+            }
+            if (isRussian && isNotUkrainian) {
+                await e.Message.RespondAsync("москальська свиня");
+            }
+        }
 
         // Toxicity handler
-        if (!e.Message.Content.StartsWith('.') && !e.Message.Content.StartsWith('/') && e.Message.Embeds.Count ==  0 && e.Message.Attachments.Count == 0) {
+        if (!e.Message.Content.StartsWith('.') && !e.Message.Content.StartsWith('/') && e.Message.Embeds.Count == 0 && e.Message.Attachments.Count == 0) {
             await toxicity.handleMessage(client, e.Message);
             await wiltery.handleMessage(client, e.Message);
         }
@@ -205,13 +226,22 @@ class Program {
         }
 
         var meowList = new List<string> {
-            "cat", "kitty", "kitten", "meow", "purr", "feline", "nya", "miau"
+            "cat",
+            "kitty",
+            "kitten",
+            "meow",
+            "purr",
+            "feline",
+            "nya",
+            "miau"
         };
-        if (meowList.Any(word =>
+        // Meowing is too common
+        /*if (meowList.Any(word =>
                 e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase) ||
                 e.Message.Attachments.Any(a => a.Url.Contains(word, StringComparison.OrdinalIgnoreCase)))) {
             await e.Message.RespondAsync("*meow*");
-        }
+        }*/
+        
     }
 
     private static async Task setup(DiscordClient client, LavalinkExtension lavalink,
@@ -224,6 +254,7 @@ class Program {
         imagesModule = new ImagesModule();
         toxicity = new ToxicityHandler();
         wiltery = new WilteryHandler(Program.client);
+        languageClient = new DetectLanguageClient(Constants.detectlanguagetoken);
 
         hasSetup = true;
         logger.info("Setup done!");

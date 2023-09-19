@@ -17,8 +17,7 @@ public sealed class GuildMusicData {
     /// <summary>
     /// Is EQ enabled?
     /// </summary>
-    public
-        bool eq;
+    public bool eq;
 
     /// <summary>
     /// Gets the playback volume for this guild.
@@ -41,24 +40,24 @@ public sealed class GuildMusicData {
     // TODO implement a *proper* music weighting system
 
     public static readonly Dictionary<string, Artist> artistMappings = new() {
-        { "_fats", new Artist(@"G:\music\Fats Waller", 1.5) },
-        { "ella mae morse", new Artist(@"G:\music\Ella Mae Morse", 1.2) },
-        { "slim gaillard", new Artist(@"G:\music\Slim Gaillard", 1.0) },
-        { "louis jordan", new Artist(@"G:\music\Louis Jordan", 1.0) },
-        { "caravan palace", new Artist(@"G:\music\Caravan Palace", 1.0, 2) },
-        { "tape five", new Artist(@"G:\music\Tape Five", 1.0) },
-        { "caro emerald", new Artist(@"G:\music\Caro Emerald", 1.0) },
-        { "chuck berry", new Artist(@"G:\music\Chuck Berry", 1.0, 0.25) }, // most of this is trash
-        { "jamie berry", new Artist(@"G:\music\Jamie Berry", 0.8) },
-        { "sim gretina", new Artist(@"G:\music\Sim Gretina", 0.8, 0) }, // too much earrape
-        { "freshly squeezed", new Artist(@"G:\music\Freshly Squeezed Music", 0.8, 0.5, 0.5, 0.3) },
-        { "puppini sisters", new Artist(@"G:\music\Puppini Sisters", 1.0) },
-        { "11 acorn lane", new Artist(@"G:\music\11 Acorn Lane", 1.0) },
-        { "electric swing circus", new Artist(@"G:\music\Electric Swing Circus", 1.0) },
-        { "the speakeasies swing band", new Artist(@"G:\music\The Speakeasies Swing Band", 1.0) },
-        { "donald lambert", new Artist(@"G:\music\Donald Lambert", 1.5) },
-        { "newport", new Artist(@"G:\music\Newport Jazz Festival", 1.5) }, // 1960 Newport Jazz Festival, full recording
-        { "hot sardines", new Artist(@"G:\music\The Hot Sardines", 1.0) }
+        { "_fats", new Artist(@"E:\music\Fats Waller", 1.5) },
+        { "ella mae morse", new Artist(@"E:\music\Ella Mae Morse", 1.2) },
+        { "slim gaillard", new Artist(@"E:\music\Slim Gaillard", 1.0) },
+        { "louis jordan", new Artist(@"E:\music\Louis Jordan", 1.0) },
+        { "caravan palace", new Artist(@"E:\music\Caravan Palace", 1.0, 2) },
+        { "tape five", new Artist(@"E:\music\Tape Five", 1.0) },
+        { "caro emerald", new Artist(@"E:\music\Caro Emerald", 1.0) },
+        { "chuck berry", new Artist(@"E:\music\Chuck Berry", 1.0, 0.25) }, // most of this is trash
+        { "jamie berry", new Artist(@"E:\music\Jamie Berry", 0.8) },
+        { "sim gretina", new Artist(@"E:\music\Sim Gretina", 0.8, 0) }, // too much earrape
+        { "freshly squeezed", new Artist(@"E:\music\Freshly Squeezed Music", 0.8, 0.5, 0.5, 0.3) },
+        { "puppini sisters", new Artist(@"E:\music\Puppini Sisters", 1.0) },
+        { "11 acorn lane", new Artist(@"E:\music\11 Acorn Lane", 1.0) },
+        { "electric swing circus", new Artist(@"E:\music\Electric Swing Circus", 1.0) },
+        { "the speakeasies swing band", new Artist(@"E:\music\The Speakeasies Swing Band", 1.0) },
+        { "donald lambert", new Artist(@"E:\music\Donald Lambert", 1.5) },
+        { "newport", new Artist(@"E:\music\Newport Jazz Festival", 1.5) }, // 1960 Newport Jazz Festival, full recording
+        { "hot sardines", new Artist(@"E:\music\The Hot Sardines", 1.0) }
     };
 
     public static readonly Dictionary<string, double> artistWeights = new();
@@ -250,7 +249,7 @@ public sealed class GuildMusicData {
             .Select(file => new FileInfo(file))
             .Select(file => getTracksAsync(Node.Rest, file).Result);
     }
-    
+
     public static async Task<LavalinkLoadResult> getTracksAsync(LavalinkRestClient client, FileInfo file) {
         var tracks = await client.GetTracksAsync(file);
 
@@ -263,6 +262,7 @@ public sealed class GuildMusicData {
         foreach (var track in tracks.Tracks.Where(track => track.Title == "Unknown title")) {
             track.GetType().GetProperty("Title")!.SetValue(track, Path.GetFileNameWithoutExtension(file.Name));
         }
+
         foreach (var track in tracks.Tracks.Where(track => track.Author == "Unknown artist")) {
             // Not to mention that we are literally reflecting the Track object because the stupid authors thought
             // their autodetection was infallible thus they haven't provided a way to properly set the track's name which will be displayed.
@@ -318,20 +318,22 @@ public sealed class GuildMusicData {
 /// <param name="weight">The rarity multiplier for the artist in the random selection.</param>
 /// <param name="repeatPenalty">If the queue already contains the artist, the chance of selecting the artist again will be multiplied by the value.</param>
 /// <param name="doubleRepeatPenalty">If the previous track is the same artist, the chance of selecting the artist again will be multiplied by the value.</param>
-public record Artist(string path, 
-    double volume, 
-    double weight = 1.0, 
+public record Artist(string path,
+    double volume,
+    double weight = 1.0,
     double repeatPenalty = 1.0,
     double doubleRepeatPenalty = 1.0);
 
 public record Track(LavalinkTrack track, string? artist);
 
 public static class IEnumerableExtensions {
+    private static Random rand = new();
+
     public static T randomElementByWeight<T>(this IEnumerable<T> sequence, Func<T, double> weightSelector) {
         var elements = sequence.ToList();
         double totalWeight = elements.Sum(weightSelector);
         // The weight we are after...
-        double itemWeightIndex = new Random().NextDouble() * totalWeight;
+        double itemWeightIndex = rand.NextDouble() * totalWeight;
         double currentWeightIndex = 0;
 
         foreach (var item in elements) {

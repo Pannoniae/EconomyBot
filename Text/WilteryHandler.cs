@@ -21,7 +21,8 @@ public class WilteryHandler {
     public WilteryHandler(DiscordClient client) {
         this.client = client;
 
-        messageHandlers.Add(new WordMessageHandler("ball", DiscordEmoji.FromName(client, ":chestnut:")));
+        messageHandlers.Add(new WordExceptionMessageHandler("ball", DiscordEmoji.FromName(client, ":chestnut:"), 
+            "basket"));
         messageHandlers.Add(new ResponseWordMessageHandler("anal", "Have fun getting HIV"));
     }
 
@@ -109,6 +110,17 @@ public interface MessageHandler {
 public class WordMessageHandler(string target, string replacement) : MessageHandler {
     public virtual bool shouldProcess(DiscordMessage message) {
         return message.Content.Contains(target, StringComparison.CurrentCultureIgnoreCase);
+    }
+
+    public virtual async void process(WilteryHandler handler, DiscordMessage message) {
+        await handler.replaceMessage(message, target, replacement);
+    }
+}
+
+public class WordExceptionMessageHandler(string target, string replacement, params string[] exceptions) : MessageHandler {
+    public virtual bool shouldProcess(DiscordMessage message) {
+        return message.Content.Contains(target, StringComparison.CurrentCultureIgnoreCase)
+               && exceptions.All(e => !message.Content.Contains(e, StringComparison.CurrentCultureIgnoreCase));
     }
 
     public virtual async void process(WilteryHandler handler, DiscordMessage message) {

@@ -61,13 +61,13 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
 
         var chn = getChannel(ctx);
-        if (chn is null) {
+        if (chn is null && ctx.Command.Name != "queue") {
             await common.respond(ctx, "You need to be in a voice channel.");
             throw new IdiotException("user error");
         }
 
         var mbr = ctx.Guild.CurrentMember?.VoiceState?.Channel;
-        if (mbr is not null && chn != mbr) {
+        if (mbr is not null && chn != mbr && ctx.Command.Name != "queue") {
             await common.respond(ctx, "You need to be in the same voice channel.");
             throw new IdiotException("user error");
         }
@@ -560,7 +560,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             .GroupBy(x => x.i / 10)
             .Select(xg =>
                 new Page(
-                    $"Now playing: {(isPlaying ? track.track.ToTrackString() : Formatter.Bold("Nothing"))}\n\n{string.Join("\n", xg.Select(xa => $"`{xa.i + 1:00}` {xa.s}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
+                    $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Length.ToDurationString()}]" : Formatter.Bold("Nothing"))}\n\n{string.Join("\n", xg.Select(xa => $"`{xa.i + 1:00}` {xa.s}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
             .ToArray();
 
         var ems = new PaginationEmojis {
@@ -614,6 +614,11 @@ public static class Extensions {
     public static string ToTrackString(this LavalinkTrack x) {
         return
             $"{Formatter.Bold(Formatter.Sanitize(x.Title))} by {Formatter.Bold(Formatter.Sanitize(x.Author ?? "No Author"))} [{x.Length.ToDurationString()}]";
+    }
+
+    public static string ToLimitedTrackString(this LavalinkTrack x) {
+        return
+            $"{Formatter.Bold(Formatter.Sanitize(x.Title))} by {Formatter.Bold(Formatter.Sanitize(x.Author ?? "No Author"))}";
     }
 }
 

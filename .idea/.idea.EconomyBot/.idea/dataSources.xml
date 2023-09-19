@@ -14,7 +14,7 @@
       </libraries>
     </data-source>
     <data-source source="LOCAL" name="bot [2]" uuid="74dd7c8e-f0dc-4ef0-8375-1b6ecc8ad140">
-      <driver-ref>a8277b13-0c92-46e6-bfd9-3377164919a6</driver-ref>
+      <driver-ref>048867ca-d518-476d-8734-f94eff58296b</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
       <jdbc-url>jdbc:sqlite:D:\dev\cs\EconomyBot\bin\Debug\net6.0\bot.db</jdbc-url>

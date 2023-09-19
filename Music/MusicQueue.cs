@@ -116,7 +116,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
     /// Enqueues a music track for playback.
     /// </summary>
     /// <param name="item">Music track to enqueue.</param>
-    public void Enqueue(LavalinkTrack item, string? artist = null) {
+    public void  Enqueue(LavalinkTrack item, string? artist = null) {
         play(new Track(item, artist));
     }
 
