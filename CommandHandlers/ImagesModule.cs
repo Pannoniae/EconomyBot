@@ -110,4 +110,35 @@ public class ImagesModule : BaseCommandModule {
     
         await ctx.RespondAsync(embed);
     }
+    
+    [Command("xkcd"), Description("Gets a specific XKCD.")]
+    public async Task xkcd(CommandContext ctx, int number) {
+
+        string title;
+        string url;
+        string alt;
+        try {
+            var randomComic = await client.GetAsync($"https://xkcd.com/{number}/info.0.json");
+            var randomComicJson = JObject.Parse(await randomComic.Content.ReadAsStringAsync());
+            title = randomComicJson["title"].Value<string>();
+            url = randomComicJson["img"].Value<string>();
+            alt = randomComicJson["alt"].Value<string>();
+        }
+        catch (Exception e) {
+            await ctx.RespondAsync("Failed to get XKCD.");
+            await Console.Out.WriteLineAsync(e.ToString());
+            return;
+        } 
+
+
+        var embed = new DiscordEmbedBuilder().WithTitle(title).WithColor(DiscordColor.Purple).WithImageUrl(url)
+            .WithDescription(
+                Formatter.MaskedUrl($"XKCD #{number}",
+                    new Uri($"https://xkcd.com/{number}"),
+                    "Two little squirrels!")
+                + Environment.NewLine
+                + alt);
+    
+        await ctx.RespondAsync(embed);
+    }
 }

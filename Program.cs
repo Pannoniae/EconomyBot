@@ -43,6 +43,10 @@ class Program {
     public const ulong LOG = 838920584879800343;
     public static ulong HALLOFFAME = 1078991955633127474;
     public const ulong UKRAYINSKIJ_KANAL = 1153439320435335278;
+    public const ulong POLISH_CHANNEL = 1156695554462597120;
+    public const ulong ZOO = 1149817703922675823;
+    public const ulong HUNGARY_CHANNEL = 1154903997510062181;
+
 
     // shut up compiler
     private Program() {
@@ -200,6 +204,33 @@ class Program {
         // Funny replacement handling
         // todo
         
+        var lizardry = new List<string> {
+            "ą               ",
+            "Ą",
+            "ć",
+            "Ć",
+            "ę",
+            "Ę",
+            "ł",
+            "Ł",
+            "ń",
+            "Ń",
+            "ó",
+            "Ó",
+            "ś",
+            "Ś",
+            "ź",
+            "Ź",
+            "Ś",
+            "ż",
+            "Ż"
+        };
+        
+        // Lizardry
+        if ((e.Channel.Id != POLISH_CHANNEL && e.Channel.Id != ZOO && e.Channel.Id != HUNGARY_CHANNEL) && lizardry.Any(word =>
+                e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase))) {
+            await e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":lizard"));
+        }
         
         // Ukrainian language promotion handler, don't trigger if it's a quote
         if (e.Channel.Id == UKRAYINSKIJ_KANAL && !e.Message.Content.Contains('"') && e.Message.Content.Length > 10) {

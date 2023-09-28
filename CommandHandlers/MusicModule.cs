@@ -430,6 +430,18 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             await common.respond(ctx, "Enabled repeat.");
         }
     }
+    
+    [Command("earrape"), Description("Toggles annoying users."), Aliases("er")]
+    public async Task EarrapeAsync(CommandContext ctx) {
+        bool earrape = GuildMusic.queue.earrapeMode;
+        GuildMusic.queue.earrapeMode = !earrape;
+        if (earrape) {
+            await common.respond(ctx, "Disabled earrape mode.");
+        }
+        else {
+            await common.respond(ctx, "Enabled earrape mode.");
+        }
+    }
 
     [Command("clear"), Description("Clears the queue.")]
     public async Task ClearAsync(CommandContext ctx) {
@@ -561,7 +573,12 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             .Select(xg =>
                 new Page(
                     $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Length.ToDurationString()}]" : Formatter.Bold("Nothing"))}\n\n{string.Join("\n", xg.Select(xa => $"`{xa.i + 1:00}` {xa.s}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
-            .ToArray();
+            .ToList();
+        
+        // queue is empty but we are playing
+        if (pages.Count == 0) {
+            pages.Add(new Page($"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Length.ToDurationString()}]" : Formatter.Bold("Nothing"))}"));
+        }
 
         var ems = new PaginationEmojis {
             SkipLeft = null,

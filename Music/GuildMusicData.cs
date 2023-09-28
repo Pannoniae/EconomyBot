@@ -57,7 +57,9 @@ public sealed class GuildMusicData {
         { "the speakeasies swing band", new Artist(@"E:\music\The Speakeasies Swing Band", 1.0) },
         { "donald lambert", new Artist(@"E:\music\Donald Lambert", 1.5) },
         { "newport", new Artist(@"E:\music\Newport Jazz Festival", 1.5) }, // 1960 Newport Jazz Festival, full recording
-        { "hot sardines", new Artist(@"E:\music\The Hot Sardines", 1.0) }
+        { "hot sardines", new Artist(@"E:\music\The Hot Sardines", 1.0) },
+        { "the wolfe tones", new Artist(@"E:\music\The Wolfe Tones", 0.8, 0.25) },
+        { "the dubliners", new Artist(@"E:\music\The Dubliners", 0.8, 0.25) }
     };
 
     public static readonly Dictionary<string, double> artistWeights = new();

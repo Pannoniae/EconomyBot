@@ -24,6 +24,8 @@ public class MusicQueue(GuildMusicData guildMusic) {
 
     public bool repeatQueue { get; set; } = false;
 
+    public bool earrapeMode { get; set; } = false;
+
     /// <summary>
     /// Gets the current auto-played music queue.
     /// </summary>
@@ -186,7 +188,13 @@ public class MusicQueue(GuildMusicData guildMusic) {
         }
 
         NowPlaying = itemN;
-        await guildMusic.Player.PlayAsync(itemN.track);
+        if (earrapeMode) {
+            var length = itemN.track.Length;
+            await guildMusic.Player.PlayPartialAsync(itemN.track, TimeSpan.Zero, length - TimeSpan.FromSeconds(20));
+        }
+        else {
+            await guildMusic.Player.PlayAsync(itemN.track);
+        }
     }
 
     public async Task addToJazz(string artist, string path) {
