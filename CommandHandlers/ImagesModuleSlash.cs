@@ -76,7 +76,7 @@ public class ImagesModuleSlash : ApplicationCommandModule {
     }
     
     [SlashCommand("xkcd", "Gets a specific XKCD.")]
-    public async Task xkcd(InteractionContext ctx, [Option("number", "The XKCD to get.")] int number) {
+    public async Task xkcd(InteractionContext ctx, [Option("number", "The XKCD to get.")] long number) {
 
         string title;
         string url;
