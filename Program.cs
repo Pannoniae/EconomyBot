@@ -205,7 +205,7 @@ class Program {
         // todo
         
         var lizardry = new List<string> {
-            "ą               ",
+            "ą",
             "Ą",
             "ć",
             "Ć",
