@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Runtime.InteropServices;
 using DSharpPlus.Entities;
 using DSharpPlus.Lavalink;
 using EconomyBot.Logging;
@@ -39,27 +40,29 @@ public sealed class GuildMusicData {
 
     // TODO implement a *proper* music weighting system
 
+    public static string rootPath;
+
     public static readonly Dictionary<string, Artist> artistMappings = new() {
-        { "_fats", new Artist(@"E:\music\Fats Waller", 1.5) },
-        { "ella mae morse", new Artist(@"E:\music\Ella Mae Morse", 1.2) },
-        { "slim gaillard", new Artist(@"E:\music\Slim Gaillard", 1.0) },
-        { "louis jordan", new Artist(@"E:\music\Louis Jordan", 1.0) },
-        { "caravan palace", new Artist(@"E:\music\Caravan Palace", 1.0, 2) },
-        { "tape five", new Artist(@"E:\music\Tape Five", 1.0) },
-        { "caro emerald", new Artist(@"E:\music\Caro Emerald", 1.0) },
-        { "chuck berry", new Artist(@"E:\music\Chuck Berry", 1.0, 0.25) }, // most of this is trash
-        { "jamie berry", new Artist(@"E:\music\Jamie Berry", 0.8) },
-        { "sim gretina", new Artist(@"E:\music\Sim Gretina", 0.8, 0) }, // too much earrape
-        { "freshly squeezed", new Artist(@"E:\music\Freshly Squeezed Music", 0.8, 0.5, 0.5, 0.3) },
-        { "puppini sisters", new Artist(@"E:\music\Puppini Sisters", 1.0) },
-        { "11 acorn lane", new Artist(@"E:\music\11 Acorn Lane", 1.0) },
-        { "electric swing circus", new Artist(@"E:\music\Electric Swing Circus", 1.0) },
-        { "the speakeasies swing band", new Artist(@"E:\music\The Speakeasies Swing Band", 1.0) },
-        { "donald lambert", new Artist(@"E:\music\Donald Lambert", 1.5) },
-        { "newport", new Artist(@"E:\music\Newport Jazz Festival", 1.5) }, // 1960 Newport Jazz Festival, full recording
-        { "hot sardines", new Artist(@"E:\music\The Hot Sardines", 1.0) },
-        { "the wolfe tones", new Artist(@"E:\music\The Wolfe Tones", 0.8, 0.25) },
-        { "the dubliners", new Artist(@"E:\music\The Dubliners", 0.8, 0.25) }
+        { "_fats", new Artist("Fats Waller", 1.5) },
+        { "ella mae morse", new Artist("Ella Mae Morse", 1.2) },
+        { "slim gaillard", new Artist("Slim Gaillard", 1.0) },
+        { "louis jordan", new Artist("Louis Jordan", 1.0) },
+        { "caravan palace", new Artist("Caravan Palace", 1.0, 2) },
+        { "tape five", new Artist("Tape Five", 1.0) },
+        { "caro emerald", new Artist("Caro Emerald", 1.0) },
+        { "chuck berry", new Artist("Chuck Berry", 1.0, 0.25) }, // most of this is trash
+        { "jamie berry", new Artist("Jamie Berry", 0.8) },
+        { "sim gretina", new Artist("Sim Gretina", 0.8, 0) }, // too much earrape
+        { "freshly squeezed", new Artist("Freshly Squeezed Music", 0.8, 0.5, 0.5, 0.3) },
+        { "puppini sisters", new Artist("Puppini Sisters", 1.0) },
+        { "11 acorn lane", new Artist("11 Acorn Lane", 1.0) },
+        { "electric swing circus", new Artist("Electric Swing Circus", 1.0) },
+        { "the speakeasies swing band", new Artist("The Speakeasies Swing Band", 1.0) },
+        { "donald lambert", new Artist("Donald Lambert", 1.5) },
+        { "newport", new Artist("Newport Jazz Festival", 1.5) }, // 1960 Newport Jazz Festival, full recording
+        { "hot sardines", new Artist("The Hot Sardines", 1.0) },
+        { "the wolfe tones", new Artist("The Wolfe Tones", 0.8, 0.25) },
+        { "the dubliners", new Artist("The Dubliners", 0.8, 0.25) }
     };
 
     public static readonly Dictionary<string, double> artistWeights = new();
@@ -79,6 +82,18 @@ public sealed class GuildMusicData {
     /// <param name="lavalink">Lavalink service.</param>
     /// <param name="node">The Lavalink node this guild is connected to.</param>
     public GuildMusicData(DiscordGuild guild, LavalinkExtension lavalink, LavalinkNodeConnection node) {
+        
+        // setup paths by OS
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+            rootPath = "/snd/music";
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+            rootPath = "E:/music";
+        }
+        else {
+            throw new NotSupportedException("OS not supported, specify paths for the music.");
+        }
+        
         Node = node;
         Guild = guild;
         Lavalink = lavalink;
@@ -87,7 +102,7 @@ public sealed class GuildMusicData {
         foreach (var artist in artistMappings) {
             // get the count of files at the directory
             int fCount = Directory
-                .GetFiles(artist.Value.path, "*", new EnumerationOptions { RecurseSubdirectories = true })
+                .GetFiles(getPath(artist.Value.path), "*", new EnumerationOptions { RecurseSubdirectories = true })
                 .Length;
             artistWeights[artist.Key] = fCount * artist.Value.weight;
         }
@@ -95,6 +110,10 @@ public sealed class GuildMusicData {
         webhookCache = new WebhookCache(Guild);
 
         logger.info("Initialised artist weights.");
+    }
+
+    public string getPath(string path) {
+        return Path.Combine(rootPath, path);
     }
 
     public void setupWebhooks() {
@@ -246,7 +265,7 @@ public sealed class GuildMusicData {
 
     public async Task<IEnumerable<LavalinkLoadResult>> getJazz(string searchTerm) {
         return artistMappings.SelectMany(
-                artist => Directory.GetFiles(artist.Value.path, searchTerm,
+                artist => Directory.GetFiles(getPath(artist.Value.path), searchTerm,
                     new EnumerationOptions { RecurseSubdirectories = true }))
             .Select(file => new FileInfo(file))
             .Select(file => getTracksAsync(Node.Rest, file).Result);

@@ -39,7 +39,7 @@ public class ImagesModuleSlash : ApplicationCommandModule {
         await ctx.CreateResponseAsync(messageBuilder);
     }
     
-    [SlashCommand("xkcd", "Gets a random XKCD.")]
+    [SlashCommand("randomxkcd", "Gets a random XKCD.")]
     public async Task xkcd(InteractionContext ctx) {
         
         int num;
@@ -76,7 +76,7 @@ public class ImagesModuleSlash : ApplicationCommandModule {
     }
     
     [SlashCommand("xkcd", "Gets a specific XKCD.")]
-    public async Task xkcd(InteractionContext ctx, [Option("number", "The XKCD to get.")] long number) {
+    public async Task xkcd(InteractionContext ctx, [Option("xkcd", "The XKCD to get.")] long number) {
 
         string title;
         string url;

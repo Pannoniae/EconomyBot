@@ -227,7 +227,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
         var randomElement =
             selectNextSong();
         if (GuildMusicData.artistMappings.TryGetValue(randomElement, out var artist)) {
-            await addToJazz(randomElement, artist.path);
+            await addToJazz(randomElement, GuildMusicData.getPath(artist.path));
         }
 
         else {

@@ -10,6 +10,7 @@ using DSharpPlus.CommandsNext.Converters;
 using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using DSharpPlus.Exceptions;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
@@ -32,7 +33,7 @@ class Program {
     public static ImagesModule imagesModule;
     public static ToxicityHandler toxicity;
     public static WilteryHandler wiltery;
-    
+
     public static DetectLanguageClient languageClient;
 
     public static bool lavalinkInit = false;
@@ -67,6 +68,9 @@ class Program {
             Intents = DiscordIntents.All
         });
         client = discord;
+
+        // error handling   
+
         var endpoint = new ConnectionEndpoint {
             Hostname = "127.0.0.1", // From your server configuration.
             Port = 2333 // From your server configuration
@@ -90,13 +94,21 @@ class Program {
         var slashCommands = discord.UseSlashCommands(new SlashCommandsConfiguration {
             Services = services
         });
-        //slashCommands.RegisterCommands<ChatModuleSlash>();
-        slashCommands.RegisterCommands<MusicModuleSlash>();
-        slashCommands.RegisterCommands<ImagesModuleSlash>();
-        commands.CommandErrored += errorHandler;
-        commands.RegisterCommands<ChatModule>();
-        commands.RegisterCommands<MusicModule>();
-        commands.RegisterCommands<ImagesModule>();
+        try {
+            //slashCommands.RegisterCommands<ChatModuleSlash>();
+            slashCommands.RegisterCommands<MusicModuleSlash>();
+            slashCommands.RegisterCommands<ImagesModuleSlash>();
+            commands.CommandErrored += errorHandler;
+            commands.RegisterCommands<ChatModule>();
+            commands.RegisterCommands<MusicModule>();
+            commands.RegisterCommands<ImagesModule>();
+        }
+        catch (Exception e) {
+            if (e is BadRequestException ex) {
+                logger.error(ex.JsonMessage);
+            }
+            logger.error(e.Message);
+        }
         discord.UseInteractivity(new InteractivityConfiguration {
             Timeout = TimeSpan.FromSeconds(180),
             PollBehaviour = PollBehaviour.KeepEmojis
@@ -203,7 +215,7 @@ class Program {
 
         // Funny replacement handling
         // todo
-        
+
         var lizardry = new List<string> {
             "ą",
             "Ą",
@@ -225,13 +237,24 @@ class Program {
             "ż",
             "Ż"
         };
-        
+
         // Lizardry
         if ((e.Channel.Id != POLISH_CHANNEL && e.Channel.Id != ZOO && e.Channel.Id != HUNGARY_CHANNEL) && lizardry.Any(word =>
                 e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase))) {
-            await e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":lizard"));
+            await e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":lizard:"));
         }
-        
+
+        var cute = new List<string> {
+            "skull",
+            "cringe"
+        };
+
+        // Lizardry
+        if (cute.Any(word =>
+                e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase))) {
+            await e.Message.RespondAsync("You are a meanie >.<");
+        }
+
         // Ukrainian language promotion handler, don't trigger if it's a quote
         if (e.Channel.Id == UKRAYINSKIJ_KANAL && !e.Message.Content.Contains('"') && e.Message.Content.Length > 10) {
             var results = await languageClient.DetectAsync(e.Message.Content);
@@ -272,7 +295,7 @@ class Program {
                 e.Message.Attachments.Any(a => a.Url.Contains(word, StringComparison.OrdinalIgnoreCase)))) {
             await e.Message.RespondAsync("*meow*");
         }*/
-        
+
     }
 
     private static async Task setup(DiscordClient client, LavalinkExtension lavalink,
