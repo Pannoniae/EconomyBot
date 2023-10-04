@@ -102,7 +102,7 @@ public sealed class GuildMusicData {
         foreach (var artist in artistMappings) {
             // get the count of files at the directory
             int fCount = Directory
-                .GetFiles(getPath(artist.Value.path), "*", new EnumerationOptions { RecurseSubdirectories = true })
+                .GetFiles(getPath(artist.Value.path), "*", new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive })
                 .Length;
             artistWeights[artist.Key] = fCount * artist.Value.weight;
         }
@@ -266,7 +266,7 @@ public sealed class GuildMusicData {
     public async Task<IEnumerable<LavalinkLoadResult>> getJazz(string searchTerm) {
         return artistMappings.SelectMany(
                 artist => Directory.GetFiles(getPath(artist.Value.path), searchTerm,
-                    new EnumerationOptions { RecurseSubdirectories = true }))
+                    new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive }))
             .Select(file => new FileInfo(file))
             .Select(file => getTracksAsync(Node.Rest, file).Result);
     }

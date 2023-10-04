@@ -118,7 +118,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
     /// Enqueues a music track for playback.
     /// </summary>
     /// <param name="item">Music track to enqueue.</param>
-    public void  Enqueue(LavalinkTrack item, string? artist = null) {
+    public void Enqueue(LavalinkTrack item, string? artist = null) {
         play(new Track(item, artist));
     }
 
@@ -199,7 +199,8 @@ public class MusicQueue(GuildMusicData guildMusic) {
 
     public async Task addToJazz(string artist, string path) {
         var rand = new Random();
-        var files = Directory.GetFiles(path, "*", new EnumerationOptions { RecurseSubdirectories = true });
+        var files = Directory.GetFiles(path, "*",
+            new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive });
         var randomFile = new FileInfo(files[rand.Next(files.Length)]);
         var tracks_ = await GuildMusicData.getTracksAsync(guildMusic.Node.Rest, randomFile);
         foreach (var track in tracks_.Tracks) {
@@ -227,7 +228,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
         var randomElement =
             selectNextSong();
         if (GuildMusicData.artistMappings.TryGetValue(randomElement, out var artist)) {
-            await addToJazz(randomElement, GuildMusicData.getPath(artist.path));
+            await addToJazz(randomElement, guildMusic.getPath(artist.path));
         }
 
         else {
@@ -264,6 +265,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
         if (repeatQueue && Queue.Count != 0 && repeatHolder != null) {
             Queue.Add(repeatHolder);
         }
+
         await Task.Delay(500);
         if (artistQueue.Count != 0 && autoQueue.Count < 6) {
             await seedQueue();
