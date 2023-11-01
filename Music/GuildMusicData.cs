@@ -43,26 +43,28 @@ public sealed class GuildMusicData {
     public static string rootPath;
 
     public static readonly Dictionary<string, Artist> artistMappings = new() {
-        { "_fats", new Artist("Fats Waller", 1.5) },
-        { "ella mae morse", new Artist("Ella Mae Morse", 1.2) },
-        { "slim gaillard", new Artist("Slim Gaillard", 1.0) },
-        { "louis jordan", new Artist("Louis Jordan", 1.0) },
-        { "caravan palace", new Artist("Caravan Palace", 1.0, 2) },
-        { "tape five", new Artist("Tape Five", 1.0) },
-        { "caro emerald", new Artist("Caro Emerald", 1.0) },
-        { "chuck berry", new Artist("Chuck Berry", 1.0, 0.25) }, // most of this is trash
-        { "jamie berry", new Artist("Jamie Berry", 0.8) },
-        { "sim gretina", new Artist("Sim Gretina", 0.8, 0) }, // too much earrape
-        { "freshly squeezed", new Artist("Freshly Squeezed Music", 0.8, 0.5, 0.5, 0.3) },
-        { "puppini sisters", new Artist("Puppini Sisters", 1.0) },
-        { "11 acorn lane", new Artist("11 Acorn Lane", 1.0) },
-        { "electric swing circus", new Artist("Electric Swing Circus", 1.0) },
-        { "the speakeasies swing band", new Artist("The Speakeasies Swing Band", 1.0) },
-        { "donald lambert", new Artist("Donald Lambert", 1.5) },
-        { "newport", new Artist("Newport Jazz Festival", 1.5) }, // 1960 Newport Jazz Festival, full recording
-        { "hot sardines", new Artist("The Hot Sardines", 1.0) },
-        { "the wolfe tones", new Artist("The Wolfe Tones", 0.8, 0.25) },
-        { "the dubliners", new Artist("The Dubliners", 0.8, 0.25) }
+        { "_fats", new Artist("Fats Waller", "Fats Waller", 1.5) },
+        { "_fatslive", new Artist("Fats Waller Live", "Fats Waller/Fats Waller Live", 1.5) },
+        { "ella mae morse", new Artist("Ella Mae Morse", "Ella Mae Morse", 1.2) },
+        { "slim gaillard", new Artist("Slim Gaillard", "Slim Gaillard", 1.0) },
+        { "louis jordan", new Artist("Louis Jordan", "Louis Jordan", 1.0) },
+        { "caravan palace", new Artist("Caravan Palace", "Caravan Palace", 1.0, 2) },
+        { "tape five", new Artist("Tape Five", "Tape Five", 1.0) },
+        { "caro emerald", new Artist("Caro Emerald", "Caro Emerald", 1.0) },
+        { "chuck berry", new Artist("Chuck Berry", "Chuck Berry", 1.0, 0.25) }, // most of this is trash
+        { "jamie berry", new Artist("Jamie Berry", "Jamie Berry", 0.8) },
+        { "sim gretina", new Artist("Sim Gretina", "Sim Gretina", 0.8, 0) }, // too much earrape
+        { "freshly squeezed", new Artist("Freshly Squeezed Music", "Freshly Squeezed Music", 0.8, 0.25, 0.5, 0.3) },
+        { "puppini sisters", new Artist("Puppini Sisters", "Puppini Sisters", 1.0) },
+        { "11 acorn lane", new Artist("11 Acorn Lane", "11 Acorn Lane", 1.0) },
+        { "electric swing circus", new Artist("Electric Swing Circus", "Electric Swing Circus", 1.0) },
+        { "the speakeasies swing band", new Artist("The Speakeasies Swing Band", "The Speakeasies Swing Band", 1.0) },
+        { "donald lambert", new Artist("Donald Lambert", "Donald Lambert", 1.5) }, {
+            "newport", new Artist("Newport Jazz Festival", "Newport Jazz Festival", 1.5)
+        }, // 1960 Newport Jazz Festival, full recording
+        { "hot sardines", new Artist("The Hot Sardines", "The Hot Sardines", 1.0) },
+        { "the wolfe tones", new Artist("The Wolfe Tones", "The Wolfe Tones", 0.8, 0.25) },
+        { "the dubliners", new Artist("The Dubliners", "The Dubliners", 0.8, 0.25) }
     };
 
     public static readonly Dictionary<string, double> artistWeights = new();
@@ -82,7 +84,6 @@ public sealed class GuildMusicData {
     /// <param name="lavalink">Lavalink service.</param>
     /// <param name="node">The Lavalink node this guild is connected to.</param>
     public GuildMusicData(DiscordGuild guild, LavalinkExtension lavalink, LavalinkNodeConnection node) {
-        
         // setup paths by OS
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
             rootPath = "/snd/music";
@@ -93,7 +94,7 @@ public sealed class GuildMusicData {
         else {
             throw new NotSupportedException("OS not supported, specify paths for the music.");
         }
-        
+
         Node = node;
         Guild = guild;
         Lavalink = lavalink;
@@ -102,7 +103,8 @@ public sealed class GuildMusicData {
         foreach (var artist in artistMappings) {
             // get the count of files at the directory
             int fCount = Directory
-                .GetFiles(getPath(artist.Value.path), "*", new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive })
+                .GetFiles(getPath(artist.Value.path), "*",
+                    new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive })
                 .Length;
             artistWeights[artist.Key] = fCount * artist.Value.weight;
         }
@@ -112,7 +114,7 @@ public sealed class GuildMusicData {
         logger.info("Initialised artist weights.");
     }
 
-    public string getPath(string path) {
+    public static string getPath(string path) {
         return Path.Combine(rootPath, path);
     }
 
@@ -139,7 +141,7 @@ public sealed class GuildMusicData {
         await Player.PauseAsync();
     }
 
-    /// <summary>
+    /// <summary>summary
     /// Resumes the playback.
     /// </summary>
     public async Task ResumeAsync() {
@@ -334,15 +336,18 @@ public sealed class GuildMusicData {
 /// <summary>
 /// Stores artist information which is used for song selection.
 /// </summary>
+/// <param name="name">The artist's name.</param>
 /// <param name="path">The path of the music files for the artist.</param>
 /// <param name="volume">The volume modifier for the artist.</param>
 /// <param name="weight">The rarity multiplier for the artist in the random selection.</param>
-/// <param name="repeatPenalty">If the queue already contains the artist, the chance of selecting the artist again will be multiplied by the value.</param>
+/// <param name="historyRepeatPenalty">If the history already contains the artist, the chance of selecting the artist again will be multiplied by the value.</param>
 /// <param name="doubleRepeatPenalty">If the previous track is the same artist, the chance of selecting the artist again will be multiplied by the value.</param>
-public record Artist(string path,
+public record Artist(
+    string name,
+    string path,
     double volume,
     double weight = 1.0,
-    double repeatPenalty = 1.0,
+    double historyRepeatPenalty = 1.0,
     double doubleRepeatPenalty = 1.0);
 
 public record Track(LavalinkTrack track, string? artist);

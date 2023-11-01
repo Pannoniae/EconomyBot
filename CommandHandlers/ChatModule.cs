@@ -9,6 +9,8 @@ namespace EconomyBot;
 [ModuleLifespan(ModuleLifespan.Singleton)]
 public class ChatModule : BaseCommandModule {
 
+    public const ulong ZEROX = 1091089609234059316;
+
     private MusicService Music { get; set; }
 
     /// <summary>
@@ -32,15 +34,19 @@ public class ChatModule : BaseCommandModule {
     [Command]
     [RequirePermissions(Permissions.ManageMessages)]
     public async Task purge(CommandContext ctx, int amt) {
-        IReadOnlyList<DiscordMessage> messages;
+        var messages = new List<DiscordMessage>();
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         // the library is stupid
         if (ctx.Message.Reference != null) {
             await Console.Out.WriteLineAsync("Purging from given message!");
-            messages = await ctx.Channel.GetMessagesBeforeAsync(ctx.Message.Reference.Message.Id, amt);
+            await foreach (var message in ctx.Channel.GetMessagesBeforeAsync(ctx.Message.Reference.Message.Id, amt)) {
+                messages.Add(message);
+            }
         }
         else {
-            messages = await ctx.Channel.GetMessagesAsync(amt);
+            await foreach (var message in ctx.Channel.GetMessagesAsync(amt)) {
+                messages.Add(message);
+            }
         }
 
         if (ctx.Channel.Id != Program.LOG) {
@@ -75,15 +81,15 @@ public class ChatModule : BaseCommandModule {
 
     [Command]
     public async Task save(CommandContext ctx) {
-        var names = (await ctx.Guild.GetAllMembersAsync()).Select(member => member.ToString());
+        var names = await ctx.Guild.GetAllMembersAsync().Select(member => member.ToString()).ToListAsync();
         await File.WriteAllLinesAsync(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/names.txt",
             names);
     }
 
     [Command("bishop")]
     public async Task saveBishop(CommandContext ctx) {
-        var messages = (await ctx.Channel.GetMessagesAsync(2000)).Where(msg => msg.Author.Id == 540265036141297676)
-            .Select(msg => msg.Content);
+        var messages = await ctx.Channel.GetMessagesAsync(2000).Where(msg => msg.Author.Id == 540265036141297676)
+            .Select(msg => msg.Content).ToListAsync();
         await File.WriteAllLinesAsync(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/bishop.txt",
             messages);
     }
@@ -117,5 +123,21 @@ public class ChatModule : BaseCommandModule {
             .WithContent($"{member.DisplayName} was squished by a giant kitten.").WithEmbed(
                 new DiscordEmbedBuilder().WithImageUrl(
                     cat)), cat, "Giant cat");
+    }
+    
+    [Command("0x")]
+    public async Task love0x(CommandContext ctx) {
+        var zerox = "https://tenor.com/view/girl-anime-kiss-anime-i-love-you-girl-kiss-gif-14375355";
+        await ctx.RespondAsync(new DiscordMessageBuilder()
+            .WithContent($"{(await ctx.Guild.GetMemberAsync(ZEROX)).Mention} is amazing and I love them so much!"));
+        await ctx.Channel.SendMessageAsync(zerox);
+    }
+    
+    [Command("panno")]
+    public async Task lovepanno(CommandContext ctx) {
+        var panno = "https://tenor.com/view/hug-gif-25588769";
+        await ctx.RespondAsync(new DiscordMessageBuilder()
+            .WithContent($"Pannoniae is a 12/10 human being that deserves love and appreciation <3"));
+        await ctx.Channel.SendMessageAsync(panno);
     }
 }

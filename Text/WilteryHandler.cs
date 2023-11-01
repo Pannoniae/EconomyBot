@@ -21,8 +21,9 @@ public class WilteryHandler {
     public WilteryHandler(DiscordClient client) {
         this.client = client;
 
-        messageHandlers.Add(new WordExceptionMessageHandler("ball", DiscordEmoji.FromName(client, ":chestnut:"), 
+        messageHandlers.Add(new WordExceptionMessageHandler("ball", DiscordEmoji.FromName(client, ":chestnut:"),
             "basket"));
+        messageHandlers.Add(new WordMessageHandler("hrt", "hurt"));
         messageHandlers.Add(new ResponseWordMessageHandler("anal", "Have fun getting HIV"));
     }
 
@@ -45,10 +46,12 @@ public class WilteryHandler {
     }
 
     public async Task sendWebhookToChannelAsUser(DiscordChannel channel, string message, DiscordMember user) {
-        await sendWebhookToChannelWithCustomUser(channel, new DiscordMessageBuilder().WithContent(message), user.GetGuildAvatarUrl(ImageFormat.Auto), user.DisplayName);
+        await sendWebhookToChannelWithCustomUser(channel, new DiscordMessageBuilder().WithContent(message),
+            user.GetGuildAvatarUrl(ImageFormat.Auto), user.DisplayName);
     }
 
-    public async Task sendWebhookToChannelWithCustomUser(DiscordChannel channel, DiscordMessageBuilder message, string avatarURL,
+    public async Task sendWebhookToChannelWithCustomUser(DiscordChannel channel, DiscordMessageBuilder message,
+        string avatarURL,
         string username) {
         Music = Program.musicService;
         GuildMusic = await Music.GetOrCreateDataAsync(channel.Guild);
@@ -117,7 +120,8 @@ public class WordMessageHandler(string target, string replacement) : MessageHand
     }
 }
 
-public class WordExceptionMessageHandler(string target, string replacement, params string[] exceptions) : MessageHandler {
+public class WordExceptionMessageHandler
+    (string target, string replacement, params string[] exceptions) : MessageHandler {
     public virtual bool shouldProcess(DiscordMessage message) {
         return message.Content.Contains(target, StringComparison.CurrentCultureIgnoreCase)
                && exceptions.All(e => !message.Content.Contains(e, StringComparison.CurrentCultureIgnoreCase));

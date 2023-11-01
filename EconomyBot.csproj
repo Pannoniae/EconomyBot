@@ -16,12 +16,12 @@
         <PackageReference Include="Catalyst.ConceptNet.English" Version="1.0.31050" />
         <PackageReference Include="Catalyst.Models.English" Version="1.0.30952" />
         <PackageReference Include="DetectLanguage" Version="1.0.0" />
-        <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-01690" />
-        <PackageReference Include="DSharpPlus.CommandsNext" Version="5.0.0-nightly-01690" />
-        <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-01690" />
-        <PackageReference Include="DSharpPlus.Lavalink" Version="5.0.0-nightly-01690" />
-        <PackageReference Include="DSharpPlus.SlashCommands" Version="5.0.0-nightly-01690" />
-        <PackageReference Include="DSharpPlus.VoiceNext" Version="5.0.0-nightly-01690" />
+        <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-01839" />
+        <PackageReference Include="DSharpPlus.CommandsNext" Version="5.0.0-nightly-01839" />
+        <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-01839" />
+        <PackageReference Include="DSharpPlus.Lavalink" Version="5.0.0-nightly-01839" />
+        <PackageReference Include="DSharpPlus.SlashCommands" Version="5.0.0-nightly-01839" />
+        <PackageReference Include="DSharpPlus.VoiceNext" Version="5.0.0-nightly-01839" />
         <PackageReference Include="FuzzierSharp" Version="3.0.1" />
         <PackageReference Include="JetBrains.Annotations" Version="2023.3.0-eap1" />
         <PackageReference Include="LanguageExt.Core" Version="4.4.3" />
@@ -38,10 +38,13 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="SpotifyAPI.Web" Version="7.0.0" />
+        <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+        <PackageReference Include="System.Linq.Parallel" Version="4.3.0" />
     </ItemGroup>
 
 
     <ItemGroup>
+        <Content Include="bin\Debug\net8.0\runtimes\linux-x64\native\libe_sqlite3.so" />
         <Content Include="lua\**">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
@@ -52,7 +55,7 @@
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="Launch.ps1">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="Lavalink.jar">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -60,10 +63,14 @@
         <None Update="application.yml">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+        <None Update="launch.sh">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 
     <ItemGroup>
+      <Folder Include="bin\Debug\net8.0\runtimes\linux-x64\native\" />
       <Folder Include="lua\" />
     </ItemGroup>
 

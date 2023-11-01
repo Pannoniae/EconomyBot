@@ -118,6 +118,16 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         await GuildMusic.queue.PlayAsync();
         await common.respond(ctx, "Started playing jazz.");
     }
+    
+    [Command("live"), Description("Live music! :3"), Aliases("l"), Priority(1)]
+    public async Task PlayLiveAsync(CommandContext ctx) {
+        // yeet the bot in
+        GuildMusic.queue.addToQueue("_fatslive");
+        await GuildMusic.queue.seedQueue();
+        await startPlayer(ctx);
+        await GuildMusic.queue.PlayAsync();
+        await common.respond(ctx, "Started playing jazz.");
+    }
 
     [Command("analyse"), Description("Analyse the frequency of artists."), Aliases("an")]
     public async Task AnalyseAsync(CommandContext ctx) {

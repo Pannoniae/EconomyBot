@@ -32,6 +32,12 @@ public class MusicQueue(GuildMusicData guildMusic) {
     public List<Track> autoQueue { get; } = new();
 
     /// <summary>
+    /// Playback history. Used for analytics.... I mean stopping the awful songs from playing.
+    /// Yes I know this should be a deque or a linked list shut up
+    /// </summary>
+    public List<Track> history { get; } = new();
+
+    /// <summary>
     /// The things being played right now. "_fats" is special-cased to the great collection.
     /// </summary>
     public List<string> artistQueue { get; } = new();
@@ -80,6 +86,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
         // autoplaylist
         if (track.artist != null) {
             autoQueue.Add(track);
+            history.Add(track);
         }
         // manually added
         else {
@@ -95,6 +102,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
         // autoplaylist
         if (track.artist != null) {
             autoQueue.Insert(0, track);
+            history.Insert(0, track);
         }
         // manually added
         else {
@@ -111,6 +119,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
         var itemCount2 = autoQueue.Count;
         Queue.Clear();
         autoQueue.Clear();
+        history.Clear();
         return itemCount + itemCount2;
     }
 
@@ -159,14 +168,16 @@ public class MusicQueue(GuildMusicData guildMusic) {
         }
 
         var item = combinedQueue[index];
+        var queue = (item.artist == null) switch {
+            true => Queue,
+            false => autoQueue
+        };
+        queue.Remove(item);
         if (item.artist != null) {
-            autoQueue.Remove(item);
-            return item.track;
+            history.Remove(item);
         }
-        else {
-            Queue.Remove(item);
-            return item.track;
-        }
+
+        return item.track;
     }
 
     /// <summary>
@@ -197,16 +208,9 @@ public class MusicQueue(GuildMusicData guildMusic) {
         }
     }
 
-    public async Task addToJazz(string artist, string path) {
-        var rand = new Random();
-        var files = Directory.GetFiles(path, "*",
-            new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive });
-        var randomFile = new FileInfo(files[rand.Next(files.Length)]);
-        var tracks_ = await GuildMusicData.getTracksAsync(guildMusic.Node.Rest, randomFile);
-        foreach (var track in tracks_.Tracks) {
-            Enqueue(track, artist);
-            logger.info($"Enqueued {track.Title} at {track.Uri}");
-        }
+    public void addToJazz(Track track) {
+        Enqueue(track.track, track.artist);
+        logger.info($"Enqueued {track.track.Title} at {track.track.Uri}");
     }
 
     public void addAllToQueue() {
@@ -225,24 +229,19 @@ public class MusicQueue(GuildMusicData guildMusic) {
 
     public async Task growQueue() {
         // return the online artist with the max. frequency of all played since we don't know the number of total songs
-        var randomElement =
-            selectNextSong();
-        if (GuildMusicData.artistMappings.TryGetValue(randomElement, out var artist)) {
-            await addToJazz(randomElement, guildMusic.getPath(artist.path));
-        }
-
-        else {
-            await guildMusic.AddToRandom(randomElement);
-        }
+        var nextSong = await selectNextPlayedSong();
+        addToJazz(nextSong);
     }
 
-    private string selectNextSong() {
+    private async Task<Track> selectNextPlayedSong() {
+        // beginning
+        beginning:
         var max = GuildMusicData.artistWeights.Values.Max();
-        return artistQueue.randomElementByWeight(e => {
+        var artistName = artistQueue.randomElementByWeight(e => {
             var weight = GuildMusicData.artistWeights.TryGetValue(e, out var element) ? element : max;
             GuildMusicData.artistMappings.TryGetValue(e, out var artist);
-            if (autoQueue.Select(i => i.artist).Contains(e)) {
-                weight *= artist!.repeatPenalty;
+            if (history.Select(i => i.artist).Contains(e)) {
+                weight *= artist!.historyRepeatPenalty;
             }
 
             if (autoQueue.FirstOrDefault()?.artist == e) {
@@ -251,6 +250,31 @@ public class MusicQueue(GuildMusicData guildMusic) {
 
             return weight;
         });
+        var artist = GuildMusicData.artistMappings[artistName];
+        var nextSong = await selectNextSong(artist);
+
+        var historyHasRemix =
+            history.Any(h => h.track.Title.Contains("remix", StringComparison.CurrentCultureIgnoreCase));
+        // remix filter
+        if (nextSong.track.Title.Contains("remix", StringComparison.CurrentCultureIgnoreCase) && historyHasRemix) {
+            // 90% reject
+            if (Random.Shared.NextDouble() < 0.9) {
+                logger.info("Found duplicate remix, re-rolling...");
+                goto beginning;
+            }
+        }
+
+        return nextSong;
+    }
+
+    private async Task<Track> selectNextSong(Artist artist) {
+        var path = GuildMusicData.getPath(artist.path);
+        var rand = new Random();
+        var files = Directory.GetFiles(path, "*",
+            new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive });
+        var randomFile = new FileInfo(files[rand.Next(files.Length)]);
+        var tracks_ = await GuildMusicData.getTracksAsync(guildMusic.Node.Rest, randomFile);
+        return new Track(tracks_.Tracks.First(), artist.name);
     }
 
     public async Task seedQueue() {
@@ -269,6 +293,10 @@ public class MusicQueue(GuildMusicData guildMusic) {
         await Task.Delay(500);
         if (artistQueue.Count != 0 && autoQueue.Count < 6) {
             await seedQueue();
+        }
+
+        if (history.Count > 20) {
+            history.RemoveAt(0);
         }
 
         await PlayHandlerAsync();

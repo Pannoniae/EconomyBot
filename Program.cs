@@ -9,6 +9,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
 using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.Entities;
+using DSharpPlus.Entities.AuditLogs;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Exceptions;
 using DSharpPlus.Interactivity;
@@ -180,7 +181,7 @@ class Program {
             var server = await client.GetGuildAsync(838843082110664756);
             _ = Task.Run(async () => {
                 await Task.Delay(3000); // stupid discord doesnt update logs immediately
-                var logs = await server.GetAuditLogsAsync(10, action_type: AuditLogActionType.MessageDelete);
+                var logs = await server.GetAuditLogsAsync(10, actionType: AuditLogActionType.MessageDelete).ToListAsync();
                 var deleter = logs.FirstOrDefault(log =>
                         log is DiscordAuditLogMessageEntry entry && entry.Target.Id == message.Id)?
                     .UserResponsible?.Username ?? "unknown";
@@ -238,7 +239,7 @@ class Program {
             "Ż"
         };
 
-        // Lizardry
+        // Cringe
         if ((e.Channel.Id != POLISH_CHANNEL && e.Channel.Id != ZOO && e.Channel.Id != HUNGARY_CHANNEL) && lizardry.Any(word =>
                 e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase))) {
             await e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":lizard:"));
@@ -246,8 +247,16 @@ class Program {
 
         var cute = new List<string> {
             "skull",
-            "cringe"
+            "cringe",
+            "\ud83d\udc80" // skull emoji
         };
+        
+        // Hoholness
+
+        var hohol = "hohol";
+        if (e.Message.Content.Contains(hohol, StringComparison.OrdinalIgnoreCase)) {
+            await ((DiscordMember)e.Author).TimeoutAsync(DateTimeOffset.Now + TimeSpan.FromHours(1), "russian simp");
+        }
 
         // Lizardry
         if (cute.Any(word =>
