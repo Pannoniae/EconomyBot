@@ -272,8 +272,13 @@ public class MusicQueue(GuildMusicData guildMusic) {
         var rand = new Random();
         var files = Directory.GetFiles(path, "*",
             new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive });
+        beginning:
         var randomFile = new FileInfo(files[rand.Next(files.Length)]);
         var tracks_ = await GuildMusicData.getTracksAsync(guildMusic.Node.Rest, randomFile);
+        if (tracks_.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks_.Tracks.Any()) {
+            // retry if not found
+            goto beginning;
+        }
         return new Track(tracks_.Tracks.First(), artist.name);
     }
 
