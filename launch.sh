@@ -1,4 +1,4 @@
 #!/bin/bash
 
 dotnet ./EconomyBot.dll &
-java -jar Lavalink.jar &
+java -jar -Xms10M -Xmx256M Lavalink.jar &
