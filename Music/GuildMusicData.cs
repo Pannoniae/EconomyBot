@@ -63,8 +63,8 @@ public sealed class GuildMusicData {
             "newport", new Artist("Newport Jazz Festival", "Newport Jazz Festival", 1.5)
         }, // 1960 Newport Jazz Festival, full recording
         { "hot sardines", new Artist("The Hot Sardines", "The Hot Sardines", 1.0) },
-        { "the wolfe tones", new Artist("The Wolfe Tones", "The Wolfe Tones", 0.8, 0.25) },
-        { "the dubliners", new Artist("The Dubliners", "The Dubliners", 0.8, 0.25) }
+        { "the wolfe tones", new Artist("The Wolfe Tones", "The Wolfe Tones", 0.8, 0) },
+        { "the dubliners", new Artist("The Dubliners", "The Dubliners", 0.8, 0) }
     };
 
     public static readonly Dictionary<string, double> artistWeights = new();
