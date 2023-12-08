@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using DSharpPlus.Entities;
 using DSharpPlus.Lavalink;
@@ -59,12 +60,12 @@ public sealed class GuildMusicData {
         { "11 acorn lane", new Artist("11 Acorn Lane", "11 Acorn Lane", 1.0) },
         { "electric swing circus", new Artist("Electric Swing Circus", "Electric Swing Circus", 1.0) },
         { "the speakeasies swing band", new Artist("The Speakeasies Swing Band", "The Speakeasies Swing Band", 1.0) },
-        { "donald lambert", new Artist("Donald Lambert", "Donald Lambert", 1.5) }, {
-            "newport", new Artist("Newport Jazz Festival", "Newport Jazz Festival", 1.5)
-        }, // 1960 Newport Jazz Festival, full recording
+        { "donald lambert", new Artist("Donald Lambert", "Donald Lambert", 1.5) },
+        // 1960 Newport Jazz Festival, full recording
+        { "newport", new Artist("Newport Jazz Festival", "Newport Jazz Festival", 1.5) },
         { "hot sardines", new Artist("The Hot Sardines", "The Hot Sardines", 1.0) },
-        { "the wolfe tones", new Artist("The Wolfe Tones", "The Wolfe Tones", 0.8, 0) },
-        { "the dubliners", new Artist("The Dubliners", "The Dubliners", 0.8, 0) }
+        { "louis armstrong", new Artist("Louis Armstrong", "Louis Armstrong", 1.0, 0.5) },
+        { "ella fitzgerald", new Artist("Ella Fitzgerald", "Ella Fitzgerald", 1.0, 0.5) },
     };
 
     public static readonly Dictionary<string, double> artistWeights = new();
@@ -86,7 +87,7 @@ public sealed class GuildMusicData {
     public GuildMusicData(DiscordGuild guild, LavalinkExtension lavalink, LavalinkNodeConnection node) {
         // setup paths by OS
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
-            rootPath = "/snd/music";
+            rootPath = "/backup/snd/music";
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
             rootPath = "E:/music";

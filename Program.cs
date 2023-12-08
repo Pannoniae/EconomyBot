@@ -1,5 +1,7 @@
 ﻿global using LanguageExt;
 global using static LanguageExt.Prelude;
+using System.Collections;
+using System.Diagnostics;
 using System.Globalization;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -108,8 +110,10 @@ class Program {
             if (e is BadRequestException ex) {
                 logger.error(ex.JsonMessage);
             }
+
             logger.error(e.Message);
         }
+
         discord.UseInteractivity(new InteractivityConfiguration {
             Timeout = TimeSpan.FromSeconds(180),
             PollBehaviour = PollBehaviour.KeepEmojis
@@ -181,7 +185,8 @@ class Program {
             var server = await client.GetGuildAsync(838843082110664756);
             _ = Task.Run(async () => {
                 await Task.Delay(3000); // stupid discord doesnt update logs immediately
-                var logs = await server.GetAuditLogsAsync(10, actionType: AuditLogActionType.MessageDelete).ToListAsync();
+                var logs = await server.GetAuditLogsAsync(10, actionType: DiscordAuditLogActionType.MessageDelete)
+                    .ToListAsync();
                 var deleter = logs.FirstOrDefault(log =>
                         log is DiscordAuditLogMessageEntry entry && entry.Target.Id == message.Id)?
                     .UserResponsible?.Username ?? "unknown";
@@ -201,7 +206,8 @@ class Program {
         }
 
         // gore protection
-        if (e.Message.Content.Contains("Screenshot_20230901_160903") || e.Message.Attachments.Any(f => f.Url.Contains("Screenshot_20230901_160903"))) {
+        if (e.Message.Content.Contains("Screenshot_20230901_160903") ||
+            e.Message.Attachments.Any(f => f.Url.Contains("Screenshot_20230901_160903"))) {
             await e.Guild.BanMemberAsync(e.Author as DiscordMember, 6);
         }
 
@@ -240,8 +246,9 @@ class Program {
         };
 
         // Cringe
-        if ((e.Channel.Id != POLISH_CHANNEL && e.Channel.Id != ZOO && e.Channel.Id != HUNGARY_CHANNEL) && lizardry.Any(word =>
-                e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase))) {
+        if ((e.Channel.Id != POLISH_CHANNEL && e.Channel.Id != ZOO && e.Channel.Id != HUNGARY_CHANNEL) && lizardry.Any(
+                word =>
+                    e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase))) {
             await e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":lizard:"));
         }
 
@@ -250,7 +257,7 @@ class Program {
             "cringe",
             "\ud83d\udc80" // skull emoji
         };
-        
+
         // Hoholness
 
         var hohol = "hohol";
@@ -273,13 +280,15 @@ class Program {
             foreach (var result in results) {
                 logger.info($"    {result.language}, {result.confidence}, {result.reliable}");
             }
+
             if (isRussian && isNotUkrainian) {
                 await e.Message.RespondAsync("москальська свиня");
             }
         }
 
         // Toxicity handler
-        if (!e.Message.Content.StartsWith('.') && !e.Message.Content.StartsWith('/') && e.Message.Embeds.Count == 0 && e.Message.Attachments.Count == 0) {
+        if (!e.Message.Content.StartsWith('.') && !e.Message.Content.StartsWith('/') && e.Message.Embeds.Count == 0 &&
+            e.Message.Attachments.Count == 0) {
             await toxicity.handleMessage(client, e.Message);
             await wiltery.handleMessage(client, e.Message);
         }
@@ -304,7 +313,6 @@ class Program {
                 e.Message.Attachments.Any(a => a.Url.Contains(word, StringComparison.OrdinalIgnoreCase)))) {
             await e.Message.RespondAsync("*meow*");
         }*/
-
     }
 
     private static async Task setup(DiscordClient client, LavalinkExtension lavalink,
@@ -320,6 +328,7 @@ class Program {
         languageClient = new DetectLanguageClient(Constants.detectlanguagetoken);
 
         hasSetup = true;
+
         logger.info("Setup done!");
     }
 
@@ -383,10 +392,12 @@ class Program {
                     return;
                 }
 
-                var closestCommand = ActualFuzz.partialFuzzItem(ex.CommandName, e.Context.CommandsNext.RegisteredCommands.Keys);
+                var closestCommand =
+                    ActualFuzz.partialFuzzItem(ex.CommandName, e.Context.CommandsNext.RegisteredCommands.Keys);
                 await sender.Client.SendMessageAsync(e.Context.Channel, new DiscordMessageBuilder().WithEmbed(
                     new DiscordEmbedBuilder().WithColor(DiscordColor.HotPink)
-                        .WithDescription($"I have no bloody idea what that command is, sorry, did you mean {closestCommand}?")
+                        .WithDescription(
+                            $"I have no bloody idea what that command is, sorry, did you mean {closestCommand}?")
                         //.WithImageUrl("https://c.tenor.com/CR9Or4gKoAUAAAAC/menhera-menhera-chan.gif").Build()));
                         .Build()));
                 return;

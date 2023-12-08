@@ -7,33 +7,34 @@
         <Nullable>enable</Nullable>
         <LangVersion>preview</LangVersion>
         <UserSecretsId>832f3487-0d4f-4c43-9fe5-a282f3cfb967</UserSecretsId>
+        <ServerGarbageCollection>false</ServerGarbageCollection>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="BooruSharp" Version="4.0.0-beta" />
         <PackageReference Include="DetectLanguage" Version="1.0.0" />
-        <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-01839" />
-        <PackageReference Include="DSharpPlus.CommandsNext" Version="5.0.0-nightly-01839" />
-        <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-01839" />
-        <PackageReference Include="DSharpPlus.Lavalink" Version="5.0.0-nightly-01839" />
-        <PackageReference Include="DSharpPlus.SlashCommands" Version="5.0.0-nightly-01839" />
-        <PackageReference Include="DSharpPlus.VoiceNext" Version="5.0.0-nightly-01839" />
+        <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-01907" />
+        <PackageReference Include="DSharpPlus.CommandsNext" Version="5.0.0-nightly-01907" />
+        <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-01907" />
+        <PackageReference Include="DSharpPlus.Lavalink" Version="5.0.0-nightly-01907" />
+        <PackageReference Include="DSharpPlus.SlashCommands" Version="5.0.0-nightly-01907" />
+        <PackageReference Include="DSharpPlus.VoiceNext" Version="5.0.0-nightly-01907" />
         <PackageReference Include="FuzzierSharp" Version="3.0.1" />
-        <PackageReference Include="JetBrains.Annotations" Version="2023.3.0-eap4" />
-        <PackageReference Include="LanguageExt.Core" Version="4.4.3" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-rc.2.23480.1">
+        <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
+        <PackageReference Include="LanguageExt.Core" Version="4.4.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0-rc.2.23480.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Reddit" Version="1.5.2" />
-        <PackageReference Include="Spectre.Console" Version="0.47.1-preview.0.27" />
-        <PackageReference Include="Spectre.Console.Analyzer" Version="0.47.1-preview.0.27">
+        <PackageReference Include="Spectre.Console" Version="0.48.1-preview.0.5" />
+        <PackageReference Include="Spectre.Console.Analyzer" Version="0.48.1-preview.0.5">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="SpotifyAPI.Web" Version="7.0.0" />
+        <PackageReference Include="SpotifyAPI.Web" Version="7.0.2" />
         <PackageReference Include="System.Linq.Async" Version="6.0.1" />
         <PackageReference Include="System.Linq.Parallel" Version="4.3.0" />
     </ItemGroup>

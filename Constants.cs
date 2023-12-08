@@ -1,5 +1,7 @@
-﻿using EconomyBot.Logging;
+﻿using System.Collections;
+using EconomyBot.Logging;
 using Newtonsoft.Json.Linq;
+using Spectre.Console;
 using SpotifyAPI.Web;
 
 namespace EconomyBot;
@@ -22,6 +24,7 @@ public static class Constants {
     public static string? detectlanguagetoken;
 
     public static void init() {
+
         JObject json;
         try {
             json = JObject.Parse(File.ReadAllText("config.json"));
