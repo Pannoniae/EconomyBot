@@ -151,7 +151,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
     public async Task PlayAsync(CommandContext ctx,
         [Description("URL to play from.")] Uri uri) {
         var trackLoad = await Music.GetTracksAsync(uri);
-        var tracks = toSeq(trackLoad.Tracks);
+        var tracks = trackLoad.Tracks.ToList();
         if (trackLoad.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks.Any()) {
             await common.respond(ctx, "No tracks were found at specified link.");
             return;
@@ -160,7 +160,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         if (trackLoad.LoadResultType == LavalinkLoadResultType.PlaylistLoaded &&
             trackLoad.PlaylistInfo.SelectedTrack > 0) {
             var index = trackLoad.PlaylistInfo.SelectedTrack;
-            tracks = tracks.Skip(index).Concat(tracks.Take(index));
+            tracks = tracks.Skip(index).Concat(tracks.Take(index)).ToList();
         }
 
         var trackCount = tracks.Count();
@@ -197,7 +197,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
 
         var interactivity = ctx.Client.GetInteractivity();
 
-        var results = (await GuildMusic.getJazz("*" + term + "*")).ToSeq();
+        var results = (await GuildMusic.getJazz("*" + term + "*")).ToList();
         if (!results.Any()) {
             await common.respond(ctx, "Nothing was found.");
             return;
@@ -206,7 +206,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         if (results.Count() == 1) {
             // only one result
             var el_ = results.First();
-            var tracks_ = el_.Tracks.ToSeq();
+            var tracks_ = el_.Tracks.ToList();
             if (el_.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks_.Any()) {
                 await common.respond(ctx, "No tracks were found at specified link.");
                 return;
@@ -287,7 +287,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
 
         var el = results.ElementAt(elInd - 1);
-        var tracks = el.Tracks.ToSeq();
+        var tracks = el.Tracks.ToList();
 
 
         if (el.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks.Any()) {
@@ -295,7 +295,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             return;
         }
 
-        var trackCount = tracks.Count();
+        var trackCount = tracks.Count;
         foreach (var track in tracks)
             GuildMusic.queue.Enqueue(track);
 
@@ -318,7 +318,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         string term) {
         var interactivity = ctx.Client.GetInteractivity();
 
-        var results = (await YouTube.SearchAsync(term)).ToSeq();
+        var results = (await YouTube.SearchAsync(term)).ToList();
         if (!results.Any()) {
             await common.respond(ctx, "Nothing was found.");
             return;
@@ -365,13 +365,13 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         var url = new Uri($"https://youtu.be/{el.Id}");
 
         var trackLoad = await Music.GetTracksAsync(url);
-        var tracks = trackLoad.Tracks.ToSeq();
+        var tracks = trackLoad.Tracks.ToList();
         if (trackLoad.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks.Any()) {
             await common.modify(ctx, msg, "No tracks were found at specified link.");
             return;
         }
 
-        var trackCount = tracks.Count();
+        var trackCount = tracks.Count;
         foreach (var track in tracks) {
             GuildMusic.queue.Enqueue(track);
         }

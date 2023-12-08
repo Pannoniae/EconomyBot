@@ -1,8 +1,4 @@
-﻿global using LanguageExt;
-global using static LanguageExt.Prelude;
-using System.Collections;
-using System.Diagnostics;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Net;
 using System.Text.RegularExpressions;
 using DetectLanguage;
