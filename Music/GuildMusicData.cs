@@ -87,7 +87,7 @@ public sealed class GuildMusicData {
     public GuildMusicData(DiscordGuild guild, LavalinkExtension lavalink, LavalinkNodeConnection node) {
         // setup paths by OS
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
-            rootPath = "/backup/snd/music";
+            rootPath = "/snd/music";
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
             rootPath = "E:/music";
@@ -103,10 +103,17 @@ public sealed class GuildMusicData {
 
         foreach (var artist in artistMappings) {
             // get the count of files at the directory
-            int fCount = Directory
-                .GetFiles(getPath(artist.Value.path), "*",
-                    new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive })
-                .Length;
+            int fCount = 0;
+            try {
+                fCount = Directory
+                    .GetFiles(getPath(artist.Value.path), "*",
+                        new EnumerationOptions
+                            { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive })
+                    .Length;
+            }
+            catch (DirectoryNotFoundException e) {
+                fCount = 0;
+            }
             artistWeights[artist.Key] = fCount * artist.Value.weight;
         }
 
@@ -267,7 +274,7 @@ public sealed class GuildMusicData {
     }
 
     public async Task<IEnumerable<LavalinkLoadResult>> getJazz(string searchTerm) {
-        return artistMappings.SelectMany(
+        return artistMappings.Where(artist => Path.Exists(getPath(artist.Value.path))).SelectMany(
                 artist => Directory.GetFiles(getPath(artist.Value.path), searchTerm,
                     new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive }))
             .Select(file => new FileInfo(file))

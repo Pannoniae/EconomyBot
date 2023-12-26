@@ -14,8 +14,6 @@ public sealed class MusicService {
     private LavalinkExtension Lavalink;
     private ConcurrentDictionary<ulong, GuildMusicData> MusicData;
     private readonly DiscordClient client;
-    
-    private GuildDB db { get; }
 
     private LavalinkNodeConnection node { get; }
 
@@ -27,7 +25,6 @@ public sealed class MusicService {
         MusicData = new ConcurrentDictionary<ulong, GuildMusicData>();
         client = lavalink.Client;
         node = theNode;
-        db = new GuildDB();
 
         node.TrackException += Lavalink_TrackExceptionThrown;
 
@@ -66,21 +63,23 @@ public sealed class MusicService {
     }
 
     public async Task<Guild> getDBForGuild(DiscordGuild guild) {
-        var guildDB = await db.Guilds.FindAsync(guild.Id);
-        if (guildDB != null) {
-            // guild found
-            await Console.Out.WriteLineAsync($"Guild ID {guild.Id} found in DB");
-        }
-        else {
-            var newGuild = await db.Guilds.AddAsync(new Guild {
-                Id = guild.Id
-            });
-            await db.SaveChangesAsync();
-            await Console.Out.WriteLineAsync($"Created new guild with ID {guild.Id} on DB");
-            return newGuild.Entity;
-        }
+        using (var db = new GuildDB()) {
+            var guildDB = await db.Guilds.FindAsync(guild.Id);
+            if (guildDB != null) {
+                // guild found
+                await Console.Out.WriteLineAsync($"Guild ID {guild.Id} found in DB");
+            }
+            else {
+                var newGuild = await db.Guilds.AddAsync(new Guild {
+                    Id = guild.Id
+                });
+                await db.SaveChangesAsync();
+                await Console.Out.WriteLineAsync($"Created new guild with ID {guild.Id} on DB");
+                return newGuild.Entity;
+            }
 
-        return guildDB;
+            return guildDB;
+        }
     }
 
     /// <summary>
@@ -114,11 +113,11 @@ public class GuildDB : DbContext {
         var folder = Environment.CurrentDirectory;
         Console.Out.WriteLine($"Current directory is {folder} ");
         //if "bin" is present, remove all the path starting from "bin" word
-        if (folder.Contains("bin"))
-        {
+        if (folder.Contains("bin")) {
             int index = folder.IndexOf("bin", StringComparison.Ordinal);
             folder = folder[..index];
         }
+
         DBPath = Path.Join(folder, "bot.db");
     }
 

@@ -16,6 +16,7 @@ using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Lavalink;
 using DSharpPlus.Net;
 using DSharpPlus.SlashCommands;
+using EconomyBot.CommandHandlers;
 using EconomyBot.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;

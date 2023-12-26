@@ -8,7 +8,6 @@ namespace EconomyBot;
 
 [ModuleLifespan(ModuleLifespan.Singleton)]
 public class ChatModule : BaseCommandModule {
-
     public const ulong ZEROX = 1091089609234059316;
 
     private MusicService Music { get; set; }
@@ -17,6 +16,7 @@ public class ChatModule : BaseCommandModule {
     /// I know the name is bad, will refactor.
     /// </summary>
     public GuildMusicData GuildMusic { get; set; }
+
     public override async Task BeforeExecutionAsync(CommandContext ctx) {
         Music = Program.musicService;
         GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild);
@@ -51,7 +51,8 @@ public class ChatModule : BaseCommandModule {
 
         if (ctx.Channel.Id != Program.LOG) {
             var message = string.Join("\n",
-                messages.Select(m => $"{m.Timestamp} {m.Author.Username}#{m.Author.Discriminator}: {m.Content}").Reverse());
+                messages.Select(m => $"{m.Timestamp} {m.Author.Username}#{m.Author.Discriminator}: {m.Content}")
+                    .Reverse());
             var logMessages = ChunksUpTo(message, 1984);
             foreach (var msg in logMessages) {
                 await (await ctx.Client.GetGuildAsync(838843082110664756)).GetChannel(Program.LOG)
@@ -81,15 +82,16 @@ public class ChatModule : BaseCommandModule {
 
     [Command]
     public async Task save(CommandContext ctx) {
-        var names = await ctx.Guild.GetAllMembersAsync().Select(member => member.ToString()).ToListAsync();
+        var names = (await ctx.Guild.GetAllMembersAsync().ToListAsync()).Select(member => member.ToString());
         await File.WriteAllLinesAsync(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/names.txt",
             names);
     }
 
     [Command("bishop")]
     public async Task saveBishop(CommandContext ctx) {
-        var messages = await ctx.Channel.GetMessagesAsync(2000).Where(msg => msg.Author.Id == 540265036141297676)
-            .Select(msg => msg.Content).ToListAsync();
+        var messages = (await ctx.Channel.GetMessagesAsync(2000).ToListAsync())
+            .Where(msg => msg.Author.Id == 540265036141297676)
+            .Select(msg => msg.Content);
         await File.WriteAllLinesAsync(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/bishop.txt",
             messages);
     }
@@ -124,7 +126,7 @@ public class ChatModule : BaseCommandModule {
                 new DiscordEmbedBuilder().WithImageUrl(
                     cat)), cat, "Giant cat");
     }
-    
+
     [Command("0x")]
     public async Task love0x(CommandContext ctx) {
         var zerox = "https://tenor.com/view/girl-anime-kiss-anime-i-love-you-girl-kiss-gif-14375355";
@@ -132,7 +134,7 @@ public class ChatModule : BaseCommandModule {
             .WithContent($"{(await ctx.Guild.GetMemberAsync(ZEROX)).Mention} is amazing and I love them so much!"));
         await ctx.Channel.SendMessageAsync(zerox);
     }
-    
+
     [Command("panno")]
     public async Task lovepanno(CommandContext ctx) {
         var panno = "https://tenor.com/view/hug-gif-25588769";

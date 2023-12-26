@@ -1,0 +1,20 @@
+source https://api.nuget.org/v3/index.json
+
+storage: none
+nuget BooruSharp 4.0.0-beta beta
+nuget DetectLanguage 1.0.0
+nuget DSharpPlus 5.0.0-nightly-01907 nightly
+nuget DSharpPlus.CommandsNext 5.0.0-nightly-01907 nightly
+nuget DSharpPlus.Interactivity 5.0.0-nightly-01907 nightly
+nuget DSharpPlus.Lavalink 5.0.0-nightly-01907 nightly
+nuget DSharpPlus.SlashCommands 5.0.0-nightly-01907 nightly
+nuget DSharpPlus.VoiceNext 5.0.0-nightly-01907 nightly
+nuget FuzzierSharp 3.0.1
+nuget JetBrains.Annotations 2023.3.0
+nuget Microsoft.EntityFrameworkCore.Design 8.0.0
+nuget Microsoft.EntityFrameworkCore.Sqlite 8.0.0
+nuget Newtonsoft.Json 13.0.3
+nuget Reddit 1.5.2
+nuget Spectre.Console 0.48.1-preview.0.5 preview
+nuget Spectre.Console.Analyzer 0.48.1-preview.0.5 preview
+nuget SpotifyAPI.Web 7.0.2

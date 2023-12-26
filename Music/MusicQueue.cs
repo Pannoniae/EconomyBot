@@ -251,6 +251,12 @@ public class MusicQueue(GuildMusicData guildMusic) {
             return weight;
         });
         var artist = GuildMusicData.artistMappings[artistName];
+        // not found
+        var path = GuildMusicData.getPath(artist.path);
+        if (!Path.Exists(path)) {
+            goto beginning;
+        }
+
         var nextSong = await selectNextSong(artist);
 
         var historyHasRemix =
