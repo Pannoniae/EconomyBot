@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Numerics;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using DSharpPlus.Entities;
 using DSharpPlus.Lavalink;
 using EconomyBot.Logging;
@@ -64,8 +62,8 @@ public sealed class GuildMusicData {
         // 1960 Newport Jazz Festival, full recording
         { "newport", new Artist("Newport Jazz Festival", "Newport Jazz Festival", 1.5) },
         { "hot sardines", new Artist("The Hot Sardines", "The Hot Sardines", 1.0) },
-        { "louis armstrong", new Artist("Louis Armstrong", "Louis Armstrong", 1.0, 0.5) },
-        { "ella fitzgerald", new Artist("Ella Fitzgerald", "Ella Fitzgerald", 1.0, 0.5) },
+        { "louis armstrong", new Artist("Louis Armstrong", "Louis Armstrong", 1.0, 0.25) },
+        { "ella fitzgerald", new Artist("Ella Fitzgerald", "Ella Fitzgerald", 1.0, 0.25) },
     };
 
     public static readonly Dictionary<string, double> artistWeights = new();

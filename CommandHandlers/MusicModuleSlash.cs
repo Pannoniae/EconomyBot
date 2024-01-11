@@ -36,14 +36,14 @@ public class MusicModuleSlash : ApplicationCommandModule {
         var chn = getChannel(ctx);
         if (chn == null) {
             await ctx.CreateResponseAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} You need to be in a voice channel.");
+                $"{Program.cube} You need to be in a voice channel.");
             throw new IdiotException("user error");
         }
 
         var mbr = ctx.Guild.CurrentMember?.VoiceState?.Channel;
         if (mbr != null && chn != mbr) {
             await ctx.CreateResponseAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} You need to be in the same voice channel.");
+                $"{Program.cube} You need to be in the same voice channel.");
             throw new IdiotException("user error");
         }
 
@@ -58,7 +58,7 @@ public class MusicModuleSlash : ApplicationCommandModule {
         // yeet the bot in 
         var chn = getChannel(ctx);
         await GuildMusic.CreatePlayerAsync(chn);
-        await ctx.CreateResponseAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Joined the channel.");
+        await ctx.CreateResponseAsync($"{Program.cube} Joined the channel.");
     }
 
     [SlashCommand("jazz", "Plays some jazz. :3")]
@@ -70,7 +70,7 @@ public class MusicModuleSlash : ApplicationCommandModule {
         var chn = vs.Channel;
         await GuildMusic.CreatePlayerAsync(chn);
         await GuildMusic.queue.PlayAsync();
-        await ctx.CreateResponseAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Started playing jazz.");
+        await ctx.CreateResponseAsync($"{Program.cube} Started playing jazz.");
     }
 
     [SlashCommand("stopjazz", "Stops jazz.")]
@@ -78,7 +78,7 @@ public class MusicModuleSlash : ApplicationCommandModule {
         GuildMusic.queue.clearQueue();
         GuildMusic.queue.EmptyQueue();
         await GuildMusic.queue.StopAsync();
-        await ctx.CreateResponseAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Stopped jazz.");
+        await ctx.CreateResponseAsync($"{Program.cube} Stopped jazz.");
     }
 
     [SlashCommand("stop", "Stops playback and quits the voice channel.")]
@@ -88,7 +88,7 @@ public class MusicModuleSlash : ApplicationCommandModule {
         await GuildMusic.DestroyPlayerAsync();
 
         await ctx.CreateResponseAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Removed {rmd:#,##0} tracks from the queue.");
+            $"{Program.cube} Removed {rmd:#,##0} tracks from the queue.");
     }
 
     [SlashCommand("clear", "Clears the queue.")]
@@ -96,20 +96,20 @@ public class MusicModuleSlash : ApplicationCommandModule {
         int rmd = GuildMusic.queue.EmptyQueue();
 
         await ctx.CreateResponseAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Removed {rmd:#,##0} tracks from the queue uwu");
+            $"{Program.cube} Removed {rmd:#,##0} tracks from the queue uwu");
     }
 
     [SlashCommand("pause", "Pauses playback.")]
     public async Task PauseAsync(InteractionContext ctx) {
         await GuildMusic.PauseAsync();
         await ctx.CreateResponseAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Playback paused. Use {Formatter.InlineCode($"/resume")} to resume playback.");
+            $"{Program.cube} Playback paused. Use {Formatter.InlineCode($"/resume")} to resume playback.");
     }
 
     [SlashCommand("resume", "Resumes playback.")]
     public async Task ResumeAsync(InteractionContext ctx) {
         await GuildMusic.ResumeAsync();
-        await ctx.CreateResponseAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Playback resumed.");
+        await ctx.CreateResponseAsync($"{Program.cube} Playback resumed.");
     }
 
     [SlashCommand("skip", "Skips current track.")]
@@ -117,7 +117,7 @@ public class MusicModuleSlash : ApplicationCommandModule {
         var track = GuildMusic.queue.NowPlaying.track;
         await GuildMusic.queue.StopAsync();
         await ctx.CreateResponseAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
+            $"{Program.cube} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
     }
 
     [SlashCommand("skipnum", "Skips current track.")]
@@ -126,7 +126,7 @@ public class MusicModuleSlash : ApplicationCommandModule {
             var track = GuildMusic.queue.NowPlaying.track;
             await GuildMusic.queue.StopAsync();
             await ctx.CreateResponseAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
+                $"{Program.cube} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
             await Task.Delay(500); // wait for the next one
         }
     }
@@ -161,17 +161,17 @@ public class MusicModuleSlash : ApplicationCommandModule {
         long volume) {
         if (volume is < 0 or > 1000) {
             await ctx.CreateResponseAsync(
-                $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Volume must be greater than 0, and less than or equal to 1000.");
+                $"{Program.cube} Volume must be greater than 0, and less than or equal to 1000.");
             return;
         }
 
         await GuildMusic.SetVolumeAsync((int)volume);
-        await ctx.CreateResponseAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Volume set to {volume}%.");
+        await ctx.CreateResponseAsync($"{Program.cube} Volume set to {volume}%.");
     }
 
     [SlashCommand("volume", "Gets playback volume.")]
     public async Task GetVolumeAsync(InteractionContext ctx) {
-        await ctx.CreateResponseAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} Volume is {GuildMusic.volume}%.");
+        await ctx.CreateResponseAsync($"{Program.cube} Volume is {GuildMusic.volume}%.");
     }
 
     [SlashCommand("restart", "Restarts the playback of the current track.")]
@@ -179,7 +179,7 @@ public class MusicModuleSlash : ApplicationCommandModule {
         var track = GuildMusic.queue.NowPlaying.track;
         await GuildMusic.queue.RestartAsync();
         await ctx.CreateResponseAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} restarted.");
+            $"{Program.cube} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} restarted.");
     }
 
     [SlashCommand("remove", "Removes a track from playback queue.")]
@@ -188,13 +188,13 @@ public class MusicModuleSlash : ApplicationCommandModule {
         long index) {
         var itemN = GuildMusic.queue.Remove((int)(index - 1));
         if (itemN == null) {
-            await ctx.CreateResponseAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} No such track.");
+            await ctx.CreateResponseAsync($"{Program.cube} No such track.");
             return;
         }
 
         var track = itemN;
         await ctx.CreateResponseAsync(
-            $"{DiscordEmoji.FromName(ctx.Client, ":cube:")} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} removed.");
+            $"{Program.cube} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} removed.");
     }
 
     [SlashCommand("queue", "Displays current playback queue.")]

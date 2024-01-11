@@ -36,6 +36,8 @@ class Program {
 
     public static DetectLanguageClient languageClient;
 
+    public static DiscordEmoji cube;
+
     public static bool lavalinkInit = false;
     public static bool hasSetup = false;
 
@@ -118,7 +120,7 @@ class Program {
         discord.MessageCreated += messageHandler;
         discord.MessagesBulkDeleted += messageDeleteHandler;
         discord.SessionCreated += (sender, _) => setup(sender, lavalink, lavalinkConfig);
-        discord.GuildDownloadCompleted += (sender, _) => setupB(sender, lavalink, lavalinkConfig);
+        //discord.GuildDownloadCompleted += (sender, _) => setupB(sender, lavalink, lavalinkConfig);
         discord.MessageDeleted += messageDeleteHandler;
         discord.GetCommandsNext().UnregisterConverter<TimeSpan>();
         discord.GetCommandsNext().RegisterConverter(new CustomTimeSpanConverter());
@@ -323,6 +325,8 @@ class Program {
         toxicity = new ToxicityHandler();
         wiltery = new WilteryHandler(Program.client);
         languageClient = new DetectLanguageClient(Constants.detectlanguagetoken);
+
+        cube = await (await client.GetGuildAsync(838843082110664756)).GetEmojiAsync(839202645734457384);
 
         hasSetup = true;
 

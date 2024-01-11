@@ -31,10 +31,10 @@ public class MusicCommon {
     }
 
     public async Task respond(CommandContext ctx, string response) {
-        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} {response}");
+        await ctx.RespondAsync($"{Program.cube} {response}");
     }
     
     public async Task modify(CommandContext ctx, DiscordMessage msg, string response) {
-        await msg.ModifyAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} {response}");
+        await msg.ModifyAsync($"{Program.cube} {response}");
     }
 }

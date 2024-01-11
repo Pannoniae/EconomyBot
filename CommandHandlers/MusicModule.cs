@@ -262,7 +262,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User && x.Channel == ctx.Channel,
             TimeSpan.FromMinutes(2));
         if (res.TimedOut || res.Result == null) {
-            await msg.ModifyAsync($"{DiscordEmoji.FromName(ctx.Client, ":cube:")} No choice was made.");
+            await msg.ModifyAsync($"{Program.cube} No choice was made.");
             return;
         }
 
