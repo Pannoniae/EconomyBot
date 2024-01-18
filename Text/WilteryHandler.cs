@@ -21,10 +21,13 @@ public class WilteryHandler {
     public WilteryHandler(DiscordClient client) {
         this.client = client;
 
-        messageHandlers.Add(new WordExceptionMessageHandler("ball", DiscordEmoji.FromName(client, ":chestnut:"),
-            "basket"));
+        messageHandlers.Add(new WordExceptionMessageHandler("balls", DiscordEmoji.FromName(client, ":chestnut:"), "basket"));
         messageHandlers.Add(new WordMessageHandler("hrt", "hurt"));
         messageHandlers.Add(new ResponseWordMessageHandler("anal", "Have fun getting HIV"));
+        messageHandlers.Add(new WordExceptionMessageHandler("nigga", "black man"));
+        messageHandlers.Add(new WordExceptionMessageHandler("nigger", "black man"));
+        messageHandlers.Add(new WordExceptionMessageHandler("porn", DiscordEmoji.FromName(client, ":underage:"), "18x"));
+        
     }
 
     public async Task sendWebhookToChannel(DiscordChannel channel, string message) {
