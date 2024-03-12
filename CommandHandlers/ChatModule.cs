@@ -1,7 +1,9 @@
-﻿using DSharpPlus;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
+﻿using System.Collections.Immutable;
+using DisCatSharp;
+using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+using DisCatSharp.Enums;
 using EconomyBot.CommandHandlers;
 
 namespace EconomyBot;
@@ -34,19 +36,15 @@ public class ChatModule : BaseCommandModule {
     [Command]
     [RequirePermissions(Permissions.ManageMessages)]
     public async Task purge(CommandContext ctx, int amt) {
-        var messages = new List<DiscordMessage>();
+        IReadOnlyList<DiscordMessage> messages = [];
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         // the library is stupid
         if (ctx.Message.Reference != null) {
             await Console.Out.WriteLineAsync("Purging from given message!");
-            await foreach (var message in ctx.Channel.GetMessagesBeforeAsync(ctx.Message.Reference.Message.Id, amt)) {
-                messages.Add(message);
-            }
+            messages = await ctx.Channel.GetMessagesBeforeAsync(ctx.Message.Reference.Message.Id, amt);
         }
         else {
-            await foreach (var message in ctx.Channel.GetMessagesAsync(amt)) {
-                messages.Add(message);
-            }
+            messages = await ctx.Channel.GetMessagesAsync(amt);
         }
 
         if (ctx.Channel.Id != Program.LOG) {
@@ -82,14 +80,14 @@ public class ChatModule : BaseCommandModule {
 
     [Command]
     public async Task save(CommandContext ctx) {
-        var names = (await ctx.Guild.GetAllMembersAsync().ToListAsync()).Select(member => member.ToString());
+        var names = (await ctx.Guild.GetAllMembersAsync()).Select(member => member.ToString());
         await File.WriteAllLinesAsync(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/names.txt",
             names);
     }
 
     [Command("bishop")]
     public async Task saveBishop(CommandContext ctx) {
-        var messages = (await ctx.Channel.GetMessagesAsync(2000).ToListAsync())
+        var messages = (await ctx.Channel.GetMessagesAsync(2000))
             .Where(msg => msg.Author.Id == 540265036141297676)
             .Select(msg => msg.Content);
         await File.WriteAllLinesAsync(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/bishop.txt",

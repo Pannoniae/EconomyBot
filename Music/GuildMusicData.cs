@@ -1,6 +1,12 @@
 ﻿using System.Runtime.InteropServices;
-using DSharpPlus.Entities;
-using DSharpPlus.Lavalink;
+using DisCatSharp;
+using DisCatSharp.Entities;
+using DisCatSharp.Lavalink;
+using DisCatSharp.Lavalink.Entities;
+using DisCatSharp.Lavalink.Entities.Filters;
+using DisCatSharp.Lavalink.Enums;
+using DisCatSharp.Lavalink.Enums.Filters;
+using DisCatSharp.Lavalink.EventArgs;
 using EconomyBot.Logging;
 using SpotifyAPI.Web;
 
@@ -33,9 +39,9 @@ public sealed class GuildMusicData {
 
     private DiscordGuild Guild { get; }
     private LavalinkExtension Lavalink { get; }
-    public LavalinkGuildConnection? Player { get; private set; }
+    public LavalinkGuildPlayer? Player { get; private set; }
 
-    public LavalinkNodeConnection Node { get; }
+    public LavalinkSession Node { get; }
 
     // TODO implement a *proper* music weighting system
 
@@ -72,7 +78,7 @@ public sealed class GuildMusicData {
     /// Gets the actual volume to set.
     /// </summary>
     public int effectiveVolume =>
-        (int)(volume * (artistMappings.GetValueOrDefault(queue.NowPlaying?.artist ?? "missing")?.volume ?? 1));
+        (int)(volume * artistVolume);
 
     public double artistVolume => artistMappings.GetValueOrDefault(queue.NowPlaying?.artist ?? "missing")?.volume ?? 1;
 
@@ -82,7 +88,7 @@ public sealed class GuildMusicData {
     /// <param name="guild">Guild to track data for.</param>
     /// <param name="lavalink">Lavalink service.</param>
     /// <param name="node">The Lavalink node this guild is connected to.</param>
-    public GuildMusicData(DiscordGuild guild, LavalinkExtension lavalink, LavalinkNodeConnection node) {
+    public GuildMusicData(DiscordGuild guild, LavalinkExtension lavalink, LavalinkSession node) {
         // setup paths by OS
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
             rootPath = "/snd/music";
@@ -112,6 +118,7 @@ public sealed class GuildMusicData {
             catch (DirectoryNotFoundException e) {
                 fCount = 0;
             }
+
             artistWeights[artist.Key] = fCount * artist.Value.weight;
         }
 
@@ -180,7 +187,7 @@ public sealed class GuildMusicData {
         if (!relative)
             await Player.SeekAsync(target);
         else
-            await Player.SeekAsync(Player.CurrentState.PlaybackPosition + target);
+            await Player.SeekAsync(Player.TrackPosition + target);
     }
 
     /// <summary>
@@ -200,8 +207,18 @@ public sealed class GuildMusicData {
             enableEQ();
         }
 
-        Player.PlaybackFinished += (con, e) => queue.Player_PlaybackFinished(con, e);
-        Player.PlaybackStarted += (sender, e) => queue.Player_PlaybackStarted(sender, e);
+        Player.TrackEnded += (con, e) => queue.Player_PlaybackFinished(con, e);
+        Player.TrackStarted += (sender, e) => queue.Player_PlaybackStarted(sender, e);
+        Player.TrackException += Lavalink_TrackExceptionThrown;
+    }
+
+    private async Task Lavalink_TrackExceptionThrown(LavalinkGuildPlayer con, LavalinkTrackExceptionEventArgs e) {
+        if (e.Guild is null) {
+            return;
+        }
+
+        await CommandChannel.SendMessageAsync(
+            $"{DiscordEmoji.FromName(Program.client, ":pinkpill:")} A problem occured while playing {Formatter.Sanitize(e.Track.Info.Title).Bold()} by {Formatter.Sanitize(e.Track.Info.Author).Bold()}:\n{e.Exception}");
     }
 
     /// <summary>
@@ -223,7 +240,7 @@ public sealed class GuildMusicData {
     /// </summary>
     /// <returns>Position in the track.</returns>
     public TimeSpan GetCurrentPosition() {
-        return queue.NowPlaying == default ? TimeSpan.Zero : Player.CurrentState.PlaybackPosition;
+        return queue.NowPlaying == default ? TimeSpan.Zero : Player.TrackPosition;
     }
 
 
@@ -262,42 +279,42 @@ public sealed class GuildMusicData {
             track = secondRequest.Items[0];
         }
 
-        var trackLoad = await Node.Rest.GetTracksAsync(result.Name + " " + track.Name);
-        var tracks = trackLoad.Tracks;
-        if (trackLoad.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks.Any()) {
+        var trackLoad = await Node.LoadTracksAsync(result.Name + " " + track.Name);
+        var tracks = trackLoad.Result;
+        if (trackLoad.LoadType == LavalinkLoadResultType.Error || trackLoad.LoadType == LavalinkLoadResultType.Track && (LavalinkTrack)tracks == null) {
             logger.error("Error loading random track");
         }
 
-        queue.Enqueue(tracks.First(), artist);
+        queue.Enqueue((LavalinkTrack)tracks, artist);
     }
 
-    public async Task<IEnumerable<LavalinkLoadResult>> getJazz(string searchTerm) {
+    public async Task<IEnumerable<LavalinkTrackLoadingResult>> getJazz(string searchTerm) {
         return artistMappings.Where(artist => Path.Exists(getPath(artist.Value.path))).SelectMany(
                 artist => Directory.GetFiles(getPath(artist.Value.path), searchTerm,
                     new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive }))
-            .Select(file => new FileInfo(file))
-            .Select(file => getTracksAsync(Node.Rest, file).Result);
+            .Select(file => getTracksAsync(Node, file).Result);
     }
 
-    public static async Task<LavalinkLoadResult> getTracksAsync(LavalinkRestClient client, FileInfo file) {
-        var tracks = await client.GetTracksAsync(file);
+    public static async Task<LavalinkTrackLoadingResult> getTracksAsync(LavalinkSession client, string file) {
+        var tracks = await client.LoadTracksAsync(file);
 
-        // This is a typical example of bad cargo-cult programming. I am leaving it in because it doesn't matter,
+        //var result = tracks.Result as LavalinkTrack;
+        /*// This is a typical example of bad cargo-cult programming. I am leaving it in because it doesn't matter,
         // but this is how programs get slow.
         // The naive programmer would think that filtering with where is cheap.
         // The naive programmer doesn't think about the fact that it traverses the entire array or list.
         // Instead of converting it to a proper imperative loop, writing a helper for concatenating the two conditions,
         // or using a better language, we just copypaste the loop and hope for the best.
-        foreach (var track in tracks.Tracks.Where(track => track.Title == "Unknown title")) {
+        if (result.Info.Title == "Unknown title") {
             track.GetType().GetProperty("Title")!.SetValue(track, Path.GetFileNameWithoutExtension(file.Name));
         }
 
-        foreach (var track in tracks.Tracks.Where(track => track.Author == "Unknown artist")) {
+        if (result.Info.Author == "Unknown artist") {
             // Not to mention that we are literally reflecting the Track object because the stupid authors thought
             // their autodetection was infallible thus they haven't provided a way to properly set the track's name which will be displayed.
             // The end-user is probably not very delighted at seeing "unknown author" or "unknown title" so we make a best-effort guess here.
             track.GetType().GetProperty("Author")!.SetValue(track, file.Directory!.Name);
-        }
+        }*/
 
         return tracks;
     }
@@ -305,28 +322,32 @@ public sealed class GuildMusicData {
     public void enableEQ() {
         eq = true;
         logger.info("Enabled EQ");
-        Player.AdjustEqualizerAsync(
-            new LavalinkBandAdjustment(0, 0.2f),
-            new LavalinkBandAdjustment(1, 0.2f),
-            new LavalinkBandAdjustment(2, 0.2f),
-            new LavalinkBandAdjustment(3, 0.2f),
-            new LavalinkBandAdjustment(4, 0.15f),
-            new LavalinkBandAdjustment(5, 0.12f),
-            new LavalinkBandAdjustment(6, 0.10f),
-            new LavalinkBandAdjustment(7, 0.05f),
-            new LavalinkBandAdjustment(8, 0.00f),
-            new LavalinkBandAdjustment(9, 0.00f),
-            new LavalinkBandAdjustment(10, -0.02f),
-            new LavalinkBandAdjustment(11, -0.02f),
-            new LavalinkBandAdjustment(12, -0.03f),
-            new LavalinkBandAdjustment(13, -0.04f),
-            new LavalinkBandAdjustment(14, -0.05f));
+        Player.UpdateAsync(action => action.Filters = new LavalinkFilters {
+                Equalizers = new List<LavalinkEqualizer> {
+                    new((LavalinkFilterBand)0, 0.2f),
+                    new((LavalinkFilterBand)1, 0.2f),
+                    new((LavalinkFilterBand)2, 0.2f),
+                    new((LavalinkFilterBand)3, 0.2f),
+                    new((LavalinkFilterBand)4, 0.15f),
+                    new((LavalinkFilterBand)5, 0.12f),
+                    new((LavalinkFilterBand)6, 0.10f),
+                    new((LavalinkFilterBand)7, 0.05f),
+                    new((LavalinkFilterBand)8, 0.00f),
+                    new((LavalinkFilterBand)9, 0.00f),
+                    new((LavalinkFilterBand)10, -0.02f),
+                    new((LavalinkFilterBand)11, -0.02f),
+                    new((LavalinkFilterBand)12, -0.03f),
+                    new((LavalinkFilterBand)13, -0.04f),
+                    new((LavalinkFilterBand)14, -0.05f)
+                }
+            }
+        );
     }
 
     public void disableEQ() {
         eq = false;
         logger.info("Disabled EQ");
-        Player.ResetEqualizerAsync();
+        Player.UpdateAsync(action => action.Filters = null!);
     }
 
     public void toggleEQ() {

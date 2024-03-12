@@ -2,8 +2,8 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Web;
-using DSharpPlus;
-using DSharpPlus.Entities;
+using DisCatSharp;
+using DisCatSharp.Entities;
 using EconomyBot.Logging;
 using Newtonsoft.Json.Linq;
 

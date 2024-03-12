@@ -1,15 +1,18 @@
-﻿using DSharpPlus;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
-using DSharpPlus.Interactivity.Enums;
-using DSharpPlus.Interactivity.Extensions;
-using DSharpPlus.SlashCommands;
+﻿using DisCatSharp;
+using DisCatSharp.Entities;
+using DisCatSharp.Interactivity;
+using DisCatSharp.Interactivity.Enums;
+using DisCatSharp.Interactivity.Extensions;
+using DisCatSharp.ApplicationCommands;
+using DisCatSharp.ApplicationCommands.Attributes;
+using DisCatSharp.ApplicationCommands.Context;
+using DisCatSharp.ApplicationCommands.Enums;
+using DisCatSharp.Enums;
 
 namespace EconomyBot;
 
-[SlashModuleLifespan(SlashModuleLifespan.Singleton)]
-public class MusicModuleSlash : ApplicationCommandModule {
-
+[ApplicationCommandModuleLifespan(ApplicationCommandModuleLifespan.Singleton)]
+public class MusicModuleSlash : ApplicationCommandsModule {
     private MusicService Music { get; }
     private YouTubeSearchProvider YouTube { get; }
 
@@ -35,14 +38,14 @@ public class MusicModuleSlash : ApplicationCommandModule {
 
         var chn = getChannel(ctx);
         if (chn == null) {
-            await ctx.CreateResponseAsync(
+            await CreateResponseAsync(ctx,
                 $"{Program.cube} You need to be in a voice channel.");
             throw new IdiotException("user error");
         }
 
         var mbr = ctx.Guild.CurrentMember?.VoiceState?.Channel;
         if (mbr != null && chn != mbr) {
-            await ctx.CreateResponseAsync(
+            await CreateResponseAsync(ctx,
                 $"{Program.cube} You need to be in the same voice channel.");
             throw new IdiotException("user error");
         }
@@ -53,12 +56,16 @@ public class MusicModuleSlash : ApplicationCommandModule {
         return true;
     }
 
+    private async Task CreateResponseAsync(InteractionContext ctx, string text) {
+        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(text));
+    }
+
     [SlashCommand("join", "Joins the voice channel.")]
     public async Task JoinAsync(InteractionContext ctx) {
         // yeet the bot in 
         var chn = getChannel(ctx);
         await GuildMusic.CreatePlayerAsync(chn);
-        await ctx.CreateResponseAsync($"{Program.cube} Joined the channel.");
+        await CreateResponseAsync(ctx,$"{Program.cube} Joined the channel.");
     }
 
     [SlashCommand("jazz", "Plays some jazz. :3")]
@@ -70,7 +77,7 @@ public class MusicModuleSlash : ApplicationCommandModule {
         var chn = vs.Channel;
         await GuildMusic.CreatePlayerAsync(chn);
         await GuildMusic.queue.PlayAsync();
-        await ctx.CreateResponseAsync($"{Program.cube} Started playing jazz.");
+        await CreateResponseAsync(ctx,$"{Program.cube} Started playing jazz.");
     }
 
     [SlashCommand("stopjazz", "Stops jazz.")]
@@ -78,7 +85,7 @@ public class MusicModuleSlash : ApplicationCommandModule {
         GuildMusic.queue.clearQueue();
         GuildMusic.queue.EmptyQueue();
         await GuildMusic.queue.StopAsync();
-        await ctx.CreateResponseAsync($"{Program.cube} Stopped jazz.");
+        await CreateResponseAsync(ctx,$"{Program.cube} Stopped jazz.");
     }
 
     [SlashCommand("stop", "Stops playback and quits the voice channel.")]
@@ -87,7 +94,7 @@ public class MusicModuleSlash : ApplicationCommandModule {
         await GuildMusic.queue.StopAsync();
         await GuildMusic.DestroyPlayerAsync();
 
-        await ctx.CreateResponseAsync(
+        await CreateResponseAsync(ctx,
             $"{Program.cube} Removed {rmd:#,##0} tracks from the queue.");
     }
 
@@ -95,29 +102,29 @@ public class MusicModuleSlash : ApplicationCommandModule {
     public async Task ClearAsync(InteractionContext ctx) {
         int rmd = GuildMusic.queue.EmptyQueue();
 
-        await ctx.CreateResponseAsync(
+        await CreateResponseAsync(ctx,
             $"{Program.cube} Removed {rmd:#,##0} tracks from the queue uwu");
     }
 
     [SlashCommand("pause", "Pauses playback.")]
     public async Task PauseAsync(InteractionContext ctx) {
         await GuildMusic.PauseAsync();
-        await ctx.CreateResponseAsync(
+        await CreateResponseAsync(ctx,
             $"{Program.cube} Playback paused. Use {Formatter.InlineCode($"/resume")} to resume playback.");
     }
 
     [SlashCommand("resume", "Resumes playback.")]
     public async Task ResumeAsync(InteractionContext ctx) {
         await GuildMusic.ResumeAsync();
-        await ctx.CreateResponseAsync($"{Program.cube} Playback resumed.");
+        await CreateResponseAsync(ctx,$"{Program.cube} Playback resumed.");
     }
 
     [SlashCommand("skip", "Skips current track.")]
     public async Task SkipAsync(InteractionContext ctx) {
         var track = GuildMusic.queue.NowPlaying.track;
         await GuildMusic.queue.StopAsync();
-        await ctx.CreateResponseAsync(
-            $"{Program.cube} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
+        await CreateResponseAsync(ctx,
+            $"{Program.cube} {track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} skipped.");
     }
 
     [SlashCommand("skipnum", "Skips current track.")]
@@ -125,8 +132,8 @@ public class MusicModuleSlash : ApplicationCommandModule {
         for (int i = 0; i < num; i++) {
             var track = GuildMusic.queue.NowPlaying.track;
             await GuildMusic.queue.StopAsync();
-            await ctx.CreateResponseAsync(
-                $"{Program.cube} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
+            await CreateResponseAsync(ctx,
+                $"{Program.cube} {track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} skipped.");
             await Task.Delay(500); // wait for the next one
         }
     }
@@ -160,26 +167,26 @@ public class MusicModuleSlash : ApplicationCommandModule {
         [Option("volume", "Volume to set. Can be 0-150. Default 100.")]
         long volume) {
         if (volume is < 0 or > 1000) {
-            await ctx.CreateResponseAsync(
+            await CreateResponseAsync(ctx,
                 $"{Program.cube} Volume must be greater than 0, and less than or equal to 1000.");
             return;
         }
 
         await GuildMusic.SetVolumeAsync((int)volume);
-        await ctx.CreateResponseAsync($"{Program.cube} Volume set to {volume}%.");
+        await CreateResponseAsync(ctx,$"{Program.cube} Volume set to {volume}%.");
     }
 
     [SlashCommand("volume", "Gets playback volume.")]
     public async Task GetVolumeAsync(InteractionContext ctx) {
-        await ctx.CreateResponseAsync($"{Program.cube} Volume is {GuildMusic.volume}%.");
+        await CreateResponseAsync(ctx,$"{Program.cube} Volume is {GuildMusic.volume}%.");
     }
 
     [SlashCommand("restart", "Restarts the playback of the current track.")]
     public async Task RestartAsync(InteractionContext ctx) {
         var track = GuildMusic.queue.NowPlaying.track;
         await GuildMusic.queue.RestartAsync();
-        await ctx.CreateResponseAsync(
-            $"{Program.cube} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} restarted.");
+        await CreateResponseAsync(ctx,
+            $"{Program.cube} {Formatter.Bold(Formatter.Sanitize(track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Info.Author))} restarted.");
     }
 
     [SlashCommand("remove", "Removes a track from playback queue.")]
@@ -188,13 +195,13 @@ public class MusicModuleSlash : ApplicationCommandModule {
         long index) {
         var itemN = GuildMusic.queue.Remove((int)(index - 1));
         if (itemN == null) {
-            await ctx.CreateResponseAsync($"{Program.cube} No such track.");
+            await CreateResponseAsync(ctx,$"{Program.cube} No such track.");
             return;
         }
 
         var track = itemN;
-        await ctx.CreateResponseAsync(
-            $"{Program.cube} {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} removed.");
+        await CreateResponseAsync(ctx,
+            $"{Program.cube} {Formatter.Bold(Formatter.Sanitize(track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Info.Author))} removed.");
     }
 
     [SlashCommand("queue", "Displays current playback queue.")]
@@ -213,10 +220,10 @@ public class MusicModuleSlash : ApplicationCommandModule {
 
         var trk = GuildMusic.queue.NowPlaying;
         if (!pages.Any()) {
-            if (trk?.track.TrackString == null)
-                await ctx.CreateResponseAsync("Queue is empty!");
+            if (trk?.track.Info.Identifier == null)
+                await CreateResponseAsync(ctx, "Queue is empty!");
             else
-                await ctx.CreateResponseAsync($"Now playing: {GuildMusic.queue.NowPlaying?.track.ToTrackString()}");
+                await CreateResponseAsync(ctx, $"Now playing: {GuildMusic.queue.NowPlaying?.track.ToTrackString()}");
 
             return;
         }
@@ -235,18 +242,18 @@ public class MusicModuleSlash : ApplicationCommandModule {
     [SlashCommand("nowplaying", "Displays information about currently-played track.")]
     public async Task NowPlayingAsync(InteractionContext ctx) {
         var track = GuildMusic.queue.NowPlaying;
-        if (GuildMusic.queue.NowPlaying?.track.TrackString == null) {
-            await ctx.CreateResponseAsync("Not playing.");
+        if (GuildMusic.queue.NowPlaying?.track.Info.Identifier == null) {
+            await CreateResponseAsync(ctx, "Not playing.");
         }
         else {
-            await ctx.CreateResponseAsync(
-                $"Now playing: {Formatter.Bold(Formatter.Sanitize(track.track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.track.Author))} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{GuildMusic.queue.NowPlaying.track.Length.ToDurationString()}].");
+            await CreateResponseAsync(ctx, 
+                $"Now playing: {Formatter.Bold(Formatter.Sanitize(track.track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.track.Info.Author))} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{GuildMusic.queue.NowPlaying.track.Info.Length.ToDurationString()}].");
         }
     }
 
     [SlashCommand("playerinfo", "Displays information about current player.")]
     public async Task PlayerInfoAsync(InteractionContext ctx) {
-        await ctx.CreateResponseAsync(
+        await CreateResponseAsync(ctx, 
             $"Queue length: {GuildMusic.queue.Queue.Count}\nVolume: {GuildMusic.volume}%");
     }
 }

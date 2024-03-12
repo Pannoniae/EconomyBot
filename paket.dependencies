@@ -5,12 +5,13 @@ source https://api.nuget.org/v3/index.json
 storage: none
 nuget BooruSharp prerelease
 nuget DetectLanguage prerelease
-nuget DSharpPlus 5.0.0-nightly-01930 prerelease
-nuget DSharpPlus.CommandsNext 5.0.0-nightly-01930 prerelease
-nuget DSharpPlus.Interactivity 5.0.0-nightly-01930 prerelease
-nuget DSharpPlus.Lavalink 5.0.0-nightly-01930 prerelease
-nuget DSharpPlus.SlashCommands 5.0.0-nightly-01930 prerelease
-nuget DSharpPlus.VoiceNext 5.0.0-nightly-01930 prerelease
+nuget DisCatSharp 10.6.2-nightly-012 prerelease
+nuget DisCatSharp.Analyzer.Roselyn 6.2.2
+nuget DisCatSharp.CommandsNext 10.6.2-nightly-012 prerelease
+nuget DisCatSharp.Interactivity 10.6.2-nightly-012 prerelease
+nuget DisCatSharp.Lavalink 10.6.2-nightly-012 prerelease
+nuget DisCatSharp.ApplicationCommands 10.6.2-nightly-012 prerelease
+nuget DisCatSharp.VoiceNext 10.6.2-nightly-012 prerelease
 nuget FuzzierSharp prerelease
 nuget JetBrains.Annotations prerelease
 nuget Newtonsoft.Json prerelease

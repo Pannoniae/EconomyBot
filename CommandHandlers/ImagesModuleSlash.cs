@@ -1,19 +1,30 @@
-﻿using DSharpPlus;
-using DSharpPlus.Entities;
-using DSharpPlus.SlashCommands;
+﻿using DisCatSharp;
+using DisCatSharp.Entities;
+using DisCatSharp.ApplicationCommands;
+using DisCatSharp.ApplicationCommands.Attributes;
+using DisCatSharp.ApplicationCommands.Context;
+using DisCatSharp.Enums;
 using Newtonsoft.Json.Linq;
 
 namespace EconomyBot;
 
-public class ImagesModuleSlash : ApplicationCommandModule {
+public class ImagesModuleSlash : ApplicationCommandsModule {
+
+
     private readonly HttpClient client = new();
+
+    private async Task CreateResponseAsync(InteractionContext ctx, string text) {
+        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(text));
+    }
+
+
     [SlashCommand("img", "Fetch a wholesome image.")]
     public async Task img(InteractionContext ctx, [Option("reddit", "Ignore this option.")] string reddit = "no") {
         if (reddit == "reddit") {
             var imgProvider = new RedditImageProvider();
             var yuri = await imgProvider.getImageFromSub("yuri");
             if (yuri == "penis") {
-                await ctx.CreateResponseAsync("The bot is currently cuddling, sorry.^^");
+                await CreateResponseAsync(ctx, "The bot is currently cuddling, sorry.^^");
                 return;
             }
 
@@ -23,7 +34,7 @@ public class ImagesModuleSlash : ApplicationCommandModule {
             var imgProvider = new BooruImageProvider();
             var yuri = await imgProvider.getRandomYuri();
             if (yuri == "penis") {
-                await ctx.CreateResponseAsync("The bot is currently cuddling, sorry.^^");
+                await CreateResponseAsync(ctx, "The bot is currently cuddling, sorry.^^");
                 return;
             }
 
@@ -36,7 +47,7 @@ public class ImagesModuleSlash : ApplicationCommandModule {
         await Console.Out.WriteLineAsync($"URL: {url}");
         var messageBuilder = new DiscordInteractionResponseBuilder().AddEmbed(new DiscordEmbedBuilder()
             .WithColor(DiscordColor.Rose).WithDescription(title).WithImageUrl(url));
-        await ctx.CreateResponseAsync(messageBuilder);
+        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, messageBuilder);
     }
     
     [SlashCommand("randomxkcd", "Gets a random XKCD.")]
@@ -49,7 +60,7 @@ public class ImagesModuleSlash : ApplicationCommandModule {
             num = latestComicJson["num"].Value<int>();
         }
         catch (Exception e) {
-            await ctx.CreateResponseAsync("Failed to get XKCD.");
+            await CreateResponseAsync(ctx, "Failed to get XKCD.");
             await Console.Out.WriteLineAsync(e.ToString());
             return;
         }
@@ -65,14 +76,14 @@ public class ImagesModuleSlash : ApplicationCommandModule {
             url = randomComicJson["img"].Value<string>();
         }
         catch (Exception e) {
-            await ctx.CreateResponseAsync("Failed to get XKCD.");
+            await CreateResponseAsync(ctx, "Failed to get XKCD.");
             await Console.Out.WriteLineAsync(e.ToString());
             return;
         }
 
 
         var embed = new DiscordEmbedBuilder().WithTitle(title).WithColor(DiscordColor.Purple).WithImageUrl(url).WithDescription($"XKCD #{randomXKCD}");
-        await ctx.CreateResponseAsync(embed);
+        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(embed));
     }
     
     [SlashCommand("xkcd", "Gets a specific XKCD.")]
@@ -89,7 +100,7 @@ public class ImagesModuleSlash : ApplicationCommandModule {
             alt = randomComicJson["alt"].Value<string>();
         }
         catch (Exception e) {
-            await ctx.CreateResponseAsync("Failed to get XKCD.");
+            await CreateResponseAsync(ctx, "Failed to get XKCD.");
             await Console.Out.WriteLineAsync(e.ToString());
             return;
         } 
@@ -103,6 +114,6 @@ public class ImagesModuleSlash : ApplicationCommandModule {
                 + Environment.NewLine
                 + alt);
     
-        await ctx.CreateResponseAsync(embed);
+        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(embed));
     }
 }

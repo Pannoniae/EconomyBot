@@ -1,8 +1,9 @@
 ﻿using System.Collections.Concurrent;
-using DSharpPlus;
-using DSharpPlus.Entities;
-using DSharpPlus.Lavalink;
-using DSharpPlus.Lavalink.EventArgs;
+using DisCatSharp;
+using DisCatSharp.Entities;
+using DisCatSharp.Lavalink;
+using DisCatSharp.Lavalink.Entities;
+using DisCatSharp.Lavalink.EventArgs;
 
 namespace EconomyBot;
 
@@ -14,24 +15,22 @@ public sealed class MusicService {
     private ConcurrentDictionary<ulong, GuildMusicData> MusicData;
     private readonly DiscordClient client;
 
-    private LavalinkNodeConnection node { get; }
+    private LavalinkSession node { get; }
 
     /// <summary>
     /// Creates a new instance of this music service.
     /// </summary>
-    public MusicService(LavalinkExtension lavalink, LavalinkNodeConnection theNode) {
+    public MusicService(LavalinkExtension lavalink, LavalinkSession theNode) {
         Lavalink = lavalink;
         MusicData = new ConcurrentDictionary<ulong, GuildMusicData>();
         client = lavalink.Client;
         node = theNode;
 
-        node.TrackException += Lavalink_TrackExceptionThrown;
-
-        async Task playbackStarted(LavalinkGuildConnection con, TrackStartEventArgs e) {
-            await Console.Out.WriteLineAsync($"len/nodes: {lavalink.ConnectedNodes.Count}");
+        async Task playbackStarted(LavalinkSession sender, LavalinkStatsReceivedEventArgs e) {
+            await Console.Out.WriteLineAsync($"len/nodes: {e.Statistics.Players}");
         }
 
-        node.PlaybackStarted += playbackStarted;
+        node.StatsReceived += playbackStarted;
     }
 
     /// <summary>
@@ -65,20 +64,9 @@ public sealed class MusicService {
     /// </summary>
     /// <param name="uri">URL to load tracks from.</param>
     /// <returns>Loaded tracks.</returns>
-    public Task<LavalinkLoadResult> GetTracksAsync(Uri uri)
-        => node.Rest.GetTracksAsync(uri);
+    public Task<LavalinkTrackLoadingResult> GetTracksAsync(Uri uri)
+        => node.LoadTracksAsync(uri.ToString());
 
-    public Task<LavalinkLoadResult> GetTracksAsync(string search)
-        => node.Rest.GetTracksAsync(search);
-
-    private async Task Lavalink_TrackExceptionThrown(LavalinkGuildConnection con, TrackExceptionEventArgs e) {
-        if (e.Player?.Guild is null)
-            return;
-
-        if (!MusicData.TryGetValue(e.Player.Guild.Id, out var gmd))
-            return;
-
-        await gmd.CommandChannel.SendMessageAsync(
-            $"{DiscordEmoji.FromName(client, ":pinkpill:")} A problem occured while playing {Formatter.Bold(Formatter.Sanitize(e.Track.Title))} by {Formatter.Bold(Formatter.Sanitize(e.Track.Author))}:\n{e.Error}");
-    }
+    public Task<LavalinkTrackLoadingResult> GetTracksAsync(string search)
+        => node.LoadTracksAsync(search);
 }

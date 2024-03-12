@@ -1,10 +1,11 @@
 BooruSharp
 DetectLanguage
-DSharpPlus.CommandsNext
-DSharpPlus.Interactivity
-DSharpPlus.Lavalink
-DSharpPlus.SlashCommands
-DSharpPlus.VoiceNext
+DisCatSharp
+DisCatSharp.CommandsNext
+DisCatSharp.Interactivity
+DisCatSharp.Lavalink
+DisCatSharp.ApplicationCommands
+DisCatSharp.VoiceNext
 FuzzierSharp
 JetBrains.Annotations
 Reddit

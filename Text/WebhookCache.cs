@@ -1,5 +1,6 @@
-﻿using DSharpPlus;
-using DSharpPlus.Entities;
+﻿using DisCatSharp;
+using DisCatSharp.Entities;
+using DisCatSharp.Enums;
 
 namespace EconomyBot;
 

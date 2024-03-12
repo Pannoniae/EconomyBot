@@ -1,5 +1,5 @@
-﻿using DSharpPlus;
-using DSharpPlus.Entities;
+﻿using DisCatSharp;
+using DisCatSharp.Entities;
 using EconomyBot.Logging;
 
 namespace EconomyBot;
@@ -35,7 +35,7 @@ public class WilteryHandler {
         if (channel.Id != webhook.ChannelId) {
             await webhook.ExecuteAsync(new DiscordWebhookBuilder {
                 Content = message,
-                ThreadId = channel.Id
+                ThreadName = channel.Name
             });
             return;
         }
@@ -47,7 +47,7 @@ public class WilteryHandler {
 
     public async Task sendWebhookToChannelAsUser(DiscordChannel channel, string message, DiscordMember user) {
         await sendWebhookToChannelWithCustomUser(channel, new DiscordMessageBuilder().WithContent(message),
-            user.GetGuildAvatarUrl(ImageFormat.Auto), user.DisplayName);
+            user.GuildAvatarUrl, user.DisplayName);
     }
 
     public async Task sendWebhookToChannelWithCustomUser(DiscordChannel channel, DiscordMessageBuilder message,
@@ -60,7 +60,7 @@ public class WilteryHandler {
         if (channel.Id != webhook.ChannelId) {
             await webhook.ExecuteAsync(new DiscordWebhookBuilder {
                 Content = message.Content,
-                ThreadId = channel.Id,
+                ThreadName = channel.Name,
                 AvatarUrl = new Optional<string>(avatarURL),
                 Username = new Optional<string>(username)
             }.AddEmbeds(message.Embeds));

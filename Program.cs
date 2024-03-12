@@ -2,21 +2,20 @@
 using System.Net;
 using System.Text.RegularExpressions;
 using DetectLanguage;
-using DSharpPlus;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Converters;
-using DSharpPlus.CommandsNext.Exceptions;
-using DSharpPlus.Entities;
-using DSharpPlus.Entities.AuditLogs;
-using DSharpPlus.EventArgs;
-using DSharpPlus.Exceptions;
-using DSharpPlus.Interactivity;
-using DSharpPlus.Interactivity.Enums;
-using DSharpPlus.Interactivity.Extensions;
-using DSharpPlus.Lavalink;
-using DSharpPlus.Net;
-using DSharpPlus.SlashCommands;
-using EconomyBot.CommandHandlers;
+using DisCatSharp;
+using DisCatSharp.ApplicationCommands;
+using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Converters;
+using DisCatSharp.CommandsNext.Exceptions;
+using DisCatSharp.Entities;
+using DisCatSharp.Enums;
+using DisCatSharp.EventArgs;
+using DisCatSharp.Exceptions;
+using DisCatSharp.Interactivity;
+using DisCatSharp.Interactivity.Enums;
+using DisCatSharp.Interactivity.Extensions;
+using DisCatSharp.Lavalink;
+using DisCatSharp.Net;
 using EconomyBot.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;
@@ -28,7 +27,7 @@ class Program {
 
     private static readonly Logger logger = Logger.getClassLogger("Main");
 
-    public static LavalinkNodeConnection LavalinkNode;
+    public static LavalinkSession LavalinkNode;
     public static MusicService musicService;
     public static ImagesModule imagesModule;
     public static ToxicityHandler toxicity;
@@ -71,7 +70,7 @@ class Program {
         });
         client = discord;
 
-        // error handling   
+        // error handling
 
         var endpoint = new ConnectionEndpoint {
             Hostname = "127.0.0.1", // From your server configuration.
@@ -88,18 +87,18 @@ class Program {
             .BuildServiceProvider(true);
         var lavalink = discord.UseLavalink();
         var commands = discord.UseCommandsNext(new CommandsNextConfiguration {
-            StringPrefixes = new[] {
+            StringPrefixes = new List<string>(new[] {
                 "."
-            },
-            Services = services
+            }),
+            ServiceProvider = services
         });
-        var slashCommands = discord.UseSlashCommands(new SlashCommandsConfiguration {
-            Services = services
+        var ApplicationCommands = discord.UseApplicationCommands(new ApplicationCommandsConfiguration {
+            ServiceProvider = services
         });
         try {
-            //slashCommands.RegisterCommands<ChatModuleSlash>();
-            slashCommands.RegisterCommands<MusicModuleSlash>();
-            slashCommands.RegisterCommands<ImagesModuleSlash>();
+            //ApplicationCommands.RegisterCommands<ChatModuleSlash>();
+            ApplicationCommands.RegisterGlobalCommands<MusicModuleSlash>();
+            ApplicationCommands.RegisterGlobalCommands<ImagesModuleSlash>();
             commands.CommandErrored += errorHandler;
             commands.RegisterCommands<ChatModule>();
             commands.RegisterCommands<MusicModule>();
@@ -119,7 +118,7 @@ class Program {
         });
         discord.MessageCreated += messageHandler;
         discord.MessagesBulkDeleted += messageDeleteHandler;
-        discord.SessionCreated += (sender, _) => setup(sender, lavalink, lavalinkConfig);
+        discord.Ready += async (sender, _) => await setup(sender, lavalink, lavalinkConfig);
         //discord.GuildDownloadCompleted += (sender, _) => setupB(sender, lavalink, lavalinkConfig);
         discord.MessageDeleted += messageDeleteHandler;
         discord.GetCommandsNext().UnregisterConverter<TimeSpan>();
@@ -159,7 +158,7 @@ class Program {
                 foreach (var a in message.Attachments) {
                     var path = "";
                     try {
-                        path = Directory.GetCurrentDirectory() + a.FileName;
+                        path = Directory.GetCurrentDirectory() + a.Filename;
                         var ext = Path.GetExtension(path);
                         path += guid + ext;
                         //slap the correct extension on it
@@ -175,7 +174,7 @@ class Program {
 
                     var file = new FileStream(path, FileMode.Open);
                     await (await client.GetGuildAsync(838843082110664756)).GetChannel(LOG)
-                        .SendMessageAsync(new DiscordMessageBuilder().AddFile(file));
+                        .SendMessageAsync(new DiscordMessageBuilder().WithFile(file));
                 }
             });
         }
@@ -184,8 +183,7 @@ class Program {
             var server = await client.GetGuildAsync(838843082110664756);
             _ = Task.Run(async () => {
                 await Task.Delay(3000); // stupid discord doesnt update logs immediately
-                var logs = await server.GetAuditLogsAsync(10, actionType: DiscordAuditLogActionType.MessageDelete)
-                    .ToListAsync();
+                var logs = await server.GetAuditLogsAsync(10, actionType: AuditLogActionType.MessageDelete);
                 var deleter = logs.FirstOrDefault(log =>
                         log is DiscordAuditLogMessageEntry entry && entry.Target.Id == message.Id)?
                     .UserResponsible?.Username ?? "unknown";
@@ -421,13 +419,13 @@ public partial class CustomTimeSpanConverter : IArgumentConverter<TimeSpan> {
 
     public Task<Optional<TimeSpan>> ConvertAsync(string value, CommandContext ctx) {
         if (value == "0")
-            return Task.FromResult(DSharpPlus.Entities.Optional.FromValue(TimeSpan.Zero));
+            return Task.FromResult(Optional.FromNullable(TimeSpan.Zero));
         if (int.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result1))
-            return Task.FromResult(DSharpPlus.Entities.Optional.FromNoValue<TimeSpan>());
+            return Task.FromResult(Optional<TimeSpan>.None);
         if (TimeSpan.TryParse(value, CultureInfo.InvariantCulture, out var result2)) {
             var _result2 = new TimeSpan(0, result2.Hours, result2.Minutes); // slash from h:m to m:s
 
-            return Task.FromResult(DSharpPlus.Entities.Optional.FromValue(_result2));
+            return Task.FromResult(Optional.FromNullable(_result2));
         }
 
         var strArray1 = new[] {
@@ -438,7 +436,7 @@ public partial class CustomTimeSpanConverter : IArgumentConverter<TimeSpan> {
         };
         var match = TimeSpanRegex.Match(value);
         if (!match.Success)
-            return Task.FromResult(DSharpPlus.Entities.Optional.FromNoValue<TimeSpan>());
+            return Task.FromResult(Optional<TimeSpan>.None);
         var days = 0;
         var hours = 0;
         var minutes = 0;
@@ -470,6 +468,6 @@ public partial class CustomTimeSpanConverter : IArgumentConverter<TimeSpan> {
         }
 
         result2 = new TimeSpan(days, hours, minutes, seconds);
-        return Task.FromResult(DSharpPlus.Entities.Optional.FromValue(result2));
+        return Task.FromResult(Optional.FromNullable(result2));
     }
 }

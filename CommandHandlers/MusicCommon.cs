@@ -1,5 +1,5 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.Entities;
+﻿using DisCatSharp.CommandsNext;
+using DisCatSharp.Entities;
 
 namespace EconomyBot; 
 
