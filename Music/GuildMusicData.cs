@@ -199,7 +199,7 @@ public sealed class GuildMusicData {
             return;
         }
 
-        Player = await Node.ConnectAsync(channel);
+        Player = await Node.ConnectAsync(channel, false);
 
         await SetVolumeAsync(volume);
 
