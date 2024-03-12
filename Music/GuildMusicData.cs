@@ -298,23 +298,29 @@ public sealed class GuildMusicData {
     public static async Task<LavalinkTrackLoadingResult> getTracksAsync(LavalinkSession client, string file) {
         var tracks = await client.LoadTracksAsync(file);
 
-        //var result = tracks.Result as LavalinkTrack;
-        /*// This is a typical example of bad cargo-cult programming. I am leaving it in because it doesn't matter,
+        if (tracks.LoadType == LavalinkLoadResultType.Error) {
+            return tracks;
+        }
+
+        // if not error, fix the titles up
+
+        LavalinkTrack result = tracks.Result as LavalinkTrack ?? throw new InvalidOperationException();
+        // This is a typical example of bad cargo-cult programming. I am leaving it in because it doesn't matter,
         // but this is how programs get slow.
         // The naive programmer would think that filtering with where is cheap.
         // The naive programmer doesn't think about the fact that it traverses the entire array or list.
         // Instead of converting it to a proper imperative loop, writing a helper for concatenating the two conditions,
         // or using a better language, we just copypaste the loop and hope for the best.
         if (result.Info.Title == "Unknown title") {
-            track.GetType().GetProperty("Title")!.SetValue(track, Path.GetFileNameWithoutExtension(file.Name));
+            result.Info.GetType().GetProperty("Title")!.SetValue(result.Info, Path.GetFileNameWithoutExtension(file));
         }
 
         if (result.Info.Author == "Unknown artist") {
             // Not to mention that we are literally reflecting the Track object because the stupid authors thought
             // their autodetection was infallible thus they haven't provided a way to properly set the track's name which will be displayed.
             // The end-user is probably not very delighted at seeing "unknown author" or "unknown title" so we make a best-effort guess here.
-            track.GetType().GetProperty("Author")!.SetValue(track, file.Directory!.Name);
-        }*/
+            result.Info.GetType().GetProperty("Author")!.SetValue(result.Info, new FileInfo(file).Directory!.Name);
+        }
 
         return tracks;
     }
