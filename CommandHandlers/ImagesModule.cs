@@ -1,8 +1,8 @@
-﻿using DSharpPlus;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.Net.Serialization;
+﻿using DisCatSharp;
+using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+using DisCatSharp.Net.Serialization;
 using Newtonsoft.Json.Linq;
 
 namespace EconomyBot;
@@ -64,7 +64,7 @@ public class ImagesModule : BaseCommandModule {
         var url = responseJson["content_urls"]["desktop"]["page"].Value<string>();
 
         await ctx.RespondAsync(new DiscordEmbedBuilder().WithTitle(title).WithThumbnail(img)
-            .WithColor(DiscordColor.Rose).WithDescription(content).AddField("Link:", url).Build());
+            .WithColor(DiscordColor.Rose).WithDescription(content).AddField(new DiscordEmbedField("Link:", url)).Build());
     }
 
     [Command("xkcd"), Description("Gets a random XKCD.")]

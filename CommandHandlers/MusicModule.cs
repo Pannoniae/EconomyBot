@@ -1,16 +1,18 @@
 ﻿using System.Globalization;
 using System.Net;
 using System.Text;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
-using DSharpPlus.Interactivity.Enums;
-using DSharpPlus.Interactivity.Extensions;
-using DSharpPlus.Lavalink;
+using DisCatSharp;
+using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+using DisCatSharp.Interactivity;
+using DisCatSharp.Interactivity.Enums;
+using DisCatSharp.Interactivity.Extensions;
+using DisCatSharp.Lavalink;
+using DisCatSharp.Lavalink.Entities;
+using DisCatSharp.Lavalink.Enums;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Formatter = DSharpPlus.Formatter;
 
 namespace EconomyBot;
 
@@ -118,7 +120,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         await GuildMusic.queue.PlayAsync();
         await common.respond(ctx, "Started playing jazz.");
     }
-    
+
     [Command("live"), Description("Live music! :3"), Aliases("l"), Priority(1)]
     public async Task PlayLiveAsync(CommandContext ctx) {
         // yeet the bot in
@@ -151,19 +153,32 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
     public async Task PlayAsync(CommandContext ctx,
         [Description("URL to play from.")] Uri uri) {
         var trackLoad = await Music.GetTracksAsync(uri);
-        var tracks = trackLoad.Tracks.ToList();
-        if (trackLoad.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks.Any()) {
+        var result = trackLoad.Result;
+        List<LavalinkTrack> tracks = [];
+        if (trackLoad.LoadType == LavalinkLoadResultType.Error) {
             await common.respond(ctx, "No tracks were found at specified link.");
             return;
         }
 
-        if (trackLoad.LoadResultType == LavalinkLoadResultType.PlaylistLoaded &&
-            trackLoad.PlaylistInfo.SelectedTrack > 0) {
-            var index = trackLoad.PlaylistInfo.SelectedTrack;
-            tracks = tracks.Skip(index).Concat(tracks.Take(index)).ToList();
+        if (trackLoad.LoadType == LavalinkLoadResultType.Playlist) {
+            var playlist = (LavalinkPlaylist)result;
+            if (playlist.Info.SelectedTrack > 0) {
+                var index = playlist.Info.SelectedTrack;
+                tracks = tracks.Skip(index).Concat(tracks.Take(index)).ToList();
+            }
         }
 
-        var trackCount = tracks.Count();
+        if (trackLoad.LoadType == LavalinkLoadResultType.Search) {
+            var search = (List<LavalinkTrack>)result;
+            tracks = search;
+        }
+
+        if (trackLoad.LoadType == LavalinkLoadResultType.Track) {
+            var search = (LavalinkTrack)result;
+            tracks = [search];
+        }
+
+        var trackCount = tracks.Count;
         foreach (var track in tracks) {
             GuildMusic.queue.Enqueue(track);
         }
@@ -177,7 +192,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         else {
             var track = tracks.First();
             await common.respond(ctx,
-                $"Added {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} to the playback queue.");
+                $"Added {Formatter.Bold(Formatter.Sanitize(track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Info.Author))} to the playback queue.");
         }
     }
 
@@ -203,33 +218,33 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             return;
         }
 
+        LavalinkTrack? track = null!;
+        object? track_;
         if (results.Count() == 1) {
             // only one result
             var el_ = results.First();
-            var tracks_ = el_.Tracks.ToList();
-            if (el_.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks_.Any()) {
+            track_ = el_.Result;
+            if (el_.LoadType == LavalinkLoadResultType.Error || track_ == null) {
                 await common.respond(ctx, "No tracks were found at specified link.");
                 return;
             }
 
-            var trackCount_ = tracks_.Count();
-            foreach (var track in tracks_) {
-                GuildMusic.queue.Enqueue(track);
-            }
+            track = (LavalinkTrack)track;
+
+
+            GuildMusic.queue.Enqueue(track);
 
 
             await startPlayer(ctx);
             await GuildMusic.queue.PlayAsync();
 
-            if (trackCount_ > 1) {
+            /*if (trackCount_ > 1) {
                 await common.respond(ctx, $"Added {trackCount_:#,##0} tracks to playback queue.");
             }
             else {
-                var track = tracks_.First();
-                await common.respond(ctx,
-                    $"Added {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} to the playback queue.");
-            }
-
+                var track = tracks_.First();*/
+            await common.respond(ctx,
+                $"Added {Formatter.Bold(Formatter.Sanitize(track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Info.Author))} to the playback queue.");
             return;
         }
 
@@ -241,7 +256,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         var content = results.Select((x, i) => (x, i))
             .GroupBy(e => e.i / 10)
             .Select(xg => new Page(
-                $"{string.Join("\n", xg.Select(xa => $"`{xa.i + 1}` {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(xa.x.Tracks.First().Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(xa.x.Tracks.First().Author)))}"))}\n\nPage {xg.Key + 1}/{pageCount}"));
+                $"{string.Join("\n", xg.Select(xa => $"`{xa.i + 1}` {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(((LavalinkTrack)xa.x.Result).Info.Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(((LavalinkTrack)xa.x.Result).Info.Author)))}"))}\n\nPage {xg.Key + 1}/{pageCount}"));
 
         var ems = new PaginationEmojis {
             SkipLeft = null,
@@ -257,6 +272,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
 
         var msgC =
             $"Type a number 1-{results.Count()} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
+
         var msg = await ctx.RespondAsync(msgC);
 
         var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User && x.Channel == ctx.Channel,
@@ -287,29 +303,26 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
 
         var el = results.ElementAt(elInd - 1);
-        var tracks = el.Tracks.ToList();
+        track_ = el.Result;
 
 
-        if (el.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks.Any()) {
+        if (el.LoadType == LavalinkLoadResultType.Error || (LavalinkTrack)track_ == null) {
             await common.modify(ctx, msg, "No tracks were found at specified link.");
             return;
         }
 
-        var trackCount = tracks.Count;
-        foreach (var track in tracks)
-            GuildMusic.queue.Enqueue(track);
+        track = (LavalinkTrack)el.Result;
 
+        GuildMusic.queue.Enqueue(track);
         await startPlayer(ctx);
         await GuildMusic.queue.PlayAsync();
 
-        if (trackCount > 1) {
-            await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
-        }
-        else {
-            var track = tracks.First();
-            await common.modify(ctx, msg,
-                $"Added {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} to the playback queue.");
-        }
+/*if (trackCount > 1) {
+    await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
+}
+else {*/
+        await common.modify(ctx, msg,
+            $"Added {Formatter.Bold(Formatter.Sanitize(track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Info.Author))} to the playback queue.");
     }
 
     [Command("play"), Priority(0)]
@@ -365,10 +378,29 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         var url = new Uri($"https://youtu.be/{el.Id}");
 
         var trackLoad = await Music.GetTracksAsync(url);
-        var tracks = trackLoad.Tracks.ToList();
-        if (trackLoad.LoadResultType == LavalinkLoadResultType.LoadFailed || !tracks.Any()) {
-            await common.modify(ctx, msg, "No tracks were found at specified link.");
+        var result = trackLoad.Result;
+        List<LavalinkTrack> tracks = [];
+        if (trackLoad.LoadType == LavalinkLoadResultType.Error) {
+            await common.respond(ctx, "No tracks were found at specified link.");
             return;
+        }
+
+        if (trackLoad.LoadType == LavalinkLoadResultType.Playlist) {
+            var playlist = (LavalinkPlaylist)result;
+            if (playlist.Info.SelectedTrack > 0) {
+                var index = playlist.Info.SelectedTrack;
+                tracks = tracks.Skip(index).Concat(tracks.Take(index)).ToList();
+            }
+        }
+
+        if (trackLoad.LoadType == LavalinkLoadResultType.Search) {
+            var search = (List<LavalinkTrack>)result;
+            tracks = search;
+        }
+
+        if (trackLoad.LoadType == LavalinkLoadResultType.Track) {
+            var search = (LavalinkTrack)result;
+            tracks = [search];
         }
 
         var trackCount = tracks.Count;
@@ -385,7 +417,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         else {
             var track = tracks.First();
             await common.modify(ctx, msg,
-                $"Added {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} to the playback queue.");
+                $"Added {Formatter.Bold(Formatter.Sanitize(track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Info.Author))} to the playback queue.");
         }
     }
 
@@ -440,7 +472,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             await common.respond(ctx, "Enabled repeat.");
         }
     }
-    
+
     [Command("earrape"), Description("Toggles annoying users."), Aliases("er")]
     public async Task EarrapeAsync(CommandContext ctx) {
         bool earrape = GuildMusic.queue.earrapeMode;
@@ -482,7 +514,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             var track = GuildMusic.queue.NowPlaying.track;
             await GuildMusic.queue.StopAsync();
             await common.respond(ctx,
-                $"{Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
+                $"{Formatter.Bold(Formatter.Sanitize(track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Info.Author))} skipped.");
         }
         finally {
             _semaphore.Release();
@@ -498,7 +530,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
                 var track = GuildMusic.queue.NowPlaying.track;
                 await GuildMusic.queue.StopAsync();
                 await common.respond(ctx,
-                    $"{Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} skipped.");
+                    $"{Formatter.Bold(Formatter.Sanitize(track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Info.Author))} skipped.");
                 await Task.Delay(500); // wait for the next one
             }
         }
@@ -549,7 +581,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         var track = GuildMusic.queue.NowPlaying.track;
         await GuildMusic.queue.RestartAsync();
         await common.respond(ctx,
-            $"{Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} restarted.");
+            $"{Formatter.Bold(Formatter.Sanitize(track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Info.Author))} restarted.");
     }
 
     [Command("remove"), Description("Removes a track from playback queue."), Aliases("del", "rm")]
@@ -561,7 +593,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
 
         await common.respond(ctx,
-            $"{Formatter.Bold(Formatter.Sanitize(itemN.Title))} by {Formatter.Bold(Formatter.Sanitize(itemN.Author))} removed.");
+            $"{Formatter.Bold(Formatter.Sanitize(itemN.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(itemN.Info.Author))} removed.");
     }
 
     [Command("queue"), Description("Displays current playback queue."), Aliases("q")]
@@ -582,12 +614,13 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             .GroupBy(x => x.i / 10)
             .Select(xg =>
                 new Page(
-                    $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Length.ToDurationString()}]" : Formatter.Bold("Nothing"))}\n\n{string.Join("\n", xg.Select(xa => $"`{xa.i + 1:00}` {xa.s}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
+                    $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}]" : Formatter.Bold("Nothing"))}\n\n{string.Join("\n", xg.Select(xa => $"`{xa.i + 1:00}` {xa.s}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
             .ToList();
-        
+
         // queue is empty but we are playing
         if (pages.Count == 0) {
-            pages.Add(new Page($"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Length.ToDurationString()}]" : Formatter.Bold("Nothing"))}"));
+            pages.Add(new Page(
+                $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}]" : Formatter.Bold("Nothing"))}"));
         }
 
         var ems = new PaginationEmojis {
@@ -609,7 +642,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
         else {
             await common.respond(ctx,
-                $"Now playing: {Formatter.Bold(Formatter.Sanitize(track.track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.track.Author))} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Length.ToDurationString()}].");
+                $"Now playing: {Formatter.Bold(Formatter.Sanitize(track.track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.track.Info.Author))} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}].");
         }
     }
 
@@ -640,12 +673,12 @@ public static class Extensions {
     /// <returns>Track string.</returns>
     public static string ToTrackString(this LavalinkTrack x) {
         return
-            $"{Formatter.Bold(Formatter.Sanitize(x.Title))} by {Formatter.Bold(Formatter.Sanitize(x.Author ?? "No Author"))} [{x.Length.ToDurationString()}]";
+            $"{x.Info.Title.Sanitize().Bold()} by {(x.Info.Author ?? "No Author").Sanitize().Bold()} [{x.Info.Length.ToDurationString()}]";
     }
 
     public static string ToLimitedTrackString(this LavalinkTrack x) {
         return
-            $"{Formatter.Bold(Formatter.Sanitize(x.Title))} by {Formatter.Bold(Formatter.Sanitize(x.Author ?? "No Author"))}";
+            $"{x.Info.Title.Sanitize().Bold()} by {(x.Info.Author ?? "No Author").Sanitize().Bold()}";
     }
 }
 
