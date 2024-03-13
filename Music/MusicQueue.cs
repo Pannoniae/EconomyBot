@@ -283,11 +283,11 @@ public class MusicQueue(GuildMusicData guildMusic) {
         beginning:
         var randomFile = files[rand.Next(files.Length)];
         var tracks_ = await GuildMusicData.getTracksAsync(guildMusic.Node, randomFile);
-        if (tracks_.LoadType == LavalinkLoadResultType.Error) {
+        if (tracks_ == null) {
             // retry if not found
             goto beginning;
         }
-        return new Track((LavalinkTrack)tracks_.Result, artistName);
+        return new Track(tracks_, artistName);
     }
 
     public async Task seedQueue() {

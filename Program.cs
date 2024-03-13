@@ -92,13 +92,13 @@ class Program {
             }),
             ServiceProvider = services
         });
-        var ApplicationCommands = discord.UseApplicationCommands(new ApplicationCommandsConfiguration {
-            ServiceProvider = services
-        });
+        //var ApplicationCommands = discord.UseApplicationCommands(new ApplicationCommandsConfiguration {
+        //    ServiceProvider = services
+        //});
         try {
             //ApplicationCommands.RegisterCommands<ChatModuleSlash>();
-            ApplicationCommands.RegisterGlobalCommands<MusicModuleSlash>();
-            ApplicationCommands.RegisterGlobalCommands<ImagesModuleSlash>();
+            //ApplicationCommands.RegisterGlobalCommands<MusicModuleSlash>();
+            //ApplicationCommands.RegisterGlobalCommands<ImagesModuleSlash>();
             commands.CommandErrored += errorHandler;
             commands.RegisterCommands<ChatModule>();
             commands.RegisterCommands<MusicModule>();

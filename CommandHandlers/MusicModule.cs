@@ -220,16 +220,16 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
 
         LavalinkTrack? track = null!;
         object? track_;
-        if (results.Count() == 1) {
+        if (results.Count == 1) {
             // only one result
             var el_ = results.First();
-            track_ = el_.Result;
-            if (el_.LoadType == LavalinkLoadResultType.Error || track_ == null) {
+            track_ = el_;
+            if (track_ == null) {
                 await common.respond(ctx, "No tracks were found at specified link.");
                 return;
             }
 
-            track = (LavalinkTrack)track;
+            track = (LavalinkTrack)track_;
 
 
             GuildMusic.queue.Enqueue(track);
@@ -244,7 +244,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             else {
                 var track = tracks_.First();*/
             await common.respond(ctx,
-                $"Added {Formatter.Bold(Formatter.Sanitize(track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Info.Author))} to the playback queue.");
+                $"Added {track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} to the playback queue.");
             return;
         }
 
@@ -256,7 +256,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         var content = results.Select((x, i) => (x, i))
             .GroupBy(e => e.i / 10)
             .Select(xg => new Page(
-                $"{string.Join("\n", xg.Select(xa => $"`{xa.i + 1}` {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(((LavalinkTrack)xa.x.Result).Info.Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(((LavalinkTrack)xa.x.Result).Info.Author)))}"))}\n\nPage {xg.Key + 1}/{pageCount}"));
+                $"{string.Join("\n", xg.Select(xa => $"`{xa.i + 1}` {WebUtility.HtmlDecode(xa.x.Info.Title).Sanitize().Bold()} by {WebUtility.HtmlDecode(xa.x.Info.Author).Sanitize().Bold()}"))}\n\nPage {xg.Key + 1}/{pageCount}"));
 
         var ems = new PaginationEmojis {
             SkipLeft = null,
@@ -303,15 +303,15 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
 
         var el = results.ElementAt(elInd - 1);
-        track_ = el.Result;
+        track_ = el;
 
 
-        if (el.LoadType == LavalinkLoadResultType.Error || (LavalinkTrack)track_ == null) {
+        if (track_ == null) {
             await common.modify(ctx, msg, "No tracks were found at specified link.");
             return;
         }
 
-        track = (LavalinkTrack)el.Result;
+        track = el;
 
         GuildMusic.queue.Enqueue(track);
         await startPlayer(ctx);
@@ -322,7 +322,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
 }
 else {*/
         await common.modify(ctx, msg,
-            $"Added {Formatter.Bold(Formatter.Sanitize(track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Info.Author))} to the playback queue.");
+            $"Added {track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} to the playback queue.");
     }
 
     [Command("play"), Priority(0)]
