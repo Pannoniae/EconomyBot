@@ -282,7 +282,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
             new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive });
         beginning:
         var randomFile = files[rand.Next(files.Length)];
-        var tracks_ = await GuildMusicData.getTracksAsync(guildMusic.Node, randomFile);
+        var tracks_ = await GuildMusicData.getTrackAsync(guildMusic.Node, randomFile);
         if (tracks_ == null) {
             // retry if not found
             goto beginning;
