@@ -26,11 +26,11 @@ public sealed class MusicService {
         client = lavalink.Client;
         node = theNode;
 
+        node.StatsReceived += playbackStarted;
+
         async Task playbackStarted(LavalinkSession sender, LavalinkStatsReceivedEventArgs e) {
             await Console.Out.WriteLineAsync($"len/nodes: {e.Statistics.Players}");
         }
-
-        node.StatsReceived += playbackStarted;
     }
 
     /// <summary>

@@ -288,18 +288,18 @@ public sealed class GuildMusicData {
         queue.Enqueue((LavalinkTrack)tracks, artist);
     }
 
-    public async Task<IEnumerable<LavalinkTrackLoadingResult>> getJazz(string searchTerm) {
+    public async Task<IEnumerable<LavalinkTrack?>> getJazz(string searchTerm) {
         return artistMappings.Where(artist => Path.Exists(getPath(artist.Value.path))).SelectMany(
                 artist => Directory.GetFiles(getPath(artist.Value.path), searchTerm,
                     new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive }))
-            .Select(file => getTracksAsync(Node, file).Result);
+            .Select(file => getTracksAsync(Node, file).Result ?? null);
     }
 
-    public static async Task<LavalinkTrackLoadingResult> getTracksAsync(LavalinkSession client, string file) {
+    public static async Task<LavalinkTrack?> getTracksAsync(LavalinkSession client, string file) {
         var tracks = await client.LoadTracksAsync(file);
 
         if (tracks.LoadType == LavalinkLoadResultType.Error) {
-            return tracks;
+            return null;
         }
 
         // if not error, fix the titles up
@@ -322,7 +322,7 @@ public sealed class GuildMusicData {
             result.Info.GetType().GetProperty("Author")!.SetValue(result.Info, new FileInfo(file).Directory!.Name);
         }
 
-        return tracks;
+        return result;
     }
 
     public void enableEQ() {
