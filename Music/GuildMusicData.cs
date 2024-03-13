@@ -218,7 +218,7 @@ public sealed class GuildMusicData {
         }
 
         await CommandChannel.SendMessageAsync(
-            $"{DiscordEmoji.FromName(Program.client, ":pinkpill:")} A problem occured while playing {Formatter.Sanitize(e.Track.Info.Title).Bold()} by {Formatter.Sanitize(e.Track.Info.Author).Bold()}:\n{e.Exception}");
+            $"{DiscordEmoji.FromName(Program.client, ":pinkpill:")} A problem occured while playing {e.Track.Info.Title.Sanitize().Bold()} by {e.Track.Info.Author.Sanitize().Bold()}:\n{e.Exception}");
     }
 
     /// <summary>
@@ -292,10 +292,10 @@ public sealed class GuildMusicData {
         return artistMappings.Where(artist => Path.Exists(getPath(artist.Value.path))).SelectMany(
                 artist => Directory.GetFiles(getPath(artist.Value.path), searchTerm,
                     new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive }))
-            .Select(file => getTracksAsync(Node, file).Result ?? null);
+            .Select(file => getTrackAsync(Node, file).Result ?? null);
     }
 
-    public static async Task<LavalinkTrack?> getTracksAsync(LavalinkSession client, string file) {
+    public static async Task<LavalinkTrack?> getTrackAsync(LavalinkSession client, string file) {
         var tracks = await client.LoadTracksAsync(file);
 
         if (tracks.LoadType == LavalinkLoadResultType.Error) {
@@ -353,7 +353,7 @@ public sealed class GuildMusicData {
     public void disableEQ() {
         eq = false;
         logger.info("Disabled EQ");
-        Player.UpdateAsync(action => action.Filters = null!);
+        Player.UpdateAsync(action => action.Filters = Optional<LavalinkFilters>.None);
     }
 
     public void toggleEQ() {
