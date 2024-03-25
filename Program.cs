@@ -208,6 +208,11 @@ class Program {
             await e.Guild.BanMemberAsync(e.Author as DiscordMember, 6);
         }
 
+        // @everyone protection
+        if (e.Message.Content.Contains("@everyone") || e.Message.Content.Contains("@here")) {
+            await e.Message.RespondAsync("This server - and the world in general - would be better without your existence " + DiscordEmoji.FromName(client, ":pleading_face:"));
+        }
+
         if (client.CurrentUser.Id == e.Author.Id) {
             return;
         }
@@ -410,12 +415,12 @@ class Program {
 }
 
 public partial class CustomTimeSpanConverter : IArgumentConverter<TimeSpan> {
-    private static Regex TimeSpanRegex { get; } =
+    static private Regex TimeSpanRegex { get; } =
         MyRegex();
 
     [GeneratedRegex(@"^(?<days>\d+d\s*)?(?<hours>\d{1,2}h\s*)?(?<minutes>\d{1,2}m\s*)?(?<seconds>\d{1,2}s\s*)?$",
         RegexOptions.Compiled | RegexOptions.ECMAScript)]
-    private static partial Regex MyRegex();
+    static private partial Regex MyRegex();
 
     public Task<Optional<TimeSpan>> ConvertAsync(string value, CommandContext ctx) {
         if (value == "0")

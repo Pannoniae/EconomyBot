@@ -8,7 +8,6 @@ using DisCatSharp.Entities;
 using DisCatSharp.Interactivity;
 using DisCatSharp.Interactivity.Enums;
 using DisCatSharp.Interactivity.Extensions;
-using DisCatSharp.Lavalink;
 using DisCatSharp.Lavalink.Entities;
 using DisCatSharp.Lavalink.Enums;
 using Newtonsoft.Json;
@@ -48,7 +47,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             await common.respond(ctx,
                 "Lavalink not initialised, can't play music right now. (Check output for details)");
             throw new Exception("Actually, this is not your fault.:)");
-        }
+        } 
 
         Music = Program.musicService;
 
@@ -137,7 +136,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
 
         var weights = GuildMusicData.artistWeights.Select(w => $"{w.Key}: {w.Value}");
         var weightsp = GuildMusicData.artistWeights.Select(
-            w => $"{w.Key}: {(w.Value / sum) * 100:#.##}%");
+            w => $"{w.Key}: {w.Value / sum * 100:#.##}%");
 
         await common.respond(ctx, $"Weights:\n{string.Join("\n", weights)}");
         await common.respond(ctx, $"Weights (percent):\n{string.Join("\n", weightsp)}");
@@ -192,7 +191,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         else {
             var track = tracks.First();
             await common.respond(ctx,
-                $"Added {Formatter.Bold(Formatter.Sanitize(track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Info.Author))} to the playback queue.");
+                $"Added {track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} to the playback queue.");
         }
     }
 
@@ -218,7 +217,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             return;
         }
 
-        LavalinkTrack? track = null!;
+        LavalinkTrack? track;
         object? track_;
         if (results.Count == 1) {
             // only one result
@@ -248,7 +247,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             return;
         }
 
-        var pageCount = results.Count() / 10 + 1;
+        var pageCount = results.Count / 10 + 1;
         if (results.Count() % 10 == 0) {
             pageCount--;
         }
@@ -292,7 +291,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             }
         }
 
-        else if (elInd < 0 || elInd > results.Count()) {
+        else if (elInd < 0 || elInd > results.Count) {
             await common.modify(ctx, msg, "Invalid choice was made.");
             return;
         }
@@ -317,10 +316,10 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         await startPlayer(ctx);
         await GuildMusic.queue.PlayAsync();
 
-/*if (trackCount > 1) {
-    await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
-}
-else {*/
+        /*if (trackCount > 1) {
+            await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
+        }
+        else {*/
         await common.modify(ctx, msg,
             $"Added {track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} to the playback queue.");
     }
@@ -339,9 +338,9 @@ else {*/
 
         var msgC = string.Join("\n",
             results.Select((x, i) =>
-                $"{MusicCommon.NumberMappings[i + 1]} {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Author)))}"));
+                $"{MusicCommon.NumberMappings[i + 1]} {WebUtility.HtmlDecode(x.Title).Sanitize().Bold()} by {WebUtility.HtmlDecode(x.Author).Sanitize().Bold()}"));
         msgC =
-            $"{msgC}\n\nType a number 1-{results.Count()} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
+            $"{msgC}\n\nType a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
         var msg = await ctx.RespondAsync(msgC);
 
         var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User, TimeSpan.FromSeconds(30));
@@ -417,7 +416,7 @@ else {*/
         else {
             var track = tracks.First();
             await common.modify(ctx, msg,
-                $"Added {Formatter.Bold(Formatter.Sanitize(track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Info.Author))} to the playback queue.");
+                $"Added {track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} to the playback queue.");
         }
     }
 
@@ -514,7 +513,7 @@ else {*/
             var track = GuildMusic.queue.NowPlaying.track;
             await GuildMusic.queue.StopAsync();
             await common.respond(ctx,
-                $"{Formatter.Bold(Formatter.Sanitize(track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Info.Author))} skipped.");
+                $"{track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} skipped.");
         }
         finally {
             _semaphore.Release();
@@ -530,7 +529,7 @@ else {*/
                 var track = GuildMusic.queue.NowPlaying.track;
                 await GuildMusic.queue.StopAsync();
                 await common.respond(ctx,
-                    $"{Formatter.Bold(Formatter.Sanitize(track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Info.Author))} skipped.");
+                    $"{track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} skipped.");
                 await Task.Delay(500); // wait for the next one
             }
         }
@@ -581,7 +580,7 @@ else {*/
         var track = GuildMusic.queue.NowPlaying.track;
         await GuildMusic.queue.RestartAsync();
         await common.respond(ctx,
-            $"{Formatter.Bold(Formatter.Sanitize(track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Info.Author))} restarted.");
+            $"{track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} restarted.");
     }
 
     [Command("remove"), Description("Removes a track from playback queue."), Aliases("del", "rm")]
@@ -593,7 +592,7 @@ else {*/
         }
 
         await common.respond(ctx,
-            $"{Formatter.Bold(Formatter.Sanitize(itemN.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(itemN.Info.Author))} removed.");
+            $"{itemN.Info.Title.Sanitize().Bold()} by {itemN.Info.Author.Sanitize().Bold()} removed.");
     }
 
     [Command("queue"), Description("Displays current playback queue."), Aliases("q")]
@@ -614,13 +613,14 @@ else {*/
             .GroupBy(x => x.i / 10)
             .Select(xg =>
                 new Page(
-                    $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}]" : Formatter.Bold("Nothing"))}\n\n{string.Join("\n", xg.Select(xa => $"`{xa.i + 1:00}` {xa.s}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
+                    $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}]" : "Nothing".Bold())}\n\n" +
+                    $"{string.Join("\n", xg.Select(xa => $"`{xa.i + 1:00}` {xa.s}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
             .ToList();
 
         // queue is empty but we are playing
         if (pages.Count == 0) {
             pages.Add(new Page(
-                $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}]" : Formatter.Bold("Nothing"))}"));
+                $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}]" : "Nothing".Bold())}"));
         }
 
         var ems = new PaginationEmojis {
@@ -642,7 +642,7 @@ else {*/
         }
         else {
             await common.respond(ctx,
-                $"Now playing: {Formatter.Bold(Formatter.Sanitize(track.track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.track.Info.Author))} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}].");
+                $"Now playing: {track.track.Info.Title.Sanitize().Bold()} by {track.track.Info.Author.Sanitize().Bold()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}].");
         }
     }
 
