@@ -70,6 +70,8 @@ public sealed class GuildMusicData {
         { "hot sardines", new Artist("The Hot Sardines", "The Hot Sardines", 1.0) },
         { "louis armstrong", new Artist("Louis Armstrong", "Louis Armstrong", 1.0, 0.25) },
         { "ella fitzgerald", new Artist("Ella Fitzgerald", "Ella Fitzgerald", 1.0, 0.25) },
+        { "wynonie harris", new Artist("Wynonie Harris", "Wynonie Harris", 1.0) },
+        { "willie the lion smith", new Artist("Willie 'The Lion' Smith", "Willie 'The Lion' Smith", 1.5) },
     };
 
     public static readonly Dictionary<string, double> artistWeights = new();
