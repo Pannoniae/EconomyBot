@@ -48,25 +48,25 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="DisCatSharp">
-      <Version>10.6.3-nightly-010</Version>
+      <Version>10.6.5-nightly-012</Version>
     </PackageReference>
     <PackageReference Update="DisCatSharp.ApplicationCommands">
-      <Version>10.6.3-nightly-010</Version>
+      <Version>10.6.5-nightly-012</Version>
     </PackageReference>
     <PackageReference Update="DisCatSharp.CommandsNext">
-      <Version>10.6.3-nightly-010</Version>
+      <Version>10.6.5-nightly-012</Version>
     </PackageReference>
     <PackageReference Update="DisCatSharp.Common">
-      <Version>10.6.3-nightly-010</Version>
+      <Version>10.6.5-nightly-012</Version>
     </PackageReference>
     <PackageReference Update="DisCatSharp.Interactivity">
-      <Version>10.6.3-nightly-010</Version>
+      <Version>10.6.5-nightly-012</Version>
     </PackageReference>
     <PackageReference Update="DisCatSharp.Lavalink">
-      <Version>10.6.3-nightly-010</Version>
+      <Version>10.6.5-nightly-012</Version>
     </PackageReference>
     <PackageReference Update="DisCatSharp.VoiceNext">
-      <Version>10.6.3-nightly-010</Version>
+      <Version>10.6.5-nightly-012</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project=".paket\Paket.Restore.targets" />
