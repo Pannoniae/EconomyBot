@@ -741,6 +741,10 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         var queue = GuildMusic.queue.getCombinedQueue();
         var pageCount = queue.Count / 10 + 1;
         if (queue.Count % 10 == 0) pageCount--;
+        if (!isPlaying || queue.Count == 0) {
+            await common.respond(ctx, "Queue is empty!");
+            return;
+        }
         var pages = queue.Select(x => x.track.ToTrackString())
             .Select((s, i) => (s, i))
             .GroupBy(x => x.i / 10)
