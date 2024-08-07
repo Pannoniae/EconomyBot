@@ -8,7 +8,10 @@ using DisCatSharp.Lavalink.Enums;
 using DisCatSharp.Lavalink.Enums.Filters;
 using DisCatSharp.Lavalink.EventArgs;
 using EconomyBot.Logging;
+using Soulseek;
 using SpotifyAPI.Web;
+using Directory = System.IO.Directory;
+using SearchResponse = Soulseek.SearchResponse;
 
 namespace EconomyBot;
 

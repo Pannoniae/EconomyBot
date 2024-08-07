@@ -68,6 +68,7 @@
     <PackageReference Update="DisCatSharp.VoiceNext">
       <Version>10.6.5-nightly-012</Version>
     </PackageReference>
+    <PackageReference Include="Soulseek" Version="6.5.0" />
   </ItemGroup>
   <Import Project=".paket\Paket.Restore.targets" />
 </Project>
