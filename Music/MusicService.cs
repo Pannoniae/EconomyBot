@@ -4,6 +4,8 @@ using DisCatSharp.Entities;
 using DisCatSharp.Lavalink;
 using DisCatSharp.Lavalink.Entities;
 using DisCatSharp.Lavalink.EventArgs;
+using Soulseek;
+using File = Soulseek.File;
 
 namespace EconomyBot;
 
@@ -14,6 +16,9 @@ public sealed class MusicService {
     private LavalinkExtension Lavalink;
     private ConcurrentDictionary<ulong, GuildMusicData> MusicData;
     private readonly DiscordClient client;
+
+
+    public SoulseekClient slsk;
 
     private LavalinkSession node { get; }
 
@@ -26,11 +31,47 @@ public sealed class MusicService {
         client = lavalink.Client;
         node = theNode;
 
+        slsk = new SoulseekClient(new SoulseekClientOptions());
+        slsk.ConnectAsync("jazzbot", "jazzbot").GetAwaiter().GetResult();
+        slsk.ExcludedSearchPhrasesReceived += (sender, args) => {
+            Console.WriteLine("Excluded search phrases: ");
+            foreach (var phrase in args) {
+                Console.WriteLine(phrase);
+            }
+        };
+
         node.StatsReceived += playbackStarted;
 
         async Task playbackStarted(LavalinkSession sender, LavalinkStatsReceivedEventArgs e) {
             await Console.Out.WriteLineAsync($"len/nodes: {e.Statistics.Players}");
         }
+    }
+
+
+    public async Task<List<SLSKResult>> getSLSK(string searchTerm) {
+        var options = new SearchOptions(searchTimeout: 6000, responseFilter: noLocked);
+        var result = await slsk.SearchAsync(new SearchQuery(searchTerm), options: options);
+
+        var results = new List<SLSKResult>();
+        // for each response, aggregate tracks with the result it belongs to
+        foreach (var r in result.Responses) {
+            foreach (var f in r.Files) {
+                results.Add(new SLSKResult(r, f));
+            }
+        }
+        // time to sort by speed! higher speed goes first
+        results.Sort((a, b) => {
+            var aSpeed = a.response.UploadSpeed;
+            var bSpeed = b.response.UploadSpeed;
+            if (aSpeed == bSpeed) return 0;
+            return bSpeed - aSpeed;
+        });
+
+        return results.Take(50).ToList();
+    }
+
+    private static bool noLocked(SearchResponse arg) {
+        return arg.HasFreeUploadSlot && arg.LockedFileCount == 0;
     }
 
     /// <summary>
@@ -69,4 +110,7 @@ public sealed class MusicService {
 
     public Task<LavalinkTrackLoadingResult> GetTracksAsync(string search)
         => node.LoadTracksAsync(search);
+}
+
+public record SLSKResult(SearchResponse response, File file) {
 }

@@ -12,6 +12,9 @@ using DisCatSharp.Lavalink.Entities;
 using DisCatSharp.Lavalink.Enums;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Soulseek;
+using Directory = System.IO.Directory;
+using File = System.IO.File;
 
 namespace EconomyBot;
 
@@ -47,7 +50,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             await common.respond(ctx,
                 "Lavalink not initialised, can't play music right now. (Check output for details)");
             throw new Exception("Actually, this is not your fault.:)");
-        } 
+        }
 
         Music = Program.musicService;
 
@@ -322,6 +325,136 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         else {*/
         await common.modify(ctx, msg,
             $"Added {track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} to the playback queue.");
+    }
+
+
+    /// <summary>
+    /// Note to Mr. or Ms. Library Author.
+    /// I won't make my bot GPL just because you want me to. I'm not using your library to make money.
+    /// I am not creating a "derivative work" using your library because the bot is perfectly functional without this functionality.
+    /// This is "mere aggregation" in GPL-speak.
+    /// P.S. fuck copyright as a concept
+    /// </summary>
+    [Command("soulseek"), Priority(0), Aliases("slsk")]
+    public async Task PlaySLSKAsync(CommandContext ctx,
+        [RemainingText, Description("Terms to search for.")]
+        string term) {
+
+        var interactivity = ctx.Client.GetInteractivity();
+        if (string.IsNullOrWhiteSpace(term)) {
+            await common.respond(ctx, "No query was entered :(");
+            return;
+        }
+
+        var results = await Music.getSLSK(term);
+        if (!results.Any()) {
+            await common.respond(ctx, "Nothing was found.");
+            return;
+        }
+
+        var pageCount = results.Count / 10 + 1;
+        if (results.Count % 10 == 0) {
+            pageCount--;
+        }
+
+        var content = results.Select((x, i) => (x, i))
+            .GroupBy(e => e.i / 10)
+            .Select(xg => new Page(
+                $"{string.Join("\n", xg.Select(xa => $"`{xa.i + 1}` {WebUtility.HtmlDecode(xa.x.file.Filename).Sanitize().Bold()}"))}\n\nPage {xg.Key + 1}/{pageCount}"));
+
+        var ems = new PaginationEmojis {
+            SkipLeft = null,
+            SkipRight = null,
+            Stop = DiscordEmoji.FromUnicode("⏹"),
+            Left = DiscordEmoji.FromUnicode("◀"),
+            Right = DiscordEmoji.FromUnicode("▶")
+        };
+
+        _ = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, content, ems,
+            PaginationBehaviour.Ignore,
+            PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
+
+        var msgC =
+            $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
+
+        var msg = await ctx.RespondAsync(msgC);
+
+        var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User && x.Channel == ctx.Channel,
+            TimeSpan.FromMinutes(2));
+        if (res.TimedOut || res.Result == null) {
+            await msg.ModifyAsync($"{Program.cube} No choice was made.");
+            return;
+        }
+
+        var resInd = res.Result.Content.Trim();
+        if (!int.TryParse(resInd, NumberStyles.Integer, CultureInfo.InvariantCulture, out var elInd)) {
+            if (resInd.ToLowerInvariant() == "cancel") {
+                elInd = -1;
+            }
+            else {
+                return;
+            }
+        }
+
+        else if (elInd < 0 || elInd > results.Count) {
+            await common.modify(ctx, msg, "Invalid choice was made.");
+            return;
+        }
+
+        if (elInd == -1) {
+            await common.modify(ctx, msg, "Choice cancelled.");
+            return;
+        }
+
+        var chosen = results.ElementAt(elInd - 1);
+
+
+        // actually download it from soulseek
+        var slsk = Music.slsk;
+        var tempFolder = "/snd/music/temp";
+
+        // basically, the "filename" goes like this:
+        // for example: @@xrknr\Music\Dream Theater\2002 - six degrees of inner turbulence (flac)\(09) [Dream Theater] IV. The Test That Stumped Them All.flac
+        // we want the LAST part of the path as the actual filename to download to.
+        var actualFilename = chosen.file.Filename.Split('\\').Last();
+
+        await common.modify(ctx, msg, $"Downloading {actualFilename}...");
+
+        // we hash the filename so we don't reDL the same file
+        var hash = chosen.file.Filename.GetHashCode().ToString("x8");
+        var localPath = Path.Join(tempFolder, hash, actualFilename);
+        // if hash exists, play from that
+        // if not, create folder
+        LavalinkTrack? lltrack;
+        // if the hash directory exists + the file exists
+        if (Directory.Exists(Path.Join(tempFolder, hash)) &&
+            File.Exists(Path.Join(tempFolder, hash, actualFilename))) {
+            lltrack = await GuildMusicData.getTrackAsync(GuildMusic.Node, localPath);
+        }
+        else {
+            // create the folder
+            Directory.CreateDirectory(Path.Join(tempFolder, hash));
+            try {
+                var dl = await slsk.DownloadAsync(chosen.response.Username, chosen.file.Filename, localPath);
+            }
+            catch (TimeoutException e) {
+                Console.WriteLine(e);
+                await common.modify(ctx, msg, "Download timed out...");
+                return;
+            }
+            lltrack = await GuildMusicData.getTrackAsync(GuildMusic.Node, localPath);
+        }
+
+        GuildMusic.queue.Enqueue(lltrack);
+        await startPlayer(ctx);
+        await GuildMusic.queue.PlayAsync();
+
+        /*if (trackCount > 1) {
+            await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
+        }
+        else {*/
+        await common.modify(ctx, msg,
+            $"Added {lltrack.Info.Title.Sanitize().Bold()} by {lltrack.Info.Author.Sanitize().Bold()} to the playback queue.");
     }
 
     [Command("play"), Priority(0)]
@@ -672,13 +805,11 @@ public static class Extensions {
     /// <param name="x">Music item to convert.</param>
     /// <returns>Track string.</returns>
     public static string ToTrackString(this LavalinkTrack x) {
-        return
-            $"{x.Info.Title.Sanitize().Bold()} by {(x.Info.Author ?? "No Author").Sanitize().Bold()} [{x.Info.Length.ToDurationString()}]";
+        return x != null ? $"{(x.Info.Title ?? "No title").Sanitize().Bold()} by {(x.Info.Author ?? "No Author").Sanitize().Bold()} [{x.Info.Length.ToDurationString()}]" : "";
     }
 
     public static string ToLimitedTrackString(this LavalinkTrack x) {
-        return
-            $"{x.Info.Title.Sanitize().Bold()} by {(x.Info.Author ?? "No Author").Sanitize().Bold()}";
+        return x != null ? $"{(x.Info.Title ?? "No title").Sanitize().Bold()} by {(x.Info.Author ?? "No Author").Sanitize().Bold()}" : "";
     }
 }
 
@@ -755,18 +886,23 @@ public struct YouTubeSearchResult {
 }
 
 internal struct YouTubeApiResponseItem {
-    [JsonProperty("id")] public ResponseId Id { get; private set; }
+    [JsonProperty("id")]
+    public ResponseId Id { get; private set; }
 
-    [JsonProperty("snippet")] public ResponseSnippet Snippet { get; private set; }
+    [JsonProperty("snippet")]
+    public ResponseSnippet Snippet { get; private set; }
 
 
     public struct ResponseId {
-        [JsonProperty("videoId")] public string VideoId { get; private set; }
+        [JsonProperty("videoId")]
+        public string VideoId { get; private set; }
     }
 
     public struct ResponseSnippet {
-        [JsonProperty("title")] public string Title { get; private set; }
+        [JsonProperty("title")]
+        public string Title { get; private set; }
 
-        [JsonProperty("channelTitle")] public string Author { get; private set; }
+        [JsonProperty("channelTitle")]
+        public string Author { get; private set; }
     }
 }
