@@ -347,7 +347,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
 
         var results = await Music.getSLSK(term);
-        if (!results.Any()) {
+        if (results.Count == 0) {
             await common.respond(ctx, "Nothing was found.");
             return;
         }
@@ -360,7 +360,10 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         var content = results.Select((x, i) => (x, i))
             .GroupBy(e => e.i / 10)
             .Select(xg => new Page(
-                $"{string.Join("\n", xg.Select(xa => $"`{xa.i + 1}` {WebUtility.HtmlDecode(xa.x.file.Filename).Sanitize().Bold()}"))}\n\nPage {xg.Key + 1}/{pageCount}"));
+                $"{string.Join("\n",
+                    xg.Select(xa => $"**{xa.i + 1}.** {WebUtility.HtmlDecode(xa.x.file.Filename.ReversePath()).InlineCode()}" +
+                                    $" {TimeSpan.FromSeconds(xa.x.file.Length.GetValueOrDefault()).musicLength().Bold()} ({xa.x.file.getBitrateString()})"))
+                }\n\nPage {xg.Key + 1}/{pageCount}"));
 
         var ems = new PaginationEmojis {
             SkipLeft = null,
@@ -392,6 +395,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
                 elInd = -1;
             }
             else {
+                await common.modify(ctx, msg, "Invalid choice was made.");
                 return;
             }
         }
@@ -814,6 +818,32 @@ public static class Extensions {
 
     public static string ToLimitedTrackString(this LavalinkTrack x) {
         return x != null ? $"{(x.Info.Title ?? "No title").Sanitize().Bold()} by {(x.Info.Author ?? "No Author").Sanitize().Bold()}" : "";
+    }
+
+    public static string ReversePath(this string s) {
+        return string.Join("\\", s.Split('\\').Reverse());
+    }
+
+    public static string musicLength(this TimeSpan timeSpan) {
+        return $"{(int)timeSpan.TotalMinutes}:{timeSpan.Seconds:D2}";
+    }
+
+    public static string getBitrateString(this Soulseek.File f) {
+        // get all attributes, join them
+
+        // if variable bitrate, return that
+        if (f.Attributes.Any(a => a.Type == FileAttributeType.BitRate)) {
+            return $"{f.BitRate!.Value}kbps";
+        }
+
+        // if samplerate+depth (FLAC), do that like 16/44.1khz
+        if (f.Attributes.Any(a => a.Type == FileAttributeType.SampleRate) &&
+                                  f.Attributes.Any(a => a.Type == FileAttributeType.BitDepth)) {
+            var sr = (f.SampleRate!.Value / 1000f).ToString("N1");
+            var bd = f.BitDepth;
+            return $"{bd}/{sr}kHz";
+        }
+        return "???";
     }
 }
 
