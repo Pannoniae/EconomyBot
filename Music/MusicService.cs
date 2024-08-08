@@ -31,7 +31,7 @@ public sealed class MusicService {
         client = lavalink.Client;
         node = theNode;
 
-        slsk = new SoulseekClient(new SoulseekClientOptions());
+        slsk = new SoulseekClient();
         slsk.ConnectAsync("jazzbot", "jazzbot").GetAwaiter().GetResult();
         slsk.ExcludedSearchPhrasesReceived += (sender, args) => {
             Console.WriteLine("Excluded search phrases: ");
