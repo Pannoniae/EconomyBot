@@ -333,13 +333,15 @@ class Program {
 
         hasSetup = true;
 
+        await setupB(client, lavalink, lavalinkConfig);
+
         logger.info("Setup done!");
     }
 
     private static async Task setupB(DiscordClient client, LavalinkExtension lavalink,
         LavalinkConfiguration lavalinkConfig) {
         foreach (var guild in client.Guilds) {
-            logger.debug($"{guild.Value.Name}, {guild.Value.JoinedAt.ToString()}");
+            logger.info($"{guild.Value.Name}, {guild.Value.JoinedAt.ToString()}");
         }
     }
 

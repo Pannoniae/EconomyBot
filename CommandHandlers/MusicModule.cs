@@ -215,7 +215,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         var interactivity = ctx.Client.GetInteractivity();
 
         var results = (await GuildMusic.getJazz("*" + term + "*")).ToList();
-        if (!results.Any()) {
+        if (results.Count == 0) {
             await common.respond(ctx, "Nothing was found.");
             return;
         }
