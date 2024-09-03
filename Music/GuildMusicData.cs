@@ -303,7 +303,7 @@ public sealed class GuildMusicData {
     public static async Task<LavalinkTrack?> getTrackAsync(LavalinkSession client, string file) {
         var tracks = await client.LoadTracksAsync(file);
 
-        if (tracks.LoadType == LavalinkLoadResultType.Error) {
+        if (tracks.LoadType != LavalinkLoadResultType.Track) {
             return null;
         }
 

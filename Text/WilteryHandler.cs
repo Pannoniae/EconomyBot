@@ -118,20 +118,10 @@ public class WilteryHandler {
             "https://api.cloudflare.com/client/v4/accounts/2498ecc574e198ccf65813d2aa3af4ca/ai/run/";
 
         var h_json = $$"""
-                        {
-                          "messages": [
-                            {
-                              "role": "system",
-                              "content": "Replace all the gendered pronouns in the following sentence with neutral ones. For example, replace 'she' with 'they'. Only output the modified sentence and nothing else.
-                              If the sentence is not gendered, output 'nothing'."
-                            },
-                            {
-                              "role": "user",
-                              "content": "{{HttpUtility.JavaScriptStringEncode(message.Content)}}"
-                            }
-                          ]
-                        }
-                        """;
+                       {
+                         "prompt": "Replace all the gendered pronouns in the following sentence with neutral ones while making sure the sentence remains grammatically valid.. For example, replace 'she' with 'they'. Only output the modified sentence and nothing else. If the sentence is not gendered, output 'nothing'. Sentence: {{HttpUtility.JavaScriptStringEncode(message.Content)}}"
+                       }
+                       """;
         var httpRequestMessage = new HttpRequestMessage {
             Method = HttpMethod.Post,
             RequestUri = new Uri(API_URL + "@cf/meta/llama-3-8b-instruct"),
@@ -143,7 +133,6 @@ public class WilteryHandler {
         var h_response = await httpClient.SendAsync(httpRequestMessage);
         var h_responseString = await h_response.Content.ReadAsStringAsync();
         JObject h_responseJson;
-        var labels = new Dictionary<string, double>();
         try {
             h_responseJson = JObject.Parse(h_responseString);
         }
