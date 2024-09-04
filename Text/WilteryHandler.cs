@@ -33,14 +33,14 @@ public class WilteryHandler {
 
         // stop the stupidity
         // replace every gendered pronoun with neutral ones
-        messageHandlers.Add(new AIWordMessageHandler("hers "));
-        messageHandlers.Add(new AIWordMessageHandler("her "));
-        messageHandlers.Add(new AIWordMessageHandler("him "));
-        messageHandlers.Add(new AIWordMessageHandler("his "));
-        messageHandlers.Add(new AIWordMessageHandler("she "));
-        messageHandlers.Add(new AIWordMessageHandler("he "));
-        messageHandlers.Add(new AIWordMessageHandler("herself "));
-        messageHandlers.Add(new AIWordMessageHandler("himself "));
+        //messageHandlers.Add(new AIWordMessageHandler("hers "));
+        //messageHandlers.Add(new AIWordMessageHandler("her "));
+        //messageHandlers.Add(new AIWordMessageHandler("him "));
+        //messageHandlers.Add(new AIWordMessageHandler("his "));
+        //messageHandlers.Add(new AIWordMessageHandler("she "));
+        //messageHandlers.Add(new AIWordMessageHandler("he "));
+        //messageHandlers.Add(new AIWordMessageHandler("herself "));
+        //messageHandlers.Add(new AIWordMessageHandler("himself "));
     }
 
     public async Task sendWebhookToChannel(DiscordChannel channel, string message) {
