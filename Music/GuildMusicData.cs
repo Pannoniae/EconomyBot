@@ -8,10 +8,8 @@ using DisCatSharp.Lavalink.Enums;
 using DisCatSharp.Lavalink.Enums.Filters;
 using DisCatSharp.Lavalink.EventArgs;
 using EconomyBot.Logging;
-using Soulseek;
 using SpotifyAPI.Web;
 using Directory = System.IO.Directory;
-using SearchResponse = Soulseek.SearchResponse;
 
 namespace EconomyBot;
 
@@ -50,7 +48,7 @@ public sealed class GuildMusicData {
 
     public static string rootPath;
 
-    public static readonly Dictionary<string, Artist> artistMappings = new() {
+    public static Dictionary<string, Artist> artistMappings = new() {
         { "_fats", new Artist("Fats Waller", "Fats Waller", 1.5) },
         { "_fatslive", new Artist("Fats Waller Live", "Fats Waller/Fats Waller Live", 1.5) },
         { "ella mae morse", new Artist("Ella Mae Morse", "Ella Mae Morse", 1.2) },
@@ -110,9 +108,21 @@ public sealed class GuildMusicData {
         Lavalink = lavalink;
         queue = new MusicQueue(this);
 
+        // load artist data from SDL file if available
+        var parser = new SDLParser();
+        try {
+            artistMappings = parser.parse("artists.sdl");
+        }
+        catch (Exception e) {
+            logger.warn("Couldn't load artist data, using defaults.");
+            Console.Out.WriteLine(e.ToString());
+        }
+        var x = artistMappings.Count;
+        logger.info($"Loaded {x} artists from file.");
+
         foreach (var artist in artistMappings) {
             // get the count of files at the directory
-            int fCount = 0;
+            int fCount;
             try {
                 fCount = Directory
                     .GetFiles(getPath(artist.Value.path), "*",
@@ -130,6 +140,12 @@ public sealed class GuildMusicData {
         webhookCache = new WebhookCache(Guild);
 
         logger.info("Initialised artist weights.");
+    }
+
+    private void loadArtistDataIntoMapping(Env env) {
+        foreach (var artist in env.artists) {
+            artistMappings[artist.Key] = artist.Value;
+        }
     }
 
     public static string getPath(string path) {

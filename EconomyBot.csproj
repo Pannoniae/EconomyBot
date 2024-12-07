@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
@@ -16,7 +16,7 @@
     <UseSystemResourceKeys>true</UseSystemResourceKeys>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="bin\Debug\net8.0\runtimes\linux-x64\native\libe_sqlite3.so" />
+    <Content Include="bin\Debug\net9.0\runtimes\linux-x64\native\libe_sqlite3.so" />
     <Content Include="lua\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -41,34 +41,36 @@
     <None Update="launch2.sh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="artists.sdl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="bin\Debug\net8.0\runtimes\linux-x64\native\" />
+    <Folder Include="bin\Debug\net9.0\runtimes\linux-x64\native\" />
     <Folder Include="lua\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="DisCatSharp">
-      <Version>10.6.5-nightly-012</Version>
+      <Version>10.6.6-nightly-018</Version>
     </PackageReference>
     <PackageReference Update="DisCatSharp.ApplicationCommands">
-      <Version>10.6.5-nightly-012</Version>
+      <Version>10.6.6-nightly-018</Version>
     </PackageReference>
     <PackageReference Update="DisCatSharp.CommandsNext">
-      <Version>10.6.5-nightly-012</Version>
+      <Version>10.6.6-nightly-018</Version>
     </PackageReference>
     <PackageReference Update="DisCatSharp.Common">
-      <Version>10.6.5-nightly-012</Version>
+      <Version>10.6.6-nightly-018</Version>
     </PackageReference>
     <PackageReference Update="DisCatSharp.Interactivity">
-      <Version>10.6.5-nightly-012</Version>
+      <Version>10.6.6-nightly-018</Version>
     </PackageReference>
     <PackageReference Update="DisCatSharp.Lavalink">
-      <Version>10.6.5-nightly-012</Version>
+      <Version>10.6.6-nightly-018</Version>
     </PackageReference>
     <PackageReference Update="DisCatSharp.VoiceNext">
-      <Version>10.6.5-nightly-012</Version>
+      <Version>10.6.6-nightly-018</Version>
     </PackageReference>
-    <PackageReference Include="Soulseek" Version="6.5.0" />
   </ItemGroup>
   <Import Project=".paket\Paket.Restore.targets" />
 </Project>

@@ -333,7 +333,8 @@ class Program {
 
         hasSetup = true;
 
-        await setupB(client, lavalink, lavalinkConfig);
+        // don't need to wait!
+        _ = setupB(client, lavalink, lavalinkConfig);
 
         logger.info("Setup done!");
     }
