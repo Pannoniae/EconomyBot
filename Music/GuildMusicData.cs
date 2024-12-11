@@ -310,10 +310,30 @@ public sealed class GuildMusicData {
     }
 
     public async Task<IEnumerable<LavalinkTrack?>> getJazz(string searchTerm) {
-        return artistMappings.Where(artist => Path.Exists(getPath(artist.Value.path))).SelectMany(
+        return artistMappings.Where(
+                artist => Path.Exists(getPath(artist.Value.path)))
+            .SelectMany(
                 artist => Directory.GetFiles(getPath(artist.Value.path), searchTerm,
                     new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive }))
+            .Where(extensionFilter)
             .Select(file => getTrackAsync(Node, file).Result ?? null);
+    }
+
+    /// <summary>
+    /// We don't load useless m3u's and png's so lavalink won't spam the log with exceptions.
+    /// </summary>
+    public static bool extensionFilter(string s) {
+        return s.EndsWith(".mp3") ||
+               s.EndsWith(".flac") ||
+               s.EndsWith(".wav") ||
+               s.EndsWith(".ogg") ||
+               s.EndsWith(".m4a") ||
+               s.EndsWith(".opus") ||
+               s.EndsWith(".webm") ||
+               s.EndsWith(".aac") ||
+               s.EndsWith(".wma") ||
+               s.EndsWith(".aiff") ||
+               s.EndsWith(".alac");
     }
 
     public static async Task<LavalinkTrack?> getTrackAsync(LavalinkSession client, string file) {

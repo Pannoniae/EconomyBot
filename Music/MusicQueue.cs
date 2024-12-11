@@ -1,6 +1,5 @@
 ﻿using DisCatSharp.Lavalink;
 using DisCatSharp.Lavalink.Entities;
-using DisCatSharp.Lavalink.Enums;
 using DisCatSharp.Lavalink.EventArgs;
 using EconomyBot.Logging;
 
@@ -279,7 +278,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
         var path = GuildMusicData.getPath(artist.path);
         var rand = new Random();
         var files = Directory.GetFiles(path, "*",
-            new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive });
+            new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive }).Where(GuildMusicData.extensionFilter).ToArray();
         beginning:
         var randomFile = files[rand.Next(files.Length)];
         var tracks_ = await GuildMusicData.getTrackAsync(guildMusic.Node, randomFile);
