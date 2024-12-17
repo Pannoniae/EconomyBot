@@ -235,7 +235,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
 
         var interactivity = ctx.Client.GetInteractivity();
 
-        var results = (await GuildMusic.getJazz("*" + term + "*")).ToList();
+        List<LavalinkTrack> results = (await GuildMusic.getJazz("*" + term + "*")).Where(t => t != null).ToList()!;
         if (results.Count == 0) {
             await common.respond(ctx, "Nothing was found.");
             return;
@@ -272,7 +272,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
 
         var pageCount = results.Count / 10 + 1;
-        if (results.Count() % 10 == 0) {
+        if (results.Count % 10 == 0) {
             pageCount--;
         }
 
@@ -294,7 +294,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
 
         var msgC =
-            $"Type a number 1-{results.Count()} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
+            $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
 
         var msg = await ctx.RespondAsync(msgC);
 
@@ -436,7 +436,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
 
         // actually download it from soulseek
         var slsk = Music.slsk;
-        var tempFolder = "/snd/music/temp";
+        const string tempFolder = "/snd/music/temp";
 
         // basically, the "filename" goes like this:
         // for example: @@xrknr\Music\Dream Theater\2002 - six degrees of inner turbulence (flac)\(09) [Dream Theater] IV. The Test That Stumped Them All.flac
@@ -537,27 +537,32 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         var trackLoad = await Music.GetTracksAsync(url);
         var result = trackLoad.Result;
         List<LavalinkTrack> tracks = [];
-        if (trackLoad.LoadType == LavalinkLoadResultType.Error) {
-            await common.respond(ctx, "No tracks were found at specified link.");
-            return;
-        }
-
-        if (trackLoad.LoadType == LavalinkLoadResultType.Playlist) {
-            var playlist = (LavalinkPlaylist)result;
-            if (playlist.Info.SelectedTrack > 0) {
-                var index = playlist.Info.SelectedTrack;
-                tracks = tracks.Skip(index).Concat(tracks.Take(index)).ToList();
+        switch (trackLoad.LoadType) {
+            case LavalinkLoadResultType.Error:
+                await common.respond(ctx, "No tracks were found at specified link.");
+                return;
+            case LavalinkLoadResultType.Playlist: {
+                var playlist = (LavalinkPlaylist)result;
+                if (playlist.Info.SelectedTrack > 0) {
+                    var index = playlist.Info.SelectedTrack;
+                    tracks = tracks.Skip(index).Concat(tracks.Take(index)).ToList();
+                }
+                break;
             }
-        }
-
-        if (trackLoad.LoadType == LavalinkLoadResultType.Search) {
-            var search = (List<LavalinkTrack>)result;
-            tracks = search;
-        }
-
-        if (trackLoad.LoadType == LavalinkLoadResultType.Track) {
-            var search = (LavalinkTrack)result;
-            tracks = [search];
+            case LavalinkLoadResultType.Search: {
+                var search = (List<LavalinkTrack>)result;
+                tracks = search;
+                break;
+            }
+            case LavalinkLoadResultType.Track: {
+                var search = (LavalinkTrack)result;
+                tracks = [search];
+                break;
+            }
+            case LavalinkLoadResultType.Empty:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
 
         var trackCount = tracks.Count;
