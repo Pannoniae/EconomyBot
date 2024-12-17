@@ -289,7 +289,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             Right = DiscordEmoji.FromUnicode("▶")
         };
 
-        _ = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, content, ems,
+        await interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, content, ems,
             PaginationBehaviour.Ignore,
             PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
 

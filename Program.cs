@@ -87,9 +87,7 @@ class Program {
             .BuildServiceProvider(true);
         var lavalink = discord.UseLavalink();
         var commands = discord.UseCommandsNext(new CommandsNextConfiguration {
-            StringPrefixes = new List<string>(new[] {
-                "."
-            }),
+            StringPrefixes = ["."],
             ServiceProvider = services
         });
         //var ApplicationCommands = discord.UseApplicationCommands(new ApplicationCommandsConfiguration {
@@ -103,6 +101,7 @@ class Program {
             commands.RegisterCommands<ChatModule>();
             commands.RegisterCommands<MusicModule>();
             commands.RegisterCommands<ImagesModule>();
+            commands.RegisterCommands<BotModule>();
         }
         catch (Exception e) {
             if (e is BadRequestException ex) {
@@ -124,10 +123,12 @@ class Program {
         discord.GetCommandsNext().UnregisterConverter<TimeSpan>();
         discord.GetCommandsNext().RegisterConverter(new CustomTimeSpanConverter());
         await discord.ConnectAsync();
+        MemoryUtils.cleanGC();
         var timer = new PeriodicTimer(TimeSpan.FromMinutes(10));
 
         while (await timer.WaitForNextTickAsync()) {
             try {
+                MemoryUtils.cleanGC();
                 foreach (var file in Directory.GetParent(Directory.GetCurrentDirectory())!.EnumerateFiles()) {
                     file.Delete();
                 }

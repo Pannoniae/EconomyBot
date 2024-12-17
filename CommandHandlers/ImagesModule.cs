@@ -2,7 +2,6 @@
 using DisCatSharp.CommandsNext;
 using DisCatSharp.CommandsNext.Attributes;
 using DisCatSharp.Entities;
-using DisCatSharp.Net.Serialization;
 using Newtonsoft.Json.Linq;
 
 namespace EconomyBot;

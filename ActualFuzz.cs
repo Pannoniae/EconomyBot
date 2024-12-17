@@ -1,6 +1,5 @@
 ﻿using FuzzierSharp;
 using FuzzierSharp.PreProcess;
-using Spectre.Console;
 
 namespace EconomyBot;
 
@@ -11,7 +10,7 @@ namespace EconomyBot;
 /// Sidenote: fuck the library's author for not exposing the actual 0-to-1 double values for the algorithms.
 /// What you get is an integer percentage between 0 and 100 which incredibly loses information. Stupid design.
 /// </summary>
-public class ActualFuzz {
+public static class ActualFuzz {
 
     /// <summary>
     /// Returns fuzzy matching for <paramref name="needle"/> in <paramref name="haystack"/>.
