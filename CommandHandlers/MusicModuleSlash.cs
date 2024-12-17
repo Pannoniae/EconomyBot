@@ -124,7 +124,7 @@ public class MusicModuleSlash : ApplicationCommandsModule {
         var track = GuildMusic.queue.NowPlaying.track;
         await GuildMusic.queue.StopAsync();
         await CreateResponseAsync(ctx,
-            $"{Program.cube} {track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} skipped.");
+            $"{Program.cube} {track.ToLimitedTrackString()} skipped.");
     }
 
     [SlashCommand("skipnum", "Skips current track.")]
@@ -133,7 +133,7 @@ public class MusicModuleSlash : ApplicationCommandsModule {
             var track = GuildMusic.queue.NowPlaying.track;
             await GuildMusic.queue.StopAsync();
             await CreateResponseAsync(ctx,
-                $"{Program.cube} {track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} skipped.");
+                $"{Program.cube} {track.ToLimitedTrackString()} skipped.");
             await Task.Delay(500); // wait for the next one
         }
     }

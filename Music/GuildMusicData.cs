@@ -108,6 +108,12 @@ public sealed class GuildMusicData {
         Lavalink = lavalink;
         queue = new MusicQueue(this);
 
+        reload();
+
+        webhookCache = new WebhookCache(Guild);
+    }
+
+    public static void reload() {
         // load artist data from SDL file if available
         var parser = new SDLParser();
         try {
@@ -136,8 +142,6 @@ public sealed class GuildMusicData {
 
             artistWeights[artist.Key] = fCount * artist.Value.weight;
         }
-
-        webhookCache = new WebhookCache(Guild);
 
         logger.info("Initialised artist weights.");
     }
@@ -239,7 +243,7 @@ public sealed class GuildMusicData {
         }
 
         await CommandChannel.SendMessageAsync(
-            $"{DiscordEmoji.FromName(Program.client, ":pinkpill:")} A problem occured while playing {e.Track.Info.Title.Sanitize().Bold()} by {e.Track.Info.Author.Sanitize().Bold()}:\n{e.Exception}");
+            $"{Program.cube} A problem occured while playing {e.Track.ToLimitedTrackString()}:\n{e.Exception}");
     }
 
     /// <summary>
@@ -346,12 +350,6 @@ public sealed class GuildMusicData {
         // if not error, fix the titles up
 
         LavalinkTrack result = tracks.Result as LavalinkTrack ?? throw new InvalidOperationException();
-        // This is a typical example of bad cargo-cult programming. I am leaving it in because it doesn't matter,
-        // but this is how programs get slow.
-        // The naive programmer would think that filtering with where is cheap.
-        // The naive programmer doesn't think about the fact that it traverses the entire array or list.
-        // Instead of converting it to a proper imperative loop, writing a helper for concatenating the two conditions,
-        // or using a better language, we just copypaste the loop and hope for the best.
         if (result.Info.Title == "Unknown title") {
             result.Info.GetType().GetProperty("Title")!.SetValue(result.Info, Path.GetFileNameWithoutExtension(file));
         }

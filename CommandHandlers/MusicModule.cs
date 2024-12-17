@@ -141,8 +141,29 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         var weightsp = GuildMusicData.artistWeights.Select(
             w => $"{w.Key}: {w.Value / sum * 100:#.##}%");
 
+        // get number of tracks per artist
+        var tracks = new Dictionary<string, int>();
+        foreach (string artist in GuildMusicData.artistWeights.Keys) {
+            var path = GuildMusicData.getPath(GuildMusicData.artistMappings[artist].path);
+            try {
+                var files = Directory.GetFiles(path, "*",
+                    new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive }).Where(GuildMusicData.extensionFilter).ToArray();
+                tracks[artist] = files.Length;
+            }
+            catch (Exception e) {
+                tracks[artist] = 0;
+            }
+        }
+
         await common.respond(ctx, $"Weights:\n{string.Join("\n", weights)}");
         await common.respond(ctx, $"Weights (percent):\n{string.Join("\n", weightsp)}");
+        await common.respond(ctx, $"Tracks:\n{string.Join("\n", tracks.Select(t => $"{t.Key}: {t.Value}"))}");
+    }
+
+    [Command("rl"), Description("Reloads music data.")]
+    public async Task ReloadAsync(CommandContext ctx) {
+        GuildMusicData.reload();
+        await common.respond(ctx, "Reloaded music data.");
     }
 
     [Command("stopjazz"), Description("Stops jazz.")]
@@ -194,7 +215,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         else {
             var track = tracks.First();
             await common.respond(ctx,
-                $"Added {track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} to the playback queue.");
+                $"Added {track.ToLimitedTrackString()} to the playback queue.");
         }
     }
 
@@ -246,7 +267,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             else {
                 var track = tracks_.First();*/
             await common.respond(ctx,
-                $"Added {track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} to the playback queue.");
+                $"Added {track.ToLimitedTrackString()} to the playback queue.");
             return;
         }
 
@@ -258,7 +279,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         var content = results.Select((x, i) => (x, i))
             .GroupBy(e => e.i / 10)
             .Select(xg => new Page(
-                $"{string.Join("\n", xg.Select(xa => $"`{xa.i + 1}` {WebUtility.HtmlDecode(xa.x.Info.Title).Sanitize().Bold()} by {WebUtility.HtmlDecode(xa.x.Info.Author).Sanitize().Bold()}"))}\n\nPage {xg.Key + 1}/{pageCount}"));
+                $"{string.Join("\n", xg.Select(xa => $"`{xa.i + 1}` {xa.x.ToLimitedTrackString()}"))}\n\nPage {xg.Key + 1}/{pageCount}"));
 
         var ems = new PaginationEmojis {
             SkipLeft = null,
@@ -324,7 +345,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
         else {*/
         await common.modify(ctx, msg,
-            $"Added {track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} to the playback queue.");
+            $"Added {track.ToLimitedTrackString()} to the playback queue.");
     }
 
 
@@ -458,7 +479,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
         else {*/
         await common.modify(ctx, msg,
-            $"Added {lltrack.Info.Title.Sanitize().Bold()} by {lltrack.Info.Author.Sanitize().Bold()} to the playback queue.");
+            $"Added {lltrack.ToLimitedTrackString()} to the playback queue.");
     }
 
     [Command("play"), Priority(0)]
@@ -475,7 +496,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
 
         var msgC = string.Join("\n",
             results.Select((x, i) =>
-                $"{MusicCommon.NumberMappings[i + 1]} {WebUtility.HtmlDecode(x.Title).Sanitize().Bold()} by {WebUtility.HtmlDecode(x.Author).Sanitize().Bold()}"));
+                $"{MusicCommon.NumberMappings[i + 1]} {WebUtility.HtmlDecode(x.Title).Sanitize().Bold().URLDecode()} by {WebUtility.HtmlDecode(x.Author).Sanitize().Bold().URLDecode()}"));
         msgC =
             $"{msgC}\n\nType a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
         var msg = await ctx.RespondAsync(msgC);
@@ -553,7 +574,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         else {
             var track = tracks.First();
             await common.modify(ctx, msg,
-                $"Added {track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} to the playback queue.");
+                $"Added {track.ToLimitedTrackString()} to the playback queue.");
         }
     }
 
@@ -650,7 +671,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             var track = GuildMusic.queue.NowPlaying.track;
             await GuildMusic.queue.StopAsync();
             await common.respond(ctx,
-                $"{track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} skipped.");
+                $"{track.ToLimitedTrackString()} skipped.");
         }
         finally {
             _semaphore.Release();
@@ -666,7 +687,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
                 var track = GuildMusic.queue.NowPlaying.track;
                 await GuildMusic.queue.StopAsync();
                 await common.respond(ctx,
-                    $"{track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} skipped.");
+                    $"{track.ToLimitedTrackString()} skipped.");
                 await Task.Delay(500); // wait for the next one
             }
         }
@@ -717,7 +738,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         var track = GuildMusic.queue.NowPlaying.track;
         await GuildMusic.queue.RestartAsync();
         await common.respond(ctx,
-            $"{track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} restarted.");
+            $"{track.ToLimitedTrackString()} restarted.");
     }
 
     [Command("remove"), Description("Removes a track from playback queue."), Aliases("del", "rm")]
@@ -729,7 +750,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
 
         await common.respond(ctx,
-            $"{itemN.Info.Title.Sanitize().Bold()} by {itemN.Info.Author.Sanitize().Bold()} removed.");
+            $"{itemN.ToLimitedTrackString()} removed.");
     }
 
     [Command("queue"), Description("Displays current playback queue."), Aliases("q")]
@@ -783,7 +804,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
         else {
             await common.respond(ctx,
-                $"Now playing: {track.track.Info.Title.Sanitize().Bold()} by {track.track.Info.Author.Sanitize().Bold()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}].");
+                $"Now playing: {track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}].");
         }
     }
 
@@ -813,11 +834,15 @@ public static class Extensions {
     /// <param name="x">Music item to convert.</param>
     /// <returns>Track string.</returns>
     public static string ToTrackString(this LavalinkTrack x) {
-        return x != null ? $"{(x.Info.Title ?? "No title").Sanitize().Bold()} by {(x.Info.Author ?? "No Author").Sanitize().Bold()} [{x.Info.Length.ToDurationString()}]" : "";
+        return x != null ? $"{(x.Info.Title ?? "No title").Sanitize().Bold().URLDecode()} by {(x.Info.Author ?? "No Author").Sanitize().Bold().URLDecode()} [{x.Info.Length.ToDurationString()}]" : "";
+    }
+
+    public static string URLDecode(this string title) {
+        return WebUtility.HtmlDecode(WebUtility.UrlDecode(title));
     }
 
     public static string ToLimitedTrackString(this LavalinkTrack x) {
-        return x != null ? $"{(x.Info.Title ?? "No title").Sanitize().Bold()} by {(x.Info.Author ?? "No Author").Sanitize().Bold()}" : "";
+        return x != null ? $"{(x.Info.Title ?? "No title").Sanitize().Bold().URLDecode()} by {(x.Info.Author ?? "No Author").Sanitize().Bold().URLDecode()}" : "";
     }
 
     public static string ReversePath(this string s) {
