@@ -14,6 +14,8 @@
     <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
     <MetadataUpdaterSupport>false</MetadataUpdaterSupport>
     <UseSystemResourceKeys>true</UseSystemResourceKeys>
+    <ThreadPoolMinThreads>4</ThreadPoolMinThreads>
+    <ThreadPoolMaxThreads>4</ThreadPoolMaxThreads>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="bin\Debug\net9.0\runtimes\linux-x64\native\libe_sqlite3.so" />

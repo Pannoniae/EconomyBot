@@ -11,4 +11,4 @@ export MALLOC_MMAP_MAX_=65536
 export DOTNET_EnableWriteXorExecute=0
 
 dotnet ./EconomyBot.dll &
-java -jar -Xms10M -Xmx256M Lavalink.jar &
+java -jar -Xms10M -Xmx75m Lavalink.jar &
