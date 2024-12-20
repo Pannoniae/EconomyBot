@@ -289,9 +289,14 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             Right = DiscordEmoji.FromUnicode("▶")
         };
 
-        await interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, content, ems,
-            PaginationBehaviour.Ignore,
-            PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
+        if (pageCount == 1) {
+            await ctx.Channel.SendMessageAsync(content.First().Content);
+        }
+        else {
+            _ = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, content, ems,
+                PaginationBehaviour.Ignore,
+                PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
+        }
 
         var msgC =
             $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
@@ -394,9 +399,14 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             Right = DiscordEmoji.FromUnicode("▶")
         };
 
-        _ = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, content, ems,
-            PaginationBehaviour.Ignore,
-            PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
+        if (pageCount == 1) {
+            await ctx.Channel.SendMessageAsync(content.First().Content);
+        }
+        else {
+            _ = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, content, ems,
+                PaginationBehaviour.Ignore,
+                PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
+        }
 
         var msgC =
             $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
@@ -761,12 +771,12 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
     [Command("queue"), Description("Displays current playback queue."), Aliases("q")]
     public async Task QueueAsync(CommandContext ctx) {
         var track = GuildMusic.queue.NowPlaying;
-        if (track == default && GuildMusic.queue.Queue.Count == 0 && GuildMusic.queue.autoQueue.Count == 0) {
+        if (track == null && GuildMusic.queue.Queue.Count == 0 && GuildMusic.queue.autoQueue.Count == 0) {
             await common.respond(ctx, "Queue is empty!");
             return;
         }
 
-        var isPlaying = track != default;
+        var isPlaying = track != null;
         var interactivity = ctx.Client.GetInteractivity();
         var queue = GuildMusic.queue.getCombinedQueue();
         var pageCount = queue.Count / 10 + 1;
@@ -797,8 +807,14 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             Left = DiscordEmoji.FromUnicode("◀"),
             Right = DiscordEmoji.FromUnicode("▶")
         };
-        await interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages, ems, PaginationBehaviour.Ignore,
-            PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
+        if (pageCount == 1) {
+            await ctx.Channel.SendMessageAsync(pages.First().Content);
+        }
+        else {
+            _ = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages, ems,
+                PaginationBehaviour.Ignore,
+                PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
+        }
     }
 
     [Command("nowplaying"), Description("Displays information about currently-played track."), Aliases("np")]
