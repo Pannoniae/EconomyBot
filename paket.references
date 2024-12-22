@@ -1,11 +1,7 @@
 BooruSharp
 DetectLanguage
-DisCatSharp
-DisCatSharp.CommandsNext
-DisCatSharp.Interactivity
-DisCatSharp.Lavalink
-DisCatSharp.ApplicationCommands
-DisCatSharp.VoiceNext
+NetCord
+Lavalink4NET.NetCord
 FuzzierSharp
 JetBrains.Annotations
 Reddit
