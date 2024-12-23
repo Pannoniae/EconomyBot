@@ -1,6 +1,7 @@
 BooruSharp
 DetectLanguage
 NetCord
+NetCord.Hosting.Services
 Lavalink4NET.NetCord
 FuzzierSharp
 JetBrains.Annotations

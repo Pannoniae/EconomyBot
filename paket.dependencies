@@ -6,12 +6,13 @@ storage: none
 nuget BooruSharp prerelease
 nuget DetectLanguage prerelease
 nuget NetCord prerelease
+nuget NetCord.Hosting.Services prerelease
 nuget Lavalink4NET.NetCord prerelease
 nuget FuzzierSharp prerelease
 nuget JetBrains.Annotations prerelease
 nuget Newtonsoft.Json prerelease
 nuget Reddit prerelease
-nuget Spectre.Console prerelease`
+nuget Spectre.Console prerelease
 nuget Spectre.Console.Analyzer prerelease
 nuget SpotifyAPI.Web prerelease
 nuget Soulseek prerelease
