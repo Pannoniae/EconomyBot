@@ -27,10 +27,10 @@ class Program {
     private static readonly Logger logger = Logger.getClassLogger("Main");
 
     public static AudioService LavalinkNode;
-    //public static MusicService musicService;
-    //public static ImagesModule imagesModule;
+    public static MusicService musicService;
+    public static ImagesModule imagesModule;
     public static ToxicityHandler toxicity;
-    //public static WilteryHandler wiltery;
+    public static WilteryHandler wiltery;
 
     public static DetectLanguageClient languageClient;
 
@@ -282,7 +282,7 @@ class Program {
         if (!message.Content.StartsWith('.') && !message.Content.StartsWith('/') && message.Embeds.Count == 0 &&
             message.Attachments.Count == 0) {
             await toxicity.handleMessage(client, message);
-            //await wiltery.handleMessage(client, message);
+            await wiltery.handleMessage(client, message);
         }
 
         if (author.Id == 947229156448538634) {
@@ -310,11 +310,11 @@ class Program {
     private static async Task setup(GatewayClient client) {
         // Wait a bit with lavalink init, Lavalink seems to start slower than the bot. Lazy solution is pretty much a sleep
         await Task.Delay(3000);
-        //musicService = new MusicService(LavalinkNode);
+        musicService = new MusicService(LavalinkNode);
         lavalinkInit = true;
-        //imagesModule = new ImagesModule();
+        imagesModule = new ImagesModule();
         toxicity = new ToxicityHandler();
-        //wiltery = new WilteryHandler(Program.client);
+        wiltery = new WilteryHandler(Program.client);
         languageClient = new DetectLanguageClient(Constants.detectlanguagetoken);
 
         cube = await (await client.Rest.GetGuildAsync(838843082110664756)).GetEmojiAsync(839202645734457384);

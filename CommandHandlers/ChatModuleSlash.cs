@@ -42,7 +42,7 @@
 //     public async Task squish(InteractionContext ctx, GuildUser member) {
 //         var cat = "https://cdn.discordapp.com/attachments/1101712131222683659/1128320701456195594/image.png";
 //         await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
-//         await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder()
+//         await ctx.Channel.SendMessageAsync(new MessageProperties()
 //             .WithContent($"{member.DisplayName} was squished by a giant kitten.").WithEmbed(
 //                 new DiscordEmbedBuilder().WithImageUrl(
 //                     cat)));

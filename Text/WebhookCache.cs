@@ -36,7 +36,7 @@ public class WebhookCache(Guild guild) {
             effectiveChannel = DiscordShim.getChannel(channel.GuildId, channel.getChnParent()!.Value);
         }
 
-        await Console.Out.WriteLineAsync($"{effectiveChannel.Id}, {effectiveChannel.Name}");
+        AnsiConsole.WriteLine($"{effectiveChannel.Id}, {effectiveChannel.Name}");
         var webhooksForChannel = allWebhooks.Where(webhook => webhook.ChannelId == effectiveChannel.Id);
         var ourWebhook = webhooksForChannel.FirstOrDefault(webhook => webhook.Name == "jazz");
         if (ourWebhook == null) {

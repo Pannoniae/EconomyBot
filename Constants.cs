@@ -9,8 +9,7 @@ namespace EconomyBot;
 public static class Constants {
     
     private static readonly Logger logger = Logger.getClassLogger("Constants");
-    
-    public static ulong szerepjatek = 886722112310632499;
+
     public static ulong server = 828296966324224020;
 
     public static string? token;

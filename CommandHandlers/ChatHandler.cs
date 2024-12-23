@@ -10,7 +10,7 @@ public class ChatHandler {
         });
         var messagesList = await messages.ToListAsync();
         foreach (var message in messagesList.Reverse<RestMessage>()) {
-            await Console.Out.WriteLineAsync($"({message.CreatedAt}) {message.Author}:{message.Content}");
+            AnsiConsole.WriteLine($"({message.CreatedAt}) {message.Author}:{message.Content}");
         }
     }
 }
