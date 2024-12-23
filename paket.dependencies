@@ -5,9 +5,9 @@ source https://api.nuget.org/v3/index.json
 storage: none
 nuget BooruSharp prerelease
 nuget DetectLanguage prerelease
-nuget NetCord prerelease
-nuget NetCord.Hosting.Services prerelease
-nuget Lavalink4NET.NetCord prerelease
+nuget NetCord 1.0.0-alpha.338 prerelease
+nuget NetCord.Hosting.Services 1.0.0-alpha.338 prerelease
+nuget Microsoft.Extensions.Hosting prerelease
 nuget FuzzierSharp prerelease
 nuget JetBrains.Annotations prerelease
 nuget Newtonsoft.Json prerelease

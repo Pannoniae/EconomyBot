@@ -2,27 +2,24 @@
 using System.Net;
 using System.Text.RegularExpressions;
 using DetectLanguage;
-using DisCatSharp;
-using DisCatSharp.ApplicationCommands;
-using DisCatSharp.CommandsNext;
-using DisCatSharp.CommandsNext.Converters;
-using DisCatSharp.CommandsNext.Exceptions;
-using DisCatSharp.Entities;
-using DisCatSharp.Enums;
-using DisCatSharp.EventArgs;
-using DisCatSharp.Exceptions;
-using DisCatSharp.Interactivity;
-using DisCatSharp.Interactivity.Enums;
-using DisCatSharp.Interactivity.Extensions;
-using DisCatSharp.Lavalink;
-using DisCatSharp.Net;
 using EconomyBot.Logging;
+using Lavalink4NET.NetCord;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using NetCord;
+using NetCord.Gateway;
+using NetCord.Hosting.Gateway;
+using NetCord.Hosting.Services;
+using NetCord.Hosting.Services.Commands;
+using NetCord.Services;
+using NetCord.Services.Commands;
 using Spectre.Console;
 
 namespace EconomyBot;
 
 class Program {
+    private static CommandService<CommandContext> commands;
+    private static IHost host;
     private static IServiceProvider services { get; set; }
 
     private static readonly Logger logger = Logger.getClassLogger("Main");
@@ -40,7 +37,7 @@ class Program {
     public static bool lavalinkInit = false;
     public static bool hasSetup = false;
 
-    public static DiscordClient client;
+    public static GatewayClient client;
 
     public const ulong LOG = 838920584879800343;
     public static ulong HALLOFFAME = 1078991955633127474;
@@ -63,89 +60,77 @@ class Program {
 
         Constants.init();
 
-        var discord = new DiscordClient(new DiscordConfiguration {
-            TokenType = TokenType.Bot,
-            Token = Constants.token,
-            Intents = DiscordIntents.All
-        });
-        client = discord;
+        var builder = Host.CreateDefaultBuilder(args)
+            .UseDiscordGateway(options => {
+                options.Token = Constants.token;
+                options.Intents = GatewayIntents.All;
+            })
+            .UseLavalink(options => {
+                options.BaseAddress = new("http://localhost:2333/");
+                options.Passphrase = "youshallnotpass";
+            })
+            .UseCommands<CommandContext>(options => {
+                options.Prefix = ".";
+                options.TypeReaders.Remove(typeof(TimeSpan));
+                options.TypeReaders.Add(typeof(TimeSpan), new CustomTimeSpanConverter());
+            })
+            .ConfigureServices(collection => collection.AddSingleton(new YouTubeSearchProvider()));
 
-        // error handling
+        host = builder.Build()
+            .AddModules(typeof(Program).Assembly)
+            .UseGatewayEventHandlers();
 
-        var endpoint = new ConnectionEndpoint {
-            Hostname = "127.0.0.1", // From your server configuration.
-            Port = 2333 // From your server configuration
-        };
 
-        var lavalinkConfig = new LavalinkConfiguration {
-            Password = "youshallnotpass", // From your server configuration.
-            RestEndpoint = endpoint,
-            SocketEndpoint = endpoint
-        };
-        services = new ServiceCollection()
-            .AddSingleton(new YouTubeSearchProvider())
-            .BuildServiceProvider(true);
-        var lavalink = discord.UseLavalink();
-        var commands = discord.UseCommandsNext(new CommandsNextConfiguration {
-            StringPrefixes = ["."],
-            ServiceProvider = services
-        });
-        //var ApplicationCommands = discord.UseApplicationCommands(new ApplicationCommandsConfiguration {
-        //    ServiceProvider = services
-        //});
+        client = host.Services.GetService<GatewayClient>();
+        commands = host.Services.GetService<CommandService<CommandContext>>();
+
         try {
             //ApplicationCommands.RegisterCommands<ChatModuleSlash>();
             //ApplicationCommands.RegisterGlobalCommands<MusicModuleSlash>();
             //ApplicationCommands.RegisterGlobalCommands<ImagesModuleSlash>();
-            commands.CommandErrored += errorHandler;
-            commands.RegisterCommands<ChatModule>();
-            commands.RegisterCommands<MusicModule>();
-            commands.RegisterCommands<ImagesModule>();
-            commands.RegisterCommands<BotModule>();
+            commands.AddModule<ChatModule>();
+            commands.AddModule<MusicModule>();
+            commands.AddModule<ImagesModule>();
+            commands.AddModule<BotModule>();
         }
         catch (Exception e) {
-            if (e is BadRequestException ex) {
-                logger.error(ex.JsonMessage);
-            }
-
             logger.error(e.Message);
         }
-
-        discord.UseInteractivity(new InteractivityConfiguration {
-            Timeout = TimeSpan.FromSeconds(180),
-            PollBehaviour = PollBehaviour.KeepEmojis
-        });
-        discord.MessageCreated += messageHandler;
-        discord.MessagesBulkDeleted += messageDeleteHandler;
-        discord.Ready += async (sender, _) => await setup(sender, lavalink, lavalinkConfig);
+        client.MessageCreate += messageHandler;
+        client.MessageDeleteBulk += messageDeleteHandler;
+        client.Ready += async (sender, _) => await setup(client, lavalink, lavalinkConfig);
         //discord.GuildDownloadCompleted += (sender, _) => setupB(sender, lavalink, lavalinkConfig);
-        discord.MessageDeleted += messageDeleteHandler;
-        discord.GetCommandsNext().UnregisterConverter<TimeSpan>();
-        discord.GetCommandsNext().RegisterConverter(new CustomTimeSpanConverter());
-        await discord.ConnectAsync();
+        client.MessageDelete += messageDeleteHandler;
+
+
+
+
         MemoryUtils.cleanGC();
         var timer = new PeriodicTimer(TimeSpan.FromMinutes(10));
 
-        while (await timer.WaitForNextTickAsync()) {
-            try {
-                MemoryUtils.cleanGC();
-                foreach (var file in Directory.GetParent(Directory.GetCurrentDirectory())!.EnumerateFiles()) {
-                    file.Delete();
-                }
+        _ = Task.Run(async () => {
+            while (await timer.WaitForNextTickAsync()) {
+                try {
+                    MemoryUtils.cleanGC();
+                    foreach (var file in Directory.GetParent(Directory.GetCurrentDirectory())!.EnumerateFiles()) {
+                        file.Delete();
+                    }
 
-                logger.info("Pruned cached images.");
+                    logger.info("Pruned cached images.");
+                }
+                catch (Exception e) {
+                    // file is in use, ignore
+                    AnsiConsole.WriteException(e);
+                }
             }
-            catch (Exception e) {
-                // file is in use, ignore
-                AnsiConsole.WriteException(e);
-            }
-        }
+        });
 
         // hold console window
+        await host.RunAsync();
         await Task.Delay(-1);
     }
 
-    private static async Task messageDeleteHandler(DiscordClient sender, MessageBulkDeleteEventArgs e) {
+    private static async ValueTask messageDeleteHandler(MessageDeleteBulkEventArgs e) {
         foreach (var message in e.Messages) {
             await actualMessageDeleteHandler(e.Channel, message);
         }
@@ -194,24 +179,26 @@ class Program {
         }
     }
 
-    private static async Task messageDeleteHandler(DiscordClient sender, MessageDeleteEventArgs e) {
+    private static async Task messageDeleteHandler(GatewayClient sender, MessageDeleteEventArgs e) {
         await actualMessageDeleteHandler(e.Channel, e.Message);
     }
 
-    private static async Task messageHandler(DiscordClient client, MessageCreateEventArgs e) {
+    private static async ValueTask messageHandler(Message message) {
         if (!hasSetup) {
             return;
         }
 
         // gore protection
-        if (e.Message.Content.Contains("Screenshot_20230901_160903") ||
-            e.Message.Attachments.Any(f => f.Url.Contains("Screenshot_20230901_160903"))) {
-            await e.Guild.BanMemberAsync(e.Author as DiscordMember, 6);
+        if (message.Content.Contains("Screenshot_20230901_160903") ||
+            message.Attachments.Any(f => f.Url.Contains("Screenshot_20230901_160903"))) {
+            await message.Guild.BanMemberAsync(e.Author as DiscordMember, 6);
         }
 
+        client.
+
         // @everyone protection
-        if (e.Message.Content.Contains("@everyone") || e.Message.Content.Contains("@here")) {
-            await e.Message.RespondAsync("This server - and the world in general - would be better without your existence " + DiscordEmoji.FromName(client, ":pleading_face:"));
+        if (message.Content.Contains("@everyone") || e.Message.Content.Contains("@here")) {
+            await message.RespondAsync("This server - and the world in general - would be better without your existence " + BotEmoji.FromName(client, ":pleading_face:"));
         }
 
         if (client.CurrentUser.Id == e.Author.Id) {
@@ -318,7 +305,7 @@ class Program {
         }*/
     }
 
-    private static async Task setup(DiscordClient client, LavalinkExtension lavalink,
+    private static async Task setup(GatewayClient client, LavalinkExtension lavalink,
         LavalinkConfiguration lavalinkConfig) {
         // Wait a bit with lavalink init, Lavalink seems to start slower than the bot. Lazy solution is pretty much a sleep
         await Task.Delay(3000);
@@ -340,101 +327,33 @@ class Program {
         logger.info("Setup done!");
     }
 
-    private static async Task setupB(DiscordClient client, LavalinkExtension lavalink,
+    private static async Task setupB(GatewayClient client, LavalinkExtension lavalink,
         LavalinkConfiguration lavalinkConfig) {
         foreach (var guild in client.Guilds) {
             logger.info($"{guild.Value.Name}, {guild.Value.JoinedAt.ToString()}");
         }
     }
-
-    private static async Task errorHandler(CommandsNextExtension sender, CommandErrorEventArgs e) {
-        switch (e.Exception) {
-            // wrong number of arguments
-            case ArgumentException when e.Exception.Message.Contains("overload"): {
-                var command = e.Command.Name;
-                var suppliedArgumentsLength = e.Context.RawArgumentString.Split().Length;
-
-                // if args are empty, we don't have arguments 
-                if (string.IsNullOrWhiteSpace(e.Context.RawArgumentString)) {
-                    suppliedArgumentsLength = 0;
-                }
-
-                var minArgumentLength = int.MaxValue;
-                var maxArgumentLength = 0;
-                // too few arguments? loop through all overloads and check if we don't have enough
-                foreach (var overload in e.Command.Overloads) {
-                    // too few
-                    minArgumentLength = Math.Min(overload.Arguments.Count, minArgumentLength);
-                    // too many
-                    maxArgumentLength = Math.Max(overload.Arguments.Count, maxArgumentLength);
-                }
-
-                // professional logging:tm:
-                logger.debug(suppliedArgumentsLength);
-                logger.debug(maxArgumentLength);
-                logger.debug(minArgumentLength);
-
-                if (suppliedArgumentsLength > maxArgumentLength) {
-                    await sender.Client.SendMessageAsync(e.Context.Channel,
-                        $"Too many arguments for command `{command}`!");
-                    logger.warn(e.Exception);
-                    return;
-                }
-
-                if (suppliedArgumentsLength < minArgumentLength) {
-                    await sender.Client.SendMessageAsync(e.Context.Channel,
-                        $"Too few arguments for command `{command}`!");
-                    logger.warn(e.Exception);
-                    return;
-                }
-
-                // if correct number of arguments but bad type; print info
-
-                await sender.Client.SendMessageAsync(e.Context.Channel, $"Wrong parameters for command `{command}`!");
-                logger.warn(e.Exception);
-                return;
-            }
-            case CommandNotFoundException ex:
-                if (e.Command is not null && !e.Command.Name.All(char.IsLetterOrDigit)) {
-                    // ignore "command"...
-                    return;
-                }
-
-                var closestCommand =
-                    ActualFuzz.partialFuzzItem(ex.CommandName, e.Context.CommandsNext.RegisteredCommands.Keys);
-                await sender.Client.SendMessageAsync(e.Context.Channel, new DiscordMessageBuilder().WithEmbed(
-                    new DiscordEmbedBuilder().WithColor(DiscordColor.HotPink)
-                        .WithDescription(
-                            $"I have no bloody idea what that command is, sorry, did you mean {closestCommand}?")
-                        //.WithImageUrl("https://c.tenor.com/CR9Or4gKoAUAAAAC/menhera-menhera-chan.gif").Build()));
-                        .Build()));
-                return;
-            default:
-                logger.warn(e.Exception);
-                await sender.Client.SendMessageAsync(e.Context.Channel,
-                    $"Exception occurred, details below:\n```{e.Exception}```");
-                break;
-        }
-    }
 }
 
-public partial class CustomTimeSpanConverter : IArgumentConverter<TimeSpan> {
-    static private Regex TimeSpanRegex { get; } =
+public partial class CustomTimeSpanConverter : CommandTypeReader<CommandContext> {
+    private static Regex TimeSpanRegex { get; } =
         MyRegex();
 
     [GeneratedRegex(@"^(?<days>\d+d\s*)?(?<hours>\d{1,2}h\s*)?(?<minutes>\d{1,2}m\s*)?(?<seconds>\d{1,2}s\s*)?$",
         RegexOptions.Compiled | RegexOptions.ECMAScript)]
-    static private partial Regex MyRegex();
+    private static partial Regex MyRegex();
 
-    public Task<Optional<TimeSpan>> ConvertAsync(string value, CommandContext ctx) {
-        if (value == "0")
-            return Task.FromResult(Optional.FromNullable(TimeSpan.Zero));
+    public async override ValueTask<TypeReaderResult> ReadAsync(ReadOnlyMemory<char> input, CommandContext context, CommandParameter<CommandContext> parameter, CommandServiceConfiguration<CommandContext> configuration, IServiceProvider? serviceProvider) {
+        var value = input.ToString();
+        if (value == "0") {
+            return TypeReaderResult.Success(TimeSpan.Zero);
+        }
         if (int.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result1))
-            return Task.FromResult(Optional<TimeSpan>.None);
+            return TypeReaderResult.Fail("TimeSpan got a number?");
         if (TimeSpan.TryParse(value, CultureInfo.InvariantCulture, out var result2)) {
             var _result2 = new TimeSpan(0, result2.Hours, result2.Minutes); // slash from h:m to m:s
 
-            return Task.FromResult(Optional.FromNullable(_result2));
+            return TypeReaderResult.Success(_result2);
         }
 
         var strArray1 = new[] {
@@ -445,7 +364,7 @@ public partial class CustomTimeSpanConverter : IArgumentConverter<TimeSpan> {
         };
         var match = TimeSpanRegex.Match(value);
         if (!match.Success)
-            return Task.FromResult(Optional<TimeSpan>.None);
+            return TypeReaderResult.ParseFail(parameter.Name);
         var days = 0;
         var hours = 0;
         var minutes = 0;
@@ -477,6 +396,6 @@ public partial class CustomTimeSpanConverter : IArgumentConverter<TimeSpan> {
         }
 
         result2 = new TimeSpan(days, hours, minutes, seconds);
-        return Task.FromResult(Optional.FromNullable(result2));
+        return TypeReaderResult.Success(result2);
     }
 }

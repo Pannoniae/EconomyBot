@@ -2,7 +2,7 @@ BooruSharp
 DetectLanguage
 NetCord
 NetCord.Hosting.Services
-Lavalink4NET.NetCord
+Microsoft.Extensions.Hosting
 FuzzierSharp
 JetBrains.Annotations
 Reddit

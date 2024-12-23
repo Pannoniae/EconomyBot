@@ -52,27 +52,13 @@
     <Folder Include="lua\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="DisCatSharp">
-      <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
-    <PackageReference Update="DisCatSharp.ApplicationCommands">
-      <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
-    <PackageReference Update="DisCatSharp.CommandsNext">
-      <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
-    <PackageReference Update="DisCatSharp.Common">
-      <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
-    <PackageReference Update="DisCatSharp.Interactivity">
-      <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
-    <PackageReference Update="DisCatSharp.Lavalink">
-      <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
-    <PackageReference Update="DisCatSharp.VoiceNext">
-      <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
+    <Content Remove="Lavalink4NET.NetCord\**" />
+    <Compile Remove="Lavalink4NET.NetCord\**" />
+    <None Remove="Lavalink4NET.NetCord\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="Lavalink4NET.NetCord\Lavalink4NET.NetCord.csproj" />
   </ItemGroup>
   <Import Project=".paket\Paket.Restore.targets" />
 </Project>
