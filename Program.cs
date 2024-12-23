@@ -3,6 +3,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using DetectLanguage;
 using EconomyBot.Logging;
+using Lavalink4NET;
 using Lavalink4NET.NetCord;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,6 +12,7 @@ using NetCord.Gateway;
 using NetCord.Hosting.Gateway;
 using NetCord.Hosting.Services;
 using NetCord.Hosting.Services.Commands;
+using NetCord.Rest;
 using NetCord.Services;
 using NetCord.Services.Commands;
 using Spectre.Console;
@@ -24,7 +26,7 @@ class Program {
 
     private static readonly Logger logger = Logger.getClassLogger("Main");
 
-    public static LavalinkSession LavalinkNode;
+    public static AudioService LavalinkNode;
     public static MusicService musicService;
     public static ImagesModule imagesModule;
     public static ToxicityHandler toxicity;
@@ -32,7 +34,7 @@ class Program {
 
     public static DetectLanguageClient languageClient;
 
-    public static DiscordEmoji cube;
+    public static GuildEmoji cube;
 
     public static bool lavalinkInit = false;
     public static bool hasSetup = false;
@@ -81,8 +83,9 @@ class Program {
             .UseGatewayEventHandlers();
 
 
-        client = host.Services.GetService<GatewayClient>();
-        commands = host.Services.GetService<CommandService<CommandContext>>();
+        client = host.Services.GetService<GatewayClient>()!;
+        commands = host.Services.GetService<CommandService<CommandContext>>()!;
+        LavalinkNode = host.Services.GetService<AudioService>()!;
 
         try {
             //ApplicationCommands.RegisterCommands<ChatModuleSlash>();
@@ -98,7 +101,7 @@ class Program {
         }
         client.MessageCreate += messageHandler;
         client.MessageDeleteBulk += messageDeleteHandler;
-        client.Ready += async (sender, _) => await setup(client, lavalink, lavalinkConfig);
+        client.Ready += async e => await setup(client);
         //discord.GuildDownloadCompleted += (sender, _) => setupB(sender, lavalink, lavalinkConfig);
         client.MessageDelete += messageDeleteHandler;
 
@@ -131,20 +134,23 @@ class Program {
     }
 
     private static async ValueTask messageDeleteHandler(MessageDeleteBulkEventArgs e) {
-        foreach (var message in e.Messages) {
-            await actualMessageDeleteHandler(e.Channel, message);
+        if (e.GuildId == null) {
+            return;
+        }
+        foreach (var message in await DiscordShim.getMessages(e.GuildId.Value, e.ChannelId, e.MessageIds)) {
+            await actualMessageDeleteHandler(DiscordShim.getChannel(e.GuildId.Value, e.ChannelId), message);
         }
     }
 
-    private static async Task actualMessageDeleteHandler(DiscordChannel channel, DiscordMessage message) {
-        if (message.Attachments.Count != 0 && message.Channel.Id != LOG) {
+    private static async Task actualMessageDeleteHandler(IGuildChannel channel, RestMessage message) {
+        if (message.Attachments.Count != 0 && message.ChannelId != LOG) {
             // long wait so wrap it in task.run
             _ = Task.Run(async () => {
                 var guid = Guid.NewGuid();
                 foreach (var a in message.Attachments) {
                     var path = "";
                     try {
-                        path = Directory.GetCurrentDirectory() + a.Filename;
+                        path = Directory.GetCurrentDirectory() + a.FileName;
                         var ext = Path.GetExtension(path);
                         path += guid + ext;
                         //slap the correct extension on it
@@ -155,60 +161,49 @@ class Program {
                         throw;
                     }
                     catch (Exception) {
-                        await channel.SendMessageAsync("Penis happened!");
+                        await DiscordShim.sendMessage(channel, "Penis happened!");
                     }
 
                     var file = new FileStream(path, FileMode.Open);
-                    await (await client.GetGuildAsync(838843082110664756)).GetChannel(LOG)
-                        .SendMessageAsync(new DiscordMessageBuilder().WithFile(file));
+                    await client.Cache.Guilds[838843082110664756].Channels[LOG]
+                        .SendMessageAsync(new MessageProperties().WithAttachments([
+                            new(a.FileName, file)
+                        ]));
                 }
             });
         }
-
-        if (message.Author == client.CurrentUser && message.Channel.Id != LOG) {
-            var server = await client.GetGuildAsync(838843082110664756);
-            _ = Task.Run(async () => {
-                await Task.Delay(3000); // stupid discord doesnt update logs immediately
-                var logs = await server.GetAuditLogsAsync(10, actionType: AuditLogActionType.MessageDelete);
-                var deleter = logs.FirstOrDefault(log =>
-                        log is DiscordAuditLogMessageEntry entry && entry.Target.Id == message.Id)?
-                    .UserResponsible?.Username ?? "unknown";
-                await server.GetChannel(LOG)
-                    .SendMessageAsync($"{message.Content} deleted by {deleter}");
-            });
-        }
     }
 
-    private static async Task messageDeleteHandler(GatewayClient sender, MessageDeleteEventArgs e) {
-        await actualMessageDeleteHandler(e.Channel, e.Message);
+    private static async ValueTask messageDeleteHandler(MessageDeleteEventArgs e) {
+        await actualMessageDeleteHandler(DiscordShim.getChannel(e.GuildId.Value, e.ChannelId), await DiscordShim.getMessage(e.GuildId.Value, e.ChannelId, e.MessageId));
     }
 
     private static async ValueTask messageHandler(Message message) {
-        if (!hasSetup) {
+        if (!hasSetup || message.GuildId == null) {
             return;
         }
+        var guild = message.Guild!;
 
         // gore protection
         if (message.Content.Contains("Screenshot_20230901_160903") ||
             message.Attachments.Any(f => f.Url.Contains("Screenshot_20230901_160903"))) {
-            await message.Guild.BanMemberAsync(e.Author as DiscordMember, 6);
+            await guild.BanUserAsync(message.Author.Id, 6);
         }
-
-        client.
 
         // @everyone protection
-        if (message.Content.Contains("@everyone") || e.Message.Content.Contains("@here")) {
-            await message.RespondAsync("This server - and the world in general - would be better without your existence " + BotEmoji.FromName(client, ":pleading_face:"));
+        if (message.Content.Contains("@everyone") || message.Content.Contains("@here")) {
+            await message.ReplyAsync("This server - and the world in general - would be better without your existence " + BotEmoji.FromName(client, ":pleading_face:"));
         }
 
-        if (client.CurrentUser.Id == e.Author.Id) {
+        if (client.Cache.User.Id == message.Author.Id) {
             return;
         }
 
         // Don't reply to webhooks with embeds. The bot might have sent them
-        if (e.Message.WebhookMessage && e.Message.Embeds.Count > 0) {
+        if (message.WebhookId.HasValue && message.Embeds.Count > 0) {
             return;
         }
+        var author = (message.Author as GuildUser)!;
 
         // Funny replacement handling
         // todo
@@ -236,10 +231,10 @@ class Program {
         };
 
         // Cringe
-        if ((e.Channel.Id != POLISH_CHANNEL && e.Channel.Id != ZOO && e.Channel.Id != HUNGARY_CHANNEL) && lizardry.Any(
+        if ((message.Channel.Id != POLISH_CHANNEL && message.Channel.Id != ZOO && message.Channel.Id != HUNGARY_CHANNEL) && lizardry.Any(
                 word =>
-                    e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase))) {
-            await e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":lizard:"));
+                    message.Content.Contains(word, StringComparison.OrdinalIgnoreCase))) {
+            await message.AddReactionAsync(BotEmoji.FromName(client, ":lizard:"));
         }
 
         var cute = new List<string> {
@@ -251,19 +246,21 @@ class Program {
         // Hoholness
 
         var hohol = "hohol";
-        if (e.Message.Content.Contains(hohol, StringComparison.OrdinalIgnoreCase)) {
-            await ((DiscordMember)e.Author).TimeoutAsync(DateTimeOffset.Now + TimeSpan.FromHours(1), "russian simp");
+        if (message.Content.Contains(hohol, StringComparison.OrdinalIgnoreCase)) {
+            await author.TimeOutAsync(DateTimeOffset.Now + TimeSpan.FromHours(1), new RestRequestProperties {
+                AuditLogReason = "russian simp"
+            });
         }
 
         // Lizardry
         if (cute.Any(word =>
-                e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase))) {
-            await e.Message.RespondAsync("You are a meanie >.<");
+                message.Content.Contains(word, StringComparison.OrdinalIgnoreCase))) {
+            await message.ReplyAsync("You are a meanie >.<");
         }
 
         // Ukrainian language promotion handler, don't trigger if it's a quote
-        if (e.Channel.Id == UKRAYINSKIJ_KANAL && !e.Message.Content.Contains('"') && e.Message.Content.Length > 10) {
-            var results = await languageClient.DetectAsync(e.Message.Content);
+        if (message.Channel.Id == UKRAYINSKIJ_KANAL && !message.Content.Contains('"') && message.Content.Length > 10) {
+            var results = await languageClient.DetectAsync(message.Content);
             bool isRussian = results.Any(r => r.language == "ru" && r.confidence > 1 && r.reliable);
             bool isNotUkrainian = results.All(r => r.language != "uk");
             logger.info($"Language analysis:");
@@ -272,19 +269,19 @@ class Program {
             }
 
             if (isRussian && isNotUkrainian) {
-                await e.Message.RespondAsync("москальська свиня");
+                await message.ReplyAsync("москальська свиня");
             }
         }
 
         // Toxicity handler
-        if (!e.Message.Content.StartsWith('.') && !e.Message.Content.StartsWith('/') && e.Message.Embeds.Count == 0 &&
-            e.Message.Attachments.Count == 0) {
-            await toxicity.handleMessage(client, e.Message);
-            await wiltery.handleMessage(client, e.Message);
+        if (!message.Content.StartsWith('.') && !message.Content.StartsWith('/') && message.Embeds.Count == 0 &&
+            message.Attachments.Count == 0) {
+            await toxicity.handleMessage(client, message);
+            await wiltery.handleMessage(client, message);
         }
 
-        if (e.Author.Id == 947229156448538634) {
-            await e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":pinkpill:"));
+        if (author.Id == 947229156448538634) {
+            await message.AddReactionAsync(BotEmoji.FromName(client, ":pinkpill:"));
         }
 
         var meowList = new List<string> {
@@ -301,35 +298,32 @@ class Program {
         /*if (meowList.Any(word =>
                 e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase) ||
                 e.Message.Attachments.Any(a => a.Url.Contains(word, StringComparison.OrdinalIgnoreCase)))) {
-            await e.Message.RespondAsync("*meow*");
+            await e.Message.ReplyAsync("*meow*");
         }*/
     }
 
-    private static async Task setup(GatewayClient client, LavalinkExtension lavalink,
-        LavalinkConfiguration lavalinkConfig) {
+    private static async Task setup(GatewayClient client) {
         // Wait a bit with lavalink init, Lavalink seems to start slower than the bot. Lazy solution is pretty much a sleep
         await Task.Delay(3000);
-        LavalinkNode = await lavalink.ConnectAsync(lavalinkConfig);
-        musicService = new MusicService(lavalink, LavalinkNode);
+        musicService = new MusicService(LavalinkNode);
         lavalinkInit = true;
         imagesModule = new ImagesModule();
         toxicity = new ToxicityHandler();
         wiltery = new WilteryHandler(Program.client);
         languageClient = new DetectLanguageClient(Constants.detectlanguagetoken);
 
-        cube = await (await client.GetGuildAsync(838843082110664756)).GetEmojiAsync(839202645734457384);
+        cube = await (await client.Rest.GetGuildAsync(838843082110664756)).GetEmojiAsync(839202645734457384);
 
         hasSetup = true;
 
         // don't need to wait!
-        _ = setupB(client, lavalink, lavalinkConfig);
+        _ = setupB(client);
 
         logger.info("Setup done!");
     }
 
-    private static async Task setupB(GatewayClient client, LavalinkExtension lavalink,
-        LavalinkConfiguration lavalinkConfig) {
-        foreach (var guild in client.Guilds) {
+    private static async Task setupB(GatewayClient client) {
+        foreach (var guild in client.Cache.Guilds) {
             logger.info($"{guild.Value.Name}, {guild.Value.JoinedAt.ToString()}");
         }
     }

@@ -301,7 +301,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         var msgC =
             $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
 
-        var msg = await ctx.RespondAsync(msgC);
+        var msg = await ctx.ReplyAsync(msgC);
 
         var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User && x.Channel == ctx.Channel,
             TimeSpan.FromMinutes(2));
@@ -411,7 +411,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         var msgC =
             $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
 
-        var msg = await ctx.RespondAsync(msgC);
+        var msg = await ctx.ReplyAsync(msgC);
 
         var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User && x.Channel == ctx.Channel,
             TimeSpan.FromMinutes(2));
@@ -509,7 +509,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
                 $"{MusicCommon.NumberMappings[i + 1]} {WebUtility.HtmlDecode(x.Title).Sanitize().Bold().URLDecode()} by {WebUtility.HtmlDecode(x.Author).Sanitize().Bold().URLDecode()}"));
         msgC =
             $"{msgC}\n\nType a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
-        var msg = await ctx.RespondAsync(msgC);
+        var msg = await ctx.ReplyAsync(msgC);
 
         var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User, TimeSpan.FromSeconds(30));
         if (res.TimedOut || res.Result == null) {

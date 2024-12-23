@@ -4,6 +4,8 @@ using DisCatSharp.Entities;
 using DisCatSharp.Lavalink;
 using DisCatSharp.Lavalink.Entities;
 using DisCatSharp.Lavalink.EventArgs;
+using Lavalink4NET;
+using NetCord.Gateway;
 using Soulseek;
 using File = Soulseek.File;
 
@@ -13,9 +15,9 @@ namespace EconomyBot;
 /// Provides a persistent way of tracking music in various guilds.
 /// </summary>
 public sealed class MusicService {
-    private LavalinkExtension Lavalink;
+    private AudioService Lavalink;
     private ConcurrentDictionary<ulong, GuildMusicData> MusicData;
-    private readonly DiscordClient client;
+    private readonly GatewayClient client;
 
 
     public SoulseekClient slsk;
@@ -25,7 +27,7 @@ public sealed class MusicService {
     /// <summary>
     /// Creates a new instance of this music service.
     /// </summary>
-    public MusicService(LavalinkExtension lavalink, LavalinkSession theNode) {
+    public MusicService(AudioService lavalink) {
         Lavalink = lavalink;
         MusicData = new ConcurrentDictionary<ulong, GuildMusicData>();
         client = lavalink.Client;

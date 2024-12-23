@@ -24,14 +24,14 @@ public class MusicCommon {
             { 7, DiscordEmoji.FromUnicode("7\u20e3") },
             { 8, DiscordEmoji.FromUnicode("8\u20e3") },
             { 9, DiscordEmoji.FromUnicode("9\u20e3") },
-            { 10, DiscordEmoji.FromName(Program.client, ":keycap_ten:") },
+            { 10, BotEmoji.FromName(Program.client, ":keycap_ten:") },
             { -1, DiscordEmoji.FromUnicode("\u274c") }
         };
         NumberMappingsReverse = NumberMappings.ToDictionary(x => x.Value, x => x.Key);
     }
 
     public async Task respond(CommandContext ctx, string response) {
-        await ctx.RespondAsync($"{Program.cube} {response}");
+        await ctx.ReplyAsync($"{Program.cube} {response}");
     }
     
     public async Task modify(CommandContext ctx, DiscordMessage msg, string response) {

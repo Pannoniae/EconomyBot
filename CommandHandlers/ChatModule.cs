@@ -59,7 +59,7 @@ public class ChatModule : BaseCommandModule {
         }
 
         await ctx.Channel.DeleteMessagesAsync(messages);
-        await ctx.RespondAsync($"Deleted {amt} messages!");
+        await ctx.ReplyAsync($"Deleted {amt} messages!");
     }
 
     [Command]
@@ -75,7 +75,7 @@ public class ChatModule : BaseCommandModule {
     [Command]
     public async Task roll(CommandContext ctx, int sides) {
         var num = new Random().Next(1, sides + 1);
-        await ctx.RespondAsync($"You rolled {num}!");
+        await ctx.ReplyAsync($"You rolled {num}!");
     }
 
     [Command]
@@ -128,7 +128,7 @@ public class ChatModule : BaseCommandModule {
     [Command("0x")]
     public async Task love0x(CommandContext ctx) {
         var zerox = "https://tenor.com/view/girl-anime-kiss-anime-i-love-you-girl-kiss-gif-14375355";
-        await ctx.RespondAsync(new DiscordMessageBuilder()
+        await ctx.ReplyAsync(new DiscordMessageBuilder()
             .WithContent($"{(await ctx.Guild.GetMemberAsync(ZEROX)).Mention} is amazing and I love them so much!"));
         await ctx.Channel.SendMessageAsync(zerox);
     }
@@ -136,7 +136,7 @@ public class ChatModule : BaseCommandModule {
     [Command("panno")]
     public async Task lovepanno(CommandContext ctx) {
         var panno = "https://tenor.com/view/hug-gif-25588769";
-        await ctx.RespondAsync(new DiscordMessageBuilder()
+        await ctx.ReplyAsync(new DiscordMessageBuilder()
             .WithContent($"Pannoniae is a 12/10 human being that deserves love and appreciation <3"));
         await ctx.Channel.SendMessageAsync(panno);
     }

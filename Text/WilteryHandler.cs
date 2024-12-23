@@ -4,6 +4,8 @@ using System.Web;
 using DisCatSharp;
 using DisCatSharp.Entities;
 using EconomyBot.Logging;
+using Lavalink4NET.Protocol;
+using NetCord.Gateway;
 using Newtonsoft.Json.Linq;
 
 namespace EconomyBot;
@@ -17,16 +19,16 @@ public class WilteryHandler {
     /// </summary>
     public GuildMusicData GuildMusic { get; set; }
 
-    public DiscordClient client;
+    public GatewayClient client;
     public HttpClient httpClient = new();
 
     private List<MessageHandler> messageHandlers = new();
 
     //noop
-    public WilteryHandler(DiscordClient client) {
+    public WilteryHandler(GatewayClient client) {
         this.client = client;
 
-        messageHandlers.Add(new WordExceptionMessageHandler("ball", DiscordEmoji.FromName(client, ":chestnut:"),
+        messageHandlers.Add(new WordExceptionMessageHandler("ball", BotEmoji.FromName(client, ":chestnut:"),
             "basket"));
         messageHandlers.Add(new WordMessageHandler("hrt", "hurt"));
         messageHandlers.Add(new ResponseWordMessageHandler("anal", "Have fun getting HIV"));
@@ -90,7 +92,7 @@ public class WilteryHandler {
         }.AddEmbeds(message.Embeds));
     }
 
-    public async Task handleMessage(DiscordClient client, DiscordMessage message) {
+    public async Task handleMessage(GatewayClient client, Message message) {
         // ensure everything is set up
         Music = Program.musicService;
         GuildMusic = await Music.GetOrCreateDataAsync(message.Channel.Guild);
@@ -244,6 +246,6 @@ public class WordExceptionMessageHandler(string target, string replacement, para
 
 public class ResponseWordMessageHandler(string target, string response) : WordMessageHandler(target, response) {
     public override async void process(WilteryHandler handler, DiscordMessage message) {
-        await message.RespondAsync(response);
+        await message.ReplyAsync(response);
     }
 }

@@ -2,9 +2,8 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Web;
-using DisCatSharp;
-using DisCatSharp.Entities;
 using EconomyBot.Logging;
+using NetCord.Gateway;
 using Newtonsoft.Json.Linq;
 
 namespace EconomyBot;
@@ -22,7 +21,7 @@ public class ToxicityHandler {
 
     private static readonly Logger logger = Logger.getClassLogger("ToxicityHandler");
 
-    public async Task handleMessage(DiscordClient client, DiscordMessage message) { 
+    public async Task handleMessage(GatewayClient client, Message message) {
         if (string.IsNullOrEmpty(message.Content)) {
             return;
         }
@@ -64,17 +63,17 @@ public class ToxicityHandler {
 
         // if it is hostile, don't process flirting
         if (threat && !checkMsgCooldown(now, "threat")) {
-            await message.RespondAsync("This user glows");
+            await message.ReplyAsync("This user glows");
             return;
         }
 
         if (attack && !checkMsgCooldown(now, "attack")) {
-            await message.RespondAsync("Fuck you too!");
+            await message.ReplyAsync("Fuck you too!");
             return;
         }
 
         if (toxic && !checkMsgCooldown(now, "toxic")) {
-            await message.RespondAsync("shut up");
+            await message.ReplyAsync("shut up");
             return;
         }
 
@@ -92,16 +91,16 @@ public class ToxicityHandler {
         }
 
         if (values.sexualScore > 0.7 && !checkMsgCooldown(now, "sexual")) {
-            await message.RespondAsync(DiscordEmoji.FromName(client, ":flushed:"));
+            await message.ReplyAsync(BotEmoji.FromName(client, ":flushed:"));
         }
 
         if (values.flirtingScore > 0.7 && !checkMsgCooldown(now, "love")) {
-            await message.RespondAsync($"cute! {DiscordEmoji.FromName(client, ":blue_heart:")}");
+            await message.ReplyAsync($"cute! {BotEmoji.FromName(client, ":blue_heart:")}");
         }
 
         // they could be 0 (default value) if the second API errors but the condition of >0.7 covers that anyway
         if ((values.sadness > 0.7 || values.fear > 0.8) && !checkMsgCooldown(now, "fear")) {
-            await message.RespondAsync("*hugs*");
+            await message.ReplyAsync("*hugs*");
         }
     }
 
@@ -184,7 +183,7 @@ public class ToxicityValues {
     public double disgust;
     public double fear;
 
-    public static async Task<ToxicityValues?> constructToxicityValues(HttpClient client, DiscordMessage message) {
+    public static async Task<ToxicityValues?> constructToxicityValues(HttpClient client, Message message) {
         var inst = new ToxicityValues();
         var json = $$"""
         {"comment": {"text": "{{HttpUtility.JavaScriptStringEncode(message.Content)}}" },"requestedAttributes":{

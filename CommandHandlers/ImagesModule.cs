@@ -26,7 +26,7 @@ public class ImagesModule : BaseCommandModule {
             var imgProvider = new RedditImageProvider();
             var yuri = await imgProvider.getImageFromSub("yuri");
             if (yuri == "penis") {
-                await ctx.RespondAsync("The bot is currently cuddling, sorry.^^");
+                await ctx.ReplyAsync("The bot is currently cuddling, sorry.^^");
                 return;
             }
 
@@ -36,7 +36,7 @@ public class ImagesModule : BaseCommandModule {
             var imgProvider = new BooruImageProvider();
             var yuri = await imgProvider.getRandomYuri();
             if (yuri == "penis") {
-                await ctx.RespondAsync("The bot is currently cuddling, sorry.^^");
+                await ctx.ReplyAsync("The bot is currently cuddling, sorry.^^");
                 return;
             }
 
@@ -49,7 +49,7 @@ public class ImagesModule : BaseCommandModule {
         Console.Out.WriteLine($"URL: {url}");
         var messageBuilder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
             .WithColor(DiscordColor.Rose).WithDescription(title).WithImageUrl(url));
-        await ctx.RespondAsync(messageBuilder);
+        await ctx.ReplyAsync(messageBuilder);
     }
 
     [Command("b"), Description("I love you Msozod :3")]
@@ -62,7 +62,7 @@ public class ImagesModule : BaseCommandModule {
         var content = responseJson["extract"].Value<string>() ?? null;
         var url = responseJson["content_urls"]["desktop"]["page"].Value<string>();
 
-        await ctx.RespondAsync(new DiscordEmbedBuilder().WithTitle(title).WithThumbnail(img)
+        await ctx.ReplyAsync(new DiscordEmbedBuilder().WithTitle(title).WithThumbnail(img)
             .WithColor(DiscordColor.Rose).WithDescription(content).AddField(new DiscordEmbedField("Link:", url)).Build());
     }
 
@@ -75,7 +75,7 @@ public class ImagesModule : BaseCommandModule {
             num = latestComicJson["num"].Value<int>();
         }
         catch (Exception e) {
-            await ctx.RespondAsync("Failed to get XKCD.");
+            await ctx.ReplyAsync("Failed to get XKCD.");
             await Console.Out.WriteLineAsync(e.ToString());
             return;
         }
@@ -93,7 +93,7 @@ public class ImagesModule : BaseCommandModule {
             alt = randomComicJson["alt"].Value<string>();
         }
         catch (Exception e) {
-            await ctx.RespondAsync("Failed to get XKCD.");
+            await ctx.ReplyAsync("Failed to get XKCD.");
             await Console.Out.WriteLineAsync(e.ToString());
             return;
         }
@@ -107,7 +107,7 @@ public class ImagesModule : BaseCommandModule {
                 + Environment.NewLine
                 + alt);
 
-        await ctx.RespondAsync(embed);
+        await ctx.ReplyAsync(embed);
     }
 
     [Command("xkcd"), Description("Gets a specific XKCD.")]
@@ -124,7 +124,7 @@ public class ImagesModule : BaseCommandModule {
             alt = randomComicJson["alt"].Value<string>();
         }
         catch (Exception e) {
-            await ctx.RespondAsync("Failed to get XKCD.");
+            await ctx.ReplyAsync("Failed to get XKCD.");
             await Console.Out.WriteLineAsync(e.ToString());
             return;
         }
@@ -138,6 +138,6 @@ public class ImagesModule : BaseCommandModule {
                 + Environment.NewLine
                 + alt);
 
-        await ctx.RespondAsync(embed);
+        await ctx.ReplyAsync(embed);
     }
 }
