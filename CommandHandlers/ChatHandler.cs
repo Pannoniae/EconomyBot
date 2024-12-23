@@ -1,12 +1,16 @@
-﻿using DisCatSharp.Entities;
+﻿using NetCord.Gateway;
+using NetCord.Rest;
 
-namespace EconomyBot.CommandHandlers; 
+namespace EconomyBot.CommandHandlers;
 
 public class ChatHandler {
-    public static async Task test2(DiscordGuild guild) {
-        var messages = await guild.GetChannel(916804452193824809).GetMessagesAsync(1000);
-        foreach (var message in messages.Reverse<DiscordMessage>()) {
-            await Console.Out.WriteLineAsync($"({message.Timestamp}) {message.Author}:{message.Content}");
+    public static async Task test2(Guild guild) {
+        var messages = Program.client.Rest.GetMessagesAsync(916804452193824809, new PaginationProperties<ulong> {
+            Limit = 1000
+        });
+        var messagesList = await messages.ToListAsync();
+        foreach (var message in messagesList.Reverse<RestMessage>()) {
+            await Console.Out.WriteLineAsync($"({message.CreatedAt}) {message.Author}:{message.Content}");
         }
     }
 }

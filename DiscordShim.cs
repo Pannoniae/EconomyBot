@@ -1,5 +1,7 @@
+using System.Runtime.CompilerServices;
 using NetCord;
 using NetCord.Gateway;
+using NetCord.JsonModels;
 using NetCord.Rest;
 
 namespace EconomyBot;
@@ -37,5 +39,18 @@ public static class DiscordShim {
 
     public static async Task SendMessageAsync(this IGuildChannel channel, MessageProperties message) {
         await client.Rest.SendMessageAsync(channel.Id, message);
+    }
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_jsonModel")]
+    public static extern JsonChannel jsonChannel(Channel channel);
+
+    public static ChannelType getChnType(this IGuildChannel channel) {
+        var jsonChannel = DiscordShim.jsonChannel((Channel)channel);
+        return jsonChannel.Type;
+    }
+
+    public static ulong? getChnParent(this IGuildChannel channel) {
+        var jsonChannel = DiscordShim.jsonChannel((Channel)channel);
+        return jsonChannel.ParentId;
     }
 }

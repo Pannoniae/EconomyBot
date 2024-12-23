@@ -1,12 +1,13 @@
-using DisCatSharp.CommandsNext;
-using DisCatSharp.CommandsNext.Attributes;
+using System.ComponentModel;
+using NetCord.Services.Commands;
 
 namespace EconomyBot;
 
-public class BotModule : BaseCommandModule {
+public class BotModule : CommandModule<CommandContext> {
 
     [Command("gc"), Description("Clears the bot's memory.")]
-    public async Task GCAsync(CommandContext ctx) {
+    public string GCAsync() {
         MemoryUtils.cleanGC();
+        return "cleaned";
     }
 }
