@@ -50,32 +50,19 @@
   <ItemGroup>
     <Folder Include="bin\Debug\net9.0\runtimes\linux-x64\native\" />
     <Folder Include="lua\" />
-    <Content Remove="DisCatSharp.NetCord\**" />
-    <Compile Remove="DisCatSharp.NetCord\**" />
+    <EmbeddedResource Remove="DisCatSharp\**"/>
+    <Content Remove="DisCatSharp\**" />
+    <Compile Remove="DisCatSharp\**" />
     <None Remove="DisCatSharp\**" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Update="DisCatSharp">
-      <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
-    <ProjectReference Update="DisCatSharp.ApplicationCommands">
-      <Version>10.6.6-nightly-021</Version>
-    </ProjectReference>
-    <ProjectReference Update="DisCatSharp.CommandsNext">
-      <Version>10.6.6-nightly-021</Version>
-    </ProjectReference>
-    <ProjectReference Update="DisCatSharp.Common">
-      <Version>10.6.6-nightly-021</Version>
-    </ProjectReference>
-    <ProjectReference Update="DisCatSharp.Interactivity">
-      <Version>10.6.6-nightly-021</Version>
-    </ProjectReference>
-    <ProjectReference Update="DisCatSharp.Lavalink">
-      <Version>10.6.6-nightly-021</Version>
-    </ProjectReference>
-    <ProjectReference Update="DisCatSharp.VoiceNext">
-      <Version>10.6.6-nightly-021</Version>
-    </ProjectReference>
+    <ProjectReference Include="DisCatSharp\DisCatSharp\DisCatSharp.csproj"/>
+    <ProjectReference Include="DisCatSharp\DisCatSharp.ApplicationCommands\DisCatSharp.ApplicationCommands.csproj"/>
+    <ProjectReference Include="DisCatSharp\DisCatSharp.CommandsNext\DisCatSharp.CommandsNext.csproj"/>
+    <ProjectReference Include="DisCatSharp\DisCatSharp.Common\DisCatSharp.Common.csproj"/>
+    <ProjectReference Include="DisCatSharp\DisCatSharp.Interactivity\DisCatSharp.Interactivity.csproj"/>
+    <ProjectReference Include="DisCatSharp\DisCatSharp.Lavalink\DisCatSharp.Lavalink.csproj"/>
+    <ProjectReference Include="DisCatSharp\DisCatSharp.VoiceNext\DisCatSharp.VoiceNext.csproj"/>
   </ItemGroup>
   <Import Project=".paket\Paket.Restore.targets" />
 </Project>
