@@ -8,6 +8,7 @@ using DisCatSharp.EventArgs;
 using DisCatSharp.Interactivity.Enums;
 
 using Microsoft.Extensions.Logging;
+using NetCord.Gateway;
 
 namespace DisCatSharp.Interactivity.EventHandling;
 

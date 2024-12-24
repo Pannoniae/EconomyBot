@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using DisCatSharp.Interactivity.Enums;
 using DisCatSharp.Interactivity.EventHandling;
+using NetCord;
 using NetCord.Gateway;
+using NetCord.Rest;
 
 namespace DisCatSharp.Interactivity;
 
@@ -79,7 +82,7 @@ public class InteractivityExtension {
     /// <param name="behaviour">What to do when the poll ends.</param>
     /// <param name="timeout">Override timeout period.</param>
     /// <returns></returns>
-    public async Task<ReadOnlyCollection<PollEmoji>> DoPollAsync(RestMessage m, IEnumerable<DiscordEmoji> emojis, PollBehaviour? behaviour = default, TimeSpan? timeout = null) {
+    public async Task<ReadOnlyCollection<PollEmoji>> DoPollAsync(RestMessage m, IEnumerable<EmojiProperties> emojis, PollBehaviour? behaviour = default, TimeSpan? timeout = null) {
         if (!Utilities.HasReactionIntents(this.Client.Configuration.Intents))
             throw new InvalidOperationException("No reaction intents are enabled.");
 
@@ -598,7 +601,7 @@ public class InteractivityExtension {
     /// <param name="timeoutOverride">Override timeout period.</param>
     public async Task<InteractivityResult<TypingStartEventArgs>> WaitForUserTypingAsync(
         User user,
-        DiscordChannel channel,
+        IGuildChannel channel,
         TimeSpan? timeoutOverride = null
     ) {
         if (!Utilities.HasTypingIntents(this.Client.Configuration.Intents))
@@ -634,7 +637,7 @@ public class InteractivityExtension {
     /// </summary>
     /// <param name="channel">Channel to type in.</param>
     /// <param name="timeoutOverride">Override timeout period.</param>
-    public async Task<InteractivityResult<TypingStartEventArgs>> WaitForTypingAsync(DiscordChannel channel, TimeSpan? timeoutOverride = null) {
+    public async Task<InteractivityResult<TypingStartEventArgs>> WaitForTypingAsync(IGuildChannel channel, TimeSpan? timeoutOverride = null) {
         if (!Utilities.HasTypingIntents(this.Client.Configuration.Intents))
             throw new InvalidOperationException("No typing intents are enabled.");
 
@@ -703,7 +706,7 @@ public class InteractivityExtension {
     /// <param name="deletion">Deletion behaviour.</param>
     /// <param name="token">A custom cancellation token that can be cancelled at any point.</param>
     public async Task SendPaginatedMessageAsync(
-        DiscordChannel channel,
+        IGuildChannel channel,
         User user,
         IEnumerable<Page> pages,
         PaginationButtons? buttons,
@@ -747,7 +750,7 @@ public class InteractivityExtension {
     /// <param name="deletion">Deletion behaviour.</param>
     /// <param name="timeoutOverride">Override timeout period.</param>
     public Task SendPaginatedMessageAsync(
-        DiscordChannel channel,
+        IGuildChannel channel,
         User user,
         IEnumerable<Page> pages,
         PaginationButtons? buttons,
@@ -767,7 +770,7 @@ public class InteractivityExtension {
     /// <param name="deletion">The deletion.</param>
     /// <param name="token">The token.</param>
     /// <returns>A Task.</returns>
-    public Task SendPaginatedMessageAsync(DiscordChannel channel, User user, IEnumerable<Page> pages, PaginationBehaviour? behaviour = default, ButtonPaginationBehavior? deletion = default, CancellationToken token = default)
+    public Task SendPaginatedMessageAsync(IGuildChannel channel, User user, IEnumerable<Page> pages, PaginationBehaviour? behaviour = default, ButtonPaginationBehavior? deletion = default, CancellationToken token = default)
         => this.SendPaginatedMessageAsync(channel, user, pages, default, behaviour, deletion, token);
 
     /// <summary>
@@ -780,7 +783,7 @@ public class InteractivityExtension {
     /// <param name="behaviour">The behaviour.</param>
     /// <param name="deletion">The deletion.</param>
     /// <returns>A Task.</returns>
-    public Task SendPaginatedMessageAsync(DiscordChannel channel, User user, IEnumerable<Page> pages, TimeSpan? timeoutOverride, PaginationBehaviour? behaviour = default, ButtonPaginationBehavior? deletion = default)
+    public Task SendPaginatedMessageAsync(IGuildChannel channel, User user, IEnumerable<Page> pages, TimeSpan? timeoutOverride, PaginationBehaviour? behaviour = default, ButtonPaginationBehavior? deletion = default)
         => this.SendPaginatedMessageAsync(channel, user, pages, default, timeoutOverride, behaviour, deletion);
 
     /// <summary>
@@ -796,7 +799,7 @@ public class InteractivityExtension {
     /// <param name="deletion">Deletion behaviour.</param>
     /// <param name="timeoutOverride">Override timeout period.</param>
     public async Task SendPaginatedMessageAsync(
-        DiscordChannel channel,
+        IGuildChannel channel,
         User user,
         IEnumerable<Page> pages,
         PaginationEmojis emojis,

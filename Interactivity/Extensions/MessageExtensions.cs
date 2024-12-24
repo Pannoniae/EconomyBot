@@ -208,7 +208,7 @@ public static class MessageExtensions
 	///     Thrown if interactivity is not enabled for the client associated with the
 	///     message.
 	/// </exception>
-	public static Task<InteractivityResult<MessageReactionAddEventArgs>> WaitForReactionAsync(this RestMessage message, User user, DiscordEmoji emoji, TimeSpan? timeoutOverride = null)
+	public static Task<InteractivityResult<MessageReactionAddEventArgs>> WaitForReactionAsync(this RestMessage message, User user, EmojiProperties emoji, TimeSpan? timeoutOverride = null)
 		=> GetInteractivity(message).WaitForReactionAsync(e => e.Emoji == emoji, message, user, timeoutOverride);
 
 	/// <summary>
@@ -237,7 +237,7 @@ public static class MessageExtensions
 	///     Thrown if interactivity is not enabled for the client associated with the
 	///     message.
 	/// </exception>
-	public static Task<ReadOnlyCollection<PollEmoji>> DoPollAsync(this RestMessage message, IEnumerable<DiscordEmoji> emojis, PollBehaviour? behaviorOverride = null, TimeSpan? timeoutOverride = null)
+	public static Task<ReadOnlyCollection<PollEmoji>> DoPollAsync(this RestMessage message, IEnumerable<EmojiProperties> emojis, PollBehaviour? behaviorOverride = null, TimeSpan? timeoutOverride = null)
 		=> GetInteractivity(message).DoPollAsync(message, emojis, behaviorOverride, timeoutOverride);
 
 	/// <summary>

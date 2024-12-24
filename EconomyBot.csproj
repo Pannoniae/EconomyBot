@@ -63,7 +63,7 @@
 
   <ItemGroup>
     <ProjectReference Include="Lavalink4NET.NetCord\Lavalink4NET.NetCord.csproj" />
-    <ProjectReference Include="Interactivity\DisCatSharp.Interactivity.csproj" />
+<!--    <ProjectReference Include="Interactivity\DisCatSharp.Interactivity.csproj" />-->
   </ItemGroup>
   <Import Project=".paket\Paket.Restore.targets" />
 </Project>

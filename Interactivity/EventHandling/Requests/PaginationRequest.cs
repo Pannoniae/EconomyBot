@@ -254,22 +254,22 @@ namespace DisCatSharp.Interactivity
 	/// </summary>
 	public class PaginationEmojis
 	{
-		public DiscordEmoji Left;
-		public DiscordEmoji Right;
-		public DiscordEmoji SkipLeft;
-		public DiscordEmoji SkipRight;
-		public DiscordEmoji Stop;
+		public EmojiProperties Left;
+		public EmojiProperties Right;
+		public EmojiProperties SkipLeft;
+		public EmojiProperties SkipRight;
+		public EmojiProperties Stop;
 
 		/// <summary>
 		///     Initializes a new instance of the <see cref="PaginationEmojis" /> class.
 		/// </summary>
 		public PaginationEmojis()
 		{
-			this.Left = DiscordEmoji.FromUnicode("◀");
-			this.Right = DiscordEmoji.FromUnicode("▶");
-			this.SkipLeft = DiscordEmoji.FromUnicode("⏮");
-			this.SkipRight = DiscordEmoji.FromUnicode("⏭");
-			this.Stop = DiscordEmoji.FromUnicode("⏹");
+			this.Left = EmojiProperties.FromUnicode("◀");
+			this.Right = EmojiProperties.FromUnicode("▶");
+			this.SkipLeft = EmojiProperties.FromUnicode("⏮");
+			this.SkipRight = EmojiProperties.FromUnicode("⏭");
+			this.Stop = EmojiProperties.FromUnicode("⏹");
 		}
 	}
 

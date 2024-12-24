@@ -9,6 +9,8 @@ using DisCatSharp.EventArgs;
 using DisCatSharp.Interactivity.Enums;
 
 using Microsoft.Extensions.Logging;
+using NetCord;
+using NetCord.Gateway;
 
 namespace DisCatSharp.Interactivity.EventHandling;
 
@@ -29,9 +31,9 @@ internal class Paginator : IPaginator
 		this._client = client;
 		this._requests = [];
 
-		this._client.MessageReactionAdded += this.HandleReactionAdd;
-		this._client.MessageReactionRemoved += this.HandleReactionRemove;
-		this._client.MessageReactionsCleared += this.HandleReactionClear;
+		this._client.MessageReactionAdd += this.HandleReactionAdd;
+		this._client.MessageReactionRemove += this.HandleReactionRemove;
+		this._client.MessageReactionRemoveAll += this.HandleReactionClear;
 	}
 
 	/// <summary>
@@ -207,18 +209,18 @@ internal class Paginator : IPaginator
 		if (p.PageCount > 1)
 		{
 			if (emojis.SkipLeft != null)
-				await msg.CreateReactionAsync(emojis.SkipLeft).ConfigureAwait(false);
+				await msg.AddReactionAsync(emojis.SkipLeft).ConfigureAwait(false);
 			if (emojis.Left != null)
-				await msg.CreateReactionAsync(emojis.Left).ConfigureAwait(false);
+				await msg.AddReactionAsync(emojis.Left).ConfigureAwait(false);
 			if (emojis.Right != null)
-				await msg.CreateReactionAsync(emojis.Right).ConfigureAwait(false);
+				await msg.AddReactionAsync(emojis.Right).ConfigureAwait(false);
 			if (emojis.SkipRight != null)
-				await msg.CreateReactionAsync(emojis.SkipRight).ConfigureAwait(false);
+				await msg.AddReactionAsync(emojis.SkipRight).ConfigureAwait(false);
 			if (emojis.Stop != null)
-				await msg.CreateReactionAsync(emojis.Stop).ConfigureAwait(false);
+				await msg.AddReactionAsync(emojis.Stop).ConfigureAwait(false);
 		}
 		else if (emojis.Stop != null && p is PaginationRequest { PaginationDeletion: PaginationDeletion.DeleteMessage })
-			await msg.CreateReactionAsync(emojis.Stop).ConfigureAwait(false);
+			await msg.AddReactionAsync(emojis.Stop).ConfigureAwait(false);
 	}
 
 	/// <summary>
@@ -226,7 +228,7 @@ internal class Paginator : IPaginator
 	/// </summary>
 	/// <param name="p">The p.</param>
 	/// <param name="emoji">The emoji.</param>
-	private async Task PaginateAsync(IPaginationRequest p, DiscordEmoji emoji)
+	private async Task PaginateAsync(IPaginationRequest p, EmojiProperties emoji)
 	{
 		var emojis = await p.GetEmojisAsync().ConfigureAwait(false);
 		var msg = await p.GetMessageAsync().ConfigureAwait(false);

@@ -7,6 +7,8 @@ using DisCatSharp.Entities;
 using DisCatSharp.Enums;
 using DisCatSharp.Interactivity.Enums;
 using DisCatSharp.Interactivity.EventHandling;
+using NetCord;
+using NetCord.Gateway;
 
 namespace DisCatSharp.Interactivity.Extensions;
 

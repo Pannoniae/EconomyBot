@@ -244,7 +244,7 @@ public class Reaction
 	/// <summary>
 	///     Gets the emoji.
 	/// </summary>
-	public DiscordEmoji Emoji { get; internal set; }
+	public EmojiProperties Emoji { get; internal set; }
 
 	/// <summary>
 	///     Gets the users.

@@ -11,6 +11,7 @@ using DisCatSharp.EventArgs;
 using DisCatSharp.Interactivity.Enums;
 
 using Microsoft.Extensions.Logging;
+using NetCord.Gateway;
 
 namespace DisCatSharp.Interactivity.EventHandling;
 
@@ -69,7 +70,7 @@ internal class ComponentEventWaiter : IDisposable
 		}
 		catch (Exception e)
 		{
-			this._client.Logger.LogError(InteractivityEvents.InteractivityWaitError, e, "An exception was thrown while waiting for components.");
+			Console.Out.WriteLine($"An exception was thrown while waiting for components. {e}");
 			return null;
 		}
 		finally
@@ -93,7 +94,7 @@ internal class ComponentEventWaiter : IDisposable
 		}
 		catch (Exception e)
 		{
-			this._client.Logger.LogError(InteractivityEvents.InteractivityCollectorError, e, "There was an error while collecting component event args.");
+			Console.Out.WriteLine("There was an error while collecting component event args. {e}");
 		}
 		finally
 		{

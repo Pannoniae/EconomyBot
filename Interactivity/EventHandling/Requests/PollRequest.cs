@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 using ConcurrentCollections;
 
-using DisCatSharp.Entities;
+using NetCord;
+using NetCord.Rest;
 
 namespace DisCatSharp.Interactivity.EventHandling;
 
@@ -17,7 +18,7 @@ public class PollRequest
 {
 	internal ConcurrentHashSet<PollEmoji> Collected;
 	internal CancellationTokenSource Ct;
-	internal List<DiscordEmoji> Emojis;
+	internal List<EmojiProperties> Emojis;
 	internal RestMessage Message;
 	internal TaskCompletionSource<bool> Tcs;
 	internal TimeSpan Timeout;
@@ -27,7 +28,7 @@ public class PollRequest
 	/// <param name="message"></param>
 	/// <param name="timeout"></param>
 	/// <param name="emojis"></param>
-	public PollRequest(RestMessage message, TimeSpan timeout, IEnumerable<DiscordEmoji> emojis)
+	public PollRequest(RestMessage message, TimeSpan timeout, IEnumerable<EmojiProperties> emojis)
 	{
 		this.Tcs = new();
 		this.Ct = new(timeout);
@@ -56,7 +57,7 @@ public class PollRequest
 	/// </summary>
 	/// <param name="emoji">The emoji.</param>
 	/// <param name="member">The member.</param>
-	internal void RemoveReaction(DiscordEmoji emoji, User member)
+	internal void RemoveReaction(EmojiProperties emoji, User member)
 	{
 		if (this.Collected.Any(x => x.Emoji == emoji))
 			if (this.Collected.Any(x => x.Voted.Contains(member)))
@@ -73,7 +74,7 @@ public class PollRequest
 	/// </summary>
 	/// <param name="emoji">The emoji.</param>
 	/// <param name="member">The member.</param>
-	internal void AddReaction(DiscordEmoji emoji, User member)
+	internal void AddReaction(EmojiProperties emoji, User member)
 	{
 		if (this.Collected.Any(x => x.Emoji == emoji))
 			if (!this.Collected.Any(x => x.Voted.Contains(member)))
@@ -105,14 +106,14 @@ public class PollRequest
 /// </summary>
 public class PollEmoji
 {
-	public DiscordEmoji Emoji;
+	public EmojiProperties Emoji;
 	public ConcurrentHashSet<User> Voted;
 
 	/// <summary>
 	///     Initializes a new instance of the <see cref="PollEmoji" /> class.
 	/// </summary>
 	/// <param name="emoji">The emoji.</param>
-	internal PollEmoji(DiscordEmoji emoji)
+	internal PollEmoji(EmojiProperties emoji)
 	{
 		this.Emoji = emoji;
 		this.Voted = [];
