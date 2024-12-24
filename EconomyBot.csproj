@@ -54,6 +54,10 @@
     <Content Remove="DisCatSharp\**" />
     <Compile Remove="DisCatSharp\**" />
     <None Remove="DisCatSharp\**" />
+    <EmbeddedResource Remove="Lavalink4NET.DisCatSharp\**"/>
+    <Content Remove="Lavalink4NET.DisCatSharp\**" />
+    <Compile Remove="Lavalink4NET.DisCatSharp\**" />
+    <None Remove="Lavalink4NET.DisCatSharp\**" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="DisCatSharp\DisCatSharp\DisCatSharp.csproj"/>
@@ -63,6 +67,7 @@
     <ProjectReference Include="DisCatSharp\DisCatSharp.Interactivity\DisCatSharp.Interactivity.csproj"/>
     <ProjectReference Include="DisCatSharp\DisCatSharp.Lavalink\DisCatSharp.Lavalink.csproj"/>
     <ProjectReference Include="DisCatSharp\DisCatSharp.VoiceNext\DisCatSharp.VoiceNext.csproj"/>
+    <ProjectReference Include="Lavalink4NET.DisCatSharp\Lavalink4NET.DisCatSharp.csproj"/>
   </ItemGroup>
   <Import Project=".paket\Paket.Restore.targets" />
 </Project>

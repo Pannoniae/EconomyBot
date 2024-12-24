@@ -73,7 +73,7 @@ public class DiscordVoiceState : ObservableApiObject
 	///     Gets ID of the guild this voice state is associated with.
 	/// </summary>
 	[JsonProperty("guild_id", NullValueHandling = NullValueHandling.Ignore)]
-	internal ulong? GuildId { get; set; }
+	public ulong? GuildId { get; set; }
 
 	/// <summary>
 	///     Gets the guild associated with this voice state.
@@ -86,7 +86,7 @@ public class DiscordVoiceState : ObservableApiObject
 	///     Gets ID of the channel this user is connected to.
 	/// </summary>
 	[JsonProperty("channel_id", NullValueHandling = NullValueHandling.Include)]
-	internal ulong? ChannelId { get; set; }
+	public ulong? ChannelId { get; set; }
 
 	/// <summary>
 	///     Gets the channel this user is connected to.
@@ -99,7 +99,7 @@ public class DiscordVoiceState : ObservableApiObject
 	///     Gets ID of the user to which this voice state belongs.
 	/// </summary>
 	[JsonProperty("user_id", NullValueHandling = NullValueHandling.Ignore)]
-	internal ulong UserId { get; set; }
+	public ulong UserId { get; set; }
 
 	/// <summary>
 	///     Gets the user associated with this voice state.
@@ -125,7 +125,7 @@ public class DiscordVoiceState : ObservableApiObject
 	///     Gets ID of the session of this voice state.
 	/// </summary>
 	[JsonProperty("session_id", NullValueHandling = NullValueHandling.Ignore)]
-	internal string SessionId { get; set; }
+	public string SessionId { get; set; }
 
 	/// <summary>
 	///     Gets whether this user is deafened.
