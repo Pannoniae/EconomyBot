@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 using DisCatSharp.Entities;
@@ -25,12 +26,35 @@ public static class DiscordJson
 	/// <summary>
 	///     Gets the serializer.
 	/// </summary>
-	private static readonly JsonSerializer s_serializer = JsonSerializer.CreateDefault(new()
+	private static JsonSerializer s_serializer = JsonSerializer.CreateDefault(new()
 	{
 		ContractResolver = s_contractResolver,
 	});
 
-	internal static readonly OptionalJsonContractResolver s_contractResolver = new();
+	internal static OptionalJsonContractResolver s_contractResolver = new();
+
+	public static void clear()
+	{
+		// clear type cache
+		try
+		{
+			var f = s_contractResolver.GetType().BaseType.GetField("_contractCache", BindingFlags.NonPublic | BindingFlags.Instance);
+			var cache = f.GetValue(s_contractResolver);
+			var concurrentStore = cache.GetType().GetField("_concurrentStore", BindingFlags.NonPublic | BindingFlags.Instance);
+			var store = concurrentStore.GetValue(cache);
+			var clear = store.GetType().GetMethod("Clear");
+			clear.Invoke(store, null);
+			s_contractResolver = new();
+			s_serializer = JsonSerializer.CreateDefault(new()
+			{
+				ContractResolver = s_contractResolver,
+			});
+		}
+		catch (Exception ex)
+		{
+			Console.Out.WriteLine(ex);
+		}
+	}
 
 	/// <summary>Serializes the specified object to a JSON string.</summary>
 	/// <param name="value">The object to serialize.</param>

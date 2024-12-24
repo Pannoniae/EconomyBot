@@ -18,7 +18,7 @@ internal static class LavalinkJson
 	/// </summary>
 	private static readonly JsonSerializerSettings s_setting = new()
 	{
-		ContractResolver = DiscordJson.s_contractResolver
+		ContractResolver = DiscordJson.s_contractResolver,
 	};
 
 	/// <summary>

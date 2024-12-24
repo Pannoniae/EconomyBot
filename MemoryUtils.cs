@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime;
 using System.Runtime.InteropServices;
+using DisCatSharp.Net.Serialization;
 
 namespace EconomyBot;
 
@@ -20,6 +21,7 @@ public static class MemoryUtils {
             LinuxMemoryUtility.ReleaseUnusedProcessWorkingSetMemoryWithMadvise_MADV_DONTNEED();
             LinuxMemoryUtility.ReleaseUnusedProcessWorkingSetMemoryWithMadvise_MADV_PAGEOUT();
         }
+        DiscordJson.clear();
 
         Console.WriteLine($"Released memory in {sw.Elapsed.TotalMilliseconds} ms");
     }

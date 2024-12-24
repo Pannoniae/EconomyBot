@@ -16,6 +16,7 @@ using DisCatSharp.Interactivity.Enums;
 using DisCatSharp.Interactivity.Extensions;
 using DisCatSharp.Lavalink;
 using DisCatSharp.Net;
+using DisCatSharp.Net.Serialization;
 using EconomyBot.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;
@@ -125,6 +126,13 @@ class Program {
         await discord.ConnectAsync();
         MemoryUtils.cleanGC();
         var timer = new PeriodicTimer(TimeSpan.FromMinutes(10));
+
+
+        // clear delegates
+        _ = Task.Run(() => {
+            DiscordJson.clear();
+            Task.Delay(60 * 1000);
+        });
 
         while (await timer.WaitForNextTickAsync()) {
             try {

@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DisCatSharp.VoiceNext", "Di
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DisCatSharp.VoiceNext.Natives", "DisCatSharp\DisCatSharp.VoiceNext.Natives\DisCatSharp.VoiceNext.Natives.csproj", "{F0174450-84A2-4F29-A86E-392550C018D0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lavalink4NET.DisCatSharp", "Lavalink4NET.DisCatSharp\Lavalink4NET.DisCatSharp.csproj", "{3C19512D-FC53-4C6C-A96C-E87FCECF3D8E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,5 +97,9 @@ Global
 		{F0174450-84A2-4F29-A86E-392550C018D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0174450-84A2-4F29-A86E-392550C018D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0174450-84A2-4F29-A86E-392550C018D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C19512D-FC53-4C6C-A96C-E87FCECF3D8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C19512D-FC53-4C6C-A96C-E87FCECF3D8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C19512D-FC53-4C6C-A96C-E87FCECF3D8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C19512D-FC53-4C6C-A96C-E87FCECF3D8E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
