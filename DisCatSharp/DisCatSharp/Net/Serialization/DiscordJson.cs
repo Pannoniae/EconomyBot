@@ -27,8 +27,10 @@ public static class DiscordJson
 	/// </summary>
 	private static readonly JsonSerializer s_serializer = JsonSerializer.CreateDefault(new()
 	{
-		ContractResolver = new OptionalJsonContractResolver()
+		ContractResolver = s_contractResolver,
 	});
+
+	internal static readonly OptionalJsonContractResolver s_contractResolver = new();
 
 	/// <summary>Serializes the specified object to a JSON string.</summary>
 	/// <param name="value">The object to serialize.</param>
@@ -113,7 +115,7 @@ public static class DiscordJson
 
 		var obj = JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings
 		{
-			ContractResolver = new OptionalJsonContractResolver(),
+			ContractResolver = s_contractResolver,
 			Error = (s, e) => DiscordJsonErrorHandler(s, e, discord)
 		})!;
 
@@ -140,7 +142,7 @@ public static class DiscordJson
 
 		var obj = JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings
 		{
-			ContractResolver = new OptionalJsonContractResolver(),
+			ContractResolver = s_contractResolver,
 			Error = (s, e) => DiscordJsonErrorHandler(s, e, discord)
 		})!;
 

@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Collections.Generic;
 
 namespace DisCatSharp.Entities;
@@ -14,7 +15,7 @@ public partial class DiscordEmoji
 	{
 #region Generated Emoji Map
 
-		s_unicodeEmojis = new()
+		s_unicodeEmojis = new Dictionary<string, string>()
 		{
 			[":100:"] = "\U0001f4af",
 			[":1234:"] = "\U0001f522",
@@ -6668,9 +6669,9 @@ public partial class DiscordEmoji
 			[":zipper_mouth_face:"] = "\U0001f910",
 			[":zombie:"] = "\U0001f9df",
 			[":zzz:"] = "\U0001f4a4"
-		};
+		}.ToFrozenDictionary();
 
-		s_discordNameLookup = new()
+		s_discordNameLookup = new Dictionary<string, string>()
 		{
 			["\U0001f4af"] = ":100:",
 			["\U0001f522"] = ":1234:",
@@ -10111,7 +10112,7 @@ public partial class DiscordEmoji
 			["\U0001f910"] = ":zipper_mouth:",
 			["\U0001f9df"] = ":zombie:",
 			["\U0001f4a4"] = ":zzz:"
-		};
+		}.ToFrozenDictionary();
 
 #endregion
 	}
@@ -10119,10 +10120,10 @@ public partial class DiscordEmoji
 	/// <summary>
 	///     Gets a mapping of :name: => unicode.
 	/// </summary>
-	private static Dictionary<string, string> s_unicodeEmojis { get; }
+	private static FrozenDictionary<string, string> s_unicodeEmojis { get; }
 
 	/// <summary>
 	///     Gets a mapping of unicode => :name:.
 	/// </summary>
-	private static Dictionary<string, string> s_discordNameLookup { get; }
+	private static FrozenDictionary<string, string> s_discordNameLookup { get; }
 }
