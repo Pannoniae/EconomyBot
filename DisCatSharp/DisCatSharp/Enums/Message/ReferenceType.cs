@@ -1,0 +1,17 @@
+namespace DisCatSharp.Enums;
+
+/// <summary>
+///     Represents the message reference type.
+/// </summary>
+public enum ReferenceType
+{
+	/// <summary>
+	///     A standard reference used by replies.
+	/// </summary>
+	Default = 0,
+
+	/// <summary>
+	///     Reference used to point to a message at a point in time.
+	/// </summary>
+	Forward = 1
+}
