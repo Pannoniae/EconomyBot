@@ -1,9 +1,17 @@
-﻿using System.Globalization;
+﻿using System.ComponentModel;
+using System.Globalization;
 using System.Net;
 using System.Text;
+using Lavalink4NET;
+using Lavalink4NET.Rest.Entities.Tracks;
+using Lavalink4NET.Tracks;
+using NetCord;
+using NetCord.Services;
+using NetCord.Services.Commands;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Soulseek;
+using Spectre.Console;
 using Directory = System.IO.Directory;
 using File = System.IO.File;
 
@@ -11,8 +19,7 @@ namespace EconomyBot;
 
 // TODO implement a CheckBaseAttribute to stop commands from erroring when base prereqs aren't met
 
-[ModuleLifespan(ModuleLifespan.Singleton)]
-public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
+public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : CommandModule<CommandContext> {
     private MusicService Music { get; set; } = Program.musicService;
     private YouTubeSearchProvider YouTube { get; } = yt;
 
@@ -21,13 +28,14 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
     private readonly MusicCommon common = new();
     private readonly SemaphoreSlim _semaphore = new(1, 1);
 
-    private static DiscordChannel? getChannel(CommandContext ctx) {
-        return ctx.Member?.VoiceState?.Channel;
+    private static IVoiceGuildChannel? getChannel(CommandContext ctx) {
+        ulong? chn = Program.client.Rest.GetGuildUserVoiceStateAsync(ctx.Guild!.Id, ctx.User.Id).GetAwaiter().GetResult()?.ChannelId;
+        return chn == null ? null : (IVoiceGuildChannel?)Program.client.Cache.Guilds[ctx.Guild.Id].Channels[chn.Value];
     }
 
     private async Task startPlayer(CommandContext ctx) {
         var chn = getChannel(ctx);
-        await GuildMusic.CreatePlayerAsync(chn);
+        await GuildMusic.CreatePlayerAsync(ctx, chn);
     }
 
     private async Task reset() {
@@ -36,96 +44,101 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         await GuildMusic.queue.StopAsync();
     }
 
-    public override async Task BeforeExecutionAsync(CommandContext ctx) {
+    public async Task BeforeExecutionAsync(CommandContext ctx) {
         if (!Program.lavalinkInit) {
-            await common.respond(ctx,
+            await MusicCommon.respond(ctx,
                 "Lavalink not initialised, can't play music right now. (Check output for details)");
             throw new Exception("Actually, this is not your fault.:)");
         }
 
         Music = Program.musicService;
+        var cmd = ctx.Message.Content[1..].Split()[0];
 
-        if (ctx.Member.Roles.Any(r => r.Name.Contains("No music", StringComparison.OrdinalIgnoreCase))) {
+        if (((GuildUser)ctx.User).GetRoles(ctx.Guild!).Any(r => r.Name.Contains("No music", StringComparison.OrdinalIgnoreCase))) {
             throw new Exception("Leave me alone...");
         }
 
-        if (ctx.Command.Name == "join") {
+        if (cmd == "join") {
             GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild);
-            GuildMusic.CommandChannel = ctx.Channel;
+            GuildMusic.CommandChannel = (TextGuildChannel)ctx.Channel!;
             return;
         }
 
         var chn = getChannel(ctx);
-        if (chn is null && ctx.Command.Name != "queue") {
-            await common.respond(ctx, "You need to be in a voice channel.");
+        if (chn is null && cmd != "queue") {
+            await MusicCommon.respond(ctx, "You need to be in a voice channel.");
             throw new IdiotException("user error");
         }
 
-        var mbr = ctx.Guild.CurrentMember?.VoiceState?.Channel;
-        if (mbr is not null && chn != mbr && ctx.Command.Name != "queue") {
-            await common.respond(ctx, "You need to be in the same voice channel.");
+        var mbr = Program.client.Cache.Guilds[ctx.Guild!.Id].Channels[
+            Program.client.Cache.Guilds[ctx.Guild.Id].GetCurrentUserVoiceStateAsync().GetAwaiter().GetResult().ChannelId.GetValueOrDefault()];
+        if (mbr is not null && chn != mbr && cmd != "queue") {
+            await MusicCommon.respond(ctx, "You need to be in the same voice channel.");
             throw new IdiotException("user error");
         }
 
         GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild);
-        GuildMusic.CommandChannel = ctx.Channel;
-
-        await base.BeforeExecutionAsync(ctx);
+        GuildMusic.CommandChannel = (TextGuildChannel)ctx.Channel!;
     }
 
     [Command("eq"), Description("Enable EQ.")]
     public async Task eq(CommandContext ctx) {
+        await BeforeExecutionAsync(ctx);
         GuildMusic.toggleEQ();
         if (GuildMusic.eq) {
-            await common.respond(ctx, "Enabled EQ.");
+            await MusicCommon.respond(ctx, "Enabled EQ.");
         }
         else {
-            await common.respond(ctx, "Disabled EQ.");
+            await MusicCommon.respond(ctx, "Disabled EQ.");
         }
     }
 
     [Command("reset"), Description("Reset the voice state.")]
     public async Task ResetAsync(CommandContext ctx) {
+        await BeforeExecutionAsync(ctx);
         await reset();
         await GuildMusic.DestroyPlayerAsync();
     }
 
-    [Command("join"), Description("Joins the voice channel."), Priority(1)]
+    [Command("join", Priority = 1), Description("Joins the voice channel.")]
     public async Task JoinAsync(CommandContext ctx) {
         // yeet the bot in
         await startPlayer(ctx);
-        await common.respond(ctx, "Joined the channel.");
+        await MusicCommon.respond(ctx, "Joined the channel.");
     }
 
-    [Command("join"), Description("Joins the voice channel."), Priority(0)]
+    [Command("join", Priority = 0), Description("Joins the voice channel.")]
     public async Task JoinAsync(CommandContext ctx, GuildUser member) {
         // yeet the bot in
         await startPlayer(ctx);
-        await common.respond(ctx, "Joined the channel.");
+        await MusicCommon.respond(ctx, "Joined the channel.");
     }
 
-    [Command("jazz"), Description("Plays some jazz. :3"), Aliases("j"), Priority(1)]
+    [Command("jazz", "j", Priority = 1), Description("Plays some jazz. :3")]
     public async Task PlayJazzAsync(CommandContext ctx) {
+        await BeforeExecutionAsync(ctx);
         // yeet the bot in
         GuildMusic.queue.addToQueue("_fats");
         await GuildMusic.queue.seedQueue();
         await startPlayer(ctx);
         await GuildMusic.queue.PlayAsync();
-        await common.respond(ctx, "Started playing jazz.");
+        await MusicCommon.respond(ctx, "Started playing jazz.");
     }
 
-    [Command("live"), Description("Live music! :3"), Aliases("l"), Priority(1)]
+    [Command("live", "l", Priority = 1), Description("Live music! :3")]
     public async Task PlayLiveAsync(CommandContext ctx) {
+        await BeforeExecutionAsync(ctx);
         // yeet the bot in
         GuildMusic.queue.addToQueue("_fatslive");
         await GuildMusic.queue.seedQueue();
         await startPlayer(ctx);
         await GuildMusic.queue.PlayAsync();
-        await common.respond(ctx, "Started playing jazz.");
+        await MusicCommon.respond(ctx, "Started playing jazz.");
     }
 
-    [Command("analyse"), Description("Analyse the frequency of artists."), Aliases("an")]
+    [Command("analyse", "an"), Description("Analyse the frequency of artists.")]
     public async Task AnalyseAsync(CommandContext ctx) {
+        await BeforeExecutionAsync(ctx);
         var sum = GuildMusicData.artistWeights.Values.Sum();
 
         var weights = GuildMusicData.artistWeights.Select(w => $"{w.Key}: {w.Value}");
@@ -146,73 +159,58 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             }
         }
 
-        await common.respond(ctx, $"Weights:\n{string.Join("\n", weights)}");
-        await common.respond(ctx, $"Weights (percent):\n{string.Join("\n", weightsp)}");
-        await common.respond(ctx, $"Tracks:\n{string.Join("\n", tracks.Select(t => $"{t.Key}: {t.Value}"))}");
+        await MusicCommon.respond(ctx, $"Weights:\n{string.Join("\n", weights)}");
+        await MusicCommon.respond(ctx, $"Weights (percent):\n{string.Join("\n", weightsp)}");
+        await MusicCommon.respond(ctx, $"Tracks:\n{string.Join("\n", tracks.Select(t => $"{t.Key}: {t.Value}"))}");
     }
 
     [Command("rl"), Description("Reloads music data.")]
     public async Task ReloadAsync(CommandContext ctx) {
+        await BeforeExecutionAsync(ctx);
         GuildMusicData.reload();
-        await common.respond(ctx, "Reloaded music data.");
+        await MusicCommon.respond(ctx, "Reloaded music data.");
     }
 
     [Command("stopjazz"), Description("Stops jazz.")]
     public async Task StopJazzAsync(CommandContext ctx) {
+        await BeforeExecutionAsync(ctx);
         await reset();
-        await common.respond(ctx, "Stopped jazz.");
+        await MusicCommon.respond(ctx, "Stopped jazz.");
     }
 
-    [Command("play"), Description("Plays supplied URL or searches for specified keywords."), Aliases("p"), Priority(1)]
+    [Command("play", "p", Priority = 1), Description("Plays supplied URL or searches for specified keywords.")]
     public async Task PlayAsync(CommandContext ctx,
         [Description("URL to play from.")] Uri uri) {
-        var trackLoad = await Music.GetTracksAsync(uri);
-        var result = trackLoad.Result;
-        List<LavalinkTrack> tracks = [];
-        if (trackLoad.LoadType == LavalinkLoadResultType.Error) {
-            await common.respond(ctx, "No tracks were found at specified link.");
+        await BeforeExecutionAsync(ctx);
+        var trackLoad = await lavalink.Tracks.LoadTracksAsync(uri.ToString(), TrackSearchMode.YouTube);
+        var result = trackLoad;
+        var tracks = result.Tracks;
+        if (trackLoad.IsFailed) {
+            await MusicCommon.respond(ctx, "No tracks were found at specified link.");
             return;
         }
 
-        if (trackLoad.LoadType == LavalinkLoadResultType.Playlist) {
-            var playlist = (LavalinkPlaylist)result;
-            if (playlist.Info.SelectedTrack > 0) {
-                var index = playlist.Info.SelectedTrack;
-                tracks = tracks.Skip(index).Concat(tracks.Take(index)).ToList();
-            }
-        }
-
-        if (trackLoad.LoadType == LavalinkLoadResultType.Search) {
-            var search = (List<LavalinkTrack>)result;
-            tracks = search;
-        }
-
-        if (trackLoad.LoadType == LavalinkLoadResultType.Track) {
-            var search = (LavalinkTrack)result;
-            tracks = [search];
-        }
-
-        var trackCount = tracks.Count;
+        var trackCount = tracks.Length;
         foreach (var track in tracks) {
             GuildMusic.queue.Enqueue(track);
         }
 
         var chn = getChannel(ctx);
-        await GuildMusic.CreatePlayerAsync(chn);
+        await GuildMusic.CreatePlayerAsync(ctx, chn);
         await GuildMusic.queue.PlayAsync();
 
         if (trackCount > 1)
-            await common.respond(ctx, $"Added {trackCount:#,##} tracks to playback queue.");
+            await MusicCommon.respond(ctx, $"Added {trackCount:#,##} tracks to playback queue.");
         else {
             var track = tracks.First();
-            await common.respond(ctx,
+            await MusicCommon.respond(ctx,
                 $"Added {track.ToLimitedTrackString()} to the playback queue.");
         }
     }
 
-    [Command("jazz"), Priority(0), Aliases("pj")]
+    [Command("jazz", "pj", Priority = 0)]
     public async Task PlayJazzAsync(CommandContext ctx,
-        [RemainingText, Description("Terms to search for.")]
+        [CommandParameter(Remainder = true), Description("Terms to search for.")]
         string term) {
         if (term == "all") {
             GuildMusic.queue.addAllToQueue();
@@ -220,7 +218,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
 
             await startPlayer(ctx);
             await GuildMusic.queue.PlayAsync();
-            await common.respond(ctx, $"Started playing {GuildMusic.queue.artistQueue.Count} cats.");
+            await MusicCommon.respond(ctx, $"Started playing {GuildMusic.queue.artistQueue.Count} cats.");
             return;
         }
 
@@ -228,7 +226,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
 
         List<LavalinkTrack> results = (await GuildMusic.getJazz("*" + term + "*")).Where(t => t != null).ToList()!;
         if (results.Count == 0) {
-            await common.respond(ctx, "Nothing was found.");
+            await MusicCommon.respond(ctx, "Nothing was found.");
             return;
         }
 
@@ -239,7 +237,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             var el_ = results.First();
             track_ = el_;
             if (track_ == null) {
-                await common.respond(ctx, "No tracks were found at specified link.");
+                await MusicCommon.respond(ctx, "No tracks were found at specified link.");
                 return;
             }
 
@@ -257,7 +255,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             }
             else {
                 var track = tracks_.First();*/
-            await common.respond(ctx,
+            await MusicCommon.respond(ctx,
                 $"Added {track.ToLimitedTrackString()} to the playback queue.");
             return;
         }
@@ -312,12 +310,12 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
 
         else if (elInd < 0 || elInd > results.Count) {
-            await common.modify(ctx, msg, "Invalid choice was made.");
+            await MusicCommon.modify(ctx, msg, "Invalid choice was made.");
             return;
         }
 
         if (elInd == -1) {
-            await common.modify(ctx, msg, "Choice cancelled.");
+            await MusicCommon.modify(ctx, msg, "Choice cancelled.");
             return;
         }
 
@@ -326,7 +324,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
 
 
         if (track_ == null) {
-            await common.modify(ctx, msg, "No tracks were found at specified link.");
+            await MusicCommon.modify(ctx, msg, "No tracks were found at specified link.");
             return;
         }
 
@@ -340,7 +338,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
         }
         else {*/
-        await common.modify(ctx, msg,
+        await MusicCommon.modify(ctx, msg,
             $"Added {track.ToLimitedTrackString()} to the playback queue.");
     }
 
@@ -352,20 +350,21 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
     /// This is "mere aggregation" in GPL-speak.
     /// P.S. fuck copyright as a concept
     /// </summary>
-    [Command("soulseek"), Priority(0), Aliases("slsk")]
-    public async Task PlaySLSKAsync(CommandContext ctx,
-        [RemainingText, Description("Terms to search for.")]
+    [Command("soulseek", "slsk", Priority = 0)]
+    public async Task PlaySLSKAsync(
+        [CommandParameter(Remainder = true), Description("Terms to search for.")]
         string term) {
+        await BeforeExecutionAsync(Context);
 
-        var interactivity = ctx.Client.GetInteractivity();
+        var interactivity = Context.Client.GetInteractivity();
         if (string.IsNullOrWhiteSpace(term)) {
-            await common.respond(ctx, "No query was entered :(");
+            await MusicCommon.respond(Context, "No query was entered :(");
             return;
         }
 
         var results = await Music.getSLSK(term);
         if (results.Count == 0) {
-            await common.respond(ctx, "Nothing was found.");
+            await MusicCommon.respond(Context, "Nothing was found.");
             return;
         }
 
@@ -417,18 +416,18 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
                 elInd = -1;
             }
             else {
-                await common.modify(ctx, msg, "Invalid choice was made.");
+                await MusicCommon.modify(Context, msg, "Invalid choice was made.");
                 return;
             }
         }
 
         else if (elInd < 0 || elInd > results.Count) {
-            await common.modify(ctx, msg, "Invalid choice was made.");
+            await MusicCommon.modify(Context, msg, "Invalid choice was made.");
             return;
         }
 
         if (elInd == -1) {
-            await common.modify(ctx, msg, "Choice cancelled.");
+            await MusicCommon.modify(Context, msg, "Choice cancelled.");
             return;
         }
 
@@ -444,7 +443,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         // we want the LAST part of the path as the actual filename to download to.
         var actualFilename = chosen.file.Filename.Split('\\').Last();
 
-        await common.modify(ctx, msg, $"Downloading {actualFilename}...");
+        await MusicCommon.modify(Context, msg, $"Downloading {actualFilename}...");
 
         // we hash the filename so we don't reDL the same file
         var hash = chosen.file.Filename.GetHashCode().ToString("x8");
@@ -455,7 +454,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         // if the hash directory exists + the file exists
         if (Directory.Exists(Path.Join(tempFolder, hash)) &&
             File.Exists(Path.Join(tempFolder, hash, actualFilename))) {
-            lltrack = await GuildMusicData.getTrackAsync(GuildMusic.Node, localPath);
+            lltrack = await GuildMusicData.getTrackAsync(Program.LavalinkNode, localPath);
         }
         else {
             // create the folder
@@ -464,34 +463,34 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
                 var dl = await slsk.DownloadAsync(chosen.response.Username, chosen.file.Filename, localPath);
             }
             catch (TimeoutException e) {
-                AnsiConsole.WriteLine(e);
-                await common.modify(ctx, msg, "Download timed out...");
+                AnsiConsole.WriteLine(e.ToString());
+                await MusicCommon.modify(Context, msg, "Download timed out...");
                 return;
             }
-            lltrack = await GuildMusicData.getTrackAsync(GuildMusic.Node, localPath);
+            lltrack = await GuildMusicData.getTrackAsync(Program.LavalinkNode, localPath);
         }
 
         GuildMusic.queue.Enqueue(lltrack);
-        await startPlayer(ctx);
+        await startPlayer(Context);
         await GuildMusic.queue.PlayAsync();
 
         /*if (trackCount > 1) {
             await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
         }
         else {*/
-        await common.modify(ctx, msg,
+        await MusicCommon.modify(Context, msg,
             $"Added {lltrack.ToLimitedTrackString()} to the playback queue.");
     }
 
-    [Command("play"), Priority(0)]
-    public async Task PlayAsync(CommandContext ctx,
-        [RemainingText, Description("Terms to search for.")]
+    [Command("play", Priority = 0)]
+    public async Task PlayAsync(
+        [CommandParameter(Remainder = true), Description("Terms to search for.")]
         string term) {
-        var interactivity = ctx.Client.GetInteractivity();
+        var interactivity = Context.Client.GetInteractivity();
 
         var results = (await YouTube.SearchAsync(term)).ToList();
         if (!results.Any()) {
-            await common.respond(ctx, "Nothing was found.");
+            await MusicCommon.respond(Context, "Nothing was found.");
             return;
         }
 
@@ -500,11 +499,11 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
                 $"{MusicCommon.NumberMappings[i + 1]} {WebUtility.HtmlDecode(x.Title).Sanitize().Bold().URLDecode()} by {WebUtility.HtmlDecode(x.Author).Sanitize().Bold().URLDecode()}"));
         msgC =
             $"{msgC}\n\nType a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
-        var msg = await ctx.ReplyAsync(msgC);
+        var msg = await Context.ReplyAsync(msgC);
 
-        var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User, TimeSpan.FromSeconds(30));
+        var res = await interactivity.WaitForMessageAsync(x => x.Author == Context.User, TimeSpan.FromSeconds(30));
         if (res.TimedOut || res.Result == null) {
-            await common.modify(ctx, msg, "No choice was made.");
+            await MusicCommon.modify(Context, msg, "No choice was made.");
             return;
         }
 
@@ -518,17 +517,17 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             }
         }
         else if (elInd < 1) {
-            await common.modify(ctx, msg, "Invalid choice was made.");
+            await MusicCommon.modify(Context, msg, "Invalid choice was made.");
             return;
         }
 
         if (!MusicCommon.NumberMappings.ContainsKey(elInd)) {
-            await common.modify(ctx, msg, "Invalid choice was made.");
+            await MusicCommon.modify(Context, msg, "Invalid choice was made.");
             return;
         }
 
         if (elInd == -1) {
-            await common.modify(ctx, msg, "Choice cancelled.");
+            await MusicCommon.modify(Context, msg, "Choice cancelled.");
             return;
         }
 
@@ -540,7 +539,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         List<LavalinkTrack> tracks = [];
         switch (trackLoad.LoadType) {
             case LavalinkLoadResultType.Error:
-                await common.respond(ctx, "No tracks were found at specified link.");
+                await MusicCommon.respond(ctx, "No tracks were found at specified link.");
                 return;
             case LavalinkLoadResultType.Playlist: {
                 var playlist = (LavalinkPlaylist)result;
@@ -571,55 +570,59 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             GuildMusic.queue.Enqueue(track);
         }
 
-        await startPlayer(ctx);
+        await startPlayer(Context);
         await GuildMusic.queue.PlayAsync();
 
         if (trackCount > 1) {
-            await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
+            await MusicCommon.modify(Context, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
         }
         else {
             var track = tracks.First();
-            await common.modify(ctx, msg,
+            await MusicCommon.modify(Context, msg,
                 $"Added {track.ToLimitedTrackString()} to the playback queue.");
         }
     }
 
-    [Command("artist"), Description("Plays tracks from an matchedArtist."), Aliases("a")]
-    public async Task ArtistAsync(CommandContext ctx, [RemainingText] string artist) {
+    [Command("artist", "a"), Description("Plays tracks from an matchedArtist.")]
+    public async Task ArtistAsync([CommandParameter(Remainder = true)] string artist) {
+        await BeforeExecutionAsync(Context);
         string matchedArtist =
             GuildMusicData.artistMappings.Keys.MaxBy(values => ActualFuzz.partialFuzz(artist, values))!;
         GuildMusic.queue.addToQueue(matchedArtist);
 
         await GuildMusic.queue.seedQueue();
 
-        await startPlayer(ctx);
+        await startPlayer(Context);
         await GuildMusic.queue.PlayAsync();
-        await common.respond(ctx, $"Started playing {matchedArtist}.");
+        await MusicCommon.respond(Context, $"Started playing {matchedArtist}.");
     }
 
-    [Command("stopartist"), Description("Stops playing tracks from an matchedArtist."), Aliases("sa")]
-    public async Task StopArtistAsync(CommandContext ctx) {
+    [Command("stopartist", "sa"), Description("Stops playing tracks from an matchedArtist.")]
+    public async Task StopArtistAsync() {
+        await BeforeExecutionAsync(Context);
         GuildMusic.queue.clearQueue();
 
         int rmd = GuildMusic.queue.EmptyQueue();
         await GuildMusic.queue.StopAsync();
         await GuildMusic.DestroyPlayerAsync();
 
-        await common.respond(ctx, $"Removed {rmd:#,##0} tracks from the queue.");
+        await MusicCommon.respond(CommandContext, $"Removed {rmd:#,##0} tracks from the queue.");
     }
 
     [Command("stop"), Description("Stops playback and quits the voice channel.")]
-    public async Task StopAsync(CommandContext ctx) {
+    public async Task StopAsync() {
+        await BeforeExecutionAsync(Context);
         int rmd = GuildMusic.queue.EmptyQueue();
         await GuildMusic.queue.StopAsync();
         GuildMusic.queue.clearQueue();
         await GuildMusic.DestroyPlayerAsync();
 
-        await common.respond(ctx, $"Removed {rmd:#,##0} tracks from the queue.");
+        await MusicCommon.respond(Context, $"Removed {rmd:#,##0} tracks from the queue.");
     }
 
     [Command("repeat"), Description("Toggles repeat of the queue.")]
-    public async Task RepeatAsync(CommandContext ctx) {
+    public async Task RepeatAsync() {
+        await BeforeExecutionAsync(Context);
         bool repeat = GuildMusic.queue.repeatQueue;
         GuildMusic.queue.repeatQueue = !repeat;
         // seed the queue if it doesn't exist and we are playing a manual song
@@ -629,54 +632,59 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
 
         if (repeat) {
-            await common.respond(ctx, "Disabled repeat.");
+            await MusicCommon.respond(Context, "Disabled repeat.");
         }
         else {
-            await common.respond(ctx, "Enabled repeat.");
+            await MusicCommon.respond(Context, "Enabled repeat.");
         }
     }
 
-    [Command("earrape"), Description("Toggles annoying users."), Aliases("er")]
-    public async Task EarrapeAsync(CommandContext ctx) {
+    [Command("earrape", "er"), Description("Toggles annoying users.")]
+    public async Task EarrapeAsync() {
+        await BeforeExecutionAsync(Context);
         bool earrape = GuildMusic.queue.earrapeMode;
         GuildMusic.queue.earrapeMode = !earrape;
         if (earrape) {
-            await common.respond(ctx, "Disabled earrape mode.");
+            await MusicCommon.respond(Context, "Disabled earrape mode.");
         }
         else {
-            await common.respond(ctx, "Enabled earrape mode.");
+            await MusicCommon.respond(Context, "Enabled earrape mode.");
         }
     }
 
     [Command("clear"), Description("Clears the queue.")]
-    public async Task ClearAsync(CommandContext ctx) {
+    public async Task ClearAsync() {
+        await BeforeExecutionAsync(Context);
         int rmd = GuildMusic.queue.EmptyQueue();
         GuildMusic.queue.clearQueue();
 
-        await common.respond(ctx, $"Removed {rmd:#,##0} tracks from the queue uwu");
+        await MusicCommon.respond(Context, $"Removed {rmd:#,##0} tracks from the queue uwu");
     }
 
     [Command("pause"), Description("Pauses playback.")]
-    public async Task PauseAsync(CommandContext ctx) {
+    public async Task PauseAsync() {
+        await BeforeExecutionAsync(Context);
         await GuildMusic.PauseAsync();
-        await common.respond(ctx,
-            $"Playback paused. Use {Formatter.InlineCode($"{ctx.Prefix}resume")} to resume playback.");
+        await MusicCommon.respond(Context,
+            $"Playback paused. Use {".resume".InlineCode()} to resume playback.");
     }
 
-    [Command("resume"), Description("Resumes playback."), Aliases("unpause")]
-    public async Task ResumeAsync(CommandContext ctx) {
+    [Command("resume", "unpause"), Description("Resumes playback.")]
+    public async Task ResumeAsync() {
+        await BeforeExecutionAsync(Context);
         await GuildMusic.ResumeAsync();
-        await common.respond(ctx, "Playback resumed.");
+        await MusicCommon.respond(Context, "Playback resumed.");
     }
 
-    [Command("skip"), Description("Skips current track."), Aliases("next")]
-    public async Task SkipAsync(CommandContext ctx) {
+    [Command("skip", "next"), Description("Skips current track.")]
+    public async Task SkipAsync() {
+        await BeforeExecutionAsync(Context);
         // don't allow skipping more at the same time
         try {
             await _semaphore.WaitAsync();
             var track = GuildMusic.queue.NowPlaying.track;
             await GuildMusic.queue.StopAsync();
-            await common.respond(ctx,
+            await MusicCommon.respond(Context,
                 $"{track.ToLimitedTrackString()} skipped.");
         }
         finally {
@@ -685,14 +693,15 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
     }
 
     [Command("skip"), Description("Skips current track.")]
-    public async Task SkipAsync(CommandContext ctx, int num) {
+    public async Task SkipAsync(int num) {
+        await BeforeExecutionAsync(Context);
         // don't allow skipping more at the same time
         try {
             await _semaphore.WaitAsync();
             for (int i = 0; i < num; i++) {
                 var track = GuildMusic.queue.NowPlaying.track;
                 await GuildMusic.queue.StopAsync();
-                await common.respond(ctx,
+                await MusicCommon.respond(Context,
                     $"{track.ToLimitedTrackString()} skipped.");
                 await Task.Delay(500); // wait for the next one
             }
@@ -703,67 +712,75 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
     }
 
     [Command("seek"), Description("Seeks to specified time in current track.")]
-    public async Task SeekAsync(CommandContext ctx, [Description("Which time point to seek to.")] TimeSpan position) {
+    public async Task SeekAsync([Description("Which time point to seek to.")] TimeSpan position) {
+        await BeforeExecutionAsync(Context);
         await GuildMusic.SeekAsync(position, false);
-        await common.respond(ctx, $"Seeking to {position.ToDurationString()}...");
+        await MusicCommon.respond(Context, $"Seeking to {position.ToDurationString()}...");
     }
 
     [Command("forward"), Description("Forwards the track by specified amount of time.")]
-    public async Task ForwardAsync(CommandContext ctx, [Description("By how much to forward.")] TimeSpan offset) {
+    public async Task ForwardAsync([Description("By how much to forward.")] TimeSpan offset) {
+        await BeforeExecutionAsync(Context);
         await GuildMusic.SeekAsync(offset, true);
-        await common.respond(ctx, $"Seeking forward by {offset.ToDurationString()}...");
+        await MusicCommon.respond(Context, $"Seeking forward by {offset.ToDurationString()}...");
     }
 
     [Command("rewind"), Description("Rewinds the track by specified amount of time.")]
-    public async Task RewindAsync(CommandContext ctx, [Description("By how much to rewind.")] TimeSpan offset) {
+    public async Task RewindAsync([Description("By how much to rewind.")] TimeSpan offset) {
+        await BeforeExecutionAsync(Context);
         await GuildMusic.SeekAsync(-offset, true);
-        await common.respond(ctx, $"Seeking backward by {offset.ToDurationString()}...");
+        await MusicCommon.respond(Context, $"Seeking backward by {offset.ToDurationString()}...");
     }
 
-    [Command("volume"), Description("Sets playback volume."), Aliases("v")]
-    public async Task SetVolumeAsync(CommandContext ctx,
+    [Command("volume", "v"), Description("Sets playback volume.")]
+    public async Task SetVolumeAsync(
         [Description("Volume to set. Can be 0-150. Default 100.")]
         int volume) {
+        await BeforeExecutionAsync(Context);
         if (volume is < 0 or > 1000) {
-            await common.respond(ctx, "Volume must be greater than 0, and less than or equal to 1000.");
+            await MusicCommon.respond(Context, "Volume must be greater than 0, and less than or equal to 1000.");
             return;
         }
 
         await GuildMusic.SetVolumeAsync(volume);
-        await common.respond(ctx, $"Volume set to {GuildMusic.effectiveVolume}%.");
+        await MusicCommon.respond(Context, $"Volume set to {GuildMusic.effectiveVolume}%.");
     }
 
     [Command("volume"), Description("Gets playback volume.")]
-    public async Task GetVolumeAsync(CommandContext ctx) {
-        await common.respond(ctx,
+    public async Task GetVolumeAsync() {
+        await BeforeExecutionAsync(Context);
+        await MusicCommon.respond(Context,
             $"Volume is {GuildMusic.volume} * {GuildMusic.artistVolume} = {GuildMusic.effectiveVolume}%.");
     }
 
     [Command("restart"), Description("Restarts the playback of the current track.")]
-    public async Task RestartAsync(CommandContext ctx) {
+    public async Task RestartAsync() {
+        await BeforeExecutionAsync(Context);
         var track = GuildMusic.queue.NowPlaying.track;
         await GuildMusic.queue.RestartAsync();
-        await common.respond(ctx,
+        await MusicCommon.respond(Context,
             $"{track.ToLimitedTrackString()} restarted.");
     }
 
-    [Command("remove"), Description("Removes a track from playback queue."), Aliases("del", "rm")]
-    public async Task RemoveAsync(CommandContext ctx, [Description("Which track to remove.")] int index) {
+    [Command("remove", "del", "rm"), Description("Removes a track from playback queue.")]
+    public async Task RemoveAsync([Description("Which track to remove.")] int index) {
+        await BeforeExecutionAsync(Context);
         var itemN = GuildMusic.queue.Remove(index - 1);
         if (itemN == null) {
-            await common.respond(ctx, "No such track.");
+            await MusicCommon.respond(Context, "No such track.");
             return;
         }
 
-        await common.respond(ctx,
+        await MusicCommon.respond(Context,
             $"{itemN.ToLimitedTrackString()} removed.");
     }
 
-    [Command("queue"), Description("Displays current playback queue."), Aliases("q")]
-    public async Task QueueAsync(CommandContext ctx) {
+    [Command("queue", "q"), Description("Displays current playback queue.")]
+    public async Task QueueAsync() {
+        await BeforeExecutionAsync(Context);
         var track = GuildMusic.queue.NowPlaying;
         if (track == null && GuildMusic.queue.Queue.Count == 0 && GuildMusic.queue.autoQueue.Count == 0) {
-            await common.respond(ctx, "Queue is empty!");
+            await MusicCommon.respond(ctx, "Queue is empty!");
             return;
         }
 
@@ -773,7 +790,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         var pageCount = queue.Count / 10 + 1;
         if (queue.Count % 10 == 0) pageCount--;
         if (!isPlaying || queue.Count == 0) {
-            await common.respond(ctx, "Queue is empty!");
+            await MusicCommon.respond(ctx, "Queue is empty!");
             return;
         }
         var pages = queue.Select(x => x.track.ToTrackString())
@@ -808,21 +825,23 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
     }
 
-    [Command("nowplaying"), Description("Displays information about currently-played track."), Aliases("np")]
-    public async Task NowPlayingAsync(CommandContext ctx) {
+    [Command("nowplaying", "np"), Description("Displays information about currently-played track.")]
+    public async Task NowPlayingAsync() {
+        await BeforeExecutionAsync(Context);
         var track = GuildMusic.queue.NowPlaying;
-        if (track == default) {
-            await common.respond(ctx, "Not playing.");
+        if (track == null) {
+            await MusicCommon.respond(Context, "Not playing.");
         }
         else {
-            await common.respond(ctx,
-                $"Now playing: {track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}].");
+            await MusicCommon.respond(Context,
+                $"Now playing: {track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Duration.ToDurationString()}].");
         }
     }
 
-    [Command("playerinfo"), Description("Displays information about current player."), Aliases("pinfo", "pinf"), Hidden]
+    [Command("playerinfo", "pinfo", "pinf"), Description("Displays information about current player.")]
     public async Task PlayerInfoAsync(CommandContext ctx) {
-        await common.respond(ctx,
+        await BeforeExecutionAsync(ctx);
+        await MusicCommon.respond(ctx,
             $"Queue length: {GuildMusic.queue.getCombinedQueue().Count}\nVolume: {GuildMusic.volume}%");
     }
 }
@@ -845,16 +864,16 @@ public static class Extensions {
     /// </summary>
     /// <param name="x">Music item to convert.</param>
     /// <returns>Track string.</returns>
-    public static string ToTrackString(this LavalinkTrack x) {
-        return x != null ? $"{(x.Info.Title ?? "No title").Sanitize().Bold().URLDecode()} by {(x.Info.Author ?? "No Author").Sanitize().Bold().URLDecode()} [{x.Info.Length.ToDurationString()}]" : "";
+    public static string ToTrackString(this LavalinkTrack? x) {
+        return x != null ? $"{(x.Title ?? "No title").Sanitize().Bold().URLDecode()} by {(x.Author ?? "No Author").Sanitize().Bold().URLDecode()} [{x.Duration.ToDurationString()}]" : "";
     }
 
     public static string URLDecode(this string title) {
         return WebUtility.HtmlDecode(WebUtility.UrlDecode(title));
     }
 
-    public static string ToLimitedTrackString(this LavalinkTrack x) {
-        return x != null ? $"{(x.Info.Title ?? "No title").Sanitize().Bold().URLDecode()} by {(x.Info.Author ?? "No Author").Sanitize().Bold().URLDecode()}" : "";
+    public static string ToLimitedTrackString(this LavalinkTrack? x) {
+        return x != null ? $"{(x.Title ?? "No title").Sanitize().Bold().URLDecode()} by {(x.Author ?? "No Author").Sanitize().Bold().URLDecode()}" : "";
     }
 
     public static string ReversePath(this string s) {
@@ -875,7 +894,7 @@ public static class Extensions {
 
         // if samplerate+depth (FLAC), do that like 16/44.1khz
         if (f.Attributes.Any(a => a.Type == FileAttributeType.SampleRate) &&
-                                  f.Attributes.Any(a => a.Type == FileAttributeType.BitDepth)) {
+            f.Attributes.Any(a => a.Type == FileAttributeType.BitDepth)) {
             var sr = (f.SampleRate!.Value / 1000f).ToString("N1");
             var bd = f.BitDepth;
             return $"{bd}/{sr}kHz";
@@ -883,7 +902,6 @@ public static class Extensions {
         return "???";
     }
 }
-
 
 /// <summary>
 /// Provides ability to search YouTube in a streamlined manner.

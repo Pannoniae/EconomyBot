@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Lavalink4NET;
 using Lavalink4NET.Events;
+using Lavalink4NET.Events.Players;
 using NetCord.Gateway;
 using Soulseek;
 using Spectre.Console;
@@ -38,10 +39,30 @@ public sealed class MusicService {
 
 
         Lavalink.StatisticsUpdated += playbackStarted;
+        Lavalink.TrackEnded += (sender, e) => {
+            // get queue for track
+            var queue = MusicData[e.Player.GuildId].queue;
+            return queue.Player_PlaybackFinished(sender, e);
+        };
+        Lavalink.TrackStarted += (sender, e) => {
+            // get queue for track
+            var queue = MusicData[e.Player.GuildId].queue;
+            return queue.Player_PlaybackStarted(sender, e);
+        };
+        Lavalink.TrackException += Lavalink_TrackExceptionThrown;
 
         async Task playbackStarted(object o, StatisticsUpdatedEventArgs e) {
             AnsiConsole.WriteLine($"len/nodes: {e.Statistics.ConnectedPlayers}");
         }
+    }
+
+    private async Task Lavalink_TrackExceptionThrown(object sender, TrackExceptionEventArgs eventArgs) {
+        if (e.Guild is null) {
+            return;
+        }
+
+        await CommandChannel.SendMessageAsync(
+            $"{Program.cube} A problem occured while playing {e.Track.ToLimitedTrackString()}:\n{e.Exception}");
     }
 
 

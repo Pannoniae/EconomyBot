@@ -1,9 +1,9 @@
-﻿using System.Collections.Immutable;
-using EconomyBot.CommandHandlers;
+﻿using EconomyBot.CommandHandlers;
 using NetCord;
 using NetCord.Rest;
 using NetCord.Services;
 using NetCord.Services.Commands;
+using Spectre.Console;
 
 namespace EconomyBot;
 
@@ -94,8 +94,10 @@ public class ChatModule : CommandModule<CommandContext> {
     }
 
     [Command("bishop")]
-    public async Task saveBishop(CommandContext ctx) {
-        var messages = (await ctx.Channel.GetMessagesAsync(2000))
+    public async Task saveBishop() {
+        var messages = (await Context.Channel.GetMessagesAsync(new PaginationProperties<ulong> {
+                Limit = 2000
+            }).ToListAsync())
             .Where(msg => msg.Author.Id == 540265036141297676)
             .Select(msg => msg.Content);
         await File.WriteAllLinesAsync(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/bishop.txt",
@@ -114,37 +116,42 @@ public class ChatModule : CommandModule<CommandContext> {
     }
 
     [Command("webhook")]
-    public async Task sendWebhook(CommandContext ctx, [RemainingText] string message) {
-        await Program.wiltery.sendWebhookToChannel(ctx.Channel, message);
+    public async Task sendWebhook([CommandParameter(Remainder = true)] string message) {
+        await Program.wiltery.sendWebhookToChannel((TextGuildChannel)Context.Channel, message);
     }
 
     [Command("user")]
-    public async Task userWebhook(CommandContext ctx, [RemainingText] string message) {
-        await Program.wiltery.sendWebhookToChannelAsUser(ctx.Channel, message, ctx.Member);
+    public async Task userWebhook([CommandParameter(Remainder = true)] string message) {
+        await Program.wiltery.sendWebhookToChannelAsUser((TextGuildChannel)Context.Channel, message, (GuildUser)Context.User);
     }
 
     [Command("squish")]
     public async Task squish(CommandContext ctx, GuildUser member) {
         var cat = "https://cdn.discordapp.com/attachments/1101712131222683659/1128320701456195594/image.png";
         await ctx.Message.DeleteAsync();
-        await Program.wiltery.sendWebhookToChannelWithCustomUser(ctx.Channel, new MessageProperties()
-            .WithContent($"{member.DisplayName} was squished by a giant kitten.").WithEmbed(
-                new DiscordEmbedBuilder().WithImageUrl(
-                    cat)), cat, "Giant cat");
+        await Program.wiltery.sendWebhookToChannelWithCustomUser((TextGuildChannel)ctx.Channel, new MessageProperties()
+            .WithContent($"{member.Nickname ?? member.Username} was squished by a giant kitten.").WithEmbeds([
+                new EmbedProperties {
+                    Url = cat,
+                    Title = "Giant cat",
+                    Image = new EmbedImageProperties(cat),
+                    Description = "Giant cat"
+                }
+            ]), cat, "Giant cat");
     }
 
     [Command("0x")]
     public async Task love0x(CommandContext ctx) {
         var zerox = "https://tenor.com/view/girl-anime-kiss-anime-i-love-you-girl-kiss-gif-14375355";
-        await ctx.ReplyAsync(new MessageProperties()
-            .WithContent($"{(await ctx.Guild.GetMemberAsync(ZEROX)).Mention} is amazing and I love them so much!"));
+        await ReplyAsync(new ReplyMessageProperties()
+            .WithContent($"{ctx.Guild.Users[ZEROX].Mention()} is amazing and I love them so much!"));
         await ctx.Channel.SendMessageAsync(zerox);
     }
 
     [Command("panno")]
     public async Task lovepanno(CommandContext ctx) {
         var panno = "https://tenor.com/view/hug-gif-25588769";
-        await ctx.ReplyAsync(new MessageProperties()
+        await ReplyAsync(new ReplyMessageProperties()
             .WithContent($"Pannoniae is a 12/10 human being that deserves love and appreciation <3"));
         await ctx.Channel.SendMessageAsync(panno);
     }

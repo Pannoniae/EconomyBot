@@ -91,11 +91,11 @@ public class ToxicityHandler {
         }
 
         if (values.sexualScore > 0.7 && !checkMsgCooldown(now, "sexual")) {
-            await message.ReplyAsync(BotEmoji.FromName(client, ":flushed:"));
+            await message.ReplyAsync(DiscordEmoji.FromName(client, ":flushed:"));
         }
 
         if (values.flirtingScore > 0.7 && !checkMsgCooldown(now, "love")) {
-            await message.ReplyAsync($"cute! {BotEmoji.FromName(client, ":blue_heart:")}");
+            await message.ReplyAsync($"cute! {DiscordEmoji.FromName(client, ":blue_heart:")}");
         }
 
         // they could be 0 (default value) if the second API errors but the condition of >0.7 covers that anyway

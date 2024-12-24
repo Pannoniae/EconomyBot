@@ -1,7 +1,9 @@
-﻿using DisCatSharp.Lavalink;
-using DisCatSharp.Lavalink.Entities;
-using DisCatSharp.Lavalink.EventArgs;
-using EconomyBot.Logging;
+﻿using EconomyBot.Logging;
+using Lavalink4NET.Events.Players;
+using Lavalink4NET.Filters;
+using Lavalink4NET.Players;
+using Lavalink4NET.Protocol.Models.Filters;
+using Lavalink4NET.Tracks;
 
 namespace EconomyBot;
 
@@ -47,7 +49,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
     /// Stops the playback.
     /// </summary>
     public async Task StopAsync() {
-        if (guildMusic.Player == null || !guildMusic.Player.IsConnected)
+        if (guildMusic.Player == null || !guildMusic.Player.ConnectionState.IsConnected)
             return;
 
         NowPlaying = default;
@@ -58,7 +60,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
     /// Begins playback.
     /// </summary>
     public async Task PlayAsync() {
-        if (guildMusic.Player == null || !guildMusic.Player.IsConnected)
+        if (guildMusic.Player == null || !guildMusic.Player.ConnectionState.IsConnected)
             return;
 
         if (NowPlaying == default)
@@ -69,7 +71,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
     /// Restarts current track.
     /// </summary>
     public async Task RestartAsync() {
-        if (guildMusic.Player == null || !guildMusic.Player.IsConnected)
+        if (guildMusic.Player == null || !guildMusic.Player.ConnectionState.IsConnected)
             return;
 
         if (NowPlaying == default)
@@ -201,8 +203,12 @@ public class MusicQueue(GuildMusicData guildMusic) {
 
         NowPlaying = nextTrack;
         if (earrapeMode) {
-            var length = nextTrack.track.Info.Length;
-            await guildMusic.Player.PlayPartialAsync(nextTrack.track, TimeSpan.Zero, length - TimeSpan.FromSeconds(20));
+            var length = nextTrack.track.Duration;
+            await guildMusic.Player.PlayAsync(nextTrack.track, new TrackPlayProperties {
+                    StartPosition = TimeSpan.Zero,
+                    EndTime = length - TimeSpan.FromSeconds(20)
+                }
+            );
         }
         else {
             await guildMusic.Player.PlayAsync(nextTrack.track);
@@ -211,7 +217,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
 
     public void addToJazz(Track track) {
         Enqueue(track.track, track.artist);
-        logger.info($"Enqueued {track.track.Info.Title} at {track.track.Info.Uri}");
+        logger.info($"Enqueued {track.track.Title} at {track.track.Uri}");
     }
 
     public void addAllToQueue() {
@@ -261,9 +267,9 @@ public class MusicQueue(GuildMusicData guildMusic) {
         var nextSong = await selectNextSong(artist, artistName);
 
         var historyHasRemix =
-            history.Any(h => h.track.Info.Title.Contains("remix", StringComparison.CurrentCultureIgnoreCase));
+            history.Any(h => h.track.Title.Contains("remix", StringComparison.CurrentCultureIgnoreCase));
         // remix filter
-        if (nextSong.track.Info.Title.Contains("remix", StringComparison.CurrentCultureIgnoreCase) && historyHasRemix) {
+        if (nextSong.track.Title.Contains("remix", StringComparison.CurrentCultureIgnoreCase) && historyHasRemix) {
             // 90% reject
             if (Random.Shared.NextDouble() < 0.9) {
                 logger.info("Found duplicate remix, re-rolling...");
@@ -281,7 +287,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
             new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive }).Where(GuildMusicData.extensionFilter).ToArray();
         beginning:
         var randomFile = files[rand.Next(files.Length)];
-        var tracks_ = await GuildMusicData.getTrackAsync(guildMusic.Node, randomFile);
+        var tracks_ = await GuildMusicData.getTrackAsync(Program.LavalinkNode, randomFile);
         if (tracks_ == null) {
             // retry if not found
             goto beginning;
@@ -296,7 +302,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
         }
     }
 
-    public async Task Player_PlaybackFinished(LavalinkGuildPlayer con, LavalinkTrackEndedEventArgs e) {
+    public async Task Player_PlaybackFinished(object sender, TrackEndedEventArgs e) {
         // requeue if there are items in the queue
         if (repeatQueue && Queue.Count != 0 && repeatHolder != null) {
             Queue.Add(repeatHolder);
@@ -314,7 +320,8 @@ public class MusicQueue(GuildMusicData guildMusic) {
         await PlayHandlerAsync();
     }
 
-    public async Task Player_PlaybackStarted(LavalinkGuildPlayer sender, LavalinkTrackStartedEventArgs e) {
-        await sender.SetVolumeAsync(guildMusic.effectiveVolume);
+    public async Task Player_PlaybackStarted(object sender, TrackStartedEventArgs e) {
+        e.Player.Filters.SetFilter(new VolumeFilterOptions(guildMusic.effectiveVolume));
+        await e.Player.Filters.CommitAsync();
     }
 }

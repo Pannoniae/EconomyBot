@@ -28,7 +28,7 @@ public class WilteryHandler {
     public WilteryHandler(GatewayClient client) {
         this.client = client;
 
-        messageHandlers.Add(new WordExceptionMessageHandler("ball", BotEmoji.FromName(client, ":chestnut:"),
+        messageHandlers.Add(new WordExceptionMessageHandler("ball", DiscordEmoji.FromName(client, ":chestnut:"),
             "basket"));
         messageHandlers.Add(new WordMessageHandler("hrt", "hurt"));
         messageHandlers.Add(new ResponseWordMessageHandler("anal", "Have fun getting HIV"));

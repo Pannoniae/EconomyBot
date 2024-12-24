@@ -91,9 +91,9 @@ class Program {
             //ApplicationCommands.RegisterCommands<ChatModuleSlash>();
             //ApplicationCommands.RegisterGlobalCommands<MusicModuleSlash>();
             //ApplicationCommands.RegisterGlobalCommands<ImagesModuleSlash>();
-            //commands.AddModule<ChatModule>();
-            //commands.AddModule<MusicModule>();
-            //commands.AddModule<ImagesModule>();
+            commands.AddModule<ChatModule>();
+            commands.AddModule<MusicModule>();
+            commands.AddModule<ImagesModule>();
             commands.AddModule<BotModule>();
         }
         catch (Exception e) {
@@ -197,7 +197,7 @@ class Program {
 
         // @everyone protection
         if (message.Content.Contains("@everyone") || message.Content.Contains("@here")) {
-            await message.ReplyAsync("This server - and the world in general - would be better without your existence " + BotEmoji.FromName(client, ":pleading_face:"));
+            await message.ReplyAsync("This server - and the world in general - would be better without your existence " + DiscordEmoji.FromName(client, ":pleading_face:"));
         }
 
         if (client.Cache.User.Id == message.Author.Id) {
@@ -239,7 +239,7 @@ class Program {
         if ((message.Channel.Id != POLISH_CHANNEL && message.Channel.Id != ZOO && message.Channel.Id != HUNGARY_CHANNEL) && lizardry.Any(
                 word =>
                     message.Content.Contains(word, StringComparison.OrdinalIgnoreCase))) {
-            await message.AddReactionAsync(BotEmoji.FromName(client, ":lizard:"));
+            await message.AddReactionAsync(DiscordEmoji.FromName(client, ":lizard:"));
         }
 
         var cute = new List<string> {
@@ -286,7 +286,7 @@ class Program {
         }
 
         if (author.Id == 947229156448538634) {
-            await message.AddReactionAsync(BotEmoji.FromName(client, ":pinkpill:"));
+            await message.AddReactionAsync(DiscordEmoji.FromName(client, ":pinkpill:"));
         }
 
         var meowList = new List<string> {

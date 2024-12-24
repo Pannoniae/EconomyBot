@@ -7,7 +7,7 @@ using System.Collections.Generic;
 /// </summary>
 public partial class DiscordEmoji {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="DiscordEmoji" /> class.
+    ///     Initializes a new instance of the <see cref="EconomyBot.DiscordEmoji" /> class.
     /// </summary>
     static DiscordEmoji() {
         #region Generated Emoji Map
