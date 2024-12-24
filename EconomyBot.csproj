@@ -50,29 +50,32 @@
   <ItemGroup>
     <Folder Include="bin\Debug\net9.0\runtimes\linux-x64\native\" />
     <Folder Include="lua\" />
+    <Content Remove="DisCatSharp.NetCord\**" />
+    <Compile Remove="DisCatSharp.NetCord\**" />
+    <None Remove="DisCatSharp\**" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="DisCatSharp">
+    <ProjectReference Update="DisCatSharp">
       <Version>10.6.6-nightly-021</Version>
     </PackageReference>
-    <PackageReference Update="DisCatSharp.ApplicationCommands">
+    <ProjectReference Update="DisCatSharp.ApplicationCommands">
       <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
-    <PackageReference Update="DisCatSharp.CommandsNext">
+    </ProjectReference>
+    <ProjectReference Update="DisCatSharp.CommandsNext">
       <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
-    <PackageReference Update="DisCatSharp.Common">
+    </ProjectReference>
+    <ProjectReference Update="DisCatSharp.Common">
       <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
-    <PackageReference Update="DisCatSharp.Interactivity">
+    </ProjectReference>
+    <ProjectReference Update="DisCatSharp.Interactivity">
       <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
-    <PackageReference Update="DisCatSharp.Lavalink">
+    </ProjectReference>
+    <ProjectReference Update="DisCatSharp.Lavalink">
       <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
-    <PackageReference Update="DisCatSharp.VoiceNext">
+    </ProjectReference>
+    <ProjectReference Update="DisCatSharp.VoiceNext">
       <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
+    </ProjectReference>
   </ItemGroup>
   <Import Project=".paket\Paket.Restore.targets" />
 </Project>
