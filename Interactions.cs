@@ -19,7 +19,7 @@ public class InteractionHandler {
     private bool expired = false;
 
     private Func<Message, bool> messageMatcher = (m) => true;
-    private Action<Message> messageCallback = (m) => { };
+    private Func<Message, Task> messageCallback = async (m) => { };
 
     private InteractionHandler(List<Page> pages) {
         content = pages;
@@ -50,7 +50,7 @@ public class InteractionHandler {
         messageMatcher = matcher;
     }
 
-    public void addMessageCallback(Action<Message> callback) {
+    public void addMessageCallback(Func<Message, Task> callback) {
         messageCallback = callback;
     }
 
@@ -63,6 +63,7 @@ public class InteractionHandler {
         foreach (var interaction in interactions) {
             if (interaction.Value.messageMatcher(message)) {
                 await interaction.Value.waitForMessage(message);
+                interaction.Value.expired = true;
             }
         }
     }

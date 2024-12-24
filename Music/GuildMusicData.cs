@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using EconomyBot.Logging;
 using Lavalink4NET;
+using Lavalink4NET.Clients;
 using Lavalink4NET.Filters;
 using Lavalink4NET.NetCord;
 using Lavalink4NET.Players;
@@ -198,7 +199,8 @@ public sealed class GuildMusicData {
             return;
 
         volume = vol;
-        await Player.SetVolumeAsync(effectiveVolume);
+        AnsiConsole.WriteLine(effectiveVolume);
+        await Player.SetVolumeAsync(effectiveVolume / 100f);
     }
 
     /// <summary>
@@ -225,10 +227,10 @@ public sealed class GuildMusicData {
             return;
         }
 
-        var retrieveOptions = new PlayerRetrieveOptions(ChannelBehavior: PlayerChannelBehavior.Join);
+        var retrieveOptions = new PlayerRetrieveOptions(ChannelBehavior: PlayerChannelBehavior.Join, MemberVoiceStateBehavior.AlwaysRequired);
 
         var result = await Lavalink.Players
-            .RetrieveAsync(ctx, playerFactory: PlayerFactory.Queued, retrieveOptions);
+            .RetrieveAsync(ctx, playerFactory: PlayerFactory.Default, new LavalinkPlayerOptions(), retrieveOptions);
 
         Player = result.Player;
 

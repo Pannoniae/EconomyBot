@@ -49,16 +49,21 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bin\Debug\net9.0\runtimes\linux-x64\native\" />
+    <Folder Include="Interactivity\" />
     <Folder Include="lua\" />
   </ItemGroup>
   <ItemGroup>
     <Content Remove="Lavalink4NET.NetCord\**" />
     <Compile Remove="Lavalink4NET.NetCord\**" />
     <None Remove="Lavalink4NET.NetCord\**" />
+    <Content Remove="Interactivity\**" />
+    <Compile Remove="Interactivity\**" />
+    <None Remove="Interactivity\**" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="Lavalink4NET.NetCord\Lavalink4NET.NetCord.csproj" />
+    <ProjectReference Include="Interactivity\DisCatSharp.Interactivity.csproj" />
   </ItemGroup>
   <Import Project=".paket\Paket.Restore.targets" />
 </Project>

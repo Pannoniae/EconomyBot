@@ -1,4 +1,5 @@
 ﻿using NetCord.Gateway;
+using NetCord.Rest;
 using NetCord.Services.Commands;
 
 namespace EconomyBot;
@@ -34,7 +35,7 @@ public class MusicCommon {
         await ctx.Message.ReplyAsync($"{Program.cube} {response}");
     }
 
-    public static async Task modify(CommandContext ctx, Message msg, string response) {
+    public static async Task modify(CommandContext ctx, RestMessage msg, string response) {
         await msg.ModifyAsync(options => options.Content = $"{Program.cube} {response}");
     }
 }

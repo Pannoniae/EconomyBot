@@ -33,8 +33,8 @@ public class MusicModule(YouTubeSearchProvider yt) : CommandModule<CommandContex
     private readonly IAudioService lavalink = Program.LavalinkNode;
 
     private static IVoiceGuildChannel? getChannel(CommandContext ctx) {
-        ulong? chn = Program.client.Rest.GetGuildUserVoiceStateAsync(ctx.Guild!.Id, ctx.User.Id).GetAwaiter().GetResult()?.ChannelId;
-        return chn == null ? null : (IVoiceGuildChannel?)Program.client.Cache.Guilds[ctx.Guild.Id].Channels[chn.Value];
+        bool succ = ctx.Guild.VoiceStates.TryGetValue(ctx.User.Id, out var voiceState);
+        return !succ ? null : (IVoiceGuildChannel?)ctx.Guild.Channels[voiceState.ChannelId.Value];
     }
 
     private async Task startPlayer(CommandContext ctx) {
@@ -62,29 +62,57 @@ public class MusicModule(YouTubeSearchProvider yt) : CommandModule<CommandContex
             throw new Exception("Leave me alone...");
         }
 
+        GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild);
+        GuildMusic.CommandChannel = (TextGuildChannel)ctx.Channel!;
+
         if (cmd == "join") {
-            GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild);
-            GuildMusic.CommandChannel = (TextGuildChannel)ctx.Channel!;
             return;
         }
 
         var chn = getChannel(ctx);
-        if (chn is null && cmd != "queue") {
+        if (chn is null && cmd != "queue" && cmd != "q") {
             await MusicCommon.respond(ctx, "You need to be in a voice channel.");
             throw new IdiotException("user error");
         }
-        // force guild cache
-        Program.client.Cache.CacheGuild(ctx.Guild);
-        Program.client.Cache.CacheCurrentUser(Program.client.Cache.User);
 
-        var mbr = Program.client.Cache.Guilds[ctx.Guild!.Id].Channels[
+        // HACK TIME
+        if (cmd is "queue" or "q") {
+            goto skip;
+        }
 
-            (await Program.client.Cache.Guilds[ctx.Guild.Id].GetCurrentUserVoiceStateAsync()).ChannelId.GetValueOrDefault()];
+        var currentGuild = Program.client.Cache.Guilds[ctx.Guild.Id];
+
+        var guild = Context.Guild!;
+        var userId = Context.User.Id;
+
+        // Get the user voice state
+        if (!guild.VoiceStates.TryGetValue(userId, out var voiceState)) {
+            await MusicCommon.respond(ctx, "You need to be in the same voice channel.");
+            throw new IdiotException("user error");
+        }
+
+        // Get the bot voice state
+        if (!guild.VoiceStates.TryGetValue(Program.client.Cache.User.Id, out var botVoiceState)) {
+            // Create player
+            await GuildMusic.CreatePlayerAsync(ctx, guild.Channels[voiceState.ChannelId.Value] as IVoiceGuildChannel);
+            // Join the voice channel
+        }
+
+        try {
+            voiceState = await currentGuild.GetCurrentUserVoiceStateAsync();
+        }
+        catch (RestException e) {
+            await Console.Out.WriteLineAsync($"Error getting voice state: {e.Error}\n{e.Error.Error}\n{e.Error.Message}\n{e.Error.Code}\n{e.Message}\n{e.ReasonPhrase}\n{e.StatusCode}");
+        }
+
+        var mbr = currentGuild.Channels[voiceState.ChannelId.GetValueOrDefault()];
+
         if (mbr is not null && chn != mbr && cmd != "queue") {
             await MusicCommon.respond(ctx, "You need to be in the same voice channel.");
             throw new IdiotException("user error");
         }
 
+        skip:
         GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild);
         GuildMusic.CommandChannel = (TextGuildChannel)ctx.Channel!;
     }
@@ -407,7 +435,7 @@ public class MusicModule(YouTubeSearchProvider yt) : CommandModule<CommandContex
         var msgC =
             $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
 
-        var msg = (Message)(await ReplyAsync(msgC));
+        var msg = await ReplyAsync(msgC);
 
         interaction.addMatcher(x => x.Author == Context.User && x.Channel == Context.Channel);
         interaction.addMessageCallback(async m => {
@@ -501,7 +529,7 @@ public class MusicModule(YouTubeSearchProvider yt) : CommandModule<CommandContex
                 $"{MusicCommon.NumberMappings[i + 1]} {WebUtility.HtmlDecode(x.Title).Sanitize().Bold().URLDecode()} by {WebUtility.HtmlDecode(x.Author).Sanitize().Bold().URLDecode()}"));
         msgC =
             $"{msgC}\n\nType a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
-        var msg = (Message)await ReplyAsync(msgC);
+        var msg = await ReplyAsync(msgC);
 
         var interaction = InteractionHandler.create(Context, [new Page(msgC)]);
 

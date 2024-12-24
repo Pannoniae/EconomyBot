@@ -321,7 +321,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
     }
 
     public async Task Player_PlaybackStarted(object sender, TrackStartedEventArgs e) {
-        e.Player.Filters.SetFilter(new VolumeFilterOptions(guildMusic.effectiveVolume));
+        e.Player.Filters.SetFilter(new VolumeFilterOptions(guildMusic.effectiveVolume / 100f));
         await e.Player.Filters.CommitAsync();
     }
 }

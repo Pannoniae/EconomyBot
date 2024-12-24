@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using DetectLanguage;
 using EconomyBot.Logging;
@@ -7,6 +8,7 @@ using Lavalink4NET;
 using Lavalink4NET.NetCord;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting.Internal;
 using NetCord;
 using NetCord.Gateway;
 using NetCord.Hosting.Gateway;
@@ -15,7 +17,9 @@ using NetCord.Hosting.Services.Commands;
 using NetCord.Rest;
 using NetCord.Services;
 using NetCord.Services.Commands;
+using Soulseek;
 using Spectre.Console;
+using Directory = System.IO.Directory;
 
 namespace EconomyBot;
 
@@ -55,7 +59,7 @@ class Program {
     }
 
 
-    public static async Task Main(string[] args) {
+    public static async Task<int> Main(string[] args) {
         // logging
 
         Logger.setLogLevel(LogLevel.INFO);
@@ -76,7 +80,8 @@ class Program {
                 options.TypeReaders.Remove(typeof(TimeSpan));
                 options.TypeReaders.Add(typeof(TimeSpan), new CustomTimeSpanConverter());
             })
-            .ConfigureServices(collection => collection.AddSingleton(new YouTubeSearchProvider()));
+            .ConfigureServices(collection => collection.AddSingleton(new YouTubeSearchProvider())
+                .AddSingleton<IHostLifetime, ConsoleLifetime>());
 
         host = builder.Build()
             .AddModules(typeof(Program).Assembly)
@@ -85,6 +90,11 @@ class Program {
 
         client = host.Services.GetService<GatewayClient>()!;
         commands = host.Services.GetService<CommandService<CommandContext>>()!;
+
+
+
+
+        await Console.Out.WriteLineAsync("Intents:" + getIntents(client));
 
         try {
             //ApplicationCommands.RegisterCommands<ChatModuleSlash>();
@@ -137,8 +147,11 @@ class Program {
 
         // hold console window
         await host.RunAsync();
-        await Task.Delay(-1);
+        return 0;
     }
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_intents")]
+    private static extern ref GatewayIntents getIntents(GatewayClient client);
 
     private static async ValueTask messageInteractionHandler(Message m) {
         await InteractionHandler.messageHandler(m);
@@ -333,6 +346,15 @@ class Program {
         languageClient = new DetectLanguageClient(Constants.detectlanguagetoken);
 
         cube = await (await client.Rest.GetGuildAsync(838843082110664756)).GetEmojiAsync(839202645734457384);
+
+        MusicService.slsk = new SoulseekClient();
+        MusicService.slsk.ConnectAsync("jazzbot", "jazzbot");
+        MusicService.slsk.ExcludedSearchPhrasesReceived += (sender, args) => {
+            AnsiConsole.WriteLine("Excluded search phrases: ");
+            foreach (var phrase in args) {
+                AnsiConsole.WriteLine(phrase);
+            }
+        };
 
         hasSetup = true;
 
