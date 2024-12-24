@@ -23,8 +23,6 @@ using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json.Linq;
 
-using Sentry;
-
 namespace DisCatSharp;
 
 /// <summary>
@@ -94,136 +92,6 @@ public abstract class BaseDiscordClient : IDisposable
 			vrs = v?.ToString(3);
 		}
 
-		if (!this.Configuration.HasShardLogger)
-			if (this.Configuration is { LoggerFactory: not null, EnableSentry: true })
-				this.Configuration.LoggerFactory.AddSentry(o =>
-				{
-					o.InitializeSdk = true;
-					o.Dsn = SentryDsn;
-					o.DetectStartupTime = StartupTimeDetectionMode.Fast;
-					o.DiagnosticLevel = SentryLevel.Debug;
-					o.Environment = "dev";
-					o.IsGlobalModeEnabled = false;
-					o.TracesSampleRate = 1.0;
-					o.ReportAssembliesMode = ReportAssembliesMode.InformationalVersion;
-					o.AddInAppInclude("DisCatSharp");
-					o.AttachStacktrace = true;
-					o.StackTraceMode = StackTraceMode.Enhanced;
-					o.Release = $"{this.BotLibrary}@{vrs}";
-					o.SendClientReports = true;
-					o.IsEnvironmentUser = false;
-					o.UseAsyncFileIO = true;
-					o.EnableScopeSync = true;
-					if (!this.Configuration.AttachRecentLogEntries)
-						o.MaxBreadcrumbs = 0;
-					if (!this.Configuration.DisableExceptionFilter)
-						o.AddExceptionFilter(new DisCatSharpExceptionFilter(this.Configuration));
-					o.Debug = this.Configuration.SentryDebug;
-					o.SetBeforeSend((e, _) =>
-					{
-						if (!this.Configuration.DisableExceptionFilter)
-						{
-							if (e.Exception != null)
-							{
-								if (!this.Configuration.TrackExceptions.Contains(e.Exception.GetType()))
-									return null;
-							}
-							else if (e.Extra.Count == 0 || !e.Extra.ContainsKey("Found Fields"))
-								return null;
-						}
-
-						if (e.HasUser())
-							return e;
-
-						if (this.Configuration.AttachUserInfo && this.CurrentUser! != null!)
-							e.User = new()
-							{
-								Id = this.CurrentUser.Id.ToString(),
-								Username = this.CurrentUser.UsernameWithDiscriminator,
-								Other = new Dictionary<string, string>
-								{
-									{ "developer", this.Configuration.DeveloperUserId?.ToString() ?? "not_given" },
-									{ "email", this.Configuration.FeedbackEmail ?? "not_given" }
-								}
-							};
-						return e;
-					});
-				});
-
-		if (this.Configuration.EnableSentry)
-		{
-			SentryOptions options = new()
-			{
-				DetectStartupTime = StartupTimeDetectionMode.Fast,
-				DiagnosticLevel = SentryLevel.Debug,
-				Environment = "dev",
-				IsGlobalModeEnabled = false,
-				TracesSampleRate = 1.0,
-				ReportAssembliesMode = ReportAssembliesMode.InformationalVersion,
-				Dsn = SentryDsn,
-				AttachStacktrace = true,
-				StackTraceMode = StackTraceMode.Enhanced,
-				SendClientReports = true,
-				Release = $"{this.BotLibrary}@{vrs}",
-				IsEnvironmentUser = false,
-				UseAsyncFileIO = true,
-				EnableScopeSync = true,
-				Debug = this.Configuration.SentryDebug,
-				MaxBreadcrumbs = this.Configuration.AttachRecentLogEntries ? 100 : 0
-			};
-
-			if (!this.Configuration.DisableScrubber)
-			{
-				options.SetBeforeBreadcrumb(b
-					=> new(Utilities.StripTokensAndOptIds(b.Message, this.Configuration.EnableDiscordIdScrubber)!,
-						b.Type!,
-						b.Data?.Select(x => new KeyValuePair<string, string>(x.Key, Utilities.StripTokensAndOptIds(x.Value, this.Configuration.EnableDiscordIdScrubber)!))
-							.ToDictionary(x => x.Key, x => x.Value),
-						b.Category,
-						b.Level));
-
-				options.SetBeforeSendTransaction(tr =>
-				{
-					if (tr.Request.Data is string str)
-						tr.Request.Data = Utilities.StripTokensAndOptIds(str, this.Configuration.EnableDiscordIdScrubber);
-
-					return tr;
-				});
-			}
-
-			options.SetBeforeSend((e, _) =>
-			{
-				if (!this.Configuration.DisableExceptionFilter)
-				{
-					if (e.Exception != null)
-					{
-						if (!this.Configuration.TrackExceptions.Contains(e.Exception.GetType()))
-							return null;
-					}
-					else if (e.Extra.Count == 0 || !e.Extra.ContainsKey("Found Fields"))
-						return null;
-				}
-
-				if (!e.HasUser())
-					if (this.Configuration.AttachUserInfo && this.CurrentUser! != null!)
-						e.User = new()
-						{
-							Id = this.CurrentUser.Id.ToString(),
-							Username = this.CurrentUser.UsernameWithDiscriminator,
-							Other = new Dictionary<string, string>
-							{
-								{ "developer", this.Configuration.DeveloperUserId?.ToString() ?? "not_given" },
-								{ "email", this.Configuration.FeedbackEmail ?? "not_given" }
-							}
-						};
-
-				if (!e.Extra.ContainsKey("Found Fields"))
-					e.SetFingerprint(GenerateSentryFingerPrint(e));
-				return e;
-			});
-			this.Sentry = new(options);
-		}
-
 		this.Logger ??= this.Configuration.LoggerFactory!.CreateLogger<BaseDiscordClient>();
 
 		this.ApiClient = new(this);
@@ -268,11 +136,6 @@ public abstract class BaseDiscordClient : IDisposable
 	///     Gets the api client.
 	/// </summary>
 	protected internal DiscordApiClient ApiClient { get; }
-
-	/// <summary>
-	///     Gets the sentry client.
-	/// </summary>
-	internal SentryClient Sentry { get; set; }
 
 	/// <summary>
 	///     Gets the sentry dsn.
@@ -496,18 +359,6 @@ public abstract class BaseDiscordClient : IDisposable
 			foreach (var xvr in vrs)
 				this.InternalVoiceRegions.TryAdd(xvr.Id, xvr);
 		}
-
-		if (this.Configuration is { EnableSentry: true, AttachUserInfo: true })
-			SentrySdk.ConfigureScope(x => x.User = new()
-			{
-				Id = this.CurrentUser.Id.ToString(),
-				Username = this.CurrentUser.UsernameWithDiscriminator,
-				Other = new Dictionary<string, string>
-				{
-					{ "developer", this.Configuration.DeveloperUserId?.ToString() ?? "not_given" },
-					{ "email", this.Configuration.FeedbackEmail ?? "not_given" }
-				}
-			});
 	}
 
 	/// <summary>
@@ -568,45 +419,4 @@ public abstract class BaseDiscordClient : IDisposable
 	/// </summary>
 	/// <param name="emoji">The emoji.</param>
 	internal abstract DiscordApplicationEmoji UpdateCachedApplicationEmoji(DiscordApplicationEmoji emoji);
-
-	/// <summary>
-	///     Generates a fingerprint for sentry.
-	/// </summary>
-	/// <param name="ev">The sentry event.</param>
-	/// <param name="additional">The optional additional fingerprint value, if any.</param>
-	internal static IEnumerable<string> GenerateSentryFingerPrint(SentryEvent ev, string? additional = null)
-	{
-		var fingerPrint = new List<string>
-		{
-			ev.Level.ToString(),
-			ev.Logger
-		};
-
-		if (ev.Message?.Message is not null)
-			fingerPrint.Add(ev.Message.Message);
-
-		if (additional is not null)
-			fingerPrint.Add(additional);
-
-		var ex = ev.Exception;
-
-		if (ex is null)
-			return fingerPrint;
-
-		fingerPrint.Add(ex.GetType().FullName);
-		if (!string.IsNullOrEmpty(ex.Message))
-			fingerPrint.Add(ex.Message);
-
-		if (ex.TargetSite is not null)
-			fingerPrint.Add(ex.TargetSite.ToString());
-
-		if (ex.InnerException is null)
-			return fingerPrint;
-
-		fingerPrint.Add(ex.InnerException.GetType().FullName);
-		if (!string.IsNullOrEmpty(ex.InnerException.Message))
-			fingerPrint.Add(ex.InnerException.Message);
-
-		return fingerPrint;
-	}
 }

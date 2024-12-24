@@ -18,20 +18,8 @@ using DisCatSharp.Enums;
 using DisCatSharp.Net;
 
 using Microsoft.Extensions.Logging;
-
-using NuGet.Common;
-using NuGet.Packaging;
-using NuGet.Protocol;
-using NuGet.Protocol.Core.Types;
-using NuGet.Versioning;
-
-using Octokit;
-using Octokit.Internal;
-
-using Connection = Octokit.Connection;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
-using Repository = NuGet.Protocol.Core.Types.Repository;
 
 namespace DisCatSharp;
 
@@ -576,87 +564,7 @@ public static class Utilities
 	/// <param name="includePrerelease">Whether to include pre-releases in the check.</param>
 	private static async Task CheckGitHubVersionAsync(BaseDiscordClient client, bool startupCheck, bool fromShard = false, string owner = "Aiko-IT-Systems", string repository = "DisCatSharp", string productName = "DisCatSharp", string? manualVersion = null, string? githubToken = null, bool includePrerelease = true)
 	{
-		if (startupCheck && s_gitHubVersionCheckFinishedFor.TryGetValue(productName, out var val) && val)
-			return;
 
-		try
-		{
-			var version = manualVersion ?? client.VersionString;
-			var currentVersion = version.Split('-')[0]!.Split('+')[0]!;
-			var splitVersion = currentVersion.Split('.');
-			var api = Convert.ToInt32(splitVersion[0]);
-			var major = Convert.ToInt32(splitVersion[1]);
-			var minor = Convert.ToInt32(splitVersion[2]);
-
-			ApiConnection apiConnection = githubToken is not null ? new(new Connection(new($"{client.BotLibrary}", client.VersionString), new InMemoryCredentialStore(new(githubToken)))) : new(new Connection(new($"{client.BotLibrary}", client.VersionString)));
-			ReleasesClient releaseClient = new(apiConnection);
-			var latest = includePrerelease
-				? (await releaseClient.GetAll(owner, repository, new()
-				{
-					PageCount = 1,
-					PageSize = 1
-				})).ToList().FirstOrDefault()
-				: await releaseClient.GetLatest(owner, repository);
-
-			if (latest is null)
-			{
-				client.Logger.LogWarning("[{Type}] Failed to check for updates. Could not determine remote version", fromShard ? "ShardedClient" : "Client");
-				return;
-			}
-
-			string? releaseNotes = null;
-			if (client.Configuration.ShowReleaseNotesInUpdateCheck)
-			{
-				var assetUrl = latest.Assets.FirstOrDefault(x => x.Name is "RELEASENOTES.md")?.BrowserDownloadUrl;
-				if (assetUrl is not null)
-					try
-					{
-						GitHubClient gitHubClient = new(apiConnection.Connection);
-						var response = await gitHubClient.Connection.GetRawStream(new(assetUrl), new Dictionary<string, string>
-						{
-							{ "Accept", "application/octet-stream " }
-						});
-						releaseNotes = await response.Body.GenerateStringFromStream();
-					}
-					catch
-					{
-						releaseNotes = null;
-					}
-			}
-
-			var lastGitHubRelease = latest.TagName.Replace("v", string.Empty, StringComparison.InvariantCultureIgnoreCase);
-			var githubSplitVersion = lastGitHubRelease.Split('.');
-			var githubApi = Convert.ToInt32(githubSplitVersion[0]);
-			var githubMajor = Convert.ToInt32(githubSplitVersion[1]);
-			var githubMinor = Convert.ToInt32(githubSplitVersion[2]);
-
-			if (api < githubApi || (api == githubApi && major < githubMajor) || (api == githubApi && major == githubMajor && minor < githubMinor))
-				client.Logger.LogCritical("[{Type}] Your version of {Product} is outdated!\n\tCurrent version: v{CurrentVersion}\n\tLatest version: v{LastGitHubRelease}", fromShard ? "ShardedClient" : "Client", productName, version, lastGitHubRelease);
-			else if (githubApi < api || (githubApi == api && githubMajor < major) || (githubApi == api && githubMajor == major && githubMinor < minor))
-				client.Logger.LogWarning("[{Type}] Your version of {Product} is newer than the latest release!\n\tPre-releases are not recommended for production.\n\tCurrent version: v{CurrentVersion}\n\tLatest version: v{LastGitHubRelease}", fromShard ? "ShardedClient" : "Client", productName, version, lastGitHubRelease);
-			else
-				client.Logger.LogInformation("[{Type}] Your version of {Product} is up to date!\n\tCurrent version: v{CurrentVersion}", fromShard ? "ShardedClient" : "Client", productName, version);
-
-			if (client.Configuration.ShowReleaseNotesInUpdateCheck)
-			{
-				if (!string.IsNullOrEmpty(releaseNotes))
-					client.Logger.LogInformation("Release Notes:\n{ReleaseNotes}", releaseNotes);
-				else
-					client.Logger.LogWarning("Could not find any release notes");
-			}
-			else
-				client.Logger.LogInformation("Release notes disabled by config");
-		}
-		catch (Exception ex)
-		{
-			client.Logger.LogWarning("[{Type}] Failed to check for updates for {Product}. Error: {Exception}", fromShard ? "ShardedClient" : "Client", productName, ex);
-		}
-		finally
-		{
-			if (startupCheck)
-				if (!s_gitHubVersionCheckFinishedFor.TryAdd(productName, true) && s_gitHubVersionCheckFinishedFor.TryGetValue(productName, out _))
-					s_gitHubVersionCheckFinishedFor[productName] = true;
-		}
 	}
 
 	/// <summary>
@@ -671,79 +579,6 @@ public static class Utilities
 	/// <returns></returns>
 	private static async Task CheckNuGetVersionAsync(BaseDiscordClient client, bool startupCheck, bool fromShard = false, string packageId = "DisCatSharp", bool includePrerelease = true, string? manualVersion = null)
 	{
-		if (startupCheck && s_nuGetVersionCheckFinishedFor.TryGetValue(packageId, out var val) && val)
-			return;
 
-		try
-		{
-			var repository = Repository.Factory.GetCoreV3("https://api.nuget.org/v3/index.json");
-			var resource = await repository.GetResourceAsync<MetadataResource>();
-			var sourceCache = new SourceCacheContext
-			{
-				RefreshMemoryCache = true,
-				IgnoreFailedSources = true,
-				NoCache = true
-			};
-			var latestVersions = (await resource.GetLatestVersions(new List<string>
-			{
-				packageId.ToLowerInvariant()
-			}, includePrerelease, false, sourceCache, new NullLogger(), CancellationToken.None))?.ToList();
-
-			if (latestVersions is null)
-			{
-				client.Logger.LogWarning("[{Type}] Failed to check for updates. Could not determine remote version", fromShard ? "ShardedClient" : "Client");
-				return;
-			}
-
-			var latestPackageVersion = latestVersions.First(x => string.Equals(x.Key, packageId, StringComparison.InvariantCultureIgnoreCase)).Value;
-			string? releaseNotes = null;
-			if (client.Configuration.ShowReleaseNotesInUpdateCheck)
-			{
-				var dResource = await repository.GetResourceAsync<FindPackageByIdResource>();
-
-				await using var packageStream = new MemoryStream();
-				await dResource.CopyNupkgToStreamAsync(
-					packageId,
-					latestPackageVersion,
-					packageStream,
-					sourceCache,
-					new NullLogger(),
-					CancellationToken.None);
-				using var packageReader = new PackageArchiveReader(packageStream);
-				var nuspecReader = await packageReader.GetNuspecReaderAsync(CancellationToken.None);
-				releaseNotes = nuspecReader.GetReleaseNotes();
-			}
-
-			var version = manualVersion ?? client.VersionString;
-			var gitLessVersion = version.Split('+')[0];
-
-			NuGetVersion currentPackageVersion = new(gitLessVersion);
-			if (latestPackageVersion > currentPackageVersion)
-				client.Logger.LogCritical("[{Type}] Your version of {Product} is outdated!\n\tCurrent version: v{CurrentVersion}\n\tLatest version: v{LastGitHubRelease}", fromShard ? "ShardedClient" : "Client", packageId, currentPackageVersion.OriginalVersion, latestPackageVersion.OriginalVersion);
-			else if (latestPackageVersion < currentPackageVersion)
-				client.Logger.LogWarning("[{Type}] Your version of {Product} is newer than the latest release!\n\tPre-releases are not recommended for production.\n\tCurrent version: v{CurrentVersion}\n\tLatest version: v{LastGitHubRelease}", fromShard ? "ShardedClient" : "Client", packageId, currentPackageVersion.OriginalVersion, latestPackageVersion.OriginalVersion);
-			else
-				client.Logger.LogInformation("[{Type}] Your version of {Product} is up to date!\n\tCurrent version: v{CurrentVersion}", fromShard ? "ShardedClient" : "Client", packageId, currentPackageVersion.OriginalVersion);
-
-			if (client.Configuration.ShowReleaseNotesInUpdateCheck)
-			{
-				if (!string.IsNullOrEmpty(releaseNotes))
-					client.Logger.LogInformation("Release Notes:\n{ReleaseNotes}", releaseNotes);
-				else
-					client.Logger.LogWarning("Could not find any release notes");
-			}
-			else
-				client.Logger.LogInformation("Release notes disabled by config");
-		}
-		catch (Exception ex)
-		{
-			client.Logger.LogWarning("[{Type}] Failed to check for updates for {Product}. Error: {Exception}", fromShard ? "ShardedClient" : "Client", packageId, ex);
-		}
-		finally
-		{
-			if (startupCheck)
-				if (!s_nuGetVersionCheckFinishedFor.TryAdd(packageId, true) && s_nuGetVersionCheckFinishedFor.TryGetValue(packageId, out _))
-					s_nuGetVersionCheckFinishedFor[packageId] = true;
-		}
 	}
 }

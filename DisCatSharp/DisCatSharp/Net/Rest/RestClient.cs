@@ -15,9 +15,6 @@ using DisCatSharp.Common.RegularExpressions;
 using DisCatSharp.Exceptions;
 
 using Microsoft.Extensions.Logging;
-
-using Sentry;
-
 namespace DisCatSharp.Net;
 
 /// <summary>
@@ -670,18 +667,6 @@ internal sealed class RestClient : IDisposable
 
 			if (ex is not null)
 			{
-				if (this._discord?.Configuration?.EnableSentry ?? false)
-					if (senex is not null)
-					{
-						Dictionary<string, object> debugInfo = new()
-						{
-							{ "route", request.Route },
-							{ "time", DateTimeOffset.UtcNow }
-						};
-						senex.AddSentryContext("Request", debugInfo);
-						this._discord.Sentry.CaptureException(senex);
-						_ = Task.Run(this._discord.Sentry.FlushAsync);
-					}
 
 				request.SetFaulted(ex);
 			}

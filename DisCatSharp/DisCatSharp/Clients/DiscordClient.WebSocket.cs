@@ -16,8 +16,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-using Sentry;
-
 namespace DisCatSharp;
 
 /// <summary>
@@ -234,11 +232,6 @@ public sealed partial class DiscordClient
 			catch (Exception ex)
 			{
 				this.Logger.LogError(LoggerEvents.WebSocketReceiveFailure, ex, "Socket handler suppressed an exception");
-				if (this.Configuration.EnableSentry)
-				{
-					this.Sentry.CaptureException(ex);
-					_ = Task.Run(this.Sentry.FlushAsync, this._cancelToken);
-				}
 			}
 		}
 

@@ -21,8 +21,6 @@ using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json.Linq;
 
-using Sentry;
-
 namespace DisCatSharp;
 
 /// <summary>
@@ -75,73 +73,6 @@ public sealed partial class DiscordShardedClient
 			this._configuration.LoggerFactory = new LoggerFactory();
 			this._configuration.LoggerFactory.AddProvider(l);
 		}
-
-		if (this._configuration is { LoggerFactory: not null, EnableSentry: true })
-			this._configuration.LoggerFactory.AddSentry(o =>
-			{
-				var a = typeof(DiscordClient).GetTypeInfo().Assembly;
-				var vs = "";
-				var iv = a.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-				if (iv != null)
-					vs = iv.InformationalVersion;
-				else
-				{
-					var v = a.GetName().Version;
-					vs = v?.ToString(3);
-				}
-
-				o.InitializeSdk = true;
-				o.Dsn = BaseDiscordClient.SentryDsn;
-				o.DetectStartupTime = StartupTimeDetectionMode.Fast;
-				o.DiagnosticLevel = SentryLevel.Debug;
-				o.Environment = "dev";
-				o.IsGlobalModeEnabled = false;
-				o.TracesSampleRate = 1.0;
-				o.ReportAssembliesMode = ReportAssembliesMode.InformationalVersion;
-				o.AddInAppInclude("DisCatSharp");
-				o.AttachStacktrace = true;
-				o.StackTraceMode = StackTraceMode.Enhanced;
-				o.Release = $"{this.BotLibrary}@{vs}";
-				o.SendClientReports = true;
-				if (!this._configuration.AttachRecentLogEntries)
-					o.MaxBreadcrumbs = 0;
-				if (!this._configuration.DisableExceptionFilter)
-					o.AddExceptionFilter(new DisCatSharpExceptionFilter(this._configuration));
-				o.IsEnvironmentUser = false;
-				o.UseAsyncFileIO = true;
-				o.Debug = this._configuration.SentryDebug;
-				o.EnableScopeSync = true;
-				o.SetBeforeSend((e, _) =>
-				{
-					if (!this._configuration.DisableExceptionFilter)
-					{
-						if (e.Exception != null)
-						{
-							if (!this._configuration.TrackExceptions.Contains(e.Exception.GetType()))
-								return null;
-						}
-						else if (e.Extra.Count == 0 || !e.Extra.ContainsKey("Found Fields"))
-							return null;
-					}
-
-					if (!e.HasUser())
-						if (this._configuration.AttachUserInfo && this.CurrentUser! != null!)
-							e.User = new()
-							{
-								Id = this.CurrentUser.Id.ToString(),
-								Username = this.CurrentUser.UsernameWithDiscriminator,
-								Other = new Dictionary<string, string>
-								{
-									{ "developer", this._configuration.DeveloperUserId?.ToString() ?? "not_given" },
-									{ "email", this._configuration.FeedbackEmail ?? "not_given" }
-								}
-							};
-
-					if (!e.Extra.ContainsKey("Found Fields"))
-						e.SetFingerprint(BaseDiscordClient.GenerateSentryFingerPrint(e));
-					return e;
-				});
-			});
 
 		this._configuration.HasShardLogger = true;
 

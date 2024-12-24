@@ -23,8 +23,6 @@ using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json.Linq;
 
-using Sentry;
-
 namespace DisCatSharp;
 
 /// <summary>
@@ -1959,9 +1957,6 @@ public sealed partial class DiscordClient : BaseDiscordClient
 		this.GuildsInternal.Clear();
 		this.EmojisInternal.Clear();
 		this._heartbeatTask?.Dispose();
-
-		if (this.Configuration.EnableSentry)
-			SentrySdk.EndSession();
 	}
 
 #endregion
