@@ -13,29 +13,29 @@ namespace EconomyBot;
 /// Provides a persistent way of tracking music in various guilds.
 /// </summary>
 public sealed class MusicService {
-    private AudioService Lavalink;
+    private IAudioService Lavalink;
     private ConcurrentDictionary<ulong, GuildMusicData> MusicData;
     private readonly GatewayClient client;
 
 
-    public SoulseekClient slsk;
+    public static SoulseekClient slsk;
 
     /// <summary>
     /// Creates a new instance of this music service.
     /// </summary>
-    public MusicService(AudioService lavalink) {
+    public MusicService(IAudioService lavalink) {
         Lavalink = lavalink;
         MusicData = new ConcurrentDictionary<ulong, GuildMusicData>();
         client = Program.client;
 
-        slsk = new SoulseekClient();
-        slsk.ConnectAsync("jazzbot", "jazzbot").GetAwaiter().GetResult();
-        slsk.ExcludedSearchPhrasesReceived += (sender, args) => {
-            AnsiConsole.WriteLine("Excluded search phrases: ");
-            foreach (var phrase in args) {
-                AnsiConsole.WriteLine(phrase);
-            }
-        };
+        //slsk = new SoulseekClient();
+        //slsk.ConnectAsync("jazzbot", "jazzbot");
+        //slsk.ExcludedSearchPhrasesReceived += (sender, args) => {
+        //    AnsiConsole.WriteLine("Excluded search phrases: ");
+        //    foreach (var phrase in args) {
+        //        AnsiConsole.WriteLine(phrase);
+        //    }
+        //};
 
 
         Lavalink.StatisticsUpdated += playbackStarted;

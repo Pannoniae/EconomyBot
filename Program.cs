@@ -26,7 +26,7 @@ class Program {
 
     private static readonly Logger logger = Logger.getClassLogger("Main");
 
-    public static AudioService LavalinkNode;
+    public static IAudioService LavalinkNode;
     public static MusicService musicService;
     public static ImagesModule imagesModule;
     public static ToxicityHandler toxicity;
@@ -85,7 +85,6 @@ class Program {
 
         client = host.Services.GetService<GatewayClient>()!;
         commands = host.Services.GetService<CommandService<CommandContext>>()!;
-        LavalinkNode = host.Services.GetService<AudioService>()!;
 
         try {
             //ApplicationCommands.RegisterCommands<ChatModuleSlash>();
@@ -101,7 +100,9 @@ class Program {
         }
         client.MessageCreate += messageHandler;
         client.MessageDeleteBulk += messageDeleteHandler;
-        client.Ready += async e => await setup(client);
+        client.Ready += async e => {
+            await setup(client);
+        };
         //discord.GuildDownloadCompleted += (sender, _) => setupB(sender, lavalink, lavalinkConfig);
         client.MessageDelete += messageDeleteHandler;
         client.InteractionCreate += interactionHandler;
@@ -319,11 +320,13 @@ class Program {
         }*/
     }
 
-    private static async Task setup(GatewayClient client) {
+    private static async ValueTask setup(GatewayClient client) {
         // Wait a bit with lavalink init, Lavalink seems to start slower than the bot. Lazy solution is pretty much a sleep
-        await Task.Delay(3000);
+        LavalinkNode = host.Services.GetService<IAudioService>()!;
+        Console.Out.WriteLine(LavalinkNode);
         musicService = new MusicService(LavalinkNode);
         lavalinkInit = true;
+
         imagesModule = new ImagesModule();
         toxicity = new ToxicityHandler();
         wiltery = new WilteryHandler(Program.client);
@@ -339,7 +342,7 @@ class Program {
         logger.info("Setup done!");
     }
 
-    private static async Task setupB(GatewayClient client) {
+    private static async ValueTask setupB(GatewayClient client) {
         foreach (var guild in client.Cache.Guilds) {
             logger.info($"{guild.Value.Name}, {guild.Value.JoinedAt.ToString()}");
         }

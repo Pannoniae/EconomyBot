@@ -42,7 +42,7 @@ public sealed class GuildMusicData {
     public TextGuildChannel CommandChannel { get; set; }
 
     private Guild Guild { get; }
-    private AudioService Lavalink { get; }
+    private IAudioService Lavalink { get; }
     public LavalinkPlayer? Player { get; private set; }
 
 
@@ -93,7 +93,7 @@ public sealed class GuildMusicData {
     /// <param name="guild">Guild to track data for.</param>
     /// <param name="lavalink">Lavalink service.</param>
     /// <param name="node">The Lavalink node this guild is connected to.</param>
-    public GuildMusicData(Guild guild, AudioService lavalink) {
+    public GuildMusicData(Guild guild, IAudioService lavalink) {
         // setup paths by OS
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
             rootPath = "/snd/music";
@@ -230,7 +230,7 @@ public sealed class GuildMusicData {
         var result = await Lavalink.Players
             .RetrieveAsync(ctx, playerFactory: PlayerFactory.Queued, retrieveOptions);
 
-        var player = result.Player;
+        Player = result.Player;
 
         await SetVolumeAsync(volume);
 
@@ -341,7 +341,7 @@ public sealed class GuildMusicData {
                s.EndsWith(".alac");
     }
 
-    public static async Task<LavalinkTrack?> getTrackAsync(AudioService client, string file) {
+    public static async Task<LavalinkTrack?> getTrackAsync(IAudioService client, string file) {
         var tracks = await client.Tracks.LoadTracksAsync(file, TrackSearchMode.None);
 
         if (tracks.Track == null) {

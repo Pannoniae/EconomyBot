@@ -22,7 +22,7 @@ namespace EconomyBot;
 
 // TODO implement a CheckBaseAttribute to stop commands from erroring when base prereqs aren't met
 
-public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : CommandModule<CommandContext> {
+public class MusicModule(YouTubeSearchProvider yt) : CommandModule<CommandContext> {
     private MusicService Music { get; set; } = Program.musicService;
     private YouTubeSearchProvider YouTube { get; } = yt;
 
@@ -30,6 +30,7 @@ public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : Comm
 
     private readonly MusicCommon common = new();
     private readonly SemaphoreSlim _semaphore = new(1, 1);
+    private readonly IAudioService lavalink = Program.LavalinkNode;
 
     private static IVoiceGuildChannel? getChannel(CommandContext ctx) {
         ulong? chn = Program.client.Rest.GetGuildUserVoiceStateAsync(ctx.Guild!.Id, ctx.User.Id).GetAwaiter().GetResult()?.ChannelId;
@@ -72,9 +73,13 @@ public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : Comm
             await MusicCommon.respond(ctx, "You need to be in a voice channel.");
             throw new IdiotException("user error");
         }
+        // force guild cache
+        Program.client.Cache.CacheGuild(ctx.Guild);
+        Program.client.Cache.CacheCurrentUser(Program.client.Cache.User);
 
         var mbr = Program.client.Cache.Guilds[ctx.Guild!.Id].Channels[
-            Program.client.Cache.Guilds[ctx.Guild.Id].GetCurrentUserVoiceStateAsync().GetAwaiter().GetResult().ChannelId.GetValueOrDefault()];
+
+            (await Program.client.Cache.Guilds[ctx.Guild.Id].GetCurrentUserVoiceStateAsync()).ChannelId.GetValueOrDefault()];
         if (mbr is not null && chn != mbr && cmd != "queue") {
             await MusicCommon.respond(ctx, "You need to be in the same voice channel.");
             throw new IdiotException("user error");
@@ -217,6 +222,7 @@ public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : Comm
     public async Task PlayJazzAsync(
         [CommandParameter(Remainder = true), Description("Terms to search for.")]
         string term) {
+        await BeforeExecutionAsync(Context);
         if (term == "all") {
             GuildMusic.queue.addAllToQueue();
             await GuildMusic.queue.seedQueue();
@@ -431,7 +437,7 @@ public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : Comm
 
 
             // actually download it from soulseek
-            var slsk = Music.slsk;
+            var slsk = MusicService.slsk;
             const string tempFolder = "/snd/music/temp";
 
             // basically, the "filename" goes like this:
