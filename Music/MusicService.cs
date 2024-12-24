@@ -56,12 +56,9 @@ public sealed class MusicService {
         }
     }
 
-    private async Task Lavalink_TrackExceptionThrown(object sender, TrackExceptionEventArgs eventArgs) {
-        if (e.Guild is null) {
-            return;
-        }
+    private async Task Lavalink_TrackExceptionThrown(object sender, TrackExceptionEventArgs e) {
 
-        await CommandChannel.SendMessageAsync(
+        await MusicData[e.Player.GuildId].CommandChannel.SendMessageAsync(
             $"{Program.cube} A problem occured while playing {e.Track.ToLimitedTrackString()}:\n{e.Exception}");
     }
 

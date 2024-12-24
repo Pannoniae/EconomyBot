@@ -1,6 +1,7 @@
 ﻿using NetCord;
 using NetCord.Gateway;
 using NetCord.Rest;
+using Spectre.Console;
 
 namespace EconomyBot;
 

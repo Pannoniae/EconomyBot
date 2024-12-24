@@ -54,7 +54,7 @@ public static class MemoryUtils {
                 //}
             }
             catch (Exception exc) {
-                AnsiConsole.WriteLine(exc);
+                AnsiConsole.WriteLine(exc.ToString());
             }
         }
 
@@ -78,7 +78,7 @@ public static class MemoryUtils {
                 //}
             }
             catch (Exception exc) {
-                AnsiConsole.WriteLine(exc);
+                AnsiConsole.WriteLine(exc.ToString());
             }
         }
 

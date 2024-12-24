@@ -104,10 +104,11 @@ class Program {
         client.Ready += async e => await setup(client);
         //discord.GuildDownloadCompleted += (sender, _) => setupB(sender, lavalink, lavalinkConfig);
         client.MessageDelete += messageDeleteHandler;
+        client.InteractionCreate += interactionHandler;
+        client.MessageCreate += messageInteractionHandler;
 
-        client.Log += message => {
+        client.Log += async message => {
             AnsiConsole.WriteLine(message.ToString());
-            return default;
         };
 
 
@@ -136,6 +137,17 @@ class Program {
         // hold console window
         await host.RunAsync();
         await Task.Delay(-1);
+    }
+
+    private static async ValueTask messageInteractionHandler(Message m) {
+        await InteractionHandler.messageHandler(m);
+    }
+
+    private static async ValueTask interactionHandler(Interaction i) {
+        if (i is ButtonInteraction bi) {
+            // TODO
+            await InteractionHandler.buttonHandler(bi);
+        }
     }
 
     private static async ValueTask messageDeleteHandler(MessageDeleteBulkEventArgs e) {

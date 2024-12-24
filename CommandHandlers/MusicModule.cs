@@ -2,10 +2,13 @@
 using System.Globalization;
 using System.Net;
 using System.Text;
+using EconomyBot;
 using Lavalink4NET;
 using Lavalink4NET.Rest.Entities.Tracks;
 using Lavalink4NET.Tracks;
 using NetCord;
+using NetCord.Gateway;
+using NetCord.Rest;
 using NetCord.Services;
 using NetCord.Services.Commands;
 using Newtonsoft.Json;
@@ -82,63 +85,65 @@ public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : Comm
     }
 
     [Command("eq"), Description("Enable EQ.")]
-    public async Task eq(CommandContext ctx) {
-        await BeforeExecutionAsync(ctx);
+    public async Task eq() {
+        await BeforeExecutionAsync(Context);
         GuildMusic.toggleEQ();
         if (GuildMusic.eq) {
-            await MusicCommon.respond(ctx, "Enabled EQ.");
+            await MusicCommon.respond(Context, "Enabled EQ.");
         }
         else {
-            await MusicCommon.respond(ctx, "Disabled EQ.");
+            await MusicCommon.respond(Context, "Disabled EQ.");
         }
     }
 
     [Command("reset"), Description("Reset the voice state.")]
-    public async Task ResetAsync(CommandContext ctx) {
-        await BeforeExecutionAsync(ctx);
+    public async Task ResetAsync() {
+        await BeforeExecutionAsync(Context);
         await reset();
         await GuildMusic.DestroyPlayerAsync();
     }
 
     [Command("join", Priority = 1), Description("Joins the voice channel.")]
-    public async Task JoinAsync(CommandContext ctx) {
+    public async Task JoinAsync() {
+        await BeforeExecutionAsync(Context);
         // yeet the bot in
-        await startPlayer(ctx);
-        await MusicCommon.respond(ctx, "Joined the channel.");
+        await startPlayer(Context);
+        await MusicCommon.respond(Context, "Joined the channel.");
     }
 
     [Command("join", Priority = 0), Description("Joins the voice channel.")]
-    public async Task JoinAsync(CommandContext ctx, GuildUser member) {
+    public async Task JoinAsync(GuildUser member) {
+        await BeforeExecutionAsync(Context);
         // yeet the bot in
-        await startPlayer(ctx);
-        await MusicCommon.respond(ctx, "Joined the channel.");
+        await startPlayer(Context);
+        await MusicCommon.respond(Context, "Joined the channel.");
     }
 
     [Command("jazz", "j", Priority = 1), Description("Plays some jazz. :3")]
-    public async Task PlayJazzAsync(CommandContext ctx) {
-        await BeforeExecutionAsync(ctx);
+    public async Task PlayJazzAsync() {
+        await BeforeExecutionAsync(Context);
         // yeet the bot in
         GuildMusic.queue.addToQueue("_fats");
         await GuildMusic.queue.seedQueue();
-        await startPlayer(ctx);
+        await startPlayer(Context);
         await GuildMusic.queue.PlayAsync();
-        await MusicCommon.respond(ctx, "Started playing jazz.");
+        await MusicCommon.respond(Context, "Started playing jazz.");
     }
 
     [Command("live", "l", Priority = 1), Description("Live music! :3")]
-    public async Task PlayLiveAsync(CommandContext ctx) {
-        await BeforeExecutionAsync(ctx);
+    public async Task PlayLiveAsync() {
+        await BeforeExecutionAsync(Context);
         // yeet the bot in
         GuildMusic.queue.addToQueue("_fatslive");
         await GuildMusic.queue.seedQueue();
-        await startPlayer(ctx);
+        await startPlayer(Context);
         await GuildMusic.queue.PlayAsync();
-        await MusicCommon.respond(ctx, "Started playing jazz.");
+        await MusicCommon.respond(Context, "Started playing jazz.");
     }
 
     [Command("analyse", "an"), Description("Analyse the frequency of artists.")]
-    public async Task AnalyseAsync(CommandContext ctx) {
-        await BeforeExecutionAsync(ctx);
+    public async Task AnalyseAsync() {
+        await BeforeExecutionAsync(Context);
         var sum = GuildMusicData.artistWeights.Values.Sum();
 
         var weights = GuildMusicData.artistWeights.Select(w => $"{w.Key}: {w.Value}");
@@ -159,34 +164,34 @@ public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : Comm
             }
         }
 
-        await MusicCommon.respond(ctx, $"Weights:\n{string.Join("\n", weights)}");
-        await MusicCommon.respond(ctx, $"Weights (percent):\n{string.Join("\n", weightsp)}");
-        await MusicCommon.respond(ctx, $"Tracks:\n{string.Join("\n", tracks.Select(t => $"{t.Key}: {t.Value}"))}");
+        await MusicCommon.respond(Context, $"Weights:\n{string.Join("\n", weights)}");
+        await MusicCommon.respond(Context, $"Weights (percent):\n{string.Join("\n", weightsp)}");
+        await MusicCommon.respond(Context, $"Tracks:\n{string.Join("\n", tracks.Select(t => $"{t.Key}: {t.Value}"))}");
     }
 
     [Command("rl"), Description("Reloads music data.")]
-    public async Task ReloadAsync(CommandContext ctx) {
-        await BeforeExecutionAsync(ctx);
+    public async Task ReloadAsync() {
+        await BeforeExecutionAsync(Context);
         GuildMusicData.reload();
-        await MusicCommon.respond(ctx, "Reloaded music data.");
+        await MusicCommon.respond(Context, "Reloaded music data.");
     }
 
     [Command("stopjazz"), Description("Stops jazz.")]
-    public async Task StopJazzAsync(CommandContext ctx) {
-        await BeforeExecutionAsync(ctx);
+    public async Task StopJazzAsync() {
+        await BeforeExecutionAsync(Context);
         await reset();
-        await MusicCommon.respond(ctx, "Stopped jazz.");
+        await MusicCommon.respond(Context, "Stopped jazz.");
     }
 
     [Command("play", "p", Priority = 1), Description("Plays supplied URL or searches for specified keywords.")]
-    public async Task PlayAsync(CommandContext ctx,
+    public async Task PlayAsync(
         [Description("URL to play from.")] Uri uri) {
-        await BeforeExecutionAsync(ctx);
+        await BeforeExecutionAsync(Context);
         var trackLoad = await lavalink.Tracks.LoadTracksAsync(uri.ToString(), TrackSearchMode.YouTube);
         var result = trackLoad;
         var tracks = result.Tracks;
         if (trackLoad.IsFailed) {
-            await MusicCommon.respond(ctx, "No tracks were found at specified link.");
+            await MusicCommon.respond(Context, "No tracks were found at specified link.");
             return;
         }
 
@@ -195,38 +200,36 @@ public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : Comm
             GuildMusic.queue.Enqueue(track);
         }
 
-        var chn = getChannel(ctx);
-        await GuildMusic.CreatePlayerAsync(ctx, chn);
+        var chn = getChannel(Context);
+        await GuildMusic.CreatePlayerAsync(Context, chn);
         await GuildMusic.queue.PlayAsync();
 
         if (trackCount > 1)
-            await MusicCommon.respond(ctx, $"Added {trackCount:#,##} tracks to playback queue.");
+            await MusicCommon.respond(Context, $"Added {trackCount:#,##} tracks to playback queue.");
         else {
             var track = tracks.First();
-            await MusicCommon.respond(ctx,
+            await MusicCommon.respond(Context,
                 $"Added {track.ToLimitedTrackString()} to the playback queue.");
         }
     }
 
     [Command("jazz", "pj", Priority = 0)]
-    public async Task PlayJazzAsync(CommandContext ctx,
+    public async Task PlayJazzAsync(
         [CommandParameter(Remainder = true), Description("Terms to search for.")]
         string term) {
         if (term == "all") {
             GuildMusic.queue.addAllToQueue();
             await GuildMusic.queue.seedQueue();
 
-            await startPlayer(ctx);
+            await startPlayer(Context);
             await GuildMusic.queue.PlayAsync();
-            await MusicCommon.respond(ctx, $"Started playing {GuildMusic.queue.artistQueue.Count} cats.");
+            await MusicCommon.respond(Context, $"Started playing {GuildMusic.queue.artistQueue.Count} cats.");
             return;
         }
 
-        var interactivity = ctx.Client.GetInteractivity();
-
         List<LavalinkTrack> results = (await GuildMusic.getJazz("*" + term + "*")).Where(t => t != null).ToList()!;
         if (results.Count == 0) {
-            await MusicCommon.respond(ctx, "Nothing was found.");
+            await MusicCommon.respond(Context, "Nothing was found.");
             return;
         }
 
@@ -237,7 +240,7 @@ public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : Comm
             var el_ = results.First();
             track_ = el_;
             if (track_ == null) {
-                await MusicCommon.respond(ctx, "No tracks were found at specified link.");
+                await MusicCommon.respond(Context, "No tracks were found at specified link.");
                 return;
             }
 
@@ -247,7 +250,7 @@ public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : Comm
             GuildMusic.queue.Enqueue(track);
 
 
-            await startPlayer(ctx);
+            await startPlayer(Context);
             await GuildMusic.queue.PlayAsync();
 
             /*if (trackCount_ > 1) {
@@ -255,7 +258,7 @@ public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : Comm
             }
             else {
                 var track = tracks_.First();*/
-            await MusicCommon.respond(ctx,
+            await MusicCommon.respond(Context,
                 $"Added {track.ToLimitedTrackString()} to the playback queue.");
             return;
         }
@@ -268,80 +271,76 @@ public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : Comm
         var content = results.Select((x, i) => (x, i))
             .GroupBy(e => e.i / 10)
             .Select(xg => new Page(
-                $"{string.Join("\n", xg.Select(xa => $"`{xa.i + 1}` {xa.x.ToLimitedTrackString()}"))}\n\nPage {xg.Key + 1}/{pageCount}"));
+                $"{string.Join("\n", xg.Select(xa => $"`{xa.i + 1}` {xa.x.ToLimitedTrackString()}"))}\n\nPage {xg.Key + 1}/{pageCount}")).ToList();
 
-        var ems = new PaginationEmojis {
-            SkipLeft = null,
-            SkipRight = null,
-            Stop = DiscordEmoji.FromUnicode("⏹"),
-            Left = DiscordEmoji.FromUnicode("◀"),
-            Right = DiscordEmoji.FromUnicode("▶")
-        };
-
+        var interaction = InteractionHandler.create(Context, content);
         if (pageCount == 1) {
-            await ctx.Channel.SendMessageAsync(content.First().Content);
+            await Context.Channel.SendMessageAsync(content.First().Content);
         }
         else {
-            _ = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, content, ems,
-                PaginationBehaviour.Ignore,
-                PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
+            await Context.Message.ReplyAsync(new ReplyMessageProperties {
+                    Content = content.First().Content,
+                    Components = [
+                        new ActionRowProperties {
+                            new ButtonProperties("left", new EmojiProperties(DiscordEmoji.FromName(Program.client, ":arrow_left:")), ButtonStyle.Primary),
+                            new ButtonProperties("right", new EmojiProperties(DiscordEmoji.FromName(Program.client, ":arrow_right:")), ButtonStyle.Primary)
+                        }
+                    ]
+                }
+            );
         }
 
         var msgC =
             $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
 
-        var msg = await ctx.ReplyAsync(msgC);
+        var msg = await ReplyAsync(msgC);
 
-        var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User && x.Channel == ctx.Channel,
-            TimeSpan.FromMinutes(2));
-        if (res.TimedOut || res.Result == null) {
-            await msg.ModifyAsync($"{Program.cube} No choice was made.");
-            return;
-        }
-
-        var resInd = res.Result.Content.Trim();
-        if (!int.TryParse(resInd, NumberStyles.Integer, CultureInfo.InvariantCulture, out var elInd)) {
-            if (resInd.ToLowerInvariant() == "cancel") {
-                elInd = -1;
+        interaction.addMatcher(x => x.Author == Context.User && x.Channel == Context.Channel);
+        interaction.addMessageCallback(async (m) => {
+            var resInd = m.Content.Trim();
+            if (!int.TryParse(resInd, NumberStyles.Integer, CultureInfo.InvariantCulture, out var elInd)) {
+                if (resInd.ToLowerInvariant() == "cancel") {
+                    elInd = -1;
+                }
+                else {
+                    return;
+                }
             }
-            else {
+
+            else if (elInd < 0 || elInd > results.Count) {
+                await MusicCommon.modify(Context, m, "Invalid choice was made.");
                 return;
             }
-        }
 
-        else if (elInd < 0 || elInd > results.Count) {
-            await MusicCommon.modify(ctx, msg, "Invalid choice was made.");
-            return;
-        }
+            if (elInd == -1) {
+                await MusicCommon.modify(Context, m, "Choice cancelled.");
+                return;
+            }
 
-        if (elInd == -1) {
-            await MusicCommon.modify(ctx, msg, "Choice cancelled.");
-            return;
-        }
-
-        var el = results.ElementAt(elInd - 1);
-        track_ = el;
+            var el = results.ElementAt(elInd - 1);
+            track_ = el;
 
 
-        if (track_ == null) {
-            await MusicCommon.modify(ctx, msg, "No tracks were found at specified link.");
-            return;
-        }
+            if (track_ == null) {
+                await MusicCommon.modify(Context, m, "No tracks were found at specified link.");
+                return;
+            }
 
-        track = el;
+            track = el;
 
-        GuildMusic.queue.Enqueue(track);
-        await startPlayer(ctx);
-        await GuildMusic.queue.PlayAsync();
+            GuildMusic.queue.Enqueue(track);
+            await startPlayer(Context);
+            await GuildMusic.queue.PlayAsync();
 
-        /*if (trackCount > 1) {
-            await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
-        }
-        else {*/
-        await MusicCommon.modify(ctx, msg,
-            $"Added {track.ToLimitedTrackString()} to the playback queue.");
+            /*if (trackCount > 1) {
+                await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
+            }
+            else {*/
+            await MusicCommon.modify(Context, m,
+                $"Added {track.ToLimitedTrackString()} to the playback queue.");
+
+        });
     }
-
 
     /// <summary>
     /// Note to Mr. or Ms. Library Author.
@@ -356,7 +355,7 @@ public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : Comm
         string term) {
         await BeforeExecutionAsync(Context);
 
-        var interactivity = Context.Client.GetInteractivity();
+
         if (string.IsNullOrWhiteSpace(term)) {
             await MusicCommon.respond(Context, "No query was entered :(");
             return;
@@ -379,114 +378,111 @@ public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : Comm
                 $"{string.Join("\n",
                     xg.Select(xa => $"**{xa.i + 1}.** {WebUtility.HtmlDecode(xa.x.file.Filename.ReversePath()).InlineCode()}" +
                                     $" {TimeSpan.FromSeconds(xa.x.file.Length.GetValueOrDefault()).musicLength().Bold()} ({xa.x.file.getBitrateString()})"))
-                }\n\nPage {xg.Key + 1}/{pageCount}"));
+                }\n\nPage {xg.Key + 1}/{pageCount}")).ToList();
 
-        var ems = new PaginationEmojis {
-            SkipLeft = null,
-            SkipRight = null,
-            Stop = DiscordEmoji.FromUnicode("⏹"),
-            Left = DiscordEmoji.FromUnicode("◀"),
-            Right = DiscordEmoji.FromUnicode("▶")
-        };
 
+        var interaction = InteractionHandler.create(Context, content);
         if (pageCount == 1) {
-            await ctx.Channel.SendMessageAsync(content.First().Content);
+            await Context.Channel.SendMessageAsync(content.First().Content);
         }
         else {
-            _ = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, content, ems,
-                PaginationBehaviour.Ignore,
-                PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
+            await Context.Message.ReplyAsync(new ReplyMessageProperties {
+                    Content = content.First().Content,
+                    Components = [
+                        new ActionRowProperties {
+                            new ButtonProperties("left", new EmojiProperties(DiscordEmoji.FromName(Program.client, ":arrow_left:")), ButtonStyle.Primary),
+                            new ButtonProperties("right", new EmojiProperties(DiscordEmoji.FromName(Program.client, ":arrow_right:")), ButtonStyle.Primary)
+                        }
+                    ]
+                }
+            );
         }
 
         var msgC =
             $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
 
-        var msg = await ctx.ReplyAsync(msgC);
+        var msg = (Message)(await ReplyAsync(msgC));
 
-        var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User && x.Channel == ctx.Channel,
-            TimeSpan.FromMinutes(2));
-        if (res.TimedOut || res.Result == null) {
-            await msg.ModifyAsync($"{Program.cube} No choice was made.");
-            return;
-        }
+        interaction.addMatcher(x => x.Author == Context.User && x.Channel == Context.Channel);
+        interaction.addMessageCallback(async m => {
 
-        var resInd = res.Result.Content.Trim();
-        if (!int.TryParse(resInd, NumberStyles.Integer, CultureInfo.InvariantCulture, out var elInd)) {
-            if (resInd.ToLowerInvariant() == "cancel") {
-                elInd = -1;
+            var resInd = m.Content.Trim();
+            if (!int.TryParse(resInd, NumberStyles.Integer, CultureInfo.InvariantCulture, out var elInd)) {
+                if (resInd.ToLowerInvariant() == "cancel") {
+                    elInd = -1;
+                }
+                else {
+                    await MusicCommon.modify(Context, msg, "Invalid choice was made.");
+                    return;
+                }
             }
-            else {
+
+            else if (elInd < 0 || elInd > results.Count) {
                 await MusicCommon.modify(Context, msg, "Invalid choice was made.");
                 return;
             }
-        }
 
-        else if (elInd < 0 || elInd > results.Count) {
-            await MusicCommon.modify(Context, msg, "Invalid choice was made.");
-            return;
-        }
-
-        if (elInd == -1) {
-            await MusicCommon.modify(Context, msg, "Choice cancelled.");
-            return;
-        }
-
-        var chosen = results.ElementAt(elInd - 1);
-
-
-        // actually download it from soulseek
-        var slsk = Music.slsk;
-        const string tempFolder = "/snd/music/temp";
-
-        // basically, the "filename" goes like this:
-        // for example: @@xrknr\Music\Dream Theater\2002 - six degrees of inner turbulence (flac)\(09) [Dream Theater] IV. The Test That Stumped Them All.flac
-        // we want the LAST part of the path as the actual filename to download to.
-        var actualFilename = chosen.file.Filename.Split('\\').Last();
-
-        await MusicCommon.modify(Context, msg, $"Downloading {actualFilename}...");
-
-        // we hash the filename so we don't reDL the same file
-        var hash = chosen.file.Filename.GetHashCode().ToString("x8");
-        var localPath = Path.Join(tempFolder, hash, actualFilename);
-        // if hash exists, play from that
-        // if not, create folder
-        LavalinkTrack? lltrack;
-        // if the hash directory exists + the file exists
-        if (Directory.Exists(Path.Join(tempFolder, hash)) &&
-            File.Exists(Path.Join(tempFolder, hash, actualFilename))) {
-            lltrack = await GuildMusicData.getTrackAsync(Program.LavalinkNode, localPath);
-        }
-        else {
-            // create the folder
-            Directory.CreateDirectory(Path.Join(tempFolder, hash));
-            try {
-                var dl = await slsk.DownloadAsync(chosen.response.Username, chosen.file.Filename, localPath);
-            }
-            catch (TimeoutException e) {
-                AnsiConsole.WriteLine(e.ToString());
-                await MusicCommon.modify(Context, msg, "Download timed out...");
+            if (elInd == -1) {
+                await MusicCommon.modify(Context, msg, "Choice cancelled.");
                 return;
             }
-            lltrack = await GuildMusicData.getTrackAsync(Program.LavalinkNode, localPath);
-        }
 
-        GuildMusic.queue.Enqueue(lltrack);
-        await startPlayer(Context);
-        await GuildMusic.queue.PlayAsync();
+            var chosen = results.ElementAt(elInd - 1);
 
-        /*if (trackCount > 1) {
-            await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
-        }
-        else {*/
-        await MusicCommon.modify(Context, msg,
-            $"Added {lltrack.ToLimitedTrackString()} to the playback queue.");
+
+            // actually download it from soulseek
+            var slsk = Music.slsk;
+            const string tempFolder = "/snd/music/temp";
+
+            // basically, the "filename" goes like this:
+            // for example: @@xrknr\Music\Dream Theater\2002 - six degrees of inner turbulence (flac)\(09) [Dream Theater] IV. The Test That Stumped Them All.flac
+            // we want the LAST part of the path as the actual filename to download to.
+            var actualFilename = chosen.file.Filename.Split('\\').Last();
+
+            await MusicCommon.modify(Context, msg, $"Downloading {actualFilename}...");
+
+            // we hash the filename so we don't reDL the same file
+            var hash = chosen.file.Filename.GetHashCode().ToString("x8");
+            var localPath = Path.Join(tempFolder, hash, actualFilename);
+            // if hash exists, play from that
+            // if not, create folder
+            LavalinkTrack? lltrack;
+            // if the hash directory exists + the file exists
+            if (Directory.Exists(Path.Join(tempFolder, hash)) &&
+                File.Exists(Path.Join(tempFolder, hash, actualFilename))) {
+                lltrack = await GuildMusicData.getTrackAsync(Program.LavalinkNode, localPath);
+            }
+            else {
+                // create the folder
+                Directory.CreateDirectory(Path.Join(tempFolder, hash));
+                try {
+                    var dl = await slsk.DownloadAsync(chosen.response.Username, chosen.file.Filename, localPath);
+                }
+                catch (TimeoutException e) {
+                    AnsiConsole.WriteLine(e.ToString());
+                    await MusicCommon.modify(Context, msg, "Download timed out...");
+                    return;
+                }
+                lltrack = await GuildMusicData.getTrackAsync(Program.LavalinkNode, localPath);
+            }
+
+            GuildMusic.queue.Enqueue(lltrack);
+            await startPlayer(Context);
+            await GuildMusic.queue.PlayAsync();
+
+            /*if (trackCount > 1) {
+                await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
+            }
+            else {*/
+            await MusicCommon.modify(Context, msg,
+                $"Added {lltrack.ToLimitedTrackString()} to the playback queue.");
+        });
     }
 
     [Command("play", Priority = 0)]
     public async Task PlayAsync(
         [CommandParameter(Remainder = true), Description("Terms to search for.")]
         string term) {
-        var interactivity = Context.Client.GetInteractivity();
 
         var results = (await YouTube.SearchAsync(term)).ToList();
         if (!results.Any()) {
@@ -499,88 +495,65 @@ public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : Comm
                 $"{MusicCommon.NumberMappings[i + 1]} {WebUtility.HtmlDecode(x.Title).Sanitize().Bold().URLDecode()} by {WebUtility.HtmlDecode(x.Author).Sanitize().Bold().URLDecode()}"));
         msgC =
             $"{msgC}\n\nType a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
-        var msg = await Context.ReplyAsync(msgC);
+        var msg = (Message)await ReplyAsync(msgC);
 
-        var res = await interactivity.WaitForMessageAsync(x => x.Author == Context.User, TimeSpan.FromSeconds(30));
-        if (res.TimedOut || res.Result == null) {
-            await MusicCommon.modify(Context, msg, "No choice was made.");
-            return;
-        }
+        var interaction = InteractionHandler.create(Context, [new Page(msgC)]);
 
-        var resInd = res.Result.Content.Trim();
-        if (!int.TryParse(resInd, NumberStyles.Integer, CultureInfo.InvariantCulture, out var elInd)) {
-            if (resInd.ToLowerInvariant() == "cancel") {
-                elInd = -1;
+        interaction.addMatcher(x => x.Author == Context.User);
+        interaction.addMessageCallback(async m => {
+
+            var resInd = m.Content.Trim();
+            if (!int.TryParse(resInd, NumberStyles.Integer, CultureInfo.InvariantCulture, out var elInd)) {
+                if (resInd.ToLowerInvariant() == "cancel") {
+                    elInd = -1;
+                }
+                else {
+                    return;
+                }
+            }
+            else if (elInd < 1) {
+                await MusicCommon.modify(Context, msg, "Invalid choice was made.");
+                return;
+            }
+
+            if (!MusicCommon.NumberMappings.ContainsKey(elInd)) {
+                await MusicCommon.modify(Context, msg, "Invalid choice was made.");
+                return;
+            }
+
+            if (elInd == -1) {
+                await MusicCommon.modify(Context, msg, "Choice cancelled.");
+                return;
+            }
+
+            var el = results.ElementAt(elInd - 1);
+            var url = new Uri($"https://youtu.be/{el.Id}");
+
+            var trackLoad = await Program.LavalinkNode.Tracks.LoadTracksAsync(url.ToString(), TrackSearchMode.YouTube);
+            var result = trackLoad.Tracks;
+            List<LavalinkTrack> tracks = trackLoad.Tracks.ToList();
+            if (!trackLoad.HasMatches) {
+                await MusicCommon.respond(Context, "No tracks were found at specified link.");
+                return;
+            }
+
+            var trackCount = tracks.Count;
+            foreach (var track in tracks) {
+                GuildMusic.queue.Enqueue(track);
+            }
+
+            await startPlayer(Context);
+            await GuildMusic.queue.PlayAsync();
+
+            if (trackCount > 1) {
+                await MusicCommon.modify(Context, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
             }
             else {
-                return;
+                var track = tracks.First();
+                await MusicCommon.modify(Context, msg,
+                    $"Added {track.ToLimitedTrackString()} to the playback queue.");
             }
-        }
-        else if (elInd < 1) {
-            await MusicCommon.modify(Context, msg, "Invalid choice was made.");
-            return;
-        }
-
-        if (!MusicCommon.NumberMappings.ContainsKey(elInd)) {
-            await MusicCommon.modify(Context, msg, "Invalid choice was made.");
-            return;
-        }
-
-        if (elInd == -1) {
-            await MusicCommon.modify(Context, msg, "Choice cancelled.");
-            return;
-        }
-
-        var el = results.ElementAt(elInd - 1);
-        var url = new Uri($"https://youtu.be/{el.Id}");
-
-        var trackLoad = await Music.GetTracksAsync(url);
-        var result = trackLoad.Result;
-        List<LavalinkTrack> tracks = [];
-        switch (trackLoad.LoadType) {
-            case LavalinkLoadResultType.Error:
-                await MusicCommon.respond(ctx, "No tracks were found at specified link.");
-                return;
-            case LavalinkLoadResultType.Playlist: {
-                var playlist = (LavalinkPlaylist)result;
-                if (playlist.Info.SelectedTrack > 0) {
-                    var index = playlist.Info.SelectedTrack;
-                    tracks = tracks.Skip(index).Concat(tracks.Take(index)).ToList();
-                }
-                break;
-            }
-            case LavalinkLoadResultType.Search: {
-                var search = (List<LavalinkTrack>)result;
-                tracks = search;
-                break;
-            }
-            case LavalinkLoadResultType.Track: {
-                var search = (LavalinkTrack)result;
-                tracks = [search];
-                break;
-            }
-            case LavalinkLoadResultType.Empty:
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-
-        var trackCount = tracks.Count;
-        foreach (var track in tracks) {
-            GuildMusic.queue.Enqueue(track);
-        }
-
-        await startPlayer(Context);
-        await GuildMusic.queue.PlayAsync();
-
-        if (trackCount > 1) {
-            await MusicCommon.modify(Context, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
-        }
-        else {
-            var track = tracks.First();
-            await MusicCommon.modify(Context, msg,
-                $"Added {track.ToLimitedTrackString()} to the playback queue.");
-        }
+        });
     }
 
     [Command("artist", "a"), Description("Plays tracks from an matchedArtist.")]
@@ -606,7 +579,7 @@ public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : Comm
         await GuildMusic.queue.StopAsync();
         await GuildMusic.DestroyPlayerAsync();
 
-        await MusicCommon.respond(CommandContext, $"Removed {rmd:#,##0} tracks from the queue.");
+        await MusicCommon.respond(Context, $"Removed {rmd:#,##0} tracks from the queue.");
     }
 
     [Command("stop"), Description("Stops playback and quits the voice channel.")]
@@ -780,17 +753,16 @@ public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : Comm
         await BeforeExecutionAsync(Context);
         var track = GuildMusic.queue.NowPlaying;
         if (track == null && GuildMusic.queue.Queue.Count == 0 && GuildMusic.queue.autoQueue.Count == 0) {
-            await MusicCommon.respond(ctx, "Queue is empty!");
+            await MusicCommon.respond(Context, "Queue is empty!");
             return;
         }
 
         var isPlaying = track != null;
-        var interactivity = ctx.Client.GetInteractivity();
         var queue = GuildMusic.queue.getCombinedQueue();
         var pageCount = queue.Count / 10 + 1;
         if (queue.Count % 10 == 0) pageCount--;
         if (!isPlaying || queue.Count == 0) {
-            await MusicCommon.respond(ctx, "Queue is empty!");
+            await MusicCommon.respond(Context, "Queue is empty!");
             return;
         }
         var pages = queue.Select(x => x.track.ToTrackString())
@@ -798,31 +770,33 @@ public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : Comm
             .GroupBy(x => x.i / 10)
             .Select(xg =>
                 new Page(
-                    $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}]" : "Nothing".Bold())}\n\n" +
+                    $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Duration.ToDurationString()}]" : "Nothing".Bold())}\n\n" +
                     $"{string.Join("\n", xg.Select(xa => $"`{xa.i + 1:00}` {xa.s}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
             .ToList();
 
         // queue is empty but we are playing
         if (pages.Count == 0) {
             pages.Add(new Page(
-                $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}]" : "Nothing".Bold())}"));
+                $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Duration.ToDurationString()}]" : "Nothing".Bold())}"));
         }
-
-        var ems = new PaginationEmojis {
-            SkipLeft = null,
-            SkipRight = null,
-            Stop = DiscordEmoji.FromUnicode("⏹"),
-            Left = DiscordEmoji.FromUnicode("◀"),
-            Right = DiscordEmoji.FromUnicode("▶")
-        };
+        var interaction = InteractionHandler.create(Context, pages);
         if (pageCount == 1) {
-            await ctx.Channel.SendMessageAsync(pages.First().Content);
+            await Context.Channel.SendMessageAsync(pages.First().Content);
         }
         else {
-            _ = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages, ems,
-                PaginationBehaviour.Ignore,
-                PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
+            await Context.Message.ReplyAsync(new ReplyMessageProperties {
+                    Content = pages.First().Content,
+                    Components = [
+                        new ActionRowProperties {
+                            new ButtonProperties("left", new EmojiProperties(DiscordEmoji.FromName(Program.client, ":arrow_left:")), ButtonStyle.Primary),
+                            new ButtonProperties("right", new EmojiProperties(DiscordEmoji.FromName(Program.client, ":arrow_right:")), ButtonStyle.Primary)
+                        }
+                    ]
+                }
+            );
         }
+        // don't wait for message
+        interaction.addMatcher((_) => false);
     }
 
     [Command("nowplaying", "np"), Description("Displays information about currently-played track.")]
@@ -839,12 +813,15 @@ public class MusicModule(YouTubeSearchProvider yt, AudioService lavalink) : Comm
     }
 
     [Command("playerinfo", "pinfo", "pinf"), Description("Displays information about current player.")]
-    public async Task PlayerInfoAsync(CommandContext ctx) {
-        await BeforeExecutionAsync(ctx);
-        await MusicCommon.respond(ctx,
+    public async Task PlayerInfoAsync() {
+        await BeforeExecutionAsync(Context);
+        await MusicCommon.respond(Context,
             $"Queue length: {GuildMusic.queue.getCombinedQueue().Count}\nVolume: {GuildMusic.volume}%");
     }
+
 }
+
+public record Page(string Content);
 
 // when the user is an idiot
 public class IdiotException(string message) : Exception(message);
