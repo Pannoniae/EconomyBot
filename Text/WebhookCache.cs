@@ -26,6 +26,7 @@ public class WebhookCache(Guild guild) {
             (!chn.Value.getChnParent().HasValue || !DiscordShim.getChannel(guild.Id, chn.Value.getChnParent()!.Value).Name.Contains("archive", StringComparison.OrdinalIgnoreCase))); // not in archive
         await Parallel.ForEachAsync(enumerable,
             async (chn, token) => await setupForChannel(chn.Value));
+        allWebhooks.Clear();
     }
 
     public async Task setupForChannel(IGuildChannel channel) {
@@ -47,7 +48,7 @@ public class WebhookCache(Guild guild) {
         webhooks[channel] = ourWebhook;
     }
 
-public Webhook getWebhook(IGuildChannel channel) {
+    public Webhook getWebhook(IGuildChannel channel) {
         return webhooks[channel];
     }
 }
