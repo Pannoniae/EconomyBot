@@ -1,9 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using DisCatSharp;
 using DisCatSharp.Entities;
-using DisCatSharp.Lavalink;
-using DisCatSharp.Lavalink.Entities;
-using DisCatSharp.Lavalink.EventArgs;
+using Lavalink4NET;
+using Lavalink4NET.Events;
+using Lavalink4NET.Events.Players;
+using Lavalink4NET.Players;
+using Lavalink4NET.Rest.Entities.Tracks;
 using Soulseek;
 using File = Soulseek.File;
 
@@ -13,38 +15,48 @@ namespace EconomyBot;
 /// Provides a persistent way of tracking music in various guilds.
 /// </summary>
 public sealed class MusicService {
-    private LavalinkExtension Lavalink;
+    private IAudioService Lavalink;
     private ConcurrentDictionary<ulong, GuildMusicData> MusicData;
     private readonly DiscordClient client;
 
 
     public SoulseekClient slsk;
 
-    private LavalinkSession node { get; }
-
     /// <summary>
     /// Creates a new instance of this music service.
     /// </summary>
-    public MusicService(LavalinkExtension lavalink, LavalinkSession theNode) {
+    public MusicService(IAudioService lavalink) {
         Lavalink = lavalink;
         MusicData = new ConcurrentDictionary<ulong, GuildMusicData>();
-        client = lavalink.Client;
-        node = theNode;
+        client = Program.client;
 
         slsk = new SoulseekClient();
         slsk.ConnectAsync("jazzbot", "jazzbot").GetAwaiter().GetResult();
         slsk.ExcludedSearchPhrasesReceived += (sender, args) => {
-            Console.WriteLine("Excluded search phrases: ");
+            Spectre.Console.AnsiConsole.WriteLine("Excluded search phrases: ");
             foreach (var phrase in args) {
-                Console.WriteLine(phrase);
+                Spectre.Console.AnsiConsole.WriteLine(phrase);
             }
         };
 
-        node.StatsReceived += playbackStarted;
+        Lavalink.StatisticsUpdated += playbackStarted;
 
-        async Task playbackStarted(LavalinkSession sender, LavalinkStatsReceivedEventArgs e) {
-            await Console.Out.WriteLineAsync($"len/nodes: {e.Statistics.Players}");
+        Lavalink.TrackEnded += async (con, e) => (await GetOrCreateDataAsync(client.Guilds[e.Player.GuildId])).queue.Player_PlaybackFinished(con, e);
+        Lavalink.TrackStarted += async(sender, e) => (await GetOrCreateDataAsync(client.Guilds[e.Player.GuildId])).queue.Player_PlaybackStarted(sender, e);
+        Lavalink.TrackException += Lavalink_TrackExceptionThrown;
+
+        async Task playbackStarted(object o, StatisticsUpdatedEventArgs e) {
+            await Console.Out.WriteLineAsync($"len/nodes: {e.Statistics.ConnectedPlayers}");
         }
+    }
+
+    private async Task Lavalink_TrackExceptionThrown(object sender, TrackExceptionEventArgs e) {
+        if (e.Player.State is PlayerState.Destroyed) {
+            return;
+        }
+
+        await (await GetOrCreateDataAsync(client.Guilds[e.Player.GuildId])).CommandChannel.SendMessageAsync(
+            $"{Program.cube} A problem occured while playing {e.Track.ToLimitedTrackString()}:\n{e.Exception}");
     }
 
 
@@ -92,7 +104,7 @@ public sealed class MusicService {
         if (MusicData.TryGetValue(guild.Id, out var gmd))
             return gmd;
 
-        gmd = MusicData.AddOrUpdate(guild.Id, new GuildMusicData(guild, Lavalink, node),
+        gmd = MusicData.AddOrUpdate(guild.Id, new GuildMusicData(guild, Lavalink),
             (k, v) => v);
 
         gmd.setupWebhooks();
@@ -105,11 +117,11 @@ public sealed class MusicService {
     /// </summary>
     /// <param name="uri">URL to load tracks from.</param>
     /// <returns>Loaded tracks.</returns>
-    public Task<LavalinkTrackLoadingResult> GetTracksAsync(Uri uri)
-        => node.LoadTracksAsync(uri.ToString());
+    public Task<TrackLoadResult> GetTracksAsync(Uri uri)
+        => Lavalink.Tracks.LoadTracksAsync(uri.ToString(), TrackSearchMode.YouTube).AsTask();
 
-    public Task<LavalinkTrackLoadingResult> GetTracksAsync(string search)
-        => node.LoadTracksAsync(search);
+    public Task<TrackLoadResult> GetTracksAsync(string search)
+        => Lavalink.Tracks.LoadTracksAsync(search, TrackSearchMode.YouTube).AsTask();
 }
 
 public record SLSKResult(SearchResponse response, File file) {

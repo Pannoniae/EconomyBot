@@ -65,7 +65,6 @@
     <ProjectReference Include="DisCatSharp\DisCatSharp.CommandsNext\DisCatSharp.CommandsNext.csproj"/>
     <ProjectReference Include="DisCatSharp\DisCatSharp.Common\DisCatSharp.Common.csproj"/>
     <ProjectReference Include="DisCatSharp\DisCatSharp.Interactivity\DisCatSharp.Interactivity.csproj"/>
-    <ProjectReference Include="DisCatSharp\DisCatSharp.Lavalink\DisCatSharp.Lavalink.csproj"/>
     <ProjectReference Include="DisCatSharp\DisCatSharp.VoiceNext\DisCatSharp.VoiceNext.csproj"/>
     <ProjectReference Include="Lavalink4NET.DisCatSharp\Lavalink4NET.DisCatSharp.csproj"/>
   </ItemGroup>

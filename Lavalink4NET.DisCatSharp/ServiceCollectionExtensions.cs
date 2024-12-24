@@ -1,4 +1,4 @@
-﻿namespace Lavalink4NET.NetCord;
+﻿namespace Lavalink4NET.DisCatSharp;
 
 using System;
 using Lavalink4NET.Extensions;

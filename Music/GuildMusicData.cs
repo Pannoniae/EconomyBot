@@ -1,13 +1,15 @@
 ﻿using System.Runtime.InteropServices;
 using DisCatSharp;
+using DisCatSharp.CommandsNext;
 using DisCatSharp.Entities;
-using DisCatSharp.Lavalink;
-using DisCatSharp.Lavalink.Entities;
-using DisCatSharp.Lavalink.Entities.Filters;
-using DisCatSharp.Lavalink.Enums;
-using DisCatSharp.Lavalink.Enums.Filters;
-using DisCatSharp.Lavalink.EventArgs;
+using DisCatSharp.Entities.Core;
 using EconomyBot.Logging;
+using Lavalink4NET;
+using Lavalink4NET.DisCatSharp;
+using Lavalink4NET.Filters;
+using Lavalink4NET.Players;
+using Lavalink4NET.Rest.Entities.Tracks;
+using Lavalink4NET.Tracks;
 using SpotifyAPI.Web;
 using Directory = System.IO.Directory;
 
@@ -39,10 +41,8 @@ public sealed class GuildMusicData {
     public DiscordChannel CommandChannel { get; set; }
 
     private DiscordGuild Guild { get; }
-    private LavalinkExtension Lavalink { get; }
-    public LavalinkGuildPlayer? Player { get; private set; }
-
-    public LavalinkSession Node { get; }
+    public IAudioService Lavalink { get; }
+    public LavalinkPlayer? Player { get; private set; }
 
     // TODO implement a *proper* music weighting system
 
@@ -91,7 +91,7 @@ public sealed class GuildMusicData {
     /// <param name="guild">Guild to track data for.</param>
     /// <param name="lavalink">Lavalink service.</param>
     /// <param name="node">The Lavalink node this guild is connected to.</param>
-    public GuildMusicData(DiscordGuild guild, LavalinkExtension lavalink, LavalinkSession node) {
+    public GuildMusicData(DiscordGuild guild, IAudioService lavalink) {
         // setup paths by OS
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
             rootPath = "/snd/music";
@@ -103,7 +103,6 @@ public sealed class GuildMusicData {
             throw new NotSupportedException("OS not supported, specify paths for the music.");
         }
 
-        Node = node;
         Guild = guild;
         Lavalink = lavalink;
         queue = new MusicQueue(this);
@@ -173,7 +172,7 @@ public sealed class GuildMusicData {
     /// Pauses the playback.
     /// </summary>
     public async Task PauseAsync() {
-        if (Player == null || !Player.IsConnected)
+        if (Player == null || !Player.ConnectionState.IsConnected)
             return;
 
         await Player.PauseAsync();
@@ -183,7 +182,7 @@ public sealed class GuildMusicData {
     /// Resumes the playback.
     /// </summary>
     public async Task ResumeAsync() {
-        if (Player == null || !Player.IsConnected)
+        if (Player == null || !Player.ConnectionState.IsConnected)
             return;
 
         await Player.ResumeAsync();
@@ -193,7 +192,7 @@ public sealed class GuildMusicData {
     /// Sets playback volume.
     /// </summary>
     public async Task SetVolumeAsync(int vol) {
-        if (Player == null || !Player.IsConnected)
+        if (Player == null || !Player.ConnectionState.IsConnected)
             return;
 
         volume = vol;
@@ -206,44 +205,31 @@ public sealed class GuildMusicData {
     /// <param name="target">Where or how much to seek by.</param>
     /// <param name="relative">Whether the seek is relative.</param>
     public async Task SeekAsync(TimeSpan target, bool relative) {
-        if (Player == null || !Player.IsConnected)
+        if (Player == null || !Player.ConnectionState.IsConnected)
             return;
 
         if (!relative)
             await Player.SeekAsync(target);
         else
-            await Player.SeekAsync(Player.TrackPosition + target);
+            await Player.SeekAsync(Player.Position.Value.Position + target);
     }
 
     /// <summary>
     /// Creates a player for this guild.
     /// </summary>
     /// <returns></returns>
-    public async Task CreatePlayerAsync(DiscordChannel channel) {
-        if (Player != null && Player.IsConnected) {
+    public async Task CreatePlayerAsync(DisCatSharpCommandContext ctx) {
+        if (Player != null && Player.ConnectionState.IsConnected) {
             return;
         }
 
-        Player = await Node.ConnectAsync(channel, false);
+        Player = (await Lavalink.Players.RetrieveAsync(ctx)).Player;
 
         await SetVolumeAsync(volume);
 
         if (!eq) {
             enableEQ();
         }
-
-        Player.TrackEnded += (con, e) => queue.Player_PlaybackFinished(con, e);
-        Player.TrackStarted += (sender, e) => queue.Player_PlaybackStarted(sender, e);
-        Player.TrackException += Lavalink_TrackExceptionThrown;
-    }
-
-    private async Task Lavalink_TrackExceptionThrown(LavalinkGuildPlayer con, LavalinkTrackExceptionEventArgs e) {
-        if (e.Guild is null) {
-            return;
-        }
-
-        await CommandChannel.SendMessageAsync(
-            $"{Program.cube} A problem occured while playing {e.Track.ToLimitedTrackString()}:\n{e.Exception}");
     }
 
     /// <summary>
@@ -254,7 +240,7 @@ public sealed class GuildMusicData {
         if (Player == null)
             return;
 
-        if (Player.IsConnected)
+        if (Player.ConnectionState.IsConnected)
             await Player.DisconnectAsync();
 
         Player = null;
@@ -265,7 +251,7 @@ public sealed class GuildMusicData {
     /// </summary>
     /// <returns>Position in the track.</returns>
     public TimeSpan GetCurrentPosition() {
-        return queue.NowPlaying == default ? TimeSpan.Zero : Player.TrackPosition;
+        return queue.NowPlaying == default ? TimeSpan.Zero : Player.Position.Value.Position;
     }
 
 
@@ -304,13 +290,12 @@ public sealed class GuildMusicData {
             track = secondRequest.Items[0];
         }
 
-        var trackLoad = await Node.LoadTracksAsync(result.Name + " " + track.Name);
-        var tracks = trackLoad.Result;
-        if (trackLoad.LoadType == LavalinkLoadResultType.Error || trackLoad.LoadType == LavalinkLoadResultType.Track && (LavalinkTrack)tracks == null) {
+        var trackLoad = await Lavalink.Tracks.LoadTracksAsync(result.Name + " " + track.Name, TrackSearchMode.YouTube);
+        if (trackLoad.IsFailed || trackLoad.Track == null) {
             logger.error("Error loading random track");
         }
 
-        queue.Enqueue((LavalinkTrack)tracks, artist);
+        queue.Enqueue(trackLoad.Track, artist);
     }
 
     public async Task<IEnumerable<LavalinkTrack?>> getJazz(string searchTerm) {
@@ -320,7 +305,7 @@ public sealed class GuildMusicData {
                 artist => Directory.GetFiles(getPath(artist.Value.path), searchTerm,
                     new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive }))
             .Where(extensionFilter)
-            .Select(file => getTrackAsync(Node, file).Result ?? null);
+            .Select(file => getTrackAsync(Lavalink, file).Result ?? null);
     }
 
     /// <summary>
@@ -340,25 +325,25 @@ public sealed class GuildMusicData {
                s.EndsWith(".alac");
     }
 
-    public static async Task<LavalinkTrack?> getTrackAsync(LavalinkSession client, string file) {
-        var tracks = await client.LoadTracksAsync(file);
+    public static async Task<LavalinkTrack?> getTrackAsync(IAudioService client, string file) {
+        var tracks = await client.Tracks.LoadTracksAsync(file, TrackSearchMode.YouTube);
 
-        if (tracks.LoadType != LavalinkLoadResultType.Track) {
+        if (!tracks.IsSuccess) {
             return null;
         }
 
         // if not error, fix the titles up
 
-        LavalinkTrack result = tracks.Result as LavalinkTrack ?? throw new InvalidOperationException();
-        if (result.Info.Title == "Unknown title") {
-            result.Info.GetType().GetProperty("Title")!.SetValue(result.Info, Path.GetFileNameWithoutExtension(file));
+        LavalinkTrack result = tracks.Track ?? throw new InvalidOperationException();
+        if (result.Title == "Unknown title") {
+            result.GetType().GetProperty("Title")!.SetValue(result, Path.GetFileNameWithoutExtension(file));
         }
 
-        if (result.Info.Author == "Unknown artist") {
+        if (result.Author == "Unknown artist") {
             // Not to mention that we are literally reflecting the Track object because the stupid authors thought
             // their autodetection was infallible thus they haven't provided a way to properly set the track's name which will be displayed.
             // The end-user is probably not very delighted at seeing "unknown author" or "unknown title" so we make a best-effort guess here.
-            result.Info.GetType().GetProperty("Author")!.SetValue(result.Info, new FileInfo(file).Directory!.Name);
+            result.GetType().GetProperty("Author")!.SetValue(result, new FileInfo(file).Directory!.Name);
         }
 
         return result;
@@ -367,24 +352,23 @@ public sealed class GuildMusicData {
     public void enableEQ() {
         eq = true;
         logger.info("Enabled EQ");
-        Player.UpdateAsync(action => action.Filters = new LavalinkFilters {
-                Equalizers = new List<LavalinkEqualizer> {
-                    new((LavalinkFilterBand)0, 0.2f),
-                    new((LavalinkFilterBand)1, 0.2f),
-                    new((LavalinkFilterBand)2, 0.2f),
-                    new((LavalinkFilterBand)3, 0.2f),
-                    new((LavalinkFilterBand)4, 0.15f),
-                    new((LavalinkFilterBand)5, 0.12f),
-                    new((LavalinkFilterBand)6, 0.10f),
-                    new((LavalinkFilterBand)7, 0.05f),
-                    new((LavalinkFilterBand)8, 0.00f),
-                    new((LavalinkFilterBand)9, 0.00f),
-                    new((LavalinkFilterBand)10, -0.02f),
-                    new((LavalinkFilterBand)11, -0.02f),
-                    new((LavalinkFilterBand)12, -0.03f),
-                    new((LavalinkFilterBand)13, -0.04f),
-                    new((LavalinkFilterBand)14, -0.05f)
-                }
+        Player.Filters.Equalizer = new EqualizerFilterOptions(
+            new Equalizer {
+                Band0 = 0.2f,
+                Band1 = 0.2f,
+                Band2 = 0.2f,
+                Band3 = 0.2f,
+                Band4 = 0.15f,
+                Band5 = 0.12f,
+                Band6 = 0.10f,
+                Band7 = 0.05f,
+                Band8 = 0.00f,
+                Band9 = 0.00f,
+                Band10 = -0.02f,
+                Band11 = -0.02f,
+                Band12 = -0.03f,
+                Band13 = -0.04f,
+                Band14 = -0.05f
             }
         );
     }
@@ -392,7 +376,8 @@ public sealed class GuildMusicData {
     public void disableEQ() {
         eq = false;
         logger.info("Disabled EQ");
-        Player.UpdateAsync(action => action.Filters = Optional<LavalinkFilters>.None);
+        Player.Filters.SetFilter(new EqualizerFilterOptions(Equalizer.Default));
+        Player.Filters.CommitAsync().GetAwaiter().GetResult();
     }
 
     public void toggleEQ() {
@@ -403,6 +388,7 @@ public sealed class GuildMusicData {
             enableEQ();
         }
     }
+
 }
 
 /// <summary>

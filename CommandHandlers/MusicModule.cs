@@ -8,8 +8,7 @@ using DisCatSharp.Entities;
 using DisCatSharp.Interactivity;
 using DisCatSharp.Interactivity.Enums;
 using DisCatSharp.Interactivity.Extensions;
-using DisCatSharp.Lavalink.Entities;
-using DisCatSharp.Lavalink.Enums;
+using Lavalink4NET.Tracks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Soulseek;
@@ -36,7 +35,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
 
     private async Task startPlayer(CommandContext ctx) {
         var chn = getChannel(ctx);
-        await GuildMusic.CreatePlayerAsync(chn);
+        await GuildMusic.CreatePlayerAsync(ctx);
     }
 
     private async Task reset() {
@@ -176,29 +175,18 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
     public async Task PlayAsync(CommandContext ctx,
         [Description("URL to play from.")] Uri uri) {
         var trackLoad = await Music.GetTracksAsync(uri);
-        var result = trackLoad.Result;
+        var result = trackLoad.Track;
         List<LavalinkTrack> tracks = [];
-        if (trackLoad.LoadType == LavalinkLoadResultType.Error) {
+        if (trackLoad.IsFailed) {
             await common.respond(ctx, "No tracks were found at specified link.");
             return;
         }
 
-        if (trackLoad.LoadType == LavalinkLoadResultType.Playlist) {
-            var playlist = (LavalinkPlaylist)result;
-            if (playlist.Info.SelectedTrack > 0) {
-                var index = playlist.Info.SelectedTrack;
-                tracks = tracks.Skip(index).Concat(tracks.Take(index)).ToList();
+        if (trackLoad.IsPlaylist) {
+            var playlist = trackLoad.Playlist;
+            if (playlist.SelectedTrack is not null) {
+                tracks = trackLoad.Tracks.ToList();
             }
-        }
-
-        if (trackLoad.LoadType == LavalinkLoadResultType.Search) {
-            var search = (List<LavalinkTrack>)result;
-            tracks = search;
-        }
-
-        if (trackLoad.LoadType == LavalinkLoadResultType.Track) {
-            var search = (LavalinkTrack)result;
-            tracks = [search];
         }
 
         var trackCount = tracks.Count;
@@ -207,7 +195,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
 
         var chn = getChannel(ctx);
-        await GuildMusic.CreatePlayerAsync(chn);
+        await GuildMusic.CreatePlayerAsync(ctx);
         await GuildMusic.queue.PlayAsync();
 
         if (trackCount > 1)
@@ -464,7 +452,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         // if the hash directory exists + the file exists
         if (Directory.Exists(Path.Join(tempFolder, hash)) &&
             File.Exists(Path.Join(tempFolder, hash, actualFilename))) {
-            lltrack = await GuildMusicData.getTrackAsync(GuildMusic.Node, localPath);
+            lltrack = await GuildMusicData.getTrackAsync(GuildMusic.Lavalink, localPath);
         }
         else {
             // create the folder
@@ -477,7 +465,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
                 await common.modify(ctx, msg, "Download timed out...");
                 return;
             }
-            lltrack = await GuildMusicData.getTrackAsync(GuildMusic.Node, localPath);
+            lltrack = await GuildMusicData.getTrackAsync(GuildMusic.Lavalink, localPath);
         }
 
         GuildMusic.queue.Enqueue(lltrack);
@@ -545,34 +533,17 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         var url = new Uri($"https://youtu.be/{el.Id}");
 
         var trackLoad = await Music.GetTracksAsync(url);
-        var result = trackLoad.Result;
+        var result = trackLoad.Tracks;
         List<LavalinkTrack> tracks = [];
-        switch (trackLoad.LoadType) {
-            case LavalinkLoadResultType.Error:
-                await common.respond(ctx, "No tracks were found at specified link.");
-                return;
-            case LavalinkLoadResultType.Playlist: {
-                var playlist = (LavalinkPlaylist)result;
-                if (playlist.Info.SelectedTrack > 0) {
-                    var index = playlist.Info.SelectedTrack;
-                    tracks = tracks.Skip(index).Concat(tracks.Take(index)).ToList();
-                }
-                break;
-            }
-            case LavalinkLoadResultType.Search: {
-                var search = (List<LavalinkTrack>)result;
-                tracks = search;
-                break;
-            }
-            case LavalinkLoadResultType.Track: {
-                var search = (LavalinkTrack)result;
-                tracks = [search];
-                break;
-            }
-            case LavalinkLoadResultType.Empty:
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
+        if (trackLoad.IsFailed) {
+            await common.respond(ctx, "No tracks were found at specified link.");
+            return;
+        }
+        else if (trackLoad.IsPlaylist) {
+            tracks = trackLoad.Tracks.ToList();
+        }
+        else {
+            throw new ArgumentOutOfRangeException();
         }
 
         var trackCount = tracks.Count;
@@ -790,14 +761,14 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             .GroupBy(x => x.i / 10)
             .Select(xg =>
                 new Page(
-                    $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}]" : "Nothing".Bold())}\n\n" +
+                    $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Duration.ToDurationString()}]" : "Nothing".Bold())}\n\n" +
                     $"{string.Join("\n", xg.Select(xa => $"`{xa.i + 1:00}` {xa.s}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
             .ToList();
 
         // queue is empty but we are playing
         if (pages.Count == 0) {
             pages.Add(new Page(
-                $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}]" : "Nothing".Bold())}"));
+                $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Duration.ToDurationString()}]" : "Nothing".Bold())}"));
         }
 
         var ems = new PaginationEmojis {
@@ -825,7 +796,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
         else {
             await common.respond(ctx,
-                $"Now playing: {track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}].");
+                $"Now playing: {track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Duration.ToDurationString()}].");
         }
     }
 
@@ -855,7 +826,7 @@ public static class Extensions {
     /// <param name="x">Music item to convert.</param>
     /// <returns>Track string.</returns>
     public static string ToTrackString(this LavalinkTrack x) {
-        return x != null ? $"{(x.Info.Title ?? "No title").Sanitize().Bold().URLDecode()} by {(x.Info.Author ?? "No Author").Sanitize().Bold().URLDecode()} [{x.Info.Length.ToDurationString()}]" : "";
+        return x != null ? $"{(x.Title ?? "No title").Sanitize().Bold().URLDecode()} by {(x.Author ?? "No Author").Sanitize().Bold().URLDecode()} [{x.Duration.ToDurationString()}]" : "";
     }
 
     public static string URLDecode(this string title) {
@@ -863,7 +834,7 @@ public static class Extensions {
     }
 
     public static string ToLimitedTrackString(this LavalinkTrack x) {
-        return x != null ? $"{(x.Info.Title ?? "No title").Sanitize().Bold().URLDecode()} by {(x.Info.Author ?? "No Author").Sanitize().Bold().URLDecode()}" : "";
+        return x != null ? $"{(x.Title ?? "No title").Sanitize().Bold().URLDecode()} by {(x.Author ?? "No Author").Sanitize().Bold().URLDecode()}" : "";
     }
 
     public static string ReversePath(this string s) {

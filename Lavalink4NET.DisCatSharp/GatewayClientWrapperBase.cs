@@ -3,7 +3,7 @@ using DisCatSharp.Entities;
 using DisCatSharp.EventArgs;
 using Lavalink4NET.Protocol.Requests;
 
-namespace Lavalink4NET.NetCord;
+namespace Lavalink4NET.DisCatSharp;
 
 using System;
 using System.Collections.Immutable;

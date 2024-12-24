@@ -2,7 +2,7 @@
 using DisCatSharp.Entities;
 using DisCatSharp.EventArgs;
 
-namespace Lavalink4NET.NetCord;
+namespace Lavalink4NET.DisCatSharp;
 
 using System;
 using System.Diagnostics.CodeAnalysis;

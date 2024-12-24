@@ -6,6 +6,8 @@ storage: none
 nuget BooruSharp prerelease
 nuget DetectLanguage prerelease
 nuget FuzzierSharp prerelease
+nuget Lavalink4NET.Artwork prerelease
+nuget Lavalink4NET.Integrations.LyricsJava prerelease
 nuget JetBrains.Annotations prerelease
 nuget Newtonsoft.Json prerelease
 nuget Reddit prerelease

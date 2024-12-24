@@ -176,6 +176,72 @@
     </When>
   </Choose>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Lavalink4NET">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\lavalink4net\4.0.26-preview.4\lib\net8.0\Lavalink4NET.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Lavalink4NET.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\lavalink4net.abstractions\4.0.26-preview.4\lib\net8.0\Lavalink4NET.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Lavalink4NET.Artwork">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\lavalink4net.artwork\4.0.26-preview.4\lib\net8.0\Lavalink4NET.Artwork.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Lavalink4NET.Integrations.LyricsJava">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\lavalink4net.integrations.lyricsjava\4.0.26-preview.4\lib\net8.0\Lavalink4NET.Integrations.LyricsJava.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Lavalink4NET.Protocol">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\lavalink4net.protocol\4.0.26-preview.4\lib\net8.0\Lavalink4NET.Protocol.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Lavalink4NET.Rest">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\lavalink4net.rest\4.0.26-preview.4\lib\net8.0\Lavalink4NET.Rest.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
       <ItemGroup>
         <Reference Include="Microsoft.Bcl.AsyncInterfaces">
@@ -217,6 +283,409 @@
         <Reference Include="Microsoft.CSharp">
           <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.csharp\4.7.0\ref\netstandard2.0\Microsoft.CSharp.dll</HintPath>
           <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Caching.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.caching.abstractions\9.0.0\lib\net9.0\Microsoft.Extensions.Caching.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Caching.Memory">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.caching.memory\9.0.0\lib\net9.0\Microsoft.Extensions.Caching.Memory.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration\9.0.0\lib\net9.0\Microsoft.Extensions.Configuration.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.abstractions\9.0.0\lib\net9.0\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.Binder">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.binder\9.0.0\lib\net9.0\Microsoft.Extensions.Configuration.Binder.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <ItemGroup>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.binder\9.0.0\analyzers\dotnet\cs\Microsoft.Extensions.Configuration.Binder.SourceGeneration.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.binder\9.0.0\analyzers\dotnet\cs\cs\Microsoft.Extensions.Configuration.Binder.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.binder\9.0.0\analyzers\dotnet\cs\de\Microsoft.Extensions.Configuration.Binder.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.binder\9.0.0\analyzers\dotnet\cs\es\Microsoft.Extensions.Configuration.Binder.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.binder\9.0.0\analyzers\dotnet\cs\fr\Microsoft.Extensions.Configuration.Binder.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.binder\9.0.0\analyzers\dotnet\cs\it\Microsoft.Extensions.Configuration.Binder.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.binder\9.0.0\analyzers\dotnet\cs\ja\Microsoft.Extensions.Configuration.Binder.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.binder\9.0.0\analyzers\dotnet\cs\ko\Microsoft.Extensions.Configuration.Binder.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.binder\9.0.0\analyzers\dotnet\cs\pl\Microsoft.Extensions.Configuration.Binder.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.binder\9.0.0\analyzers\dotnet\cs\pt-BR\Microsoft.Extensions.Configuration.Binder.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.binder\9.0.0\analyzers\dotnet\cs\ru\Microsoft.Extensions.Configuration.Binder.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.binder\9.0.0\analyzers\dotnet\cs\tr\Microsoft.Extensions.Configuration.Binder.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.binder\9.0.0\analyzers\dotnet\cs\zh-Hans\Microsoft.Extensions.Configuration.Binder.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.binder\9.0.0\analyzers\dotnet\cs\zh-Hant\Microsoft.Extensions.Configuration.Binder.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+  </ItemGroup>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.DependencyInjection">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.dependencyinjection\9.0.0\lib\net9.0\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.dependencyinjection.abstractions\9.0.0\lib\net9.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Diagnostics">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.diagnostics\9.0.0\lib\net9.0\Microsoft.Extensions.Diagnostics.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Diagnostics.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.diagnostics.abstractions\9.0.0\lib\net9.0\Microsoft.Extensions.Diagnostics.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.FileProviders.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.fileproviders.abstractions\9.0.0\lib\net9.0\Microsoft.Extensions.FileProviders.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Hosting.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.hosting.abstractions\9.0.0\lib\net9.0\Microsoft.Extensions.Hosting.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Http">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.http\9.0.0\lib\net9.0\Microsoft.Extensions.Http.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging\9.0.0\lib\net9.0\Microsoft.Extensions.Logging.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\lib\net9.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <ItemGroup>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn3.11\cs\Microsoft.Extensions.Logging.Generators.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn3.11\cs\cs\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn3.11\cs\de\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn3.11\cs\es\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn3.11\cs\fr\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn3.11\cs\it\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn3.11\cs\ja\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn3.11\cs\ko\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn3.11\cs\pl\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn3.11\cs\pt-BR\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn3.11\cs\ru\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn3.11\cs\tr\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn3.11\cs\zh-Hans\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn3.11\cs\zh-Hant\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.0\cs\Microsoft.Extensions.Logging.Generators.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.0\cs\cs\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.0\cs\de\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.0\cs\es\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.0\cs\fr\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.0\cs\it\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.0\cs\ja\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.0\cs\ko\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.0\cs\pl\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.0\cs\pt-BR\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.0\cs\ru\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.0\cs\tr\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.0\cs\zh-Hans\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.0\cs\zh-Hant\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.4\cs\Microsoft.Extensions.Logging.Generators.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.4\cs\cs\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.4\cs\de\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.4\cs\es\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.4\cs\fr\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.4\cs\it\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.4\cs\ja\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.4\cs\ko\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.4\cs\pl\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.4\cs\pt-BR\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.4\cs\ru\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.4\cs\tr\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.4\cs\zh-Hans\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\analyzers\dotnet\roslyn4.4\cs\zh-Hant\Microsoft.Extensions.Logging.Generators.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+  </ItemGroup>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Options">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.0\lib\net9.0\Microsoft.Extensions.Options.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <ItemGroup>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.0\analyzers\dotnet\roslyn4.4\cs\Microsoft.Extensions.Options.SourceGeneration.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.0\analyzers\dotnet\roslyn4.4\cs\cs\Microsoft.Extensions.Options.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.0\analyzers\dotnet\roslyn4.4\cs\de\Microsoft.Extensions.Options.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.0\analyzers\dotnet\roslyn4.4\cs\es\Microsoft.Extensions.Options.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.0\analyzers\dotnet\roslyn4.4\cs\fr\Microsoft.Extensions.Options.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.0\analyzers\dotnet\roslyn4.4\cs\it\Microsoft.Extensions.Options.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.0\analyzers\dotnet\roslyn4.4\cs\ja\Microsoft.Extensions.Options.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.0\analyzers\dotnet\roslyn4.4\cs\ko\Microsoft.Extensions.Options.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.0\analyzers\dotnet\roslyn4.4\cs\pl\Microsoft.Extensions.Options.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.0\analyzers\dotnet\roslyn4.4\cs\pt-BR\Microsoft.Extensions.Options.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.0\analyzers\dotnet\roslyn4.4\cs\ru\Microsoft.Extensions.Options.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.0\analyzers\dotnet\roslyn4.4\cs\tr\Microsoft.Extensions.Options.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.0\analyzers\dotnet\roslyn4.4\cs\zh-Hans\Microsoft.Extensions.Options.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.0\analyzers\dotnet\roslyn4.4\cs\zh-Hant\Microsoft.Extensions.Options.SourceGeneration.resources.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+  </ItemGroup>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Options.ConfigurationExtensions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options.configurationextensions\9.0.0\lib\net9.0\Microsoft.Extensions.Options.ConfigurationExtensions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Primitives">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.primitives\9.0.0\lib\net9.0\Microsoft.Extensions.Primitives.dll</HintPath>
+          <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
       </ItemGroup>
@@ -441,6 +910,17 @@
     </When>
   </Choose>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="System.Net.Http.Json">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\system.net.http.json\9.0.0\lib\net9.0\System.Net.Http.Json.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
       <ItemGroup>
         <Reference Include="System.Numerics">
@@ -511,6 +991,15 @@
       <ItemGroup>
         <Reference Include="System.Text.Json">
           <HintPath>..\..\..\..\..\..\.nuget\packages\system.text.json\9.0.0\lib\net462\System.Text.Json.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="System.Text.Json">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\system.text.json\9.0.0\lib\net9.0\System.Text.Json.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>

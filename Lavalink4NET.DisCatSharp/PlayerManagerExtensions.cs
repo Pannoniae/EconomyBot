@@ -1,14 +1,15 @@
 using DisCatSharp.CommandsNext;
 using DisCatSharp.Entities;
+using DisCatSharp.Entities.Core;
 
-namespace Lavalink4NET.NetCord;
+namespace Lavalink4NET.DisCatSharp;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Lavalink4NET.Extensions;
-using Lavalink4NET.NetCord;
+using Lavalink4NET.DisCatSharp;
 using Lavalink4NET.Players;
 using Microsoft.Extensions.Options;
 
@@ -20,7 +21,7 @@ public static class PlayerManagerExtensions
 {
     public static ValueTask<PlayerResult<TPlayer>> RetrieveAsync<TPlayer, TOptions>(
         this IPlayerManager playerManager,
-        CommandContext context,
+        DisCatSharpCommandContext context,
         PlayerFactory<TPlayer, TOptions> playerFactory,
         IOptions<TOptions> options,
         PlayerRetrieveOptions retrieveOptions = default,
@@ -30,12 +31,12 @@ public static class PlayerManagerExtensions
     {
         ArgumentNullException.ThrowIfNull(playerManager);
 
-        var memberVoiceChannelId = context is not null && context.Guild!.VoiceStates.TryGetValue(context.User.Id, out var voiceState)
+        var memberVoiceChannelId = context is not null && context.Client.Guilds[context.GuildId!.Value].VoiceStates.TryGetValue(context.UserId, out var voiceState)
             ? voiceState.ChannelId
             : default(ulong?);
 
         return playerManager.RetrieveAsync(
-            guildId: context.Guild!.Id,
+            guildId: context.GuildId.Value,
             memberVoiceChannel: memberVoiceChannelId,
             playerFactory: playerFactory,
             options: options,
@@ -45,7 +46,7 @@ public static class PlayerManagerExtensions
 
     public static ValueTask<PlayerResult<TPlayer>> RetrieveAsync<TPlayer, TOptions>(
         this IPlayerManager playerManager,
-        CommandContext context,
+        DisCatSharpCommandContext context,
         PlayerFactory<TPlayer, TOptions> playerFactory,
         Action<TOptions>? configure,
         PlayerRetrieveOptions retrieveOptions = default,
@@ -68,7 +69,7 @@ public static class PlayerManagerExtensions
 
     public static ValueTask<PlayerResult<TPlayer>> RetrieveAsync<TPlayer, TOptions>(
         this IPlayerManager playerManager,
-        CommandContext context,
+        DisCatSharpCommandContext context,
         PlayerFactory<TPlayer, TOptions> playerFactory,
         TOptions options,
         PlayerRetrieveOptions retrieveOptions = default,
@@ -91,7 +92,7 @@ public static class PlayerManagerExtensions
 
     public static ValueTask<PlayerResult<TPlayer>> RetrieveAsync<TPlayer, TOptions>(
         this IPlayerManager playerManager,
-        CommandContext context,
+        DisCatSharpCommandContext context,
         PlayerFactory<TPlayer, TOptions> playerFactory,
         PlayerRetrieveOptions retrieveOptions = default,
         CancellationToken cancellationToken = default)
@@ -112,7 +113,7 @@ public static class PlayerManagerExtensions
 
     public static ValueTask<PlayerResult<ILavalinkPlayer>> RetrieveAsync(
         this IPlayerManager playerManager,
-        CommandContext context,
+        DisCatSharpCommandContext context,
         PlayerFactory<ILavalinkPlayer, LavalinkPlayerOptions> playerFactory,
         Action<LavalinkPlayerOptions>? configure,
         PlayerRetrieveOptions retrieveOptions = default,
@@ -133,7 +134,7 @@ public static class PlayerManagerExtensions
 
     public static ValueTask<PlayerResult<ILavalinkPlayer>> RetrieveAsync(
         this IPlayerManager playerManager,
-        CommandContext context,
+        DisCatSharpCommandContext context,
         PlayerFactory<ILavalinkPlayer, LavalinkPlayerOptions> playerFactory,
         LavalinkPlayerOptions options,
         PlayerRetrieveOptions retrieveOptions = default,
@@ -154,7 +155,7 @@ public static class PlayerManagerExtensions
 
     public static ValueTask<PlayerResult<ILavalinkPlayer>> RetrieveAsync(
         this IPlayerManager playerManager,
-        CommandContext context,
+        DisCatSharpCommandContext context,
         PlayerFactory<ILavalinkPlayer, LavalinkPlayerOptions> playerFactory,
         PlayerRetrieveOptions retrieveOptions = default,
         CancellationToken cancellationToken = default)
@@ -173,7 +174,7 @@ public static class PlayerManagerExtensions
 
     public static ValueTask<PlayerResult<LavalinkPlayer>> RetrieveAsync(
         this IPlayerManager playerManager,
-        CommandContext context,
+        DisCatSharpCommandContext context,
         IOptions<LavalinkPlayerOptions> options,
         PlayerRetrieveOptions retrieveOptions = default,
         CancellationToken cancellationToken = default)
@@ -192,7 +193,7 @@ public static class PlayerManagerExtensions
 
     public static ValueTask<PlayerResult<LavalinkPlayer>> RetrieveAsync(
         this IPlayerManager playerManager,
-        CommandContext context,
+        DisCatSharpCommandContext context,
         Action<LavalinkPlayerOptions>? configure,
         PlayerRetrieveOptions retrieveOptions = default,
         CancellationToken cancellationToken = default)
@@ -210,7 +211,7 @@ public static class PlayerManagerExtensions
 
     public static ValueTask<PlayerResult<LavalinkPlayer>> RetrieveAsync(
         this IPlayerManager playerManager,
-        CommandContext context,
+        DisCatSharpCommandContext context,
         LavalinkPlayerOptions options,
         PlayerRetrieveOptions retrieveOptions = default,
         CancellationToken cancellationToken = default)
@@ -229,7 +230,7 @@ public static class PlayerManagerExtensions
 
     public static ValueTask<PlayerResult<LavalinkPlayer>> RetrieveAsync(
         this IPlayerManager playerManager,
-        CommandContext context,
+        DisCatSharpCommandContext context,
         PlayerRetrieveOptions retrieveOptions = default,
         CancellationToken cancellationToken = default)
     {

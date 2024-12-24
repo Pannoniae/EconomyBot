@@ -1,6 +1,6 @@
 ﻿using DisCatSharp;
 
-namespace Lavalink4NET.NetCord;
+namespace Lavalink4NET.DisCatSharp;
 
 using System;
 using System.Collections.Immutable;
