@@ -8,6 +8,7 @@ using DisCatSharp.ApplicationCommands.Attributes;
 using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.ApplicationCommands.Enums;
 using DisCatSharp.Enums;
+using DisCatSharp.Interactivity.EventHandling;
 
 namespace EconomyBot;
 
@@ -24,7 +25,7 @@ public class MusicModuleSlash : ApplicationCommandsModule {
         Music = Program.musicService;
         YouTube = yt;
     }
-    
+
     private static DiscordChannel getChannel(InteractionContext ctx) {
         return ctx.Member!.VoiceState.Channel;
     }
@@ -52,7 +53,7 @@ public class MusicModuleSlash : ApplicationCommandsModule {
 
         GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild);
         GuildMusic.CommandChannel = ctx.Channel;
-        
+
         return true;
     }
 
@@ -65,7 +66,7 @@ public class MusicModuleSlash : ApplicationCommandsModule {
         // yeet the bot in 
         var chn = getChannel(ctx);
         await GuildMusic.CreatePlayerAsync(chn);
-        await CreateResponseAsync(ctx,$"{Program.cube} Joined the channel.");
+        await CreateResponseAsync(ctx, $"{Program.cube} Joined the channel.");
     }
 
     [SlashCommand("jazz", "Plays some jazz. :3")]
@@ -77,7 +78,7 @@ public class MusicModuleSlash : ApplicationCommandsModule {
         var chn = vs.Channel;
         await GuildMusic.CreatePlayerAsync(chn);
         await GuildMusic.queue.PlayAsync();
-        await CreateResponseAsync(ctx,$"{Program.cube} Started playing jazz.");
+        await CreateResponseAsync(ctx, $"{Program.cube} Started playing jazz.");
     }
 
     [SlashCommand("stopjazz", "Stops jazz.")]
@@ -85,7 +86,7 @@ public class MusicModuleSlash : ApplicationCommandsModule {
         GuildMusic.queue.clearQueue();
         GuildMusic.queue.EmptyQueue();
         await GuildMusic.queue.StopAsync();
-        await CreateResponseAsync(ctx,$"{Program.cube} Stopped jazz.");
+        await CreateResponseAsync(ctx, $"{Program.cube} Stopped jazz.");
     }
 
     [SlashCommand("stop", "Stops playback and quits the voice channel.")]
@@ -116,7 +117,7 @@ public class MusicModuleSlash : ApplicationCommandsModule {
     [SlashCommand("resume", "Resumes playback.")]
     public async Task ResumeAsync(InteractionContext ctx) {
         await GuildMusic.ResumeAsync();
-        await CreateResponseAsync(ctx,$"{Program.cube} Playback resumed.");
+        await CreateResponseAsync(ctx, $"{Program.cube} Playback resumed.");
     }
 
     [SlashCommand("skip", "Skips current track.")]
@@ -156,7 +157,7 @@ public class MusicModuleSlash : ApplicationCommandsModule {
 
     [SlashCommand("rewind", "Rewinds the track by specified amount of time.")]
     public async Task RewindAsync(InteractionContext ctx,
-        [Option( "rewind", "By how much to rewind.")]
+        [Option("rewind", "By how much to rewind.")]
         string offset) {
         var o = (await new CustomTimeSpanConverter().ConvertAsync(offset, null)).Value;
         await GuildMusic.SeekAsync(-o, true);
@@ -173,12 +174,12 @@ public class MusicModuleSlash : ApplicationCommandsModule {
         }
 
         await GuildMusic.SetVolumeAsync((int)volume);
-        await CreateResponseAsync(ctx,$"{Program.cube} Volume set to {volume}%.");
+        await CreateResponseAsync(ctx, $"{Program.cube} Volume set to {volume}%.");
     }
 
     [SlashCommand("volume", "Gets playback volume.")]
     public async Task GetVolumeAsync(InteractionContext ctx) {
-        await CreateResponseAsync(ctx,$"{Program.cube} Volume is {GuildMusic.volume}%.");
+        await CreateResponseAsync(ctx, $"{Program.cube} Volume is {GuildMusic.volume}%.");
     }
 
     [SlashCommand("restart", "Restarts the playback of the current track.")]
@@ -195,7 +196,7 @@ public class MusicModuleSlash : ApplicationCommandsModule {
         long index) {
         var itemN = GuildMusic.queue.Remove((int)(index - 1));
         if (itemN == null) {
-            await CreateResponseAsync(ctx,$"{Program.cube} No such track.");
+            await CreateResponseAsync(ctx, $"{Program.cube} No such track.");
             return;
         }
 
@@ -228,15 +229,9 @@ public class MusicModuleSlash : ApplicationCommandsModule {
             return;
         }
 
-        var ems = new PaginationEmojis {
-            SkipLeft = null,
-            SkipRight = null,
-            Stop = DiscordEmoji.FromUnicode("⏹"),
-            Left = DiscordEmoji.FromUnicode("◀"),
-            Right = DiscordEmoji.FromUnicode("▶")
-        };
-        await interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages, ems, PaginationBehaviour.Ignore,
-            PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
+        _ = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages, TimeSpan.FromMinutes(2),
+            PaginationBehaviour.Ignore,
+            ButtonPaginationBehavior.Ignore);
     }
 
     [SlashCommand("nowplaying", "Displays information about currently-played track.")]
@@ -246,14 +241,14 @@ public class MusicModuleSlash : ApplicationCommandsModule {
             await CreateResponseAsync(ctx, "Not playing.");
         }
         else {
-            await CreateResponseAsync(ctx, 
+            await CreateResponseAsync(ctx,
                 $"Now playing: {Formatter.Bold(Formatter.Sanitize(track.track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.track.Info.Author))} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{GuildMusic.queue.NowPlaying.track.Info.Length.ToDurationString()}].");
         }
     }
 
     [SlashCommand("playerinfo", "Displays information about current player.")]
     public async Task PlayerInfoAsync(InteractionContext ctx) {
-        await CreateResponseAsync(ctx, 
+        await CreateResponseAsync(ctx,
             $"Queue length: {GuildMusic.queue.Queue.Count}\nVolume: {GuildMusic.volume}%");
     }
 }

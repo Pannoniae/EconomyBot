@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime;
 using System.Runtime.InteropServices;
+using Spectre.Console;
 
 namespace EconomyBot;
 
@@ -21,7 +22,7 @@ public static class MemoryUtils {
             LinuxMemoryUtility.ReleaseUnusedProcessWorkingSetMemoryWithMadvise_MADV_PAGEOUT();
         }
 
-        Console.WriteLine($"Released memory in {sw.Elapsed.TotalMilliseconds} ms");
+        AnsiConsole.WriteLine($"Released memory in {sw.Elapsed.TotalMilliseconds} ms");
     }
 
     public class LinuxMemoryUtility {
@@ -53,7 +54,7 @@ public static class MemoryUtils {
                 //}
             }
             catch (Exception exc) {
-                Console.WriteLine(exc);
+                AnsiConsole.WriteLine(exc.ToString());
             }
         }
 
@@ -77,7 +78,7 @@ public static class MemoryUtils {
                 //}
             }
             catch (Exception exc) {
-                Console.WriteLine(exc);
+                AnsiConsole.WriteLine(exc.ToString());
             }
         }
 
@@ -96,11 +97,11 @@ public static class MemoryUtils {
                 // released back to the system, or 0 if it was not possible to
                 // release any memory.
                 if (result != 1) {
-                    Console.WriteLine($"malloc_trim errno: {Marshal.GetLastSystemError()}");
+                    AnsiConsole.WriteLine($"malloc_trim errno: {Marshal.GetLastSystemError()}");
                 }
             }
             catch (Exception exc) {
-                Console.WriteLine(exc);
+                AnsiConsole.WriteLine(exc.ToString());
             }
         }
     }

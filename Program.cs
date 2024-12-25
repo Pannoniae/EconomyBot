@@ -113,7 +113,8 @@ class Program {
 
         discord.UseInteractivity(new InteractivityConfiguration {
             Timeout = TimeSpan.FromSeconds(180),
-            PollBehaviour = PollBehaviour.KeepEmojis
+            PollBehaviour = PollBehaviour.KeepEmojis,
+            AckPaginationButtons = true
         });
         discord.MessageCreated += messageHandler;
         discord.MessagesBulkDeleted += messageDeleteHandler;

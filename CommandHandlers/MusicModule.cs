@@ -5,8 +5,10 @@ using DisCatSharp;
 using DisCatSharp.CommandsNext;
 using DisCatSharp.CommandsNext.Attributes;
 using DisCatSharp.Entities;
+using DisCatSharp.Enums;
 using DisCatSharp.Interactivity;
 using DisCatSharp.Interactivity.Enums;
+using DisCatSharp.Interactivity.EventHandling;
 using DisCatSharp.Interactivity.Extensions;
 using DisCatSharp.Lavalink.Entities;
 using DisCatSharp.Lavalink.Enums;
@@ -281,22 +283,16 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             .Select(xg => new Page(
                 $"{string.Join("\n", xg.Select(xa => $"`{xa.i + 1}` {xa.x.ToLimitedTrackString()}"))}\n\nPage {xg.Key + 1}/{pageCount}"));
 
-        var ems = new PaginationEmojis {
-            SkipLeft = null,
-            SkipRight = null,
-            Stop = DiscordEmoji.FromUnicode("⏹"),
-            Left = DiscordEmoji.FromUnicode("◀"),
-            Right = DiscordEmoji.FromUnicode("▶")
-        };
-
+        Task task = null;
         if (pageCount == 1) {
             await ctx.Channel.SendMessageAsync(content.First().Content);
         }
         else {
-            _ = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, content, ems,
+            task = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, content, TimeSpan.FromMinutes(2),
                 PaginationBehaviour.Ignore,
-                PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
+                ButtonPaginationBehavior.Ignore);
         }
+        task.Equals(null);
 
         var msgC =
             $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
@@ -391,22 +387,16 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
                                     $" {TimeSpan.FromSeconds(xa.x.file.Length.GetValueOrDefault()).musicLength().Bold()} ({xa.x.file.getBitrateString()})"))
                 }\n\nPage {xg.Key + 1}/{pageCount}"));
 
-        var ems = new PaginationEmojis {
-            SkipLeft = null,
-            SkipRight = null,
-            Stop = DiscordEmoji.FromUnicode("⏹"),
-            Left = DiscordEmoji.FromUnicode("◀"),
-            Right = DiscordEmoji.FromUnicode("▶")
-        };
-
+        Task task = null;
         if (pageCount == 1) {
             await ctx.Channel.SendMessageAsync(content.First().Content);
         }
         else {
-            _ = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, content, ems,
+            task = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, content, TimeSpan.FromMinutes(2),
                 PaginationBehaviour.Ignore,
-                PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
+                ButtonPaginationBehavior.Ignore);
         }
+        task.Equals(null);
 
         var msgC =
             $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
@@ -800,21 +790,16 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
                 $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}]" : "Nothing".Bold())}"));
         }
 
-        var ems = new PaginationEmojis {
-            SkipLeft = null,
-            SkipRight = null,
-            Stop = DiscordEmoji.FromUnicode("⏹"),
-            Left = DiscordEmoji.FromUnicode("◀"),
-            Right = DiscordEmoji.FromUnicode("▶")
-        };
+        Task task = null;
         if (pageCount == 1) {
             await ctx.Channel.SendMessageAsync(pages.First().Content);
         }
         else {
-            _ = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages, ems,
+            task = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages, TimeSpan.FromMinutes(2),
                 PaginationBehaviour.Ignore,
-                PaginationDeletion.KeepEmojis, TimeSpan.FromMinutes(2));
+                ButtonPaginationBehavior.Ignore);
         }
+        task.Equals(null);
     }
 
     [Command("nowplaying"), Description("Displays information about currently-played track."), Aliases("np")]
@@ -884,7 +869,7 @@ public static class Extensions {
 
         // if samplerate+depth (FLAC), do that like 16/44.1khz
         if (f.Attributes.Any(a => a.Type == FileAttributeType.SampleRate) &&
-                                  f.Attributes.Any(a => a.Type == FileAttributeType.BitDepth)) {
+            f.Attributes.Any(a => a.Type == FileAttributeType.BitDepth)) {
             var sr = (f.SampleRate!.Value / 1000f).ToString("N1");
             var bd = f.BitDepth;
             return $"{bd}/{sr}kHz";
