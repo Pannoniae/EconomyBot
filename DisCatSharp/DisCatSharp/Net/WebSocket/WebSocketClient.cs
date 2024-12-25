@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Net;
 using System.Net.WebSockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -233,7 +234,7 @@ public class WebSocketClient : IWebSocketClient
 		if (this._ws.State is not WebSocketState.Open && this._ws.State is not WebSocketState.CloseReceived)
 			return;
 
-		var bytes = Utilities.UTF8.GetBytes(message);
+		var bytes = Encoding.UTF8.GetBytes(message);
 		await this._senderLock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 		try
 		{

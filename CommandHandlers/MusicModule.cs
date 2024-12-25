@@ -356,6 +356,8 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             await common.respond(ctx, "No lyrics were found.");
             return;
         }
+        await Console.Out.WriteLineAsync(lyrics.Text);
+        await ctx.RespondAsync(lyrics.Text);
     }
 
 
