@@ -292,7 +292,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
                 PaginationBehaviour.Ignore,
                 ButtonPaginationBehavior.Ignore);
         }
-        task.Equals(null);
+        task = task;
 
         var msgC =
             $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
@@ -396,7 +396,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
                 PaginationBehaviour.Ignore,
                 ButtonPaginationBehavior.Ignore);
         }
-        task.Equals(null);
+        task = task;
 
         var msgC =
             $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
@@ -799,7 +799,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
                 PaginationBehaviour.Ignore,
                 ButtonPaginationBehavior.Ignore);
         }
-        task.Equals(null);
+        task = task;
     }
 
     [Command("nowplaying"), Description("Displays information about currently-played track."), Aliases("np")]
