@@ -19,12 +19,16 @@ using DisCatSharp.Net.Serialization;
 using EconomyBot.Logging;
 using Lavalink4NET;
 using Lavalink4NET.DisCatSharp;
+using Lavalink4NET.Integrations.LyricsJava.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting.Internal;
 using Spectre.Console;
 
 namespace EconomyBot;
 
 class Program {
+    private static IHost host;
     private static IServiceProvider services { get; set; }
 
     private static readonly Logger logger = Logger.getClassLogger("Main");
@@ -72,12 +76,19 @@ class Program {
         });
         client = discord;
 
+        var builder = Host.CreateDefaultBuilder(args)
+            .UseLavalink(options => {
+                options.BaseAddress = new("http://localhost:2333/");
+                options.Passphrase = "youshallnotpass";
+            }, client).ConfigureServices(collection => collection.AddSingleton<IHostLifetime, ConsoleLifetime>());
+
+        host = builder.Build();
+        host.UseLyricsJava();
+
         // error handling
         services = new ServiceCollection()
             .AddSingleton(new YouTubeSearchProvider())
-            .AddLavalink()
             .BuildServiceProvider(true);
-        LavalinkNode = services.GetRequiredService<IAudioService>();
         var commands = discord.UseCommandsNext(new CommandsNextConfiguration {
             StringPrefixes = ["."],
             ServiceProvider = services
@@ -109,13 +120,13 @@ class Program {
         });
         discord.MessageCreated += messageHandler;
         discord.MessagesBulkDeleted += messageDeleteHandler;
-        discord.Ready += async (sender, _) => await setup(sender, LavalinkNode);
+        discord.Ready += async (sender, _) => await setup(sender);
         //discord.GuildDownloadCompleted += (sender, _) => setupB(sender, lavalink, lavalinkConfig);
         discord.MessageDeleted += messageDeleteHandler;
         discord.GetCommandsNext().UnregisterConverter<TimeSpan>();
         discord.GetCommandsNext().RegisterConverter(new CustomTimeSpanConverter());
         await discord.ConnectAsync();
-        await LavalinkNode.StartAsync();
+        await host.StartAsync();
         MemoryUtils.cleanGC();
         var timer = new PeriodicTimer(TimeSpan.FromMinutes(10));
 
@@ -318,18 +329,19 @@ class Program {
         }*/
     }
 
-    private static async Task setup(DiscordClient client, IAudioService lavalink) {
+    private static async Task setup(DiscordClient client) {
         // Wait a bit with lavalink init, Lavalink seems to start slower than the bot. Lazy solution is pretty much a sleep
         await Task.Delay(3000);
-        musicService = new MusicService(lavalink);
-        lavalinkInit = true;
+
         imagesModule = new ImagesModule();
         toxicity = new ToxicityHandler();
         wiltery = new WilteryHandler(Program.client);
         languageClient = new DetectLanguageClient(Constants.detectlanguagetoken);
 
         cube = await (await client.GetGuildAsync(838843082110664756)).GetEmojiAsync(839202645734457384);
-
+        LavalinkNode = host.Services.GetRequiredService<IAudioService>();
+        musicService = new MusicService(LavalinkNode);
+        lavalinkInit = true;
         hasSetup = true;
 
         // don't need to wait!

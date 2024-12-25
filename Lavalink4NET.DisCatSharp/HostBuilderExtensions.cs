@@ -1,4 +1,6 @@
-﻿namespace Lavalink4NET.DisCatSharp;
+﻿using DisCatSharp;
+
+namespace Lavalink4NET.DisCatSharp;
 
 using System;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,13 +15,14 @@ public static class HostBuilderExtensions
         return hostBuilder.ConfigureServices(static (_, services) => services.AddLavalink());
     }
 
-    public static IHostBuilder UseLavalink(this IHostBuilder hostBuilder, Action<AudioServiceOptions>? configure)
+    public static IHostBuilder UseLavalink(this IHostBuilder hostBuilder, Action<AudioServiceOptions>? configure, DiscordClient client)
     {
         ArgumentNullException.ThrowIfNull(hostBuilder);
 
         return hostBuilder.ConfigureServices((_, services) =>
         {
             services.AddLavalink();
+            services.AddSingleton(client);
 
             if (configure is not null)
             {

@@ -23,8 +23,9 @@ lavalink:
     gc-warnings: true
   plugins:
     # Replace VERSION with the current version as shown by the Releases tab or a long commit hash for snapshots.
-    - dependency: "dev.lavalink.youtube:youtube-plugin:1.11.1"
-      snapshot: false # Set to true if you want to use a snapshot version.
+    - dependency: "dev.lavalink.youtube:youtube-plugin:1.11.2"
+      snapshot: true # Set to true if you want to use a snapshot version.
+    - dependency: "me.duncte123:java-lyrics-plugin:1.6.5"
 
 plugins:
   youtube:
@@ -41,6 +42,9 @@ plugins:
       - WEB
       - WEBEMBEDDED
       - ANDROID_VR
+  lyrics:
+    countryCode: gb #country code for resolving isrc tracks
+    geniusApiKey: "GcZnBGCIsD3JC5MVknXIU8wCxXNIz2N5gP92Hes2UOELiY4zsfbB66M4evTFa3Hb" # leave this out to disable genius searching. Get your api key (Client Access Token) from https://genius.com/api-clients
 
 metrics:
   prometheus:

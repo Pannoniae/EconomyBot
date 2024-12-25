@@ -8,6 +8,7 @@ using DisCatSharp.Entities;
 using DisCatSharp.Interactivity;
 using DisCatSharp.Interactivity.Enums;
 using DisCatSharp.Interactivity.Extensions;
+using Lavalink4NET.Integrations.LyricsJava.Extensions;
 using Lavalink4NET.Tracks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -340,6 +341,25 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         await common.modify(ctx, msg,
             $"Added {track.ToLimitedTrackString()} to the playback queue.");
     }
+    [Command("lyrics"), Description("Get lyrics for a song."), Aliases("ly")]
+    public async Task LyricsAsync(CommandContext ctx) {
+        var track = GuildMusic.queue.NowPlaying;
+        if (track is null) {
+            await common.respond(ctx, "No track is playing.");
+            return;
+        }
+
+        var lyrics = await GuildMusic.Lavalink.Tracks
+            .GetCurrentTrackLyricsAsync(GuildMusic.Player)
+            .ConfigureAwait(false);
+        if (lyrics is null) {
+            await common.respond(ctx, "No lyrics were found.");
+            return;
+        }
+
+    }
+
+
 
 
     /// <summary>
@@ -855,7 +875,7 @@ public static class Extensions {
 
         // if samplerate+depth (FLAC), do that like 16/44.1khz
         if (f.Attributes.Any(a => a.Type == FileAttributeType.SampleRate) &&
-                                  f.Attributes.Any(a => a.Type == FileAttributeType.BitDepth)) {
+            f.Attributes.Any(a => a.Type == FileAttributeType.BitDepth)) {
             var sr = (f.SampleRate!.Value / 1000f).ToString("N1");
             var bd = f.BitDepth;
             return $"{bd}/{sr}kHz";

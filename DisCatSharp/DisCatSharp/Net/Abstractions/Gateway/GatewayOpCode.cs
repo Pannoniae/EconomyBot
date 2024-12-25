@@ -3,7 +3,7 @@ namespace DisCatSharp.Net.Abstractions;
 /// <summary>
 ///     Specifies an OP code in a gateway payload.
 /// </summary>
-internal enum GatewayOpCode
+public enum GatewayOpCode
 {
 	/// <summary>
 	///     Used for dispatching events.

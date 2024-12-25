@@ -3,6 +3,7 @@ DetectLanguage
 FuzzierSharp
 Lavalink4NET.Artwork
 Lavalink4NET.Integrations.LyricsJava
+Microsoft.Extensions.Hosting
 JetBrains.Annotations
 Reddit
 Spectre.Console

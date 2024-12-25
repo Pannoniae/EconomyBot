@@ -5,6 +5,7 @@ using DisCatSharp.Entities;
 using DisCatSharp.Entities.Core;
 using EconomyBot.Logging;
 using Lavalink4NET;
+using Lavalink4NET.Clients;
 using Lavalink4NET.DisCatSharp;
 using Lavalink4NET.Filters;
 using Lavalink4NET.Players;
@@ -196,7 +197,7 @@ public sealed class GuildMusicData {
             return;
 
         volume = vol;
-        await Player.SetVolumeAsync(effectiveVolume);
+        await Player.SetVolumeAsync(effectiveVolume / 100f);
     }
 
     /// <summary>
@@ -223,7 +224,12 @@ public sealed class GuildMusicData {
             return;
         }
 
-        Player = (await Lavalink.Players.RetrieveAsync(ctx)).Player;
+        var retrieveOptions = new PlayerRetrieveOptions(ChannelBehavior: PlayerChannelBehavior.Join, MemberVoiceStateBehavior.AlwaysRequired);
+
+        var result = await Lavalink.Players
+            .RetrieveAsync(ctx, playerFactory: PlayerFactory.Default, new LavalinkPlayerOptions(), retrieveOptions);
+
+        Player = result.Player;
 
         await SetVolumeAsync(volume);
 
@@ -326,7 +332,7 @@ public sealed class GuildMusicData {
     }
 
     public static async Task<LavalinkTrack?> getTrackAsync(IAudioService client, string file) {
-        var tracks = await client.Tracks.LoadTracksAsync(file, TrackSearchMode.YouTube);
+        var tracks = await client.Tracks.LoadTracksAsync(file, TrackSearchMode.None);
 
         if (!tracks.IsSuccess) {
             return null;

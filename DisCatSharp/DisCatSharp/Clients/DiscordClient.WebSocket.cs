@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,6 +10,7 @@ using DisCatSharp.Enums;
 using DisCatSharp.EventArgs;
 using DisCatSharp.Net;
 using DisCatSharp.Net.Abstractions;
+using DisCatSharp.Net.Serialization;
 using DisCatSharp.Net.WebSocket;
 
 using Microsoft.Extensions.Logging;
@@ -624,10 +626,22 @@ public sealed partial class DiscordClient
 	///     Sends a websocket message.
 	/// </summary>
 	/// <param name="payload">The payload to send.</param>
-	internal async Task WsSendAsync(string payload)
+	public async Task WsSendAsync(string payload)
 	{
 		this.Logger.LogTrace(LoggerEvents.GatewayWsTx, "{Payload}", payload);
 		await this.WebSocketClient.SendMessageAsync(payload).ConfigureAwait(false);
+	}
+
+	public async Task SendPayloadAsync(GatewayOpCode opCode, object? data)
+	{
+		GatewayPayload payload = new()
+		{
+			OpCode = opCode,
+			Data = data
+		};
+
+		string payloadString = DiscordJson.SerializeObject(payload);
+		await this.WebSocketClient.SendMessageAsync(payloadString);
 	}
 
 #endregion

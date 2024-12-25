@@ -47,6 +47,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="ILLink\ILLink.Descriptors.LibraryBuild.xml">
+      <Paket>True</Paket>
+    </Content>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="source.extension.cs">
       <AutoGen>True</AutoGen>
@@ -311,6 +314,15 @@
     </When>
   </Choose>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration\9.0.0\lib\net462\Microsoft.Extensions.Configuration.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
       <ItemGroup>
         <Reference Include="Microsoft.Extensions.Configuration">
@@ -320,8 +332,26 @@
         </Reference>
       </ItemGroup>
     </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration\9.0.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
   </Choose>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.abstractions\9.0.0\lib\net462\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
       <ItemGroup>
         <Reference Include="Microsoft.Extensions.Configuration.Abstractions">
@@ -331,12 +361,39 @@
         </Reference>
       </ItemGroup>
     </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.abstractions\9.0.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
   </Choose>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.Binder">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.binder\9.0.0\lib\net462\Microsoft.Extensions.Configuration.Binder.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
       <ItemGroup>
         <Reference Include="Microsoft.Extensions.Configuration.Binder">
           <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.binder\9.0.0\lib\net9.0\Microsoft.Extensions.Configuration.Binder.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.Binder">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.binder\9.0.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.Binder.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
@@ -388,6 +445,160 @@
     </Analyzer>
   </ItemGroup>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.CommandLine">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.commandline\9.0.0\lib\net462\Microsoft.Extensions.Configuration.CommandLine.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.CommandLine">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.commandline\9.0.0\lib\net9.0\Microsoft.Extensions.Configuration.CommandLine.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.CommandLine">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.commandline\9.0.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.CommandLine.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.EnvironmentVariables">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.environmentvariables\9.0.0\lib\net462\Microsoft.Extensions.Configuration.EnvironmentVariables.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.EnvironmentVariables">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.environmentvariables\9.0.0\lib\net9.0\Microsoft.Extensions.Configuration.EnvironmentVariables.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.EnvironmentVariables">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.environmentvariables\9.0.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.EnvironmentVariables.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.FileExtensions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.fileextensions\9.0.0\lib\net462\Microsoft.Extensions.Configuration.FileExtensions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.FileExtensions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.fileextensions\9.0.0\lib\net9.0\Microsoft.Extensions.Configuration.FileExtensions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.FileExtensions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.fileextensions\9.0.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.FileExtensions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.Json">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.json\9.0.0\lib\net462\Microsoft.Extensions.Configuration.Json.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.Json">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.json\9.0.0\lib\net9.0\Microsoft.Extensions.Configuration.Json.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.Json">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.json\9.0.0\lib\netstandard2.1\Microsoft.Extensions.Configuration.Json.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.UserSecrets">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.usersecrets\9.0.0\lib\net462\Microsoft.Extensions.Configuration.UserSecrets.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.UserSecrets">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.usersecrets\9.0.0\lib\net9.0\Microsoft.Extensions.Configuration.UserSecrets.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Configuration.UserSecrets">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.usersecrets\9.0.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.UserSecrets.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.DependencyInjection">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.dependencyinjection\9.0.0\lib\net462\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
       <ItemGroup>
         <Reference Include="Microsoft.Extensions.DependencyInjection">
@@ -397,8 +608,26 @@
         </Reference>
       </ItemGroup>
     </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.DependencyInjection">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.dependencyinjection\9.0.0\lib\netstandard2.1\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
   </Choose>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.dependencyinjection.abstractions\9.0.0\lib\net462\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
       <ItemGroup>
         <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
@@ -408,8 +637,26 @@
         </Reference>
       </ItemGroup>
     </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.dependencyinjection.abstractions\9.0.0\lib\netstandard2.1\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
   </Choose>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Diagnostics">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.diagnostics\9.0.0\lib\net462\Microsoft.Extensions.Diagnostics.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
       <ItemGroup>
         <Reference Include="Microsoft.Extensions.Diagnostics">
@@ -419,8 +666,26 @@
         </Reference>
       </ItemGroup>
     </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Diagnostics">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.diagnostics\9.0.0\lib\netstandard2.0\Microsoft.Extensions.Diagnostics.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
   </Choose>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Diagnostics.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.diagnostics.abstractions\9.0.0\lib\net462\Microsoft.Extensions.Diagnostics.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
       <ItemGroup>
         <Reference Include="Microsoft.Extensions.Diagnostics.Abstractions">
@@ -430,8 +695,26 @@
         </Reference>
       </ItemGroup>
     </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Diagnostics.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.diagnostics.abstractions\9.0.0\lib\netstandard2.0\Microsoft.Extensions.Diagnostics.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
   </Choose>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.FileProviders.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.fileproviders.abstractions\9.0.0\lib\net462\Microsoft.Extensions.FileProviders.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
       <ItemGroup>
         <Reference Include="Microsoft.Extensions.FileProviders.Abstractions">
@@ -441,12 +724,129 @@
         </Reference>
       </ItemGroup>
     </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.FileProviders.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.fileproviders.abstractions\9.0.0\lib\netstandard2.0\Microsoft.Extensions.FileProviders.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
   </Choose>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.FileProviders.Physical">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.fileproviders.physical\9.0.0\lib\net462\Microsoft.Extensions.FileProviders.Physical.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.FileProviders.Physical">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.fileproviders.physical\9.0.0\lib\net9.0\Microsoft.Extensions.FileProviders.Physical.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.FileProviders.Physical">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.fileproviders.physical\9.0.0\lib\netstandard2.0\Microsoft.Extensions.FileProviders.Physical.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.FileSystemGlobbing">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.filesystemglobbing\9.0.0\lib\net462\Microsoft.Extensions.FileSystemGlobbing.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.FileSystemGlobbing">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.filesystemglobbing\9.0.0\lib\net9.0\Microsoft.Extensions.FileSystemGlobbing.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.FileSystemGlobbing">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.filesystemglobbing\9.0.0\lib\netstandard2.0\Microsoft.Extensions.FileSystemGlobbing.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="System.Runtime">
+          <Paket>True</Paket>
+        </Reference>
+        <Reference Include="Microsoft.Extensions.Hosting">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.hosting\9.0.0\lib\net462\Microsoft.Extensions.Hosting.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Hosting">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.hosting\9.0.0\lib\net9.0\Microsoft.Extensions.Hosting.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Hosting">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.hosting\9.0.0\lib\netstandard2.1\Microsoft.Extensions.Hosting.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Hosting.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.hosting.abstractions\9.0.0\lib\net462\Microsoft.Extensions.Hosting.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
       <ItemGroup>
         <Reference Include="Microsoft.Extensions.Hosting.Abstractions">
           <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.hosting.abstractions\9.0.0\lib\net9.0\Microsoft.Extensions.Hosting.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Hosting.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.hosting.abstractions\9.0.0\lib\netstandard2.1\Microsoft.Extensions.Hosting.Abstractions.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
@@ -465,6 +865,15 @@
     </When>
   </Choose>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging\9.0.0\lib\net462\Microsoft.Extensions.Logging.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
       <ItemGroup>
         <Reference Include="Microsoft.Extensions.Logging">
@@ -474,12 +883,39 @@
         </Reference>
       </ItemGroup>
     </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging\9.0.0\lib\netstandard2.1\Microsoft.Extensions.Logging.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
   </Choose>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\lib\net462\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
       <ItemGroup>
         <Reference Include="Microsoft.Extensions.Logging.Abstractions">
           <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\lib\net9.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging.Abstractions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.abstractions\9.0.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
@@ -615,10 +1051,176 @@
     </Analyzer>
   </ItemGroup>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging.Configuration">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.configuration\9.0.0\lib\net462\Microsoft.Extensions.Logging.Configuration.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging.Configuration">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.configuration\9.0.0\lib\net9.0\Microsoft.Extensions.Logging.Configuration.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging.Configuration">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.configuration\9.0.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Configuration.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging.Console">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.console\9.0.0\lib\net462\Microsoft.Extensions.Logging.Console.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging.Console">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.console\9.0.0\lib\net9.0\Microsoft.Extensions.Logging.Console.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging.Console">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.console\9.0.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Console.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging.Debug">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.debug\9.0.0\lib\net462\Microsoft.Extensions.Logging.Debug.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging.Debug">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.debug\9.0.0\lib\net9.0\Microsoft.Extensions.Logging.Debug.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging.Debug">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.debug\9.0.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Debug.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging.EventLog">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.eventlog\9.0.0\lib\net462\Microsoft.Extensions.Logging.EventLog.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging.EventLog">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.eventlog\9.0.0\lib\net9.0\Microsoft.Extensions.Logging.EventLog.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging.EventLog">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.eventlog\9.0.0\lib\netstandard2.0\Microsoft.Extensions.Logging.EventLog.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging.EventSource">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.eventsource\9.0.0\lib\net462\Microsoft.Extensions.Logging.EventSource.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging.EventSource">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.eventsource\9.0.0\lib\net9.0\Microsoft.Extensions.Logging.EventSource.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Logging.EventSource">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.logging.eventsource\9.0.0\lib\netstandard2.0\Microsoft.Extensions.Logging.EventSource.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="System.ComponentModel.DataAnnotations">
+          <Paket>True</Paket>
+        </Reference>
+        <Reference Include="Microsoft.Extensions.Options">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.0\lib\net462\Microsoft.Extensions.Options.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
       <ItemGroup>
         <Reference Include="Microsoft.Extensions.Options">
           <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.0\lib\net9.0\Microsoft.Extensions.Options.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Options">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.0\lib\netstandard2.1\Microsoft.Extensions.Options.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
@@ -670,6 +1272,15 @@
     </Analyzer>
   </ItemGroup>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Options.ConfigurationExtensions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options.configurationextensions\9.0.0\lib\net462\Microsoft.Extensions.Options.ConfigurationExtensions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
       <ItemGroup>
         <Reference Include="Microsoft.Extensions.Options.ConfigurationExtensions">
@@ -679,12 +1290,39 @@
         </Reference>
       </ItemGroup>
     </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Options.ConfigurationExtensions">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options.configurationextensions\9.0.0\lib\netstandard2.0\Microsoft.Extensions.Options.ConfigurationExtensions.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
   </Choose>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Primitives">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.primitives\9.0.0\lib\net462\Microsoft.Extensions.Primitives.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
       <ItemGroup>
         <Reference Include="Microsoft.Extensions.Primitives">
           <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.primitives\9.0.0\lib\net9.0\Microsoft.Extensions.Primitives.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Primitives">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.primitives\9.0.0\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
@@ -870,6 +1508,66 @@
     </When>
   </Choose>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="System.ComponentModel.Annotations">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\system.componentmodel.annotations\5.0.0\lib\netstandard2.1\System.ComponentModel.Annotations.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="System.ComponentModel.Annotations">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\system.componentmodel.annotations\5.0.0\ref\netstandard2.1\System.ComponentModel.Annotations.dll</HintPath>
+          <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
+      <ItemGroup>
+        <Reference Include="System.Diagnostics.DiagnosticSource">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\system.diagnostics.diagnosticsource\9.0.0\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="System.Diagnostics.DiagnosticSource">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\system.diagnostics.diagnosticsource\9.0.0\lib\netstandard2.0\System.Diagnostics.DiagnosticSource.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v9.0'">
+      <ItemGroup>
+        <Reference Include="System.Diagnostics.EventLog">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\system.diagnostics.eventlog\9.0.0\lib\net9.0\System.Diagnostics.EventLog.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="System.Diagnostics.EventLog">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\system.diagnostics.eventlog\9.0.0\lib\netstandard2.0\System.Diagnostics.EventLog.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.7.2'">
       <ItemGroup>
         <Reference Include="System.IO.Pipelines">
@@ -961,6 +1659,26 @@
         <Reference Include="System.Runtime.CompilerServices.Unsafe">
           <HintPath>..\..\..\..\..\..\.nuget\packages\system.runtime.compilerservices.unsafe\6.1.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
           <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="System.Security.Principal.Windows">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\system.security.principal.windows\5.0.0\lib\netstandard2.0\System.Security.Principal.Windows.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v2.1'">
+      <ItemGroup>
+        <Reference Include="System.Security.Principal.Windows">
+          <HintPath>..\..\..\..\..\..\.nuget\packages\system.security.principal.windows\5.0.0\ref\netstandard2.0\System.Security.Principal.Windows.dll</HintPath>
+          <Private>False</Private>
           <Paket>True</Paket>
         </Reference>
       </ItemGroup>
