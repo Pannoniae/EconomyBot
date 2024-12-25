@@ -7,6 +7,7 @@ using EconomyBot.Logging;
 using Lavalink4NET;
 using Lavalink4NET.Clients;
 using Lavalink4NET.DisCatSharp;
+using Lavalink4NET.Extensions;
 using Lavalink4NET.Filters;
 using Lavalink4NET.Players;
 using Lavalink4NET.Rest.Entities.Tracks;
@@ -220,14 +221,14 @@ public sealed class GuildMusicData {
     /// </summary>
     /// <returns></returns>
     public async Task CreatePlayerAsync(DisCatSharpCommandContext ctx) {
-        if (Player != null && Player.ConnectionState.IsConnected) {
-            return;
+
+        var retrieveOptions = new PlayerRetrieveOptions(ChannelBehavior: PlayerChannelBehavior.Move, MemberVoiceStateBehavior.AlwaysRequired);
+
+        var result = await Lavalink.Players.RetrieveAsync(ctx, retrieveOptions);
+
+        if (!result.IsSuccess) {
+            throw new Exception($"Couldn't connect to the voice channel. {result.Status}");
         }
-
-        var retrieveOptions = new PlayerRetrieveOptions(ChannelBehavior: PlayerChannelBehavior.Join, MemberVoiceStateBehavior.AlwaysRequired);
-
-        var result = await Lavalink.Players
-            .RetrieveAsync(ctx, playerFactory: PlayerFactory.Default, new LavalinkPlayerOptions(), retrieveOptions);
 
         Player = result.Player;
 
