@@ -153,7 +153,7 @@ class Program {
         }
 
         // hold console window
-        await Task.Delay(-1);
+        await host.WaitForShutdownAsync();
     }
 
     private static async Task messageDeleteHandler(DiscordClient sender, MessageBulkDeleteEventArgs e) {

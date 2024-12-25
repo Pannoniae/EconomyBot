@@ -23,8 +23,8 @@ lavalink:
     gc-warnings: true
   plugins:
     # Replace VERSION with the current version as shown by the Releases tab or a long commit hash for snapshots.
-    - dependency: "dev.lavalink.youtube:youtube-plugin:1.11.2"
-      snapshot: true # Set to true if you want to use a snapshot version.
+    - dependency: "dev.lavalink.youtube:youtube-plugin:1.11.1"
+      snapshot: false # Set to true if you want to use a snapshot version.
     - dependency: "me.duncte123:java-lyrics-plugin:1.6.5"
 
 plugins:

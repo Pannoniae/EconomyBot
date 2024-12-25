@@ -356,7 +356,6 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             await common.respond(ctx, "No lyrics were found.");
             return;
         }
-
     }
 
 
