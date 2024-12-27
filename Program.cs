@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using DetectLanguage;
 using DisCatSharp;
@@ -19,6 +20,7 @@ using DisCatSharp.Net;
 using EconomyBot.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;
+using Color = System.Drawing.Color;
 
 namespace EconomyBot;
 
@@ -273,6 +275,18 @@ class Program {
         if (cute.Any(word =>
                 e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase))) {
             await e.Message.RespondAsync("You are a meanie >.<");
+        }
+
+        // Spam detection
+
+        // base64 decode
+        var word = new string(Encoding.UTF8.GetString(Convert.FromBase64String("bWZiem9iZQ==")).Select(c => char.IsLetter(c) ? (char)(c + (char.ToLower(c) < 'n' ? 13 : -13)) : c).ToArray());
+        if (e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase)) {
+            await e.Message.DeleteAsync();
+        }
+        var word1 = new string(Encoding.UTF8.GetString(Convert.FromBase64String("Y2V2Zm1hbG54")).Select(c => char.IsLetter(c) ? (char)(c + (char.ToLower(c) < 'n' ? 13 : -13)) : c).ToArray());
+        if (e.Message.Content.Contains(word1, StringComparison.OrdinalIgnoreCase)) {
+            await e.Message.DeleteAsync();
         }
 
         // Ukrainian language promotion handler, don't trigger if it's a quote
