@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using DisCatSharp;
 using DisCatSharp.Entities;
@@ -217,7 +218,8 @@ public class ExactWordMessageHandler(string target, string replacement) : WordMe
     private readonly string target = target;
     private readonly string replacement = replacement;
     public override bool shouldProcess(DiscordMessage message) {
-        return message.Content.Contains($"{target} ", StringComparison.CurrentCultureIgnoreCase);
+        return Regex.IsMatch(message.Content, $@"\b{target}\b", RegexOptions.IgnoreCase);
+
     }
 
     public override async void process(WilteryHandler handler, DiscordMessage message) {
