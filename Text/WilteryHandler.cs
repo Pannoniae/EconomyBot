@@ -201,7 +201,7 @@ public class WilteryHandler {
 public interface MessageHandler {
     bool shouldProcess(DiscordMessage message);
 
-    void process(WilteryHandler handler, DiscordMessage message);
+    Task process(WilteryHandler handler, DiscordMessage message);
 }
 
 public class WordMessageHandler(string target, string replacement) : MessageHandler {
@@ -209,7 +209,7 @@ public class WordMessageHandler(string target, string replacement) : MessageHand
         return message.Content.Contains(target, StringComparison.CurrentCultureIgnoreCase);
     }
 
-    public virtual async void process(WilteryHandler handler, DiscordMessage message) {
+    public virtual async Task process(WilteryHandler handler, DiscordMessage message) {
         await handler.replaceMessage(message, target, replacement);
     }
 }
@@ -222,7 +222,7 @@ public class ExactWordMessageHandler(string target, string replacement) : WordMe
 
     }
 
-    public override async void process(WilteryHandler handler, DiscordMessage message) {
+    public override async Task process(WilteryHandler handler, DiscordMessage message) {
         await handler.replaceMessage(message, target, replacement);
     }
 }
@@ -233,7 +233,7 @@ public class AIWordMessageHandler(string target) : WordMessageHandler(target, ""
         return message.Content.Contains(target, StringComparison.CurrentCultureIgnoreCase) && !message.Author.IsBot;
     }
 
-    public override async void process(WilteryHandler handler, DiscordMessage message) {
+    public override async Task process(WilteryHandler handler, DiscordMessage message) {
         await handler.replaceMessageAINeutral(message);
     }
 }
@@ -244,13 +244,13 @@ public class WordExceptionMessageHandler(string target, string replacement, para
                && exceptions.All(e => !message.Content.Contains(e, StringComparison.CurrentCultureIgnoreCase));
     }
 
-    public virtual async void process(WilteryHandler handler, DiscordMessage message) {
+    public virtual async Task process(WilteryHandler handler, DiscordMessage message) {
         await handler.replaceMessage(message, target, replacement);
     }
 }
 
 public class ResponseWordMessageHandler(string target, string response) : WordMessageHandler(target, response) {
-    public override async void process(WilteryHandler handler, DiscordMessage message) {
+    public override async Task process(WilteryHandler handler, DiscordMessage message) {
         await message.RespondAsync(response);
     }
 }
