@@ -30,6 +30,11 @@ public class WilteryHandler {
             "basket"));
         messageHandlers.Add(new WordMessageHandler("hrt", "hurt"));
         messageHandlers.Add(new ResponseWordMessageHandler("anal", "Have fun getting HIV"));
+        messageHandlers.Add(new ExactWordMessageHandler("bro", DiscordEmoji.FromName(client, ":cat2:")));
+        messageHandlers.Add(new ExactWordMessageHandler("bruv", DiscordEmoji.FromName(client, ":cat2:")));
+        messageHandlers.Add(new ExactWordMessageHandler("brah", DiscordEmoji.FromName(client, ":cat2:")));
+        messageHandlers.Add(new ExactWordMessageHandler("bra", DiscordEmoji.FromName(client, ":cat2:")));
+        messageHandlers.Add(new ExactWordMessageHandler("bruh", DiscordEmoji.FromName(client, ":cat2:")));
 
         // stop the stupidity
         // replace every gendered pronoun with neutral ones
