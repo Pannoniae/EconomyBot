@@ -239,12 +239,12 @@ public class AIWordMessageHandler(string target) : WordMessageHandler(target, ""
 }
 
 public class WordExceptionMessageHandler(string target, string replacement, params string[] exceptions) : MessageHandler {
-    public virtual bool shouldProcess(DiscordMessage message) {
+    public bool shouldProcess(DiscordMessage message) {
         return message.Content.Contains(target, StringComparison.CurrentCultureIgnoreCase)
                && exceptions.All(e => !message.Content.Contains(e, StringComparison.CurrentCultureIgnoreCase));
     }
 
-    public virtual async Task process(WilteryHandler handler, DiscordMessage message) {
+    public async Task process(WilteryHandler handler, DiscordMessage message) {
         await handler.replaceMessage(message, target, replacement);
     }
 }
