@@ -3,6 +3,7 @@ using DisCatSharp;
 using DisCatSharp.Entities;
 using DisCatSharp.Lavalink;
 using DisCatSharp.Lavalink.Entities;
+using DisCatSharp.Lavalink.Enums;
 using DisCatSharp.Lavalink.EventArgs;
 using Soulseek;
 using File = Soulseek.File;
@@ -110,6 +111,9 @@ public sealed class MusicService {
 
     public Task<LavalinkTrackLoadingResult> GetTracksAsync(string search)
         => node.LoadTracksAsync(search);
+
+    public Task<LavalinkTrackLoadingResult> SearchTracksAsync(string search)
+        => node.LoadTracksAsync(LavalinkSearchType.Youtube, search);
 }
 
 public record SLSKResult(SearchResponse response, File file) {

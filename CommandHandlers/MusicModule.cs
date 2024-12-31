@@ -187,6 +187,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
 
         if (trackLoad.LoadType == LavalinkLoadResultType.Playlist) {
             var playlist = (LavalinkPlaylist)result;
+            tracks = playlist.Tracks;
             if (playlist.Info.SelectedTrack > 0) {
                 var index = playlist.Info.SelectedTrack;
                 tracks = tracks.Skip(index).Concat(tracks.Take(index)).ToList();
@@ -312,6 +313,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
                 elInd = -1;
             }
             else {
+                await common.modify(ctx, msg, "Invalid choice was made.");
                 return;
             }
         }
@@ -488,22 +490,82 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         string term) {
         var interactivity = ctx.Client.GetInteractivity();
 
-        var results = (await YouTube.SearchAsync(term)).ToList();
-        if (!results.Any()) {
+        var r = await Music.SearchTracksAsync(term);
+        if (r.LoadType != LavalinkLoadResultType.Search) {
+            await common.respond(ctx, "No tracks were found at specified link.");
+            return;
+        }
+        var results = (List<LavalinkTrack>)r.Result;
+        if (results.Count == 0) {
             await common.respond(ctx, "Nothing was found.");
             return;
         }
 
-        var msgC = string.Join("\n",
-            results.Select((x, i) =>
-                $"{MusicCommon.NumberMappings[i + 1]} {WebUtility.HtmlDecode(x.Title).Sanitize().Bold().URLDecode()} by {WebUtility.HtmlDecode(x.Author).Sanitize().Bold().URLDecode()}"));
-        msgC =
-            $"{msgC}\n\nType a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
+        if (results.Count == 0) {
+            await common.respond(ctx, "Nothing was found.");
+            return;
+        }
+
+        LavalinkTrack? track;
+        object? track_;
+        if (results.Count == 1) {
+            // only one result
+            var el_ = results.First();
+            track_ = el_;
+            if (track_ == null) {
+                await common.respond(ctx, "No tracks were found at specified link.");
+                return;
+            }
+
+            track = (LavalinkTrack)track_;
+
+
+            GuildMusic.queue.Enqueue(track);
+
+
+            await startPlayer(ctx);
+            await GuildMusic.queue.PlayAsync();
+
+            /*if (trackCount_ > 1) {
+                await common.respond(ctx, $"Added {trackCount_:#,##0} tracks to playback queue.");
+            }
+            else {
+                var track = tracks_.First();*/
+            await common.respond(ctx,
+                $"Added {track.ToLimitedTrackString()} to the playback queue.");
+            return;
+        }
+
+        var pageCount = results.Count / 10 + 1;
+        if (results.Count % 10 == 0) {
+            pageCount--;
+        }
+
+        var content = results.Select((x, i) => (x, i))
+            .GroupBy(e => e.i / 10)
+            .Select(xg => new Page(
+                $"{string.Join("\n", xg.Select(xa => $"`{xa.i + 1}` {xa.x.ToLimitedTrackString()}"))}\n\nPage {xg.Key + 1}/{pageCount}"));
+
+        Task task = null;
+        if (pageCount == 1) {
+            await ctx.Channel.SendMessageAsync(content.First().Content);
+        }
+        else {
+            task = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, content, TimeSpan.FromMinutes(2),
+                PaginationBehaviour.Ignore,
+                ButtonPaginationBehavior.Ignore);
+        }
+        task = task;
+
+        var msgC =
+            $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
+
         var msg = await ctx.RespondAsync(msgC);
 
-        var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User, TimeSpan.FromSeconds(30));
+        var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User && x.Channel == ctx.Channel,
+            TimeSpan.FromMinutes(2));
         if (res.TimedOut || res.Result == null) {
-            await common.modify(ctx, msg, "No choice was made.");
+            await msg.ModifyAsync($"{Program.cube} No choice was made.");
             return;
         }
 
@@ -513,15 +575,12 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
                 elInd = -1;
             }
             else {
+                await common.modify(ctx, msg, "Invalid choice was made.");
                 return;
             }
         }
-        else if (elInd < 1) {
-            await common.modify(ctx, msg, "Invalid choice was made.");
-            return;
-        }
 
-        if (!MusicCommon.NumberMappings.ContainsKey(elInd)) {
+        else if (elInd < 0 || elInd > results.Count) {
             await common.modify(ctx, msg, "Invalid choice was made.");
             return;
         }
@@ -532,55 +591,23 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
 
         var el = results.ElementAt(elInd - 1);
-        var url = new Uri($"https://youtu.be/{el.Id}");
+        track_ = el;
 
-        var trackLoad = await Music.GetTracksAsync(url);
-        var result = trackLoad.Result;
-        List<LavalinkTrack> tracks = [];
-        switch (trackLoad.LoadType) {
-            case LavalinkLoadResultType.Error:
-                await common.respond(ctx, "No tracks were found at specified link.");
-                return;
-            case LavalinkLoadResultType.Playlist: {
-                var playlist = (LavalinkPlaylist)result;
-                if (playlist.Info.SelectedTrack > 0) {
-                    var index = playlist.Info.SelectedTrack;
-                    tracks = tracks.Skip(index).Concat(tracks.Take(index)).ToList();
-                }
-                break;
-            }
-            case LavalinkLoadResultType.Search: {
-                var search = (List<LavalinkTrack>)result;
-                tracks = search;
-                break;
-            }
-            case LavalinkLoadResultType.Track: {
-                var search = (LavalinkTrack)result;
-                tracks = [search];
-                break;
-            }
-            case LavalinkLoadResultType.Empty:
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
+
+        if (track_ == null) {
+            await common.modify(ctx, msg, "No tracks were found at specified link.");
+            return;
         }
 
-        var trackCount = tracks.Count;
-        foreach (var track in tracks) {
-            GuildMusic.queue.Enqueue(track);
-        }
+        track = el;
+        GuildMusic.queue.Enqueue(track);
 
         await startPlayer(ctx);
         await GuildMusic.queue.PlayAsync();
 
-        if (trackCount > 1) {
-            await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
-        }
-        else {
-            var track = tracks.First();
-            await common.modify(ctx, msg,
-                $"Added {track.ToLimitedTrackString()} to the playback queue.");
-        }
+        var track2 = results.First();
+        await common.modify(ctx, msg,
+            $"Added {track2.ToLimitedTrackString()} to the playback queue.");
     }
 
     [Command("artist"), Description("Plays tracks from an matchedArtist."), Aliases("a")]
