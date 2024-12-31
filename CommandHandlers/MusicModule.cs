@@ -695,6 +695,12 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         await common.respond(ctx, "Playback resumed.");
     }
 
+    [Command("shuffle"), Description("Shuffles the queue.")]
+    public async Task ShuffleAsync(CommandContext ctx) {
+        GuildMusic.queue.shuffle();
+        await common.respond(ctx, "Queue shuffled.");
+    }
+
     [Command("skip"), Description("Skips current track."), Aliases("next")]
     public async Task SkipAsync(CommandContext ctx) {
         // don't allow skipping more at the same time

@@ -21,7 +21,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
     /// <summary>
     /// Gets the current manual music queue.
     /// </summary>
-    public List<Track> Queue { get; } = [];
+    public List<Track> Queue { get; private set; } = [];
 
     public bool repeatQueue { get; set; } = false;
 
@@ -30,18 +30,18 @@ public class MusicQueue(GuildMusicData guildMusic) {
     /// <summary>
     /// Gets the current auto-played music queue.
     /// </summary>
-    public List<Track> autoQueue { get; } = [];
+    public List<Track> autoQueue { get; private set; } = [];
 
     /// <summary>
     /// Playback history. Used for analytics.... I mean stopping the awful songs from playing.
     /// Yes I know this should be a deque or a linked list shut up
     /// </summary>
-    public List<Track> history { get; } = [];
+    public List<Track> history { get; private set; } = [];
 
     /// <summary>
     /// The things being played right now. "_fats" is special-cased to the great collection.
     /// </summary>
-    public List<string> artistQueue { get; } = [];
+    public List<string> artistQueue { get; private set; } = [];
 
     /// <summary>
     /// Stops the playback.
@@ -179,6 +179,24 @@ public class MusicQueue(GuildMusicData guildMusic) {
         }
 
         return item.track;
+    }
+
+
+    /// <summary>
+    /// Shuffles both playlists. NOTE: this shuffles playlists separately. They still won't get intermixed.
+    /// </summary>Does
+    public void shuffle() {
+        shuffle(Queue);
+        shuffle(autoQueue);
+    }
+
+    public static void shuffle<T>(IList<T> list) {
+        int n = list.Count;
+        while (n > 1) {
+            n--;
+            int k = Random.Shared.Next(n + 1);
+            (list[k], list[n]) = (list[n], list[k]);
+        }
     }
 
     /// <summary>
