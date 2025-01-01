@@ -71,8 +71,27 @@ public sealed class MusicService {
         return results.Take(50).ToList();
     }
 
+    public async Task<List<SLSKResult>> getSLSKbyUser(string searchTerm, string user) {
+        var options = new SearchOptions(searchTimeout: 10000, responseFilter: arg => userFilter(arg, user));
+        var result = await slsk.SearchAsync(new SearchQuery(searchTerm), options: options);
+
+        var results = new List<SLSKResult>();
+        // for each response, aggregate tracks with the result it belongs to
+        foreach (var r in result.Responses) {
+                foreach (var f in r.Files) {
+                    results.Add(new SLSKResult(r, f));
+                }
+        }
+
+        return results.Take(50).ToList();
+    }
+
     private static bool noLocked(SearchResponse arg) {
         return arg.HasFreeUploadSlot && arg.LockedFileCount == 0;
+    }
+
+    private static bool userFilter(SearchResponse arg, string user) {
+        return ActualFuzz.partialFuzz(user, arg.Username) > 75;
     }
 
     /// <summary>

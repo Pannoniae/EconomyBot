@@ -12,6 +12,7 @@ using DisCatSharp.Interactivity.EventHandling;
 using DisCatSharp.Interactivity.Extensions;
 using DisCatSharp.Lavalink.Entities;
 using DisCatSharp.Lavalink.Enums;
+using DisCatSharp.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Soulseek;
@@ -371,6 +372,133 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
         }
 
         var results = await Music.getSLSK(term);
+        if (results.Count == 0) {
+            await common.respond(ctx, "Nothing was found.");
+            return;
+        }
+
+        var pageCount = results.Count / 10 + 1;
+        if (results.Count % 10 == 0) {
+            pageCount--;
+        }
+
+        var content = results.Select((x, i) => (x, i))
+            .GroupBy(e => e.i / 10)
+            .Select(xg => new Page(
+                $"{string.Join("\n",
+                    xg.Select(xa => $"**{xa.i + 1}.** {WebUtility.HtmlDecode(xa.x.file.Filename.ReversePath()).InlineCode()}" +
+                                    $" {TimeSpan.FromSeconds(xa.x.file.Length.GetValueOrDefault()).musicLength().Bold()} ({xa.x.file.getBitrateString()})"))
+                }\n\nPage {xg.Key + 1}/{pageCount}"));
+
+        Task task = null;
+        if (pageCount == 1) {
+            await ctx.Channel.SendMessageAsync(content.First().Content);
+        }
+        else {
+            task = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, content, TimeSpan.FromMinutes(2),
+                PaginationBehaviour.Ignore,
+                ButtonPaginationBehavior.Ignore);
+        }
+        task = task;
+
+        var msgC =
+            $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
+
+        var msg = await ctx.RespondAsync(msgC);
+
+        var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User && x.Channel == ctx.Channel,
+            TimeSpan.FromMinutes(2));
+        if (res.TimedOut || res.Result == null) {
+            await msg.ModifyAsync($"{Program.cube} No choice was made.");
+            return;
+        }
+
+        var resInd = res.Result.Content.Trim();
+        if (!int.TryParse(resInd, NumberStyles.Integer, CultureInfo.InvariantCulture, out var elInd)) {
+            if (resInd.ToLowerInvariant() == "cancel") {
+                elInd = -1;
+            }
+            else {
+                await common.modify(ctx, msg, "Invalid choice was made.");
+                return;
+            }
+        }
+
+        else if (elInd < 0 || elInd > results.Count) {
+            await common.modify(ctx, msg, "Invalid choice was made.");
+            return;
+        }
+
+        if (elInd == -1) {
+            await common.modify(ctx, msg, "Choice cancelled.");
+            return;
+        }
+
+        var chosen = results.ElementAt(elInd - 1);
+
+
+        // actually download it from soulseek
+        var slsk = Music.slsk;
+        const string tempFolder = "/snd/music/temp";
+
+        // basically, the "filename" goes like this:
+        // for example: @@xrknr\Music\Dream Theater\2002 - six degrees of inner turbulence (flac)\(09) [Dream Theater] IV. The Test That Stumped Them All.flac
+        // we want the LAST part of the path as the actual filename to download to.
+        var actualFilename = chosen.file.Filename.Split('\\').Last();
+
+        await common.modify(ctx, msg, $"Downloading {actualFilename}...");
+
+        // we hash the filename so we don't reDL the same file
+        var hash = chosen.file.Filename.GetHashCode().ToString("x8");
+        var localPath = Path.Join(tempFolder, hash, actualFilename);
+        // if hash exists, play from that
+        // if not, create folder
+        LavalinkTrack? lltrack;
+        // if the hash directory exists + the file exists
+        if (Directory.Exists(Path.Join(tempFolder, hash)) &&
+            File.Exists(Path.Join(tempFolder, hash, actualFilename))) {
+            lltrack = await GuildMusicData.getTrackAsync(GuildMusic.Node, localPath);
+        }
+        else {
+            // create the folder
+            Directory.CreateDirectory(Path.Join(tempFolder, hash));
+            try {
+                var dl = await slsk.DownloadAsync(chosen.response.Username, chosen.file.Filename, localPath);
+            }
+            catch (TimeoutException e) {
+                Console.WriteLine(e);
+                await common.modify(ctx, msg, "Download timed out...");
+                return;
+            }
+            lltrack = await GuildMusicData.getTrackAsync(GuildMusic.Node, localPath);
+        }
+
+        GuildMusic.queue.Enqueue(lltrack);
+        await startPlayer(ctx);
+        await GuildMusic.queue.PlayAsync();
+
+        /*if (trackCount > 1) {
+            await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
+        }
+        else {*/
+        await common.modify(ctx, msg,
+            $"Added {lltrack.ToLimitedTrackString()} to the playback queue.");
+    }
+
+    [Command("soulseekuser"), Priority(0), Aliases("su")]
+    public async Task PlaySLSKUserAsync(CommandContext ctx,
+        [Description("The user to search.")]
+        string user,
+        [RemainingText, Description("Terms to search for.")]
+        string term) {
+
+        var interactivity = ctx.Client.GetInteractivity();
+        if (string.IsNullOrWhiteSpace(term)) {
+            await common.respond(ctx, "No query was entered :(");
+            return;
+        }
+
+        var results = await Music.getSLSKbyUser(term, user);
         if (results.Count == 0) {
             await common.respond(ctx, "Nothing was found.");
             return;

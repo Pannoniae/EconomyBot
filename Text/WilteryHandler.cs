@@ -19,9 +19,9 @@ public class WilteryHandler {
     public GuildMusicData GuildMusic { get; set; }
 
     public DiscordClient client;
-    public HttpClient httpClient = new();
+    public readonly HttpClient httpClient = new();
 
-    private List<MessageHandler> messageHandlers = new();
+    private readonly List<MessageHandler> messageHandlers = [];
 
     //noop
     public WilteryHandler(DiscordClient client) {
@@ -101,14 +101,21 @@ public class WilteryHandler {
         Music = Program.musicService;
         GuildMusic = await Music.GetOrCreateDataAsync(message.Channel.Guild);
 
+        var textContent = message.Content;
+        var processed = false;
 
         // process handlers
         foreach (var handler in messageHandlers) {
             if (handler.shouldProcess(message)) {
-                handler.process(this, message);
-                // if processed, don't bother with the rest
-                break;
+                textContent = await handler.process(this, textContent);
+                await handler.effect(this, message);
+                processed = true;
             }
+        }
+
+        // replace with final message
+        if (processed) {
+            await editMessage(message, message.Content, textContent);
         }
     }
 
@@ -184,8 +191,8 @@ public class WilteryHandler {
 
     public async Task replaceMessage(DiscordMessage message, string from, string to) {
         string contents = message.Content;
-        DiscordChannel channel = message.Channel;
-        DiscordMember user = (DiscordMember)message.Author;
+        var channel = message.Channel;
+        var user = (DiscordMember)message.Author;
         try {
             // yeet
             await message.DeleteAsync();
@@ -196,12 +203,29 @@ public class WilteryHandler {
             logger.error(e);
         }
     }
+
+    public async Task editMessage(DiscordMessage message, string from, string to) {
+        var channel = message.Channel;
+        var user = (DiscordMember)message.Author;
+        try {
+            // yeet
+            await message.DeleteAsync();
+            await sendWebhookToChannelAsUser(channel, to, user);
+        }
+        catch (Exception e) {
+            logger.error(e);
+        }
+    }
 }
 
 public interface MessageHandler {
     bool shouldProcess(DiscordMessage message);
 
-    Task process(WilteryHandler handler, DiscordMessage message);
+    Task<string> process(WilteryHandler handler, string message);
+
+    Task effect(WilteryHandler handler, DiscordMessage message) {
+        return Task.CompletedTask;
+    }
 }
 
 public class WordMessageHandler(string target, string replacement) : MessageHandler {
@@ -209,8 +233,12 @@ public class WordMessageHandler(string target, string replacement) : MessageHand
         return message.Content.Contains(target, StringComparison.CurrentCultureIgnoreCase);
     }
 
-    public virtual async Task process(WilteryHandler handler, DiscordMessage message) {
-        await handler.replaceMessage(message, target, replacement);
+    public virtual async Task<string> process(WilteryHandler handler, string message) {
+        return message.Replace(target, replacement, StringComparison.CurrentCultureIgnoreCase);
+    }
+
+    public virtual Task effect(WilteryHandler handler, DiscordMessage message) {
+        return Task.CompletedTask;
     }
 }
 
@@ -222,8 +250,8 @@ public class ExactWordMessageHandler(string target, string replacement) : WordMe
 
     }
 
-    public override async Task process(WilteryHandler handler, DiscordMessage message) {
-        await handler.replaceMessage(message, target, replacement);
+    public override async Task<string> process(WilteryHandler handler, string message) {
+        return message.Replace(target, replacement, StringComparison.CurrentCultureIgnoreCase);
     }
 }
 
@@ -233,9 +261,10 @@ public class AIWordMessageHandler(string target) : WordMessageHandler(target, ""
         return message.Content.Contains(target, StringComparison.CurrentCultureIgnoreCase) && !message.Author.IsBot;
     }
 
-    public override async Task process(WilteryHandler handler, DiscordMessage message) {
+    public override async Task effect(WilteryHandler handler, DiscordMessage message) {
         await handler.replaceMessageAINeutral(message);
     }
+
 }
 
 public class WordExceptionMessageHandler(string target, string replacement, params string[] exceptions) : MessageHandler {
@@ -244,13 +273,13 @@ public class WordExceptionMessageHandler(string target, string replacement, para
                && exceptions.All(e => !message.Content.Contains(e, StringComparison.CurrentCultureIgnoreCase));
     }
 
-    public async Task process(WilteryHandler handler, DiscordMessage message) {
-        await handler.replaceMessage(message, target, replacement);
+    public async Task<string> process(WilteryHandler handler, string message) {
+        return message.Replace(target, replacement, StringComparison.CurrentCultureIgnoreCase);
     }
 }
 
 public class ResponseWordMessageHandler(string target, string response) : WordMessageHandler(target, response) {
-    public override async Task process(WilteryHandler handler, DiscordMessage message) {
+    public override async Task effect(WilteryHandler handler, DiscordMessage message) {
         await message.RespondAsync(response);
     }
 }
