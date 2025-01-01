@@ -124,8 +124,8 @@ public class WilteryHandler {
     /// </summary>
     public async Task replaceMessageAINeutral(DiscordMessage message) {
         string contents = message.Content;
-        DiscordChannel channel = message.Channel;
-        DiscordMember user = (DiscordMember)message.Author;
+        var channel = message.Channel;
+        var user = (DiscordMember)message.Author;
 
         const string API_URL =
             "https://api.cloudflare.com/client/v4/accounts/2498ecc574e198ccf65813d2aa3af4ca/ai/run/";
@@ -150,7 +150,6 @@ public class WilteryHandler {
             h_responseJson = JObject.Parse(h_responseString);
         }
         catch {
-
             logger.error(h_responseString);
             return;
         }
@@ -219,10 +218,21 @@ public class WilteryHandler {
 }
 
 public interface MessageHandler {
+
+    /// <summary>
+    /// Should process the given message?
+    /// </summary>
     bool shouldProcess(DiscordMessage message);
 
+
+    /// <summary>
+    /// Takes the string and returns a new one.
+    /// </summary>
     Task<string> process(WilteryHandler handler, string message);
 
+    /// <summary>
+    /// Executes a custom effect on the message. Doesn't have to be implemented, it does nothing by default. Used for side effects.
+    /// </summary>
     Task effect(WilteryHandler handler, DiscordMessage message) {
         return Task.CompletedTask;
     }
