@@ -21,6 +21,7 @@ lavalink:
     youtubeSearchEnabled: true
     soundcloudSearchEnabled: true
     gc-warnings: true
+    nonAllocatingFrameBuffer: true # Setting to true reduces the number of allocations made by each player at the expense of frame rebuilding (e.g. non-instantaneous volume changes)
   plugins:
     # Replace VERSION with the current version as shown by the Releases tab or a long commit hash for snapshots.
     - dependency: "dev.lavalink.youtube:youtube-plugin:1.11.3"
@@ -35,16 +36,16 @@ plugins:
     # The clients to use for track loading. See below for a list of valid clients.
     # Clients are queried in the order they are given (left-to-right)
     clients:
-      - MUSIC
-      - ANDROID_TESTSUITE
-      - ANDROID_MUSIC
       - WEB
+      - MUSIC
+      - MWEB
+      - ANDROID_MUSIC
       - WEBEMBEDDED
       - ANDROID_VR
 
 metrics:
   prometheus:
-    enabled: true
+    enabled: false
     endpoint: /metrics
 
 sentry:

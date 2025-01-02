@@ -16,6 +16,7 @@ using DisCatSharp.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Soulseek;
+using Spectre.Console;
 using Directory = System.IO.Directory;
 using File = System.IO.File;
 
@@ -593,7 +594,7 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
                 var dl = await slsk.DownloadAsync(chosen.response.Username, chosen.file.Filename, localPath);
             }
             catch (TimeoutException e) {
-                Console.WriteLine(e);
+                AnsiConsole.WriteLine(e.ToString());
                 await common.modify(ctx, msg, "Download timed out...");
                 return;
             }
@@ -629,11 +630,6 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             return;
         }
 
-        if (results.Count == 0) {
-            await common.respond(ctx, "Nothing was found.");
-            return;
-        }
-
         LavalinkTrack? track;
         object? track_;
         if (results.Count == 1) {
@@ -654,11 +650,6 @@ public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
             await startPlayer(ctx);
             await GuildMusic.queue.PlayAsync();
 
-            /*if (trackCount_ > 1) {
-                await common.respond(ctx, $"Added {trackCount_:#,##0} tracks to playback queue.");
-            }
-            else {
-                var track = tracks_.First();*/
             await common.respond(ctx,
                 $"Added {track.ToLimitedTrackString()} to the playback queue.");
             return;

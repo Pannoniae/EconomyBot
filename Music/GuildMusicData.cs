@@ -232,6 +232,11 @@ public sealed class GuildMusicData {
             enableEQ();
         }
 
+        // reset events
+        Player.TrackEnded -= queue.Player_PlaybackFinished;
+        Player.TrackStarted -= queue.Player_PlaybackStarted;
+        Player.TrackException -= Lavalink_TrackExceptionThrown;
+
         Player.TrackEnded += (con, e) => queue.Player_PlaybackFinished(con, e);
         Player.TrackStarted += (sender, e) => queue.Player_PlaybackStarted(sender, e);
         Player.TrackException += Lavalink_TrackExceptionThrown;
