@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using DetectLanguage;
@@ -18,15 +19,11 @@ using DisCatSharp.Interactivity.Extensions;
 using DisCatSharp.Lavalink;
 using DisCatSharp.Net;
 using EconomyBot.Logging;
-using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;
-using Color = System.Drawing.Color;
 
 namespace EconomyBot;
 
-class Program {
-    private static IServiceProvider services { get; set; }
-
+public class Program {
     private static readonly Logger logger = Logger.getClassLogger("Main");
 
     public static LavalinkSession LavalinkNode;
@@ -84,13 +81,9 @@ class Program {
             RestEndpoint = endpoint,
             SocketEndpoint = endpoint
         };
-        services = new ServiceCollection()
-            .AddSingleton(new YouTubeSearchProvider())
-            .BuildServiceProvider(true);
         var lavalink = discord.UseLavalink();
         var commands = discord.UseCommandsNext(new CommandsNextConfiguration {
             StringPrefixes = ["."],
-            ServiceProvider = services
         });
         //var ApplicationCommands = discord.UseApplicationCommands(new ApplicationCommandsConfiguration {
         //    ServiceProvider = services
@@ -369,7 +362,7 @@ class Program {
                 var command = e.Command.Name;
                 var suppliedArgumentsLength = e.Context.RawArgumentString.Split().Length;
 
-                // if args are empty, we don't have arguments 
+                // if args are empty, we don't have arguments
                 if (string.IsNullOrWhiteSpace(e.Context.RawArgumentString)) {
                     suppliedArgumentsLength = 0;
                 }

@@ -1,78 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <LangVersion>preview</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <InvariantGlobalization>true</InvariantGlobalization>
-    <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
-    <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
-    <EventSourceSupport>false</EventSourceSupport>
-    <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
-    <MetadataUpdaterSupport>false</MetadataUpdaterSupport>
-    <UseSystemResourceKeys>true</UseSystemResourceKeys>
-    <ThreadPoolMinThreads>4</ThreadPoolMinThreads>
-    <ThreadPoolMaxThreads>4</ThreadPoolMaxThreads>
-  </PropertyGroup>
-  <ItemGroup>
-    <Content Include="bin\Debug\net9.0\runtimes\linux-x64\native\libe_sqlite3.so" />
-    <Content Include="lua\**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <None Update="bot.db">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="config.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Launch.ps1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Lavalink.jar">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="application.yml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="launch.sh">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="launch2.sh">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="artists.sdl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="bin\Debug\net9.0\runtimes\linux-x64\native\" />
-    <Folder Include="lua\" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="DisCatSharp">
-      <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
-    <PackageReference Update="DisCatSharp.ApplicationCommands">
-      <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
-    <PackageReference Update="DisCatSharp.CommandsNext">
-      <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
-    <PackageReference Update="DisCatSharp.Common">
-      <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
-    <PackageReference Update="DisCatSharp.Interactivity">
-      <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
-    <PackageReference Update="DisCatSharp.Lavalink">
-      <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
-    <PackageReference Update="DisCatSharp.VoiceNext">
-      <Version>10.6.6-nightly-021</Version>
-    </PackageReference>
-  </ItemGroup>
-  <Import Project=".paket\Paket.Restore.targets" />
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>preview</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
+        <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+        <EventSourceSupport>false</EventSourceSupport>
+        <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
+        <MetadataUpdaterSupport>false</MetadataUpdaterSupport>
+        <UseSystemResourceKeys>true</UseSystemResourceKeys>
+        <ThreadPoolMinThreads>4</ThreadPoolMinThreads>
+        <ThreadPoolMaxThreads>4</ThreadPoolMaxThreads>
+    </PropertyGroup>
+    <ItemGroup>
+        <Content Include="bin\Debug\net9.0\runtimes\linux-x64\native\libe_sqlite3.so"/>
+        <Content Include="lua\**">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Update="bot.db">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="config.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Launch.ps1">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Lavalink.jar">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="application.yml">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="launch.sh">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="launch2.sh">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="artists.sdl">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="bin\Debug\net9.0\runtimes\linux-x64\native\"/>
+        <Folder Include="lua\"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="ConcurrentHashSet" Version="1.3.0"/>
+        <Reference Include="DisCatSharp">
+            <HintPath>DisCatSharp.dll</HintPath>
+        </Reference>
+        <Reference Include="DisCatSharp.Common">
+            <HintPath>DisCatSharp.Common.dll</HintPath>
+        </Reference>
+        <Reference Include="DisCatSharp.CommandsNext">
+            <HintPath>DisCatSharp.CommandsNext.dll</HintPath>
+        </Reference>
+        <Reference Include="DisCatSharp.Interactivity">
+            <HintPath>DisCatSharp.Interactivity.dll</HintPath>
+        </Reference>
+        <Reference Include="DisCatSharp.ApplicationCommands">
+            <HintPath>DisCatSharp.ApplicationCommands.dll</HintPath>
+        </Reference>
+        <Reference Include="DisCatSharp.Lavalink">
+            <HintPath>DisCatSharp.Lavalink.dll</HintPath>
+        </Reference>
+        <Reference Include="DisCatSharp.Attributes">
+            <HintPath>DisCatSharp.Attributes.dll</HintPath>
+        </Reference>
+        <Reference Include="Spectre.Console">
+            <HintPath>Spectre.Console.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
+
+    <Import Project=".paket\Paket.Restore.targets"/>
 </Project>

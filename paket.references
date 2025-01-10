@@ -1,15 +1,9 @@
 BooruSharp
 DetectLanguage
-DisCatSharp
-DisCatSharp.CommandsNext
-DisCatSharp.Interactivity
-DisCatSharp.Lavalink
-DisCatSharp.ApplicationCommands
-DisCatSharp.VoiceNext
 FuzzierSharp
 JetBrains.Annotations
+Microsoft.Extensions.Logging.Console
 Reddit
-Spectre.Console
 Spectre.Console.Analyzer
 SpotifyAPI.Web
 Soulseek

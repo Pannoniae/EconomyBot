@@ -25,9 +25,8 @@ namespace EconomyBot;
 // TODO implement a CheckBaseAttribute to stop commands from erroring when base prereqs aren't met
 
 [ModuleLifespan(ModuleLifespan.Singleton)]
-public class MusicModule(YouTubeSearchProvider yt) : BaseCommandModule {
+public class MusicModule : BaseCommandModule {
     private MusicService Music { get; set; } = Program.musicService;
-    private YouTubeSearchProvider YouTube { get; } = yt;
 
     public GuildMusicData GuildMusic { get; set; }
 
