@@ -269,7 +269,7 @@ public class MusicModule : BaseCommandModule {
 
         await common.respond(ctx, $"Weights:\n{string.Join("\n", weights)}");
         await common.respond(ctx, $"Weights (percent):\n{string.Join("\n", weightsp)}");
-        await common.respond(ctx, $"Tracks:\n{string.Join("\n", tracks.Select(t => $"{t.Key}: {t.Value}"))}");
+        await common.respond(ctx, $"Tracks:\n{string.Join("\n", tracks.Select(t => $"{t.Key}: {t.Value}"))}\nTotal: {tracks.Sum(t => t.Value)}");
     }
 
     [Command("rl"), Description("Reloads music data.")]

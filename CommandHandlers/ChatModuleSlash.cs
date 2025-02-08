@@ -43,7 +43,7 @@ public class ChatModuleSlash : ApplicationCommandsModule {
         var cat = "https://cdn.discordapp.com/attachments/1101712131222683659/1128320701456195594/image.png";
         await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
         await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder()
-            .WithContent($"{member.DisplayName} was squished by a giant kitten.").WithEmbed(
+            .WithContent($"{member.DisplayName} was squished by a giant kitten.").AddEmbed(
                 new DiscordEmbedBuilder().WithImageUrl(
                     cat)));
     }

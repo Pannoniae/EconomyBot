@@ -120,7 +120,7 @@ public class ChatModule : BaseCommandModule {
         var cat = "https://cdn.discordapp.com/attachments/1101712131222683659/1128320701456195594/image.png";
         await ctx.Message.DeleteAsync();
         await Program.wiltery.sendWebhookToChannelWithCustomUser(ctx.Channel, new DiscordMessageBuilder()
-            .WithContent($"{member.DisplayName} was squished by a giant kitten.").WithEmbed(
+            .WithContent($"{member.DisplayName} was squished by a giant kitten.").AddEmbed(
                 new DiscordEmbedBuilder().WithImageUrl(
                     cat)), cat, "Giant cat");
     }

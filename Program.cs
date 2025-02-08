@@ -160,7 +160,7 @@ public class Program {
                         var ext = Path.GetExtension(path);
                         path += guid + ext;
                         //slap the correct extension on it
-                        using var response = await httpClient.GetAsync(a.Url);
+                        using var response = await httpClient.GetAsync(a.Url.ToString());
                         response.EnsureSuccessStatusCode();
                         await using var fs = new FileStream(path, FileMode.Create);
                         await response.Content.CopyToAsync(fs);
@@ -205,7 +205,7 @@ public class Program {
 
         // gore protection
         if (e.Author is DiscordMember m && (e.Message.Content.Contains("Screenshot_20230901_160903") ||
-            e.Message.Attachments.Any(f => f.Url.Contains("Screenshot_20230901_160903")))) {
+            e.Message.Attachments.Any(f => f.Url.ToString()!.Contains("Screenshot_20230901_160903")))) {
             await e.Guild.BanMemberAsync(m, 6);
         }
 
@@ -333,7 +333,7 @@ public class Program {
     private static async Task setup(DiscordClient client, LavalinkExtension lavalink,
         LavalinkConfiguration lavalinkConfig) {
         // Wait a bit with lavalink init, Lavalink seems to start slower than the bot. Lazy solution is pretty much a sleep
-        await Task.Delay(5000);
+        //await Task.Delay(5000);
         LavalinkNode = await lavalink.ConnectAsync(lavalinkConfig);
         musicService = new MusicService(lavalink, LavalinkNode);
         lavalinkInit = true;
@@ -415,7 +415,7 @@ public class Program {
 
                 var closestCommand =
                     ActualFuzz.partialFuzzItem(ex.CommandName, e.Context.CommandsNext.RegisteredCommands.Keys);
-                await sender.Client.SendMessageAsync(e.Context.Channel, new DiscordMessageBuilder().WithEmbed(
+                await sender.Client.SendMessageAsync(e.Context.Channel, new DiscordMessageBuilder().AddEmbed(
                     new DiscordEmbedBuilder().WithColor(DiscordColor.HotPink)
                         .WithDescription(
                             $"I have no bloody idea what that command is, sorry, did you mean {closestCommand}?")
