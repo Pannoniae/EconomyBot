@@ -36,7 +36,7 @@ public sealed class GuildMusicData {
     /// <summary>
     /// Gets or sets the channel in which commands are executed.
     /// </summary>
-    public DiscordChannel CommandChannel { get; set; }
+    public DiscordChannel? CommandChannel { get; set; }
 
     private DiscordGuild Guild { get; }
     private LavalinkExtension Lavalink { get; }
@@ -46,7 +46,7 @@ public sealed class GuildMusicData {
 
     // TODO implement a *proper* music weighting system
 
-    public static string rootPath;
+    public static string rootPath = null!;
 
     public static Dictionary<string, Artist> artistMappings = new() {
         { "_fats", new Artist("Fats Waller", "Fats Waller", 1.5) },
@@ -136,7 +136,7 @@ public sealed class GuildMusicData {
                             { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive })
                     .Length;
             }
-            catch (DirectoryNotFoundException e) {
+            catch (DirectoryNotFoundException) {
                 fCount = 0;
             }
 
@@ -243,11 +243,12 @@ public sealed class GuildMusicData {
     }
 
     private async Task Lavalink_TrackExceptionThrown(LavalinkGuildPlayer con, LavalinkTrackExceptionEventArgs e) {
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (e.Guild is null) {
             return;
         }
 
-        await CommandChannel.SendMessageAsync(
+        await CommandChannel!.SendMessageAsync(
             $"{Program.cube} A problem occured while playing {e.Track.ToLimitedTrackString()}:\n{e.Exception}");
     }
 
@@ -270,21 +271,21 @@ public sealed class GuildMusicData {
     /// </summary>
     /// <returns>Position in the track.</returns>
     public TimeSpan GetCurrentPosition() {
-        return queue.NowPlaying == default ? TimeSpan.Zero : Player.TrackPosition;
+        return queue.NowPlaying == null ? TimeSpan.Zero : Player!.TrackPosition;
     }
 
 
     public async Task AddToRandom(string artist) {
         var config = SpotifyClientConfig
             .CreateDefault()
-            .WithAuthenticator(new ClientCredentialsAuthenticator(Constants.spotifytoken, Constants.spotifytoken2));
+            .WithAuthenticator(new ClientCredentialsAuthenticator(Constants.spotifytoken!, Constants.spotifytoken2!));
         var spotify = new SpotifyClient(config);
 
         var results = (await spotify.Search.Item(new SearchRequest(SearchRequest.Types.Artist, $"artist:\"{artist}\"") {
             Limit = 2
         })).Artists.Items;
         FullArtist result;
-        if (results.Any()) {
+        if (results != null && results.Count != 0) {
             result = results[0];
         }
         else {
@@ -297,35 +298,35 @@ public sealed class GuildMusicData {
                 Offset = new Random().Next(1000)
             })).Tracks;
         FullTrack track;
-        if (tracksList.Items.Any()) {
+        if (tracksList.Items != null && tracksList.Items.Count != 0) {
             track = tracksList.Items[0];
         }
         else {
             var secondRequest = (await spotify.Search.Item(
                 new SearchRequest(SearchRequest.Types.Track, $"artist:\"{result.Name}\"") {
                     Limit = 1,
-                    Offset = new Random().Next(tracksList.Total.Value)
+                    Offset = new Random().Next(tracksList.Total!.Value)
                 })).Tracks;
-            track = secondRequest.Items[0];
+            track = secondRequest.Items![0];
         }
 
         var trackLoad = await Node.LoadTracksAsync(result.Name + " " + track.Name);
         var tracks = trackLoad.Result;
-        if (trackLoad.LoadType == LavalinkLoadResultType.Error || trackLoad.LoadType == LavalinkLoadResultType.Track && (LavalinkTrack)tracks == null) {
+        if (trackLoad.LoadType == LavalinkLoadResultType.Error || trackLoad.LoadType == LavalinkLoadResultType.Track && (LavalinkTrack)tracks == null!) {
             logger.error("Error loading random track");
         }
 
-        queue.Enqueue((LavalinkTrack)tracks, artist);
+        queue.Enqueue((LavalinkTrack)tracks!, artist);
     }
 
-    public async Task<IEnumerable<LavalinkTrack?>> getJazz(string searchTerm) {
-        return artistMappings.Where(
+    public Task<IEnumerable<LavalinkTrack?>> getJazz(string searchTerm) {
+        return Task.FromResult(artistMappings.Where(
                 artist => Path.Exists(getPath(artist.Value.path)))
             .SelectMany(
                 artist => Directory.GetFiles(getPath(artist.Value.path), searchTerm,
                     new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive }))
             .Where(extensionFilter)
-            .Select(file => getTrackAsync(Node, file).Result ?? null);
+            .Select(file => getTrackAsync(Node, file).Result ?? null));
     }
 
     /// <summary>
@@ -372,7 +373,7 @@ public sealed class GuildMusicData {
     public void enableEQ() {
         eq = true;
         logger.info("Enabled EQ");
-        Player.UpdateAsync(action => action.Filters = new LavalinkFilters {
+        Player!.UpdateAsync(action => action.Filters = new LavalinkFilters {
                 Equalizers = new List<LavalinkEqualizer> {
                     new((LavalinkFilterBand)0, 0.2f),
                     new((LavalinkFilterBand)1, 0.2f),
@@ -397,7 +398,7 @@ public sealed class GuildMusicData {
     public void disableEQ() {
         eq = false;
         logger.info("Disabled EQ");
-        Player.UpdateAsync(action => action.Filters = Optional<LavalinkFilters>.None);
+        Player!.UpdateAsync(action => action.Filters = Optional<LavalinkFilters>.None);
     }
 
     public void toggleEQ() {

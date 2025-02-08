@@ -11,12 +11,12 @@ namespace EconomyBot;
 
 public class WilteryHandler {
     private static readonly Logger logger = Logger.getClassLogger("WilteryHandler");
-    private MusicService Music { get; set; }
+    private MusicService? Music { get; set; }
 
     /// <summary>
     /// I know the name is bad, will refactor.
     /// </summary>
-    public GuildMusicData GuildMusic { get; set; }
+    public GuildMusicData? GuildMusic { get; set; }
 
     public DiscordClient client;
     public readonly HttpClient httpClient = new();
@@ -243,8 +243,8 @@ public class WordMessageHandler(string target, string replacement) : MessageHand
         return message.Content.Contains(target, StringComparison.CurrentCultureIgnoreCase);
     }
 
-    public virtual async Task<string> process(WilteryHandler handler, string message) {
-        return message.Replace(target, replacement, StringComparison.CurrentCultureIgnoreCase);
+    public virtual Task<string> process(WilteryHandler handler, string message) {
+        return Task.FromResult(message.Replace(target, replacement, StringComparison.CurrentCultureIgnoreCase));
     }
 
     public virtual Task effect(WilteryHandler handler, DiscordMessage message) {
@@ -260,8 +260,8 @@ public class ExactWordMessageHandler(string target, string replacement) : WordMe
 
     }
 
-    public override async Task<string> process(WilteryHandler handler, string message) {
-        return message.Replace(target, replacement, StringComparison.CurrentCultureIgnoreCase);
+    public override Task<string> process(WilteryHandler handler, string message) {
+        return Task.FromResult(message.Replace(target, replacement, StringComparison.CurrentCultureIgnoreCase));
     }
 }
 
@@ -283,12 +283,13 @@ public class WordExceptionMessageHandler(string target, string replacement, para
                && exceptions.All(e => !message.Content.Contains(e, StringComparison.CurrentCultureIgnoreCase));
     }
 
-    public async Task<string> process(WilteryHandler handler, string message) {
-        return message.Replace(target, replacement, StringComparison.CurrentCultureIgnoreCase);
+    public Task<string> process(WilteryHandler handler, string message) {
+        return Task.FromResult(message.Replace(target, replacement, StringComparison.CurrentCultureIgnoreCase));
     }
 }
 
 public class ResponseWordMessageHandler(string target, string response) : WordMessageHandler(target, response) {
+    private readonly string response = response;
     public override async Task effect(WilteryHandler handler, DiscordMessage message) {
         await message.RespondAsync(response);
     }

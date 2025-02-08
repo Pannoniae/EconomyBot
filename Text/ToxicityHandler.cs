@@ -223,14 +223,14 @@ public class ToxicityValues {
         try {
             attributes = responseJson["attributeScores"];
             attributesFlirt = responseJsonFlirt["attributeScores"];
-            inst.toxicityScore = attributes["TOXICITY"]["summaryScore"]["value"].Value<double>();
-            inst.severeToxicityScore = attributes["SEVERE_TOXICITY"]["summaryScore"]["value"].Value<double>();
-            inst.attackScore = attributes["IDENTITY_ATTACK"]["summaryScore"]["value"].Value<double>();
-            inst.insultScore = attributes["INSULT"]["summaryScore"]["value"].Value<double>();
-            inst.profanityScore = attributes["PROFANITY"]["summaryScore"]["value"].Value<double>();
-            inst.threatScore = attributes["THREAT"]["summaryScore"]["value"].Value<double>();
-            inst.sexualScore = attributesFlirt["SEXUALLY_EXPLICIT"]["summaryScore"]["value"].Value<double>();
-            inst.flirtingScore = attributesFlirt["FLIRTATION"]["summaryScore"]["value"].Value<double>();
+            inst.toxicityScore = attributes?["TOXICITY"]?["summaryScore"]?["value"]?.Value<double>() ?? throw new NullReferenceException();
+            inst.severeToxicityScore = attributes["SEVERE_TOXICITY"]?["summaryScore"]?["value"]?.Value<double>() ?? throw new NullReferenceException();
+            inst.attackScore = attributes["IDENTITY_ATTACK"]?["summaryScore"]?["value"]?.Value<double>() ?? throw new NullReferenceException();
+            inst.insultScore = attributes["INSULT"]?["summaryScore"]?["value"]?.Value<double>() ?? throw new NullReferenceException();
+            inst.profanityScore = attributes["PROFANITY"]?["summaryScore"]?["value"]?.Value<double>() ?? throw new NullReferenceException();
+            inst.threatScore = attributes["THREAT"]?["summaryScore"]?["value"]?.Value<double>() ?? throw new NullReferenceException();
+            inst.sexualScore = attributesFlirt?["SEXUALLY_EXPLICIT"]?["summaryScore"]?["value"]?.Value<double>() ?? throw new NullReferenceException();
+            inst.flirtingScore = attributesFlirt["FLIRTATION"]?["summaryScore"]?["value"]?.Value<double>() ?? throw new NullReferenceException();
         }
         catch (Exception e) {
             logger.error(responseString);
@@ -278,8 +278,8 @@ public class ToxicityValues {
 
         try {
             attributes = h_responseJson.First;
-            foreach (var element in attributes) {
-                labels[element["label"].Value<string>()] = element["score"].Value<double>();
+            foreach (var element in attributes ?? throw new NullReferenceException()) {
+                labels[element["label"]?.Value<string>() ?? throw new NullReferenceException()] = (element["score"] ?? throw new NullReferenceException()).Value<double>();
             }
         }
         catch {

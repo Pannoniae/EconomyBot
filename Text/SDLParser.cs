@@ -98,7 +98,7 @@ public partial class SDLParser {
         return entries;
     }
 
-    private Artist ParseArtistEntry(string entry) {
+    private Artist? ParseArtistEntry(string entry) {
         //Console.Out.WriteLine("Artist: " + entry);
         // Remove outer parentheses
         entry = entry.Trim('(', ')').Trim();
@@ -115,28 +115,28 @@ public partial class SDLParser {
         try {
             volume = parts.Count > 3 ? double.Parse(parts[3]) : 1.0;
         }
-        catch (FormatException e) {
+        catch (FormatException) {
             logger.warn("Malformed artist entry: " + entry);
             return null;
         }
         try {
             weight = parts.Count > 4 ? double.Parse(parts[4]) : 1.0;
         }
-        catch (FormatException e) {
+        catch (FormatException) {
             logger.warn("Malformed artist entry: " + entry);
             return null;
         }
         try {
             historyRepeatPenalty = parts.Count > 5 ? double.Parse(parts[5]) : 1.0;
         }
-        catch (FormatException e) {
+        catch (FormatException) {
             logger.warn("Malformed artist entry: " + entry);
             return null;
         }
         try {
             doubleRepeatPenalty = parts.Count > 6 ? double.Parse(parts[6]) : 1.0;
         }
-        catch (FormatException e) {
+        catch (FormatException) {
             logger.warn("Malformed artist entry: " + entry);
             return null;
         }
@@ -190,5 +190,5 @@ public partial class SDLParser {
 /// The script environment.
 /// </summary>
 public class Env {
-    public Dictionary<string, Artist> artists;
+    public Dictionary<string, Artist> artists = null!;
 }

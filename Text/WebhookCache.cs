@@ -20,7 +20,7 @@ public class WebhookCache(DiscordGuild guild) {
             chn.Value.Type != ChannelType.Category &&
             chn.Value.Type != ChannelType.Voice && // not invalid channel
             chn.Value.Name != "admin" && // not admin
-            (chn.Value.Parent == null || !chn.Value.Parent.Name.Contains("archive", StringComparison.OrdinalIgnoreCase))); // not in archive
+            (chn.Value.Parent == null! || !chn.Value.Parent.Name.Contains("archive", StringComparison.OrdinalIgnoreCase))); // not in archive
         await Parallel.ForEachAsync(enumerable,
             async (chn, token) => await setupForChannel(chn.Value));
     }
@@ -37,7 +37,7 @@ public class WebhookCache(DiscordGuild guild) {
         await Console.Out.WriteLineAsync($"{effectiveChannel.Id}, {effectiveChannel.Name}");
         var webhooksForChannel = await effectiveChannel.GetWebhooksAsync();
         var ourWebhook = webhooksForChannel.FirstOrDefault(webhook => webhook.Name == "jazz");
-        if (ourWebhook == null) {
+        if (ourWebhook! == null!) {
             ourWebhook = await effectiveChannel.CreateWebhookAsync("jazz");
         }
 

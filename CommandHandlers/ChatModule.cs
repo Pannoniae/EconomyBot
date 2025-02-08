@@ -12,16 +12,16 @@ namespace EconomyBot;
 public class ChatModule : BaseCommandModule {
     public const ulong ZEROX = 1091089609234059316;
 
-    private MusicService Music { get; set; }
+    private MusicService? Music { get; set; }
 
     /// <summary>
     /// I know the name is bad, will refactor.
     /// </summary>
-    public GuildMusicData GuildMusic { get; set; }
+    public GuildMusicData? GuildMusic { get; set; }
 
     public override async Task BeforeExecutionAsync(CommandContext ctx) {
         Music = Program.musicService;
-        GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild);
+        GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild!);
     }
 
     static IEnumerable<string> ChunksUpTo(string str, int maxChunkSize) {
@@ -32,12 +32,12 @@ public class ChatModule : BaseCommandModule {
     /// <summary>
     /// Retards abused it so it's manage messages-only. Thank you.
     /// </summary>
+    /// <param name="ctx"></param>
     /// <param name="amt">How many messages to purge.</param>
     [Command]
     [RequirePermissions(Permissions.ManageMessages)]
     public async Task purge(CommandContext ctx, int amt) {
-        IReadOnlyList<DiscordMessage> messages = [];
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        IReadOnlyList<DiscordMessage> messages;
         // the library is stupid
         if (ctx.Message.Reference != null) {
             await Console.Out.WriteLineAsync("Purging from given message!");
@@ -53,7 +53,7 @@ public class ChatModule : BaseCommandModule {
                     .Reverse());
             var logMessages = ChunksUpTo(message, 1984);
             foreach (var msg in logMessages) {
-                await (await ctx.Client.GetGuildAsync(838843082110664756)).GetChannel(Program.LOG)
+                await (await ctx.Client.GetGuildAsync(838843082110664756)!).GetChannel(Program.LOG)!
                     .SendMessageAsync(msg);
             }
         }
@@ -64,7 +64,7 @@ public class ChatModule : BaseCommandModule {
 
     [Command]
     public async Task test2(CommandContext ctx) {
-        await ChatHandler.test2(ctx.Guild);
+        await ChatHandler.test2(ctx.Guild!);
     }
 
     [Command]
@@ -80,7 +80,7 @@ public class ChatModule : BaseCommandModule {
 
     [Command]
     public async Task save(CommandContext ctx) {
-        var names = (await ctx.Guild.GetAllMembersAsync()).Select(member => member.ToString());
+        var names = (await ctx.Guild!.GetAllMembersAsync()).Select(member => member.ToString());
         await File.WriteAllLinesAsync(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/names.txt",
             names);
     }
@@ -129,7 +129,7 @@ public class ChatModule : BaseCommandModule {
     public async Task love0x(CommandContext ctx) {
         var zerox = "https://tenor.com/view/girl-anime-kiss-anime-i-love-you-girl-kiss-gif-14375355";
         await ctx.RespondAsync(new DiscordMessageBuilder()
-            .WithContent($"{(await ctx.Guild.GetMemberAsync(ZEROX)).Mention} is amazing and I love them so much!"));
+            .WithContent($"{(await ctx.Guild!.GetMemberAsync(ZEROX)).Mention} is amazing and I love them so much!"));
         await ctx.Channel.SendMessageAsync(zerox);
     }
 

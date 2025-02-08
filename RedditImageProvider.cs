@@ -28,7 +28,7 @@ public class RedditImageProvider : IImageProvider {
         return await getImgFromSub(subreddit);
     }
 
-    private async Task<string> getImgFromSub(Subreddit sub) {
+    private Task<string> getImgFromSub(Subreddit sub) {
         try {
             while (true) {
                 var posts = sub.Posts.Hot;
@@ -42,7 +42,7 @@ public class RedditImageProvider : IImageProvider {
                 var url = imgjson["images"]?[0]?["source"]?.Value<string?>("url");
                 if (url != null) {
                     // send the image
-                    return url;
+                    return Task.FromResult(url);
                 }
 
                 if (post.Listing.Preview != null && url != null) {

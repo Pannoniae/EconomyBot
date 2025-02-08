@@ -57,13 +57,23 @@ public class ImagesModule : BaseCommandModule {
         var response = await client.GetAsync("https://en.wikipedia.org/api/rest_v1/page/random/summary");
         var responseJson = JObject.Parse(await response.Content.ReadAsStringAsync());
 
-        var title = responseJson["title"].Value<string>();
-        var img = responseJson["originalimage"]["source"].Value<string>() ?? null;
-        var content = responseJson["extract"].Value<string>() ?? null;
-        var url = responseJson["content_urls"]["desktop"]["page"].Value<string>();
+        string title;
+        string? img;
+        string? content;
+        string url;
+        try {
+            title = responseJson["title"]?.Value<string>() ?? throw new NullReferenceException();
+            img = responseJson["originalimage"]?["source"]?.Value<string>() ?? null;
+            content = responseJson["extract"]?.Value<string>() ?? null;
+            url = responseJson["content_urls"]?["desktop"]?["page"]?.Value<string>() ?? throw new NullReferenceException();
+        }
+        catch (Exception e) {
+            await ctx.RespondAsync($"Something went wrong with fetching wikipedia, error: {e}");
+            return;
+        }
 
-        await ctx.RespondAsync(new DiscordEmbedBuilder().WithTitle(title).WithThumbnail(img)
-            .WithColor(DiscordColor.Rose).WithDescription(content).AddField(new DiscordEmbedField("Link:", url)).Build());
+        await ctx.RespondAsync(new DiscordEmbedBuilder().WithTitle(title).WithThumbnail(img!)
+            .WithColor(DiscordColor.Rose).WithDescription(content!).AddField(new DiscordEmbedField("Link:", url)).Build());
     }
 
     [Command("xkcd"), Description("Gets a random XKCD.")]
@@ -72,7 +82,7 @@ public class ImagesModule : BaseCommandModule {
         try {
             var latestComic = await client.GetAsync("https://xkcd.com/info.0.json");
             var latestComicJson = JObject.Parse(await latestComic.Content.ReadAsStringAsync());
-            num = latestComicJson["num"].Value<int>();
+            num = latestComicJson["num"]?.Value<int>() ?? throw new NullReferenceException();
         }
         catch (Exception e) {
             await ctx.RespondAsync("Failed to get XKCD.");
@@ -88,9 +98,9 @@ public class ImagesModule : BaseCommandModule {
         try {
             var randomComic = await client.GetAsync($"https://xkcd.com/{randomXKCD}/info.0.json");
             var randomComicJson = JObject.Parse(await randomComic.Content.ReadAsStringAsync());
-            title = randomComicJson["title"].Value<string>();
-            url = randomComicJson["img"].Value<string>();
-            alt = randomComicJson["alt"].Value<string>();
+            title = randomComicJson["title"]?.Value<string>() ?? throw new NullReferenceException();
+            url = randomComicJson["img"]?.Value<string>() ?? throw new NullReferenceException();
+            alt = randomComicJson["alt"]?.Value<string>() ?? throw new NullReferenceException();
         }
         catch (Exception e) {
             await ctx.RespondAsync("Failed to get XKCD.");
@@ -119,9 +129,9 @@ public class ImagesModule : BaseCommandModule {
         try {
             var randomComic = await client.GetAsync($"https://xkcd.com/{number}/info.0.json");
             var randomComicJson = JObject.Parse(await randomComic.Content.ReadAsStringAsync());
-            title = randomComicJson["title"].Value<string>();
-            url = randomComicJson["img"].Value<string>();
-            alt = randomComicJson["alt"].Value<string>();
+            title = randomComicJson["title"]?.Value<string>() ?? throw new NullReferenceException();
+            url = randomComicJson["img"]?.Value<string>() ?? throw new NullReferenceException();
+            alt = randomComicJson["alt"]?.Value<string>() ?? throw new NullReferenceException();
         }
         catch (Exception e) {
             await ctx.RespondAsync("Failed to get XKCD.");

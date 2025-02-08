@@ -40,7 +40,7 @@ public static class MemoryUtils {
             // https://linux.die.net/man/2/madvise
 
             try {
-                var startMemoryAddress = Process.GetCurrentProcess().MainModule.BaseAddress;
+                var startMemoryAddress = Process.GetCurrentProcess().MainModule!.BaseAddress;
                 var memoryLength = new UIntPtr((ulong)Process.GetCurrentProcess().WorkingSet64);
 
                 //Console.WriteLine($"Calling madvise with start: {startMemoryAddress} and length: {memoryLength}");
@@ -64,7 +64,7 @@ public static class MemoryUtils {
         public static void ReleaseUnusedProcessWorkingSetMemoryWithMadvise_MADV_PAGEOUT() {
 
             try {
-                var startMemoryAddress = Process.GetCurrentProcess().MainModule.BaseAddress;
+                var startMemoryAddress = Process.GetCurrentProcess().MainModule!.BaseAddress;
                 var memoryLength = new UIntPtr((ulong)Process.GetCurrentProcess().WorkingSet64);
 
                 //Console.WriteLine($"Calling madvise with start: {startMemoryAddress} and length: {memoryLength}");

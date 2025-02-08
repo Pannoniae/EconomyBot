@@ -28,7 +28,7 @@ namespace EconomyBot;
 public class MusicModule : BaseCommandModule {
     private MusicService Music { get; set; } = Program.musicService;
 
-    public GuildMusicData GuildMusic { get; set; }
+    public required GuildMusicData GuildMusic { get; set; }
 
     private readonly MusicCommon common = new();
     private readonly SemaphoreSlim _semaphore = new(1, 1);
@@ -39,7 +39,7 @@ public class MusicModule : BaseCommandModule {
 
     private async Task startPlayer(CommandContext ctx) {
         var chn = getChannel(ctx);
-        await GuildMusic.CreatePlayerAsync(chn);
+        await GuildMusic.CreatePlayerAsync(chn!);
     }
 
     private async Task reset() {
@@ -62,7 +62,7 @@ public class MusicModule : BaseCommandModule {
         }
 
         if (ctx.Command.Name == "join") {
-            GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild);
+            GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild!);
             GuildMusic.CommandChannel = ctx.Channel;
             return;
         }
@@ -73,8 +73,8 @@ public class MusicModule : BaseCommandModule {
             throw new IdiotException("user error");
         }
 
-        var mbr = ctx.Guild.CurrentMember?.VoiceState?.Channel;
-        if (mbr is not null && chn != mbr && ctx.Command.Name != "queue") {
+        var mbr = ctx.Guild!.CurrentMember?.VoiceState?.Channel;
+        if (mbr is not null && chn! != mbr && ctx.Command.Name != "queue") {
             await common.respond(ctx, "You need to be in the same voice channel.");
             throw new IdiotException("user error");
         }
@@ -153,7 +153,7 @@ public class MusicModule : BaseCommandModule {
                     new EnumerationOptions { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive }).Where(GuildMusicData.extensionFilter).ToArray();
                 tracks[artist] = files.Length;
             }
-            catch (Exception e) {
+            catch (Exception) {
                 tracks[artist] = 0;
             }
         }
@@ -211,7 +211,7 @@ public class MusicModule : BaseCommandModule {
         }
 
         var chn = getChannel(ctx);
-        await GuildMusic.CreatePlayerAsync(chn);
+        await GuildMusic.CreatePlayerAsync(chn!);
         await GuildMusic.queue.PlayAsync();
 
         if (trackCount > 1)
@@ -285,7 +285,7 @@ public class MusicModule : BaseCommandModule {
             .Select(xg => new Page(
                 $"{string.Join("\n", xg.Select(xa => $"`{xa.i + 1}` {xa.x.ToLimitedTrackString()}"))}\n\nPage {xg.Key + 1}/{pageCount}"));
 
-        Task task = null;
+        Task task = null!;
         if (pageCount == 1) {
             await ctx.Channel.SendMessageAsync(content.First().Content);
         }
@@ -294,7 +294,9 @@ public class MusicModule : BaseCommandModule {
                 PaginationBehaviour.Ignore,
                 ButtonPaginationBehavior.Ignore);
         }
+        #pragma warning disable CS1717 // Assignment made to same variable
         task = task;
+        #pragma warning restore CS1717 // Assignment made to same variable
 
         var msgC =
             $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
@@ -303,7 +305,7 @@ public class MusicModule : BaseCommandModule {
 
         var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User && x.Channel == ctx.Channel,
             TimeSpan.FromMinutes(2));
-        if (res.TimedOut || res.Result == null) {
+        if (res.TimedOut || res.Result == null!) {
             await msg.ModifyAsync($"{Program.cube} No choice was made.");
             return;
         }
@@ -390,7 +392,7 @@ public class MusicModule : BaseCommandModule {
                                     $" {TimeSpan.FromSeconds(xa.x.file.Length.GetValueOrDefault()).musicLength().Bold()} ({xa.x.file.getBitrateString()})"))
                 }\n\nPage {xg.Key + 1}/{pageCount}"));
 
-        Task task = null;
+        Task task = null!;
         if (pageCount == 1) {
             await ctx.Channel.SendMessageAsync(content.First().Content);
         }
@@ -399,7 +401,9 @@ public class MusicModule : BaseCommandModule {
                 PaginationBehaviour.Ignore,
                 ButtonPaginationBehavior.Ignore);
         }
+        #pragma warning disable CS1717 // Assignment made to same variable
         task = task;
+        #pragma warning restore CS1717 // Assignment made to same variable
 
         var msgC =
             $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
@@ -408,134 +412,7 @@ public class MusicModule : BaseCommandModule {
 
         var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User && x.Channel == ctx.Channel,
             TimeSpan.FromMinutes(2));
-        if (res.TimedOut || res.Result == null) {
-            await msg.ModifyAsync($"{Program.cube} No choice was made.");
-            return;
-        }
-
-        var resInd = res.Result.Content.Trim();
-        if (!int.TryParse(resInd, NumberStyles.Integer, CultureInfo.InvariantCulture, out var elInd)) {
-            if (resInd.ToLowerInvariant() == "cancel") {
-                elInd = -1;
-            }
-            else {
-                await common.modify(ctx, msg, "Invalid choice was made.");
-                return;
-            }
-        }
-
-        else if (elInd < 0 || elInd > results.Count) {
-            await common.modify(ctx, msg, "Invalid choice was made.");
-            return;
-        }
-
-        if (elInd == -1) {
-            await common.modify(ctx, msg, "Choice cancelled.");
-            return;
-        }
-
-        var chosen = results.ElementAt(elInd - 1);
-
-
-        // actually download it from soulseek
-        var slsk = Music.slsk;
-        const string tempFolder = "/snd/music/temp";
-
-        // basically, the "filename" goes like this:
-        // for example: @@xrknr\Music\Dream Theater\2002 - six degrees of inner turbulence (flac)\(09) [Dream Theater] IV. The Test That Stumped Them All.flac
-        // we want the LAST part of the path as the actual filename to download to.
-        var actualFilename = chosen.file.Filename.Split('\\').Last();
-
-        await common.modify(ctx, msg, $"Downloading {actualFilename}...");
-
-        // we hash the filename so we don't reDL the same file
-        var hash = chosen.file.Filename.GetHashCode().ToString("x8");
-        var localPath = Path.Join(tempFolder, hash, actualFilename);
-        // if hash exists, play from that
-        // if not, create folder
-        LavalinkTrack? lltrack;
-        // if the hash directory exists + the file exists
-        if (Directory.Exists(Path.Join(tempFolder, hash)) &&
-            File.Exists(Path.Join(tempFolder, hash, actualFilename))) {
-            lltrack = await GuildMusicData.getTrackAsync(GuildMusic.Node, localPath);
-        }
-        else {
-            // create the folder
-            Directory.CreateDirectory(Path.Join(tempFolder, hash));
-            try {
-                var dl = await slsk.DownloadAsync(chosen.response.Username, chosen.file.Filename, localPath);
-            }
-            catch (TimeoutException e) {
-                Console.WriteLine(e);
-                await common.modify(ctx, msg, "Download timed out...");
-                return;
-            }
-            lltrack = await GuildMusicData.getTrackAsync(GuildMusic.Node, localPath);
-        }
-
-        GuildMusic.queue.Enqueue(lltrack);
-        await startPlayer(ctx);
-        await GuildMusic.queue.PlayAsync();
-
-        /*if (trackCount > 1) {
-            await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
-        }
-        else {*/
-        await common.modify(ctx, msg,
-            $"Added {lltrack.ToLimitedTrackString()} to the playback queue.");
-    }
-
-    [Command("soulseekuser"), Priority(0), Aliases("su")]
-    public async Task PlaySLSKUserAsync(CommandContext ctx,
-        [Description("The user to search.")]
-        string user,
-        [RemainingText, Description("Terms to search for.")]
-        string term) {
-
-        var interactivity = ctx.Client.GetInteractivity();
-        if (string.IsNullOrWhiteSpace(term)) {
-            await common.respond(ctx, "No query was entered :(");
-            return;
-        }
-
-        var results = await Music.getSLSKbyUser(term, user);
-        if (results.Count == 0) {
-            await common.respond(ctx, "Nothing was found.");
-            return;
-        }
-
-        var pageCount = results.Count / 10 + 1;
-        if (results.Count % 10 == 0) {
-            pageCount--;
-        }
-
-        var content = results.Select((x, i) => (x, i))
-            .GroupBy(e => e.i / 10)
-            .Select(xg => new Page(
-                $"{string.Join("\n",
-                    xg.Select(xa => $"**{xa.i + 1}.** {WebUtility.HtmlDecode(xa.x.file.Filename.ReversePath()).InlineCode()}" +
-                                    $" {TimeSpan.FromSeconds(xa.x.file.Length.GetValueOrDefault()).musicLength().Bold()} ({xa.x.file.getBitrateString()})"))
-                }\n\nPage {xg.Key + 1}/{pageCount}"));
-
-        Task task = null;
-        if (pageCount == 1) {
-            await ctx.Channel.SendMessageAsync(content.First().Content);
-        }
-        else {
-            task = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, content, TimeSpan.FromMinutes(2),
-                PaginationBehaviour.Ignore,
-                ButtonPaginationBehavior.Ignore);
-        }
-        task = task;
-
-        var msgC =
-            $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
-
-        var msg = await ctx.RespondAsync(msgC);
-
-        var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User && x.Channel == ctx.Channel,
-            TimeSpan.FromMinutes(2));
-        if (res.TimedOut || res.Result == null) {
+        if (res.TimedOut || res.Result == null!) {
             await msg.ModifyAsync($"{Program.cube} No choice was made.");
             return;
         }
@@ -598,6 +475,143 @@ public class MusicModule : BaseCommandModule {
                 return;
             }
             lltrack = await GuildMusicData.getTrackAsync(GuildMusic.Node, localPath);
+        }
+        if (lltrack == null) {
+            await common.respond(ctx, "Nothing was found.");
+            return;
+        }
+        GuildMusic.queue.Enqueue(lltrack);
+        await startPlayer(ctx);
+        await GuildMusic.queue.PlayAsync();
+
+        /*if (trackCount > 1) {
+            await common.modify(ctx, msg, $"Added {trackCount:#,##0} tracks to playback queue.");
+        }
+        else {*/
+        await common.modify(ctx, msg,
+            $"Added {lltrack.ToLimitedTrackString()} to the playback queue.");
+    }
+
+    [Command("soulseekuser"), Priority(0), Aliases("su")]
+    public async Task PlaySLSKUserAsync(CommandContext ctx,
+        [Description("The user to search.")]
+        string user,
+        [RemainingText, Description("Terms to search for.")]
+        string term) {
+
+        var interactivity = ctx.Client.GetInteractivity();
+        if (string.IsNullOrWhiteSpace(term)) {
+            await common.respond(ctx, "No query was entered :(");
+            return;
+        }
+
+        var results = await Music.getSLSKbyUser(term, user);
+        if (results.Count == 0) {
+            await common.respond(ctx, "Nothing was found.");
+            return;
+        }
+
+        var pageCount = results.Count / 10 + 1;
+        if (results.Count % 10 == 0) {
+            pageCount--;
+        }
+
+        var content = results.Select((x, i) => (x, i))
+            .GroupBy(e => e.i / 10)
+            .Select(xg => new Page(
+                $"{string.Join("\n",
+                    xg.Select(xa => $"**{xa.i + 1}.** {WebUtility.HtmlDecode(xa.x.file.Filename.ReversePath()).InlineCode()}" +
+                                    $" {TimeSpan.FromSeconds(xa.x.file.Length.GetValueOrDefault()).musicLength().Bold()} ({xa.x.file.getBitrateString()})"))
+                }\n\nPage {xg.Key + 1}/{pageCount}"));
+
+        Task task = null!;
+        if (pageCount == 1) {
+            await ctx.Channel.SendMessageAsync(content.First().Content);
+        }
+        else {
+            task = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, content, TimeSpan.FromMinutes(2),
+                PaginationBehaviour.Ignore,
+                ButtonPaginationBehavior.Ignore);
+        }
+        #pragma warning disable CS1717 // Assignment made to same variable
+        task = task;
+        #pragma warning restore CS1717 // Assignment made to same variable
+
+        var msgC =
+            $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
+
+        var msg = await ctx.RespondAsync(msgC);
+
+        var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User && x.Channel == ctx.Channel,
+            TimeSpan.FromMinutes(2));
+        if (res.TimedOut || res.Result == null!) {
+            await msg.ModifyAsync($"{Program.cube} No choice was made.");
+            return;
+        }
+
+        var resInd = res.Result.Content.Trim();
+        if (!int.TryParse(resInd, NumberStyles.Integer, CultureInfo.InvariantCulture, out var elInd)) {
+            if (resInd.ToLowerInvariant() == "cancel") {
+                elInd = -1;
+            }
+            else {
+                await common.modify(ctx, msg, "Invalid choice was made.");
+                return;
+            }
+        }
+
+        else if (elInd < 0 || elInd > results.Count) {
+            await common.modify(ctx, msg, "Invalid choice was made.");
+            return;
+        }
+
+        if (elInd == -1) {
+            await common.modify(ctx, msg, "Choice cancelled.");
+            return;
+        }
+
+        var chosen = results.ElementAt(elInd - 1);
+
+
+        // actually download it from soulseek
+        var slsk = Music.slsk;
+        const string tempFolder = "/snd/music/temp";
+
+        // basically, the "filename" goes like this:
+        // for example: @@xrknr\Music\Dream Theater\2002 - six degrees of inner turbulence (flac)\(09) [Dream Theater] IV. The Test That Stumped Them All.flac
+        // we want the LAST part of the path as the actual filename to download to.
+        var actualFilename = chosen.file.Filename.Split('\\').Last();
+
+        await common.modify(ctx, msg, $"Downloading {actualFilename}...");
+
+        // we hash the filename so we don't reDL the same file
+        var hash = chosen.file.Filename.GetHashCode().ToString("x8");
+        var localPath = Path.Join(tempFolder, hash, actualFilename);
+        // if hash exists, play from that
+        // if not, create folder
+        LavalinkTrack? lltrack;
+        // if the hash directory exists + the file exists
+        if (Directory.Exists(Path.Join(tempFolder, hash)) &&
+            File.Exists(Path.Join(tempFolder, hash, actualFilename))) {
+            lltrack = await GuildMusicData.getTrackAsync(GuildMusic.Node, localPath);
+        }
+        else {
+            // create the folder
+            Directory.CreateDirectory(Path.Join(tempFolder, hash));
+            try {
+                var dl = await slsk.DownloadAsync(chosen.response.Username, chosen.file.Filename, localPath);
+            }
+            catch (TimeoutException e) {
+                AnsiConsole.WriteLine(e.ToString());
+                await common.modify(ctx, msg, "Download timed out...");
+                return;
+            }
+            lltrack = await GuildMusicData.getTrackAsync(GuildMusic.Node, localPath);
+        }
+
+        if (lltrack == null) {
+            await common.respond(ctx, "Nothing was found.");
+            return;
         }
 
         GuildMusic.queue.Enqueue(lltrack);
@@ -664,7 +678,7 @@ public class MusicModule : BaseCommandModule {
             .Select(xg => new Page(
                 $"{string.Join("\n", xg.Select(xa => $"`{xa.i + 1}` {xa.x.ToLimitedTrackString()}"))}\n\nPage {xg.Key + 1}/{pageCount}"));
 
-        Task task = null;
+        Task task = null!;
         if (pageCount == 1) {
             await ctx.Channel.SendMessageAsync(content.First().Content);
         }
@@ -673,7 +687,9 @@ public class MusicModule : BaseCommandModule {
                 PaginationBehaviour.Ignore,
                 ButtonPaginationBehavior.Ignore);
         }
+        #pragma warning disable CS1717 // Assignment made to same variable
         task = task;
+        #pragma warning restore CS1717 // Assignment made to same variable
 
         var msgC =
             $"Type a number 1-{results.Count} to queue a track. To cancel, type cancel or {MusicCommon.NumberMappingsReverse.Last()}.";
@@ -682,7 +698,7 @@ public class MusicModule : BaseCommandModule {
 
         var res = await interactivity.WaitForMessageAsync(x => x.Author == ctx.User && x.Channel == ctx.Channel,
             TimeSpan.FromMinutes(2));
-        if (res.TimedOut || res.Result == null) {
+        if (res.TimedOut || res.Result == null!) {
             await msg.ModifyAsync($"{Program.cube} No choice was made.");
             return;
         }
@@ -824,7 +840,7 @@ public class MusicModule : BaseCommandModule {
         // don't allow skipping more at the same time
         try {
             await _semaphore.WaitAsync();
-            var track = GuildMusic.queue.NowPlaying.track;
+            var track = GuildMusic.queue.NowPlaying?.track;
             await GuildMusic.queue.StopAsync();
             await common.respond(ctx,
                 $"{track.ToLimitedTrackString()} skipped.");
@@ -840,7 +856,7 @@ public class MusicModule : BaseCommandModule {
         try {
             await _semaphore.WaitAsync();
             for (int i = 0; i < num; i++) {
-                var track = GuildMusic.queue.NowPlaying.track;
+                var track = GuildMusic.queue.NowPlaying?.track;
                 await GuildMusic.queue.StopAsync();
                 await common.respond(ctx,
                     $"{track.ToLimitedTrackString()} skipped.");
@@ -891,7 +907,7 @@ public class MusicModule : BaseCommandModule {
 
     [Command("restart"), Description("Restarts the playback of the current track.")]
     public async Task RestartAsync(CommandContext ctx) {
-        var track = GuildMusic.queue.NowPlaying.track;
+        var track = GuildMusic.queue.NowPlaying?.track;
         await GuildMusic.queue.RestartAsync();
         await common.respond(ctx,
             $"{track.ToLimitedTrackString()} restarted.");
@@ -931,17 +947,17 @@ public class MusicModule : BaseCommandModule {
             .GroupBy(x => x.i / 10)
             .Select(xg =>
                 new Page(
-                    $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}]" : "Nothing".Bold())}\n\n" +
+                    $"Now playing: {(isPlaying ? $"{track?.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track?.track.Info.Length.ToDurationString()}]" : "Nothing".Bold())}\n\n" +
                     $"{string.Join("\n", xg.Select(xa => $"`{xa.i + 1:00}` {xa.s}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
             .ToList();
 
         // queue is empty but we are playing
         if (pages.Count == 0) {
             pages.Add(new Page(
-                $"Now playing: {(isPlaying ? $"{track.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track.track.Info.Length.ToDurationString()}]" : "Nothing".Bold())}"));
+                $"Now playing: {(isPlaying ? $"{track?.track.ToLimitedTrackString()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{track?.track.Info.Length.ToDurationString()}]" : "Nothing".Bold())}"));
         }
 
-        Task task = null;
+        Task task = null!;
         if (pageCount == 1) {
             await ctx.Channel.SendMessageAsync(pages.First().Content);
         }
@@ -950,7 +966,9 @@ public class MusicModule : BaseCommandModule {
                 PaginationBehaviour.Ignore,
                 ButtonPaginationBehavior.Ignore);
         }
+        #pragma warning disable CS1717 // Assignment made to same variable
         task = task;
+        #pragma warning restore CS1717 // Assignment made to same variable
     }
 
     [Command("nowplaying"), Description("Displays information about currently-played track."), Aliases("np")]
@@ -990,7 +1008,7 @@ public static class Extensions {
     /// </summary>
     /// <param name="x">Music item to convert.</param>
     /// <returns>Track string.</returns>
-    public static string ToTrackString(this LavalinkTrack x) {
+    public static string ToTrackString(this LavalinkTrack? x) {
         return x != null ? $"{(x.Info.Title ?? "No title").Sanitize().Bold().URLDecode()} by {(x.Info.Author ?? "No Author").Sanitize().Bold().URLDecode()} [{x.Info.Length.ToDurationString()}]" : "";
     }
 
@@ -998,12 +1016,12 @@ public static class Extensions {
         return WebUtility.HtmlDecode(WebUtility.UrlDecode(title));
     }
 
-    public static string ToLimitedTrackString(this LavalinkTrack x) {
+    public static string ToLimitedTrackString(this LavalinkTrack? x) {
         return x != null ? $"{(x.Info.Title ?? "No title").Sanitize().Bold().URLDecode()} by {(x.Info.Author ?? "No Author").Sanitize().Bold().URLDecode()}" : "";
     }
 
     public static string ReversePath(this string s) {
-        return string.Join("\\", s.Split('\\').Reverse());
+        return string.Join("\\", Enumerable.Reverse(s.Split('\\')));
     }
 
     public static string musicLength(this TimeSpan timeSpan) {
@@ -1040,6 +1058,9 @@ public sealed class YouTubeSearchProvider {
     /// Creates a new YouTube search provider service instance.
     /// </summary>
     public YouTubeSearchProvider() {
+        if (Constants.apikey == null) {
+            throw new NullReferenceException("YouTube API key not found.");
+        }
         ApiKey = Constants.apikey;
         Http = new HttpClient {
             BaseAddress = new Uri("https://www.googleapis.com/youtube/v3/search")
@@ -1063,9 +1084,9 @@ public sealed class YouTubeSearchProvider {
             json = await sr.ReadToEndAsync();
 
         var jsonData = JObject.Parse(json);
-        var data = jsonData["items"].ToObject<IEnumerable<YouTubeApiResponseItem>>();
+        var data = jsonData["items"]?.ToObject<IEnumerable<YouTubeApiResponseItem>>();
 
-        return data.Select(x => new YouTubeSearchResult(x.Snippet.Title, x.Snippet.Author, x.Id.VideoId));
+        return (data ?? []).Select(x => new YouTubeSearchResult(x.Snippet.Title, x.Snippet.Author, x.Id.VideoId));
     }
 }
 

@@ -31,7 +31,7 @@ public static class Constants {
         try {
             json = JObject.Parse(File.ReadAllText("config.json"));
         }
-        catch (FileNotFoundException e) {
+        catch (FileNotFoundException) {
             logger.error("The bot doesn't work without a config.json file, please create one.");
             return;
         }
@@ -59,7 +59,7 @@ public static class Constants {
             logger.warn("Reddit tokens not found.");
         }
 
-        detectlanguagetoken = json["detecttoken"].Value<string>();
+        detectlanguagetoken = json["detecttoken"]?.Value<string>();
         if (detectlanguagetoken is null) {
             logger.warn("Language detection API token not found.");
         }

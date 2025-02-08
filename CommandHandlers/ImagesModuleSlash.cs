@@ -57,7 +57,7 @@ public class ImagesModuleSlash : ApplicationCommandsModule {
         try {
             var latestComic = await client.GetAsync("https://xkcd.com/info.0.json");
             var latestComicJson = JObject.Parse(await latestComic.Content.ReadAsStringAsync());
-            num = latestComicJson["num"].Value<int>();
+            num = latestComicJson["num"]!.Value<int>();
         }
         catch (Exception e) {
             await CreateResponseAsync(ctx, "Failed to get XKCD.");
@@ -72,8 +72,8 @@ public class ImagesModuleSlash : ApplicationCommandsModule {
         try {
             var randomComic = await client.GetAsync($"https://xkcd.com/{randomXKCD}/info.0.json");
             var randomComicJson = JObject.Parse(await randomComic.Content.ReadAsStringAsync());
-            title = randomComicJson["title"].Value<string>();
-            url = randomComicJson["img"].Value<string>();
+            title = randomComicJson["title"]!.Value<string>() ?? throw new InvalidOperationException();
+            url = randomComicJson["img"]!.Value<string>() ?? throw new InvalidOperationException();
         }
         catch (Exception e) {
             await CreateResponseAsync(ctx, "Failed to get XKCD.");
@@ -95,9 +95,9 @@ public class ImagesModuleSlash : ApplicationCommandsModule {
         try {
             var randomComic = await client.GetAsync($"https://xkcd.com/{number}/info.0.json");
             var randomComicJson = JObject.Parse(await randomComic.Content.ReadAsStringAsync());
-            title = randomComicJson["title"].Value<string>();
-            url = randomComicJson["img"].Value<string>();
-            alt = randomComicJson["alt"].Value<string>();
+            title = randomComicJson["title"]!.Value<string>() ?? throw new InvalidOperationException();
+            url = randomComicJson["img"]!.Value<string>() ?? throw new InvalidOperationException();
+            alt = randomComicJson["alt"]!.Value<string>() ?? throw new InvalidOperationException();
         }
         catch (Exception e) {
             await CreateResponseAsync(ctx, "Failed to get XKCD.");

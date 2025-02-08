@@ -26,20 +26,20 @@ namespace EconomyBot;
 public class Program {
     private static readonly Logger logger = Logger.getClassLogger("Main");
 
-    public static LavalinkSession LavalinkNode;
-    public static MusicService musicService;
-    public static ImagesModule imagesModule;
-    public static ToxicityHandler toxicity;
-    public static WilteryHandler wiltery;
+    public static LavalinkSession LavalinkNode = null!;
+    public static MusicService musicService = null!;
+    public static ImagesModule imagesModule = null!;
+    public static ToxicityHandler toxicity = null!;
+    public static WilteryHandler wiltery = null!;
 
-    public static DetectLanguageClient languageClient;
+    public static DetectLanguageClient languageClient = null!;
 
-    public static DiscordEmoji cube;
+    public static DiscordEmoji cube = null!;
 
     public static bool lavalinkInit = false;
     public static bool hasSetup = false;
 
-    public static DiscordClient client;
+    public static DiscordClient client = null!;
 
     public const ulong LOG = 838920584879800343;
     public static ulong HALLOFFAME = 1078991955633127474;
@@ -51,7 +51,7 @@ public class Program {
 
     // shut up compiler
     private Program() {
-        Main(null!);
+        _ = Main(null!);
     }
 
 
@@ -100,7 +100,7 @@ public class Program {
         }
         catch (Exception e) {
             if (e is BadRequestException ex) {
-                logger.error(ex.JsonMessage);
+                logger.error(ex.JsonMessage ?? "No message? wtf");
             }
 
             logger.error(e.Message);
@@ -152,6 +152,7 @@ public class Program {
             // long wait so wrap it in task.run
             _ = Task.Run(async () => {
                 var guid = Guid.NewGuid();
+                using var httpClient = new HttpClient();
                 foreach (var a in message.Attachments) {
                     var path = "";
                     try {
@@ -159,7 +160,10 @@ public class Program {
                         var ext = Path.GetExtension(path);
                         path += guid + ext;
                         //slap the correct extension on it
-                        new WebClient().DownloadFile(a.Url, path);
+                        using var response = await httpClient.GetAsync(a.Url);
+                        response.EnsureSuccessStatusCode();
+                        await using var fs = new FileStream(path, FileMode.Create);
+                        await response.Content.CopyToAsync(fs);
                     }
                     catch (WebException exception) {
                         logger.warn(exception);
@@ -170,7 +174,7 @@ public class Program {
                     }
 
                     var file = new FileStream(path, FileMode.Open);
-                    await (await client.GetGuildAsync(838843082110664756)).GetChannel(LOG)
+                    await (await client.GetGuildAsync(838843082110664756)!).GetChannel(LOG)!
                         .SendMessageAsync(new DiscordMessageBuilder().WithFile(file));
                 }
             });
@@ -184,7 +188,7 @@ public class Program {
                 var deleter = logs.FirstOrDefault(log =>
                         log is DiscordAuditLogMessageEntry entry && entry.Target.Id == message.Id)?
                     .UserResponsible?.Username ?? "unknown";
-                await server.GetChannel(LOG)
+                await server.GetChannel(LOG)!
                     .SendMessageAsync($"{message.Content} deleted by {deleter}");
             });
         }
@@ -200,9 +204,9 @@ public class Program {
         }
 
         // gore protection
-        if (e.Message.Content.Contains("Screenshot_20230901_160903") ||
-            e.Message.Attachments.Any(f => f.Url.Contains("Screenshot_20230901_160903"))) {
-            await e.Guild.BanMemberAsync(e.Author as DiscordMember, 6);
+        if (e.Author is DiscordMember m && (e.Message.Content.Contains("Screenshot_20230901_160903") ||
+            e.Message.Attachments.Any(f => f.Url.Contains("Screenshot_20230901_160903")))) {
+            await e.Guild.BanMemberAsync(m, 6);
         }
 
         // @everyone protection
@@ -348,11 +352,12 @@ public class Program {
         logger.info("Setup done!");
     }
 
-    private static async Task setupB(DiscordClient client, LavalinkExtension lavalink,
+    private static Task setupB(DiscordClient client, LavalinkExtension lavalink,
         LavalinkConfiguration lavalinkConfig) {
         foreach (var guild in client.Guilds) {
             logger.info($"{guild.Value.Name}, {guild.Value.JoinedAt.ToString()}");
         }
+        return Task.CompletedTask;
     }
 
     private static async Task errorHandler(CommandsNextExtension sender, CommandErrorEventArgs e) {
@@ -427,14 +432,14 @@ public class Program {
 }
 
 public partial class CustomTimeSpanConverter : IArgumentConverter<TimeSpan> {
-    static private Regex TimeSpanRegex { get; } =
+    private static Regex TimeSpanRegex { get; } =
         MyRegex();
 
     [GeneratedRegex(@"^(?<days>\d+d\s*)?(?<hours>\d{1,2}h\s*)?(?<minutes>\d{1,2}m\s*)?(?<seconds>\d{1,2}s\s*)?$",
         RegexOptions.Compiled | RegexOptions.ECMAScript)]
-    static private partial Regex MyRegex();
+    private static partial Regex MyRegex();
 
-    public Task<Optional<TimeSpan>> ConvertAsync(string value, CommandContext ctx) {
+    public Task<Optional<TimeSpan>> ConvertAsync(string value, CommandContext? ctx) {
         if (value == "0")
             return Task.FromResult(Optional.FromNullable(TimeSpan.Zero));
         if (int.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result1))

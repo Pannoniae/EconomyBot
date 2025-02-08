@@ -6,6 +6,7 @@ using DisCatSharp.Lavalink.Entities;
 using DisCatSharp.Lavalink.Enums;
 using DisCatSharp.Lavalink.EventArgs;
 using Soulseek;
+using Spectre.Console;
 using File = Soulseek.File;
 
 namespace EconomyBot;
@@ -35,9 +36,9 @@ public sealed class MusicService {
         slsk = new SoulseekClient();
         slsk.ConnectAsync("jazzbot", "jazzbot").GetAwaiter().GetResult();
         slsk.ExcludedSearchPhrasesReceived += (sender, args) => {
-            Console.WriteLine("Excluded search phrases: ");
+            AnsiConsole.WriteLine("Excluded search phrases: ");
             foreach (var phrase in args) {
-                Console.WriteLine(phrase);
+                AnsiConsole.WriteLine(phrase);
             }
         };
 
@@ -108,16 +109,16 @@ public sealed class MusicService {
     /// </summary>
     /// <param name="guild">Guild to get or create dataset for.</param>
     /// <returns>Resulting dataset.</returns>
-    public async Task<GuildMusicData> GetOrCreateDataAsync(DiscordGuild guild) {
+    public Task<GuildMusicData> GetOrCreateDataAsync(DiscordGuild guild) {
         if (MusicData.TryGetValue(guild.Id, out var gmd))
-            return gmd;
+            return Task.FromResult(gmd);
 
         gmd = MusicData.AddOrUpdate(guild.Id, new GuildMusicData(guild, Lavalink, node),
             (k, v) => v);
 
         gmd.setupWebhooks();
 
-        return gmd;
+        return Task.FromResult(gmd);
     }
 
     /// <summary>

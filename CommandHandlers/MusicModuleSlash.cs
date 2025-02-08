@@ -17,41 +17,41 @@ public class MusicModuleSlash : ApplicationCommandsModule {
     private MusicService Music { get; }
     private YouTubeSearchProvider YouTube { get; }
 
-    public GuildMusicData GuildMusic { get; set; }
+    public required GuildMusicData GuildMusic { get; set; }
 
-    public MusicCommon common;
+    public required MusicCommon common;
 
     public MusicModuleSlash(YouTubeSearchProvider yt) {
         Music = Program.musicService;
         YouTube = yt;
     }
 
-    private static DiscordChannel getChannel(InteractionContext ctx) {
-        return ctx.Member!.VoiceState.Channel;
+    private static DiscordChannel? getChannel(InteractionContext ctx) {
+        return ctx.Member!.VoiceState?.Channel;
     }
 
     public override async Task<bool> BeforeSlashExecutionAsync(InteractionContext ctx) {
         if (ctx.CommandName == "join") {
-            GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild);
+            GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild!);
             GuildMusic.CommandChannel = ctx.Channel;
             return false;
         }
 
         var chn = getChannel(ctx);
-        if (chn == null) {
+        if (chn! == null!) {
             await CreateResponseAsync(ctx,
                 $"{Program.cube} You need to be in a voice channel.");
             throw new IdiotException("user error");
         }
 
-        var mbr = ctx.Guild.CurrentMember?.VoiceState?.Channel;
-        if (mbr != null && chn != mbr) {
+        var mbr = ctx.Guild?.CurrentMember?.VoiceState?.Channel;
+        if (mbr! != null! && chn != mbr) {
             await CreateResponseAsync(ctx,
                 $"{Program.cube} You need to be in the same voice channel.");
             throw new IdiotException("user error");
         }
 
-        GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild);
+        GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild!);
         GuildMusic.CommandChannel = ctx.Channel;
 
         return true;
@@ -65,7 +65,7 @@ public class MusicModuleSlash : ApplicationCommandsModule {
     public async Task JoinAsync(InteractionContext ctx) {
         // yeet the bot in 
         var chn = getChannel(ctx);
-        await GuildMusic.CreatePlayerAsync(chn);
+        await GuildMusic.CreatePlayerAsync(chn!);
         await CreateResponseAsync(ctx, $"{Program.cube} Joined the channel.");
     }
 
@@ -74,9 +74,9 @@ public class MusicModuleSlash : ApplicationCommandsModule {
         // yeet the bot in
         GuildMusic.queue.addToQueue("_fats");
         await GuildMusic.queue.seedQueue();
-        var vs = ctx.Member.VoiceState;
-        var chn = vs.Channel;
-        await GuildMusic.CreatePlayerAsync(chn);
+        var vs = ctx.Member?.VoiceState;
+        var chn = vs?.Channel;
+        await GuildMusic.CreatePlayerAsync(chn!);
         await GuildMusic.queue.PlayAsync();
         await CreateResponseAsync(ctx, $"{Program.cube} Started playing jazz.");
     }
@@ -122,7 +122,7 @@ public class MusicModuleSlash : ApplicationCommandsModule {
 
     [SlashCommand("skip", "Skips current track.")]
     public async Task SkipAsync(InteractionContext ctx) {
-        var track = GuildMusic.queue.NowPlaying.track;
+        var track = GuildMusic.queue.NowPlaying?.track;
         await GuildMusic.queue.StopAsync();
         await CreateResponseAsync(ctx,
             $"{Program.cube} {track.ToLimitedTrackString()} skipped.");
@@ -131,7 +131,7 @@ public class MusicModuleSlash : ApplicationCommandsModule {
     [SlashCommand("skipnum", "Skips current track.")]
     public async Task SkipAsync(InteractionContext ctx, [Option("tracks", "How many tracks to skip.")] long num) {
         for (int i = 0; i < num; i++) {
-            var track = GuildMusic.queue.NowPlaying.track;
+            var track = GuildMusic.queue.NowPlaying?.track;
             await GuildMusic.queue.StopAsync();
             await CreateResponseAsync(ctx,
                 $"{Program.cube} {track.ToLimitedTrackString()} skipped.");
@@ -184,10 +184,13 @@ public class MusicModuleSlash : ApplicationCommandsModule {
 
     [SlashCommand("restart", "Restarts the playback of the current track.")]
     public async Task RestartAsync(InteractionContext ctx) {
-        var track = GuildMusic.queue.NowPlaying.track;
+        var track = GuildMusic.queue.NowPlaying?.track;
         await GuildMusic.queue.RestartAsync();
+        if (track == null) {
+            return;
+        }
         await CreateResponseAsync(ctx,
-            $"{Program.cube} {Formatter.Bold(Formatter.Sanitize(track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Info.Author))} restarted.");
+            $"{Program.cube} {track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} restarted.");
     }
 
     [SlashCommand("remove", "Removes a track from playback queue.")]
@@ -202,7 +205,7 @@ public class MusicModuleSlash : ApplicationCommandsModule {
 
         var track = itemN;
         await CreateResponseAsync(ctx,
-            $"{Program.cube} {Formatter.Bold(Formatter.Sanitize(track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Info.Author))} removed.");
+            $"{Program.cube} {track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} removed.");
     }
 
     [SlashCommand("queue", "Displays current playback queue.")]
@@ -237,12 +240,12 @@ public class MusicModuleSlash : ApplicationCommandsModule {
     [SlashCommand("nowplaying", "Displays information about currently-played track.")]
     public async Task NowPlayingAsync(InteractionContext ctx) {
         var track = GuildMusic.queue.NowPlaying;
-        if (GuildMusic.queue.NowPlaying?.track.Info.Identifier == null) {
+        if (track == null || GuildMusic.queue.NowPlaying?.track.Info.Identifier == null) {
             await CreateResponseAsync(ctx, "Not playing.");
         }
         else {
             await CreateResponseAsync(ctx,
-                $"Now playing: {Formatter.Bold(Formatter.Sanitize(track.track.Info.Title))} by {Formatter.Bold(Formatter.Sanitize(track.track.Info.Author))} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{GuildMusic.queue.NowPlaying.track.Info.Length.ToDurationString()}].");
+                $"Now playing: {track.track.Info.Title.Sanitize().Bold()} by {track.track.Info.Author.Sanitize().Bold()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{GuildMusic.queue.NowPlaying.track.Info.Length.ToDurationString()}].");
         }
     }
 

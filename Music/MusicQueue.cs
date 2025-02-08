@@ -50,7 +50,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
         if (guildMusic.Player == null || !guildMusic.Player.IsConnected)
             return;
 
-        NowPlaying = default;
+        NowPlaying = null;
         await guildMusic.Player.StopAsync();
     }
 
@@ -220,10 +220,10 @@ public class MusicQueue(GuildMusicData guildMusic) {
         NowPlaying = nextTrack;
         if (earrapeMode) {
             var length = nextTrack.track.Info.Length;
-            await guildMusic.Player.PlayPartialAsync(nextTrack.track, TimeSpan.Zero, length - TimeSpan.FromSeconds(20));
+            await guildMusic.Player!.PlayPartialAsync(nextTrack.track, TimeSpan.Zero, length - TimeSpan.FromSeconds(20));
         }
         else {
-            await guildMusic.Player.PlayAsync(nextTrack.track);
+            await guildMusic.Player!.PlayAsync(nextTrack.track);
         }
     }
 

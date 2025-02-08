@@ -17,14 +17,14 @@ public class ChatModuleSlash : ApplicationCommandsModule {
     public async Task purge(InteractionContext ctx, [Option("amt", "Amount")] long amt) {
         var messages = await ctx.Channel.GetMessagesAsync((int)amt);
         var message = string.Join("\n", messages.Select(m => $"{m.Timestamp} {m.Author}: {m.Content}"));
-        await ctx.Guild.GetChannel(Program.LOG).SendMessageAsync(message);
-        await ctx.Channel.DeleteMessagesAsync(messages);
+        await ctx.Guild!.GetChannel(Program.LOG)!.SendMessageAsync(message);
+        await ctx.Channel!.DeleteMessagesAsync(messages);
         await CreateResponseAsync(ctx, $"Deleted {amt} messages!");
     }
 
     [SlashCommand("test2", "")]
     public async Task test2(InteractionContext ctx) {
-        await ChatHandler.test2(ctx.Guild);
+        await ChatHandler.test2(ctx.Guild!);
     }
     
     [SlashCommand("roll", "")]

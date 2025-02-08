@@ -1,0 +1,30 @@
+[Unit]
+Description=EconomyBot
+After=network.target
+
+[Service]
+Type=simple
+User=pannoniae
+WorkingDirectory=/home/pannoniae/dev/cs/EconomyBot_prod/
+Environment="MALLOC_ARENA_MAX=2"
+Environment="MALLOC_MMAP_THRESHOLD_=8192"
+Environment="MALLOC_TRIM_THRESHOLD_=8192"
+Environment="MALLOC_TOP_PAD_=8192"
+Environment="LD_PRELOAD=/usr/lib/libjemalloc.so"
+Environment="MALLOC_CONF=narenas:1,tcache:false,dirty_decay_ms:1000,muzzy_decay_ms:1000,metadata_thp:disabled"
+Environment="DOTNET_EnableWriteXorExecute=0"
+Environment="DOTNET_GCHighMemPercent=1"
+Environment="DOTNET_GCConserveMemory=7"
+
+ExecStart=/usr/bin/dotnet ./EconomyBot.dll
+ExecStop=/usr/bin/pkill -f "EconomyBot.dll"
+
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
+
+[Unit]
+Requires=lavalink.service
+After=lavalink.service
