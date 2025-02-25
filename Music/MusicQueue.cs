@@ -47,8 +47,9 @@ public class MusicQueue(GuildMusicData guildMusic) {
     /// Stops the playback.
     /// </summary>
     public async Task StopAsync() {
-        if (guildMusic.Player == null || !guildMusic.Player.IsConnected)
+        if (guildMusic.Player == null || !guildMusic.Player.IsConnected) {
             return;
+        }
 
         NowPlaying = null;
         await guildMusic.Player.StopAsync();
@@ -58,22 +59,26 @@ public class MusicQueue(GuildMusicData guildMusic) {
     /// Begins playback.
     /// </summary>
     public async Task PlayAsync() {
-        if (guildMusic.Player == null || !guildMusic.Player.IsConnected)
+        if (guildMusic.Player == null || !guildMusic.Player.IsConnected) {
             return;
+        }
 
-        if (NowPlaying == default)
+        if (NowPlaying == default) {
             await guildMusic.queue.PlayHandlerAsync();
+        }
     }
 
     /// <summary>
     /// Restarts current track.
     /// </summary>
     public async Task RestartAsync() {
-        if (guildMusic.Player == null || !guildMusic.Player.IsConnected)
+        if (guildMusic.Player == null || !guildMusic.Player.IsConnected) {
             return;
+        }
 
-        if (NowPlaying == default)
+        if (NowPlaying == default) {
             return;
+        }
 
         insert(0, NowPlaying);
         await guildMusic.Player.StopAsync();

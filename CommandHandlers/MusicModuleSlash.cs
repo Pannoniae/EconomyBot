@@ -213,7 +213,9 @@ public class MusicModuleSlash : ApplicationCommandsModule {
         var interactivity = ctx.Client.GetInteractivity();
 
         var pageCount = GuildMusic.queue.Queue.Count / 10 + 1;
-        if (GuildMusic.queue.Queue.Count % 10 == 0) pageCount--;
+        if (GuildMusic.queue.Queue.Count % 10 == 0) {
+            pageCount--;
+        }
         var pages = GuildMusic.queue.Queue.Select(x => x.track.ToTrackString())
             .Select((s, i) => new { str = s, index = i })
             .GroupBy(x => x.index / 10)
@@ -224,10 +226,12 @@ public class MusicModuleSlash : ApplicationCommandsModule {
 
         var trk = GuildMusic.queue.NowPlaying;
         if (!pages.Any()) {
-            if (trk?.track.Info.Identifier == null)
+            if (trk?.track.Info.Identifier == null) {
                 await CreateResponseAsync(ctx, "Queue is empty!");
-            else
+            }
+            else {
                 await CreateResponseAsync(ctx, $"Now playing: {GuildMusic.queue.NowPlaying?.track.ToTrackString()}");
+            }
 
             return;
         }

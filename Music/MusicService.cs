@@ -42,6 +42,9 @@ public sealed class MusicService {
             }
         };
 
+        node.LavalinkSocketErrored += async (sender, args) => {
+            await Console.Out.WriteLineAsync($"Lavalink socket errored: {args.Exception.Message}");
+        };
         node.StatsReceived += playbackStarted;
 
         async Task playbackStarted(LavalinkSession sender, LavalinkStatsReceivedEventArgs e) {
@@ -65,7 +68,9 @@ public sealed class MusicService {
         results.Sort((a, b) => {
             var aSpeed = a.response.UploadSpeed;
             var bSpeed = b.response.UploadSpeed;
-            if (aSpeed == bSpeed) return 0;
+            if (aSpeed == bSpeed) {
+                return 0;
+            }
             return bSpeed - aSpeed;
         });
 
@@ -110,8 +115,9 @@ public sealed class MusicService {
     /// <param name="guild">Guild to get or create dataset for.</param>
     /// <returns>Resulting dataset.</returns>
     public Task<GuildMusicData> GetOrCreateDataAsync(DiscordGuild guild) {
-        if (MusicData.TryGetValue(guild.Id, out var gmd))
+        if (MusicData.TryGetValue(guild.Id, out var gmd)) {
             return Task.FromResult(gmd);
+        }
 
         gmd = MusicData.AddOrUpdate(guild.Id, new GuildMusicData(guild, Lavalink, node),
             (k, v) => v);

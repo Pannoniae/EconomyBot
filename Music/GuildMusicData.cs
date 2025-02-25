@@ -173,8 +173,9 @@ public sealed class GuildMusicData {
     /// Pauses the playback.
     /// </summary>
     public async Task PauseAsync() {
-        if (Player == null || !Player.IsConnected)
+        if (Player == null || !Player.IsConnected) {
             return;
+        }
 
         await Player.PauseAsync();
     }
@@ -183,8 +184,9 @@ public sealed class GuildMusicData {
     /// Resumes the playback.
     /// </summary>
     public async Task ResumeAsync() {
-        if (Player == null || !Player.IsConnected)
+        if (Player == null || !Player.IsConnected) {
             return;
+        }
 
         await Player.ResumeAsync();
     }
@@ -193,8 +195,9 @@ public sealed class GuildMusicData {
     /// Sets playback volume.
     /// </summary>
     public async Task SetVolumeAsync(int vol) {
-        if (Player == null || !Player.IsConnected)
+        if (Player == null || !Player.IsConnected) {
             return;
+        }
 
         volume = vol;
         await Player.SetVolumeAsync(effectiveVolume);
@@ -206,13 +209,16 @@ public sealed class GuildMusicData {
     /// <param name="target">Where or how much to seek by.</param>
     /// <param name="relative">Whether the seek is relative.</param>
     public async Task SeekAsync(TimeSpan target, bool relative) {
-        if (Player == null || !Player.IsConnected)
+        if (Player == null || !Player.IsConnected) {
             return;
+        }
 
-        if (!relative)
+        if (!relative) {
             await Player.SeekAsync(target);
-        else
+        }
+        else {
             await Player.SeekAsync(Player.TrackPosition + target);
+        }
     }
 
     /// <summary>
@@ -257,11 +263,13 @@ public sealed class GuildMusicData {
     /// </summary>
     /// <returns></returns>
     public async Task DestroyPlayerAsync() {
-        if (Player == null)
+        if (Player == null) {
             return;
+        }
 
-        if (Player.IsConnected)
+        if (Player.IsConnected) {
             await Player.DisconnectAsync();
+        }
 
         Player = null;
     }
@@ -390,7 +398,9 @@ public sealed class GuildMusicData {
                     new((LavalinkFilterBand)12, -0.03f),
                     new((LavalinkFilterBand)13, -0.04f),
                     new((LavalinkFilterBand)14, -0.05f)
-                }
+                },
+                // otherwise this errors? idk
+                PluginFilters = new Dictionary<string, IPluginFilter>()
             }
         );
     }
@@ -445,8 +455,9 @@ public static class IEnumerableExtensions {
             currentWeightIndex += weight;
 
             // If we've hit or passed the weight we are after for this item then it's the one we want....
-            if (currentWeightIndex >= itemWeightIndex)
+            if (currentWeightIndex >= itemWeightIndex) {
                 return item;
+            }
         }
 
         return default!;

@@ -13,7 +13,7 @@
         <EventSourceSupport>false</EventSourceSupport>
         <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
         <MetadataUpdaterSupport>false</MetadataUpdaterSupport>
-        <UseSystemResourceKeys>true</UseSystemResourceKeys>
+<!--        <UseSystemResourceKeys>true</UseSystemResourceKeys>-->
         <ThreadPoolMinThreads>1</ThreadPoolMinThreads>
         <ThreadPoolMaxThreads>4</ThreadPoolMaxThreads>
     </PropertyGroup>

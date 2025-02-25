@@ -58,6 +58,14 @@ public class Program {
     public static async Task Main(string[] args) {
         // logging
 
+        // set global exception handler
+        AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) => {
+            logger.error(eventArgs.ExceptionObject as Exception ?? throw new InvalidOperationException());
+        };
+        AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) => {
+            logger.info("Exiting...");
+        };
+
         Logger.setLogLevel(LogLevel.INFO);
 
         Constants.init();
@@ -81,6 +89,7 @@ public class Program {
             RestEndpoint = endpoint,
             SocketEndpoint = endpoint
         };
+
         var lavalink = discord.UseLavalink();
         var commands = discord.UseCommandsNext(new CommandsNextConfiguration {
             StringPrefixes = ["."],
@@ -118,6 +127,10 @@ public class Program {
         discord.MessageDeleted += messageDeleteHandler;
         discord.GetCommandsNext().UnregisterConverter<TimeSpan>();
         discord.GetCommandsNext().RegisterConverter(new CustomTimeSpanConverter());
+        #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        discord.ClientErrored += async (sender, e) => logger.error(e.Exception);
+        discord.SocketErrored += async (sender, e) => logger.error(e.Exception);
+        #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         await discord.ConnectAsync();
         MemoryUtils.cleanGC();
         var timer = new PeriodicTimer(TimeSpan.FromMinutes(10));
@@ -440,10 +453,12 @@ public partial class CustomTimeSpanConverter : IArgumentConverter<TimeSpan> {
     private static partial Regex MyRegex();
 
     public Task<Optional<TimeSpan>> ConvertAsync(string value, CommandContext? ctx) {
-        if (value == "0")
+        if (value == "0") {
             return Task.FromResult(Optional.FromNullable(TimeSpan.Zero));
-        if (int.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result1))
+        }
+        if (int.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result1)) {
             return Task.FromResult(Optional<TimeSpan>.None);
+        }
         if (TimeSpan.TryParse(value, CultureInfo.InvariantCulture, out var result2)) {
             var _result2 = new TimeSpan(0, result2.Hours, result2.Minutes); // slash from h:m to m:s
 
@@ -457,8 +472,9 @@ public partial class CustomTimeSpanConverter : IArgumentConverter<TimeSpan> {
             "seconds"
         };
         var match = TimeSpanRegex.Match(value);
-        if (!match.Success)
+        if (!match.Success) {
             return Task.FromResult(Optional<TimeSpan>.None);
+        }
         var days = 0;
         var hours = 0;
         var minutes = 0;

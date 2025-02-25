@@ -153,7 +153,9 @@ public static class DictionaryExtensions {
 
         ref TValue value = ref CollectionsMarshal
             .GetValueRefOrAddDefault(dictionary, key, out bool exists)!;
-        if (exists) return value;
+        if (exists) {
+            return value;
+        }
         try {
             value = valueFactory(key);
         }

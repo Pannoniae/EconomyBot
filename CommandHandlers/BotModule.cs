@@ -6,7 +6,9 @@ namespace EconomyBot;
 public class BotModule : BaseCommandModule {
 
     [Command("gc"), Description("Clears the bot's memory.")]
-    public void GCAsync(CommandContext ctx) {
+    #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+    public async Task GCAsync(CommandContext ctx) {
+        #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         MemoryUtils.cleanGC();
     }
 }

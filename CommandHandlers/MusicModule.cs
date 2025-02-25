@@ -13,6 +13,7 @@ using DisCatSharp.Interactivity.Extensions;
 using DisCatSharp.Lavalink.Entities;
 using DisCatSharp.Lavalink.Enums;
 using DisCatSharp.Net;
+using EconomyBot.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Soulseek;
@@ -32,6 +33,8 @@ public class MusicModule : BaseCommandModule {
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private const string TEMP_FOLDER = "/snd/music/temp";
 
+    private static readonly Logger logger = Logger.getClassLogger("MusicModule");
+
     private static DiscordChannel? getChannel(CommandContext ctx) {
         return ctx.Member?.VoiceState?.Channel;
     }
@@ -48,31 +51,44 @@ public class MusicModule : BaseCommandModule {
     }
 
     // Shared search result handling logic
-    private async Task<(T? SelectedItem, DiscordMessage Message)> HandleSearchResults<T>(
+    private async Task<(T? SelectedItem, DiscordMessage? Message)> HandleSearchResults<T>(
         CommandContext ctx,
         List<T> results,
         Func<T, int, string> formatResult) where T : class {
+        var interactivity = ctx.Client.GetInteractivity();
         if (results.Count == 0) {
             await common.respond(ctx, "Nothing was found.");
-            return (null, null!);
+            return (null, null);
         }
 
         if (results.Count == 1) {
-            return (results.First(), null!);
+            logger.info("Returning only one result");
+            return (results.First(), null);
         }
 
         var pageCount = results.Count / 10 + 1;
-        if (results.Count % 10 == 0) pageCount--;
+        if (results.Count % 10 == 0) {
+            pageCount--;
+        }
 
         var content = results.Select((x, i) => (x, i))
             .GroupBy(e => e.i / 10)
             .Select(xg => new Page(
-                $"{string.Join("\n", xg.Select(xa => formatResult(xa.x, xa.i)))}\n\nPage {xg.Key + 1}/{pageCount}"));
+                $"{string.Join("\n", xg.Select(xa => formatResult(xa.x, xa.i)))}\n\nPage {xg.Key + 1}/{pageCount}")).ToList();
 
-        var interactivity = ctx.Client.GetInteractivity();
+        if (content.Count == 0) {
+            logger.info("Content is empty");
+        }
+        else if (content.Count == 1) {
+            logger.info("Content is 1 page long");
+        }
+        else {
+            logger.info($"Content is {content.Count} pages long");
+        }
+
         Task task = null!;
         if (pageCount == 1) {
-            await ctx.Channel.SendMessageAsync(content.First().Content);
+            await ctx.Channel.SendMessageAsync(content.First().Content!);
         }
         else {
             task = interactivity.SendPaginatedMessageAsync(
@@ -323,8 +339,9 @@ public class MusicModule : BaseCommandModule {
         await GuildMusic.CreatePlayerAsync(chn!);
         await GuildMusic.queue.PlayAsync();
 
-        if (trackCount > 1)
+        if (trackCount > 1) {
             await common.respond(ctx, $"Added {trackCount:#,##} tracks to playback queue.");
+        }
         else {
             var track = tracks.First();
             await common.respond(ctx,
@@ -349,13 +366,15 @@ public class MusicModule : BaseCommandModule {
         var (track, msg) = await HandleSearchResults(ctx, results,
             (x, i) => $"`{i + 1}` {x.ToLimitedTrackString()}");
 
-        if (track == null) return;
+        if (track == null) {
+            return;
+        }
 
         GuildMusic.queue.Enqueue(track);
         await startPlayer(ctx);
         await GuildMusic.queue.PlayAsync();
 
-        if (msg != null) {
+        if (msg! != null!) {
             await common.modify(ctx, msg, $"Added {track.ToLimitedTrackString()} to the playback queue.");
         }
         else {
@@ -385,10 +404,17 @@ public class MusicModule : BaseCommandModule {
             (x, i) => $"**{i + 1}.** {WebUtility.HtmlDecode(x.file.Filename.ReversePath()).InlineCode()}" +
                       $" {TimeSpan.FromSeconds(x.file.Length.GetValueOrDefault()).musicLength().Bold()} ({x.file.getBitrateString()})");
 
-        if (chosen == null) return;
+        if (chosen == null) {
+            return;
+        }
+        if (msg! == null!) {
+            return;
+        }
 
         var track = await DownloadAndGetTrack((chosen.response, chosen.file), ctx, msg);
-        if (track == null) return;
+        if (track == null) {
+            return;
+        }
 
         GuildMusic.queue.Enqueue(track);
         await startPlayer(ctx);
@@ -411,10 +437,17 @@ public class MusicModule : BaseCommandModule {
             (x, i) => $"**{i + 1}.** {WebUtility.HtmlDecode(x.file.Filename.ReversePath()).InlineCode()}" +
                       $" {TimeSpan.FromSeconds(x.file.Length.GetValueOrDefault()).musicLength().Bold()} ({x.file.getBitrateString()})");
 
-        if (chosen == null) return;
+        if (chosen == null) {
+            return;
+        }
+        if (msg! == null!) {
+            return;
+        }
 
         var track = await DownloadAndGetTrack((chosen.response, chosen.file), ctx, msg);
-        if (track == null) return;
+        if (track == null) {
+            return;
+        }
 
         GuildMusic.queue.Enqueue(track);
         await startPlayer(ctx);
@@ -436,13 +469,15 @@ public class MusicModule : BaseCommandModule {
         var (track, msg) = await HandleSearchResults(ctx, results,
             (x, i) => $"`{i + 1}` {x.ToLimitedTrackString()}");
 
-        if (track == null) return;
+        if (track == null) {
+            return;
+        }
 
         GuildMusic.queue.Enqueue(track);
         await startPlayer(ctx);
         await GuildMusic.queue.PlayAsync();
 
-        if (msg != null) {
+        if (msg! != null!) {
             await common.modify(ctx, msg, $"Added {track.ToLimitedTrackString()} to the playback queue.");
         }
         else {
@@ -643,7 +678,9 @@ public class MusicModule : BaseCommandModule {
         var interactivity = ctx.Client.GetInteractivity();
         var queue = GuildMusic.queue.getCombinedQueue();
         var pageCount = queue.Count / 10 + 1;
-        if (queue.Count % 10 == 0) pageCount--;
+        if (queue.Count % 10 == 0) {
+            pageCount--;
+        }
         if (!isPlaying || queue.Count == 0) {
             await common.respond(ctx, "Queue is empty!");
             return;
@@ -665,7 +702,7 @@ public class MusicModule : BaseCommandModule {
 
         Task task = null!;
         if (pageCount == 1) {
-            await ctx.Channel.SendMessageAsync(pages.First().Content);
+            await ctx.Channel.SendMessageAsync(pages.First().Content!);
         }
         else {
             task = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages, TimeSpan.FromMinutes(2),

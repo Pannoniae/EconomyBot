@@ -35,7 +35,9 @@ public partial class SDLParser {
         var entries = SplitEntries(artistsContent);
 
         foreach (var entry in entries) {
-            if (string.IsNullOrWhiteSpace(entry)) continue;
+            if (string.IsNullOrWhiteSpace(entry)) {
+                continue;
+            }
 
             var artist = ParseArtistEntry(entry);
             if (artist != null) {
