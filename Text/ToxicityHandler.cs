@@ -242,7 +242,7 @@ public class ToxicityValues {
 
         logger.info(
             $"T:{inst.toxicityScore}, ST:{inst.severeToxicityScore}, A:{inst.attackScore}, I:{inst.insultScore}, P:{inst.profanityScore}, TH:{inst.threatScore}, S:{inst.sexualScore}, F:{inst.flirtingScore}");
-
+        /*
         const string API_URL =
             "https://api-inference.huggingface.co/models/j-hartmann/emotion-english-distilroberta-base";
 
@@ -298,7 +298,7 @@ public class ToxicityValues {
         inst.fear = labels["fear"];
 
         logger.info(
-            $"J:{inst.joy}, N:{inst.neutral}, S:{inst.surprise}, SA:{inst.sadness}, A:{inst.anger}, D:{inst.disgust}, F:{inst.fear}");
+            $"J:{inst.joy}, N:{inst.neutral}, S:{inst.surprise}, SA:{inst.sadness}, A:{inst.anger}, D:{inst.disgust}, F:{inst.fear}");*/
         return inst;
     }
 }

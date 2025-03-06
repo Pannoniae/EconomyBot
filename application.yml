@@ -24,7 +24,7 @@ lavalink:
     nonAllocatingFrameBuffer: true # Setting to true reduces the number of allocations made by each player at the expense of frame rebuilding (e.g. non-instantaneous volume changes)
   plugins:
     # Replace VERSION with the current version as shown by the Releases tab or a long commit hash for snapshots.
-    - dependency: "dev.lavalink.youtube:youtube-plugin:1.11.4"
+    - dependency: "dev.lavalink.youtube:youtube-plugin:1.11.5"
       snapshot: false # Set to true if you want to use a snapshot version.
 
 plugins:

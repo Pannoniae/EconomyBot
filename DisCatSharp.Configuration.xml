@@ -1,0 +1,212 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DisCatSharp.Configuration</name>
+    </assembly>
+    <members>
+        <member name="T:DisCatSharp.Configuration.ConfigurationExtensions">
+            <summary>
+                The configuration extensions.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Configuration.ConfigurationExtensions.FACTORY_ERROR_MESSAGE">
+            <summary>
+                The factory error message.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Configuration.ConfigurationExtensions.DEFAULT_ROOT_LIB">
+            <summary>
+                The default root lib.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Configuration.ConfigurationExtensions.CONFIG_SUFFIX">
+            <summary>
+                The config suffix.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Configuration.ConfigurationExtensions.ConfigPath(Microsoft.Extensions.Configuration.IConfiguration,System.String[])">
+            <summary>
+                Easily piece together paths that will work within <see cref="T:Microsoft.Extensions.Configuration.IConfiguration" />
+            </summary>
+            <param name="config">(not used - only for adding context based functionality)</param>
+            <param name="values">The strings to piece together</param>
+            <returns>Strings joined together via ':'</returns>
+        </member>
+        <member name="M:DisCatSharp.Configuration.ConfigurationExtensions.HydrateInstance(System.Object@,DisCatSharp.Configuration.Models.ConfigSection)">
+            <summary>
+                Skims over the configuration section and only overrides values that are explicitly defined within the config.
+            </summary>
+            <param name="config">Instance of config</param>
+            <param name="section">Section which contains values for <paramref name="config" /></param>
+        </member>
+        <member name="M:DisCatSharp.Configuration.ConfigurationExtensions.ExtractConfig(DisCatSharp.Configuration.Models.ConfigSection,System.Func{System.Object})">
+            <summary>
+                Instantiate an entity using <paramref name="factory" /> then walk through the specified <paramref name="section" />
+                and translate user-defined config values to the instantiated instance from <paramref name="factory" />
+            </summary>
+            <param name="section">Section containing values for targeted config</param>
+            <param name="factory">Function which generates a default entity</param>
+            <returns>Hydrated instance of an entity which contains user-defined values (if any)</returns>
+            <exception cref="T:System.ArgumentNullException">When <paramref name="factory" /> is null</exception>
+        </member>
+        <member name="M:DisCatSharp.Configuration.ConfigurationExtensions.ExtractConfig(Microsoft.Extensions.Configuration.IConfiguration,System.String,System.Func{System.Object},System.String)">
+            <summary>
+                Instantiate an entity using <paramref name="factory" /> then walk through the specified
+                <paramref name="sectionName" />
+                in <paramref name="config" />. Translate user-defined config values to the instantiated instance from
+                <paramref name="factory" />
+            </summary>
+            <param name="config">Loaded App Configuration</param>
+            <param name="sectionName">Name of section to load</param>
+            <param name="factory">Function which creates a default entity to work with</param>
+            <param name="rootSectionName">
+                (Optional) Used when section is nested within another. Default value is
+                <see cref="F:DisCatSharp.Configuration.ConfigurationExtensions.DEFAULT_ROOT_LIB" />
+            </param>
+            <returns>Hydrated instance of an entity which contains user-defined values (if any)</returns>
+            <exception cref="T:System.ArgumentNullException">When <paramref name="factory" /> is null</exception>
+        </member>
+        <member name="M:DisCatSharp.Configuration.ConfigurationExtensions.ExtractConfig``1(Microsoft.Extensions.Configuration.IConfiguration,System.IServiceProvider,System.String,System.String)">
+            <summary>
+                Instantiate a new instance of <typeparamref name="TConfig" />, then walk through the specified
+                <paramref name="sectionName" />
+                in <paramref name="config" />. Translate user-defined config values to the <typeparamref name="TConfig" />
+                instance.
+            </summary>
+            <param name="config">Loaded App Configuration</param>
+            <param name="serviceProvider"></param>
+            <param name="sectionName">Name of section to load</param>
+            <param name="rootSectionName">
+                (Optional) Used when section is nested with another. Default value is
+                <see cref="F:DisCatSharp.Configuration.ConfigurationExtensions.DEFAULT_ROOT_LIB" />
+            </param>
+            <typeparam name="TConfig">Type of instance that <paramref name="sectionName" /> represents</typeparam>
+            <returns>Hydrated instance of <typeparamref name="TConfig" /> which contains the user-defined values (if any).</returns>
+        </member>
+        <member name="M:DisCatSharp.Configuration.ConfigurationExtensions.ExtractConfig``1(Microsoft.Extensions.Configuration.IConfiguration,System.String,System.String)">
+            <summary>
+                Instantiate a new instance of <typeparamref name="TConfig" />, then walk through the specified
+                <paramref name="sectionName" />
+                in <paramref name="config" />. Translate user-defined config values to the <typeparamref name="TConfig" />
+                instance.
+            </summary>
+            <param name="config">Loaded App Configuration</param>
+            <param name="sectionName">Name of section to load</param>
+            <param name="rootSectionName">
+                (Optional) Used when section is nested with another. Default value is
+                <see cref="F:DisCatSharp.Configuration.ConfigurationExtensions.DEFAULT_ROOT_LIB" />
+            </param>
+            <typeparam name="TConfig">Type of instance that <paramref name="sectionName" /> represents</typeparam>
+            <returns>Hydrated instance of <typeparamref name="TConfig" /> which contains the user-defined values (if any).</returns>
+        </member>
+        <member name="M:DisCatSharp.Configuration.ConfigurationExtensions.HasSection(Microsoft.Extensions.Configuration.IConfiguration,System.String[])">
+            <summary>
+                Determines if <paramref name="config" /> contains a particular section/object (not value)
+            </summary>
+            <remarks>
+                <code>
+            {
+               "Discord": {  // this is a section/object
+            
+               },
+               "Value": "something" // this is not a section/object
+            }
+            </code>
+            </remarks>
+            <param name="config"></param>
+            <param name="values"></param>
+            <returns>True if section exists, otherwise false</returns>
+        </member>
+        <member name="M:DisCatSharp.Configuration.ConfigurationExtensions.BuildClient(Microsoft.Extensions.Configuration.IConfiguration,System.IServiceProvider,System.String)">
+            <summary>
+                Instantiates an instance of <see cref="T:DisCatSharp.DiscordClient" />, then consumes any custom
+                configuration from user/developer from <paramref name="config" />. <br />
+                View remarks for more info
+            </summary>
+            <remarks>
+                This is an example of how your JSON structure should look if you wish
+                to override one or more of the default values from <see cref="T:DisCatSharp.DiscordConfiguration" />
+                <code>
+            {
+              "DisCatSharp": {
+                 "Discord": { }
+              }
+            }
+            </code>
+                <br />
+                Alternatively, you can use the type name itself
+                <code>
+            {
+              "DisCatSharp": {
+                 "DiscordConfiguration": { }
+              }
+            }
+            </code>
+                <code>
+            {
+              "botSectionName": {
+                 "DiscordConfiguration": { }
+              }
+            }
+            </code>
+            </remarks>
+            <param name="config"></param>
+            <param name="serviceProvider"></param>
+            <param name="botSectionName"></param>
+            <returns>Instance of <see cref="T:DisCatSharp.DiscordClient" /></returns>
+        </member>
+        <member name="T:DisCatSharp.Configuration.Models.ConfigSection">
+            <summary>
+                Represents an object in <see cref="T:Microsoft.Extensions.Configuration.IConfiguration" />
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Configuration.Models.ConfigSection.SectionName">
+            <summary>
+                Key within <see cref="P:DisCatSharp.Configuration.Models.ConfigSection.Config" /> which represents an object containing multiple values
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Configuration.Models.ConfigSection.Root">
+            <summary>
+                Optional used to indicate this section is nested within another
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Configuration.Models.ConfigSection.Config">
+            <summary>
+                Reference to <see cref="T:Microsoft.Extensions.Configuration.IConfiguration" /> used within application
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Configuration.Models.ConfigSection.#ctor(Microsoft.Extensions.Configuration.IConfiguration@,System.String,System.String)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Configuration.Models.ConfigSection" /> class.
+            </summary>
+            <param name="config">Reference to config</param>
+            <param name="sectionName">Section of interest</param>
+            <param name="rootName">
+                (Optional) Indicates <paramref name="sectionName" /> is nested within this name. Default value
+                is DisCatSharp
+            </param>
+        </member>
+        <member name="M:DisCatSharp.Configuration.Models.ConfigSection.ContainsKey(System.String)">
+            <summary>
+                Checks if key exists in <see cref="P:DisCatSharp.Configuration.Models.ConfigSection.Config" />
+            </summary>
+            <param name="name">Property / Key to search for in section</param>
+            <returns>True if key exists, otherwise false. Outputs path to config regardless</returns>
+        </member>
+        <member name="M:DisCatSharp.Configuration.Models.ConfigSection.GetValue(System.String)">
+            <summary>
+                Attempts to get value associated to the config path. <br /> Should be used in unison with
+                <see cref="M:DisCatSharp.Configuration.Models.ConfigSection.ContainsKey(System.String)" />
+            </summary>
+            <param name="propName">Config path to value</param>
+            <returns>Value found at <paramref name="propName" /></returns>
+        </member>
+        <member name="M:DisCatSharp.Configuration.Models.ConfigSection.GetPath(System.String)">
+            <summary>
+                Gets the path.
+            </summary>
+            <param name="value">The value.</param>
+            <returns>A string.</returns>
+        </member>
+    </members>
+</doc>

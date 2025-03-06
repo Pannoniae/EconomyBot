@@ -1,0 +1,2763 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DisCatSharp.ApplicationCommands</name>
+    </assembly>
+    <members>
+        <member name="T:DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration">
+            <summary>
+                A configuration for a <see cref="T:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension" />
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration.#ctor">
+            <summary>
+                Creates a new configuration with default values.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration.#ctor(System.IServiceProvider)">
+            <summary>
+                Utilized via dependency injection pipeline.
+            </summary>
+            <param name="provider">The service provider.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration.#ctor(DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration)">
+            <summary>
+                Creates a new instance of <see cref="T:DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration" />, copying the properties of another
+                configuration.
+            </summary>
+            <param name="acc">Configuration the properties of which are to be copied.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration.ServiceProvider">
+            <summary>
+                <para>Sets the service provider.</para>
+                <para>Objects in this provider are used when instantiating application command modules.</para>
+                <para>This allows passing data around without resorting to static members.</para>
+                <para>Defaults to <see langword="null" />.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration.EnableDefaultHelp">
+            <summary>
+                <para>This option enables the default help command.</para>
+                <para>Disabling this will allow you to make your own help command.</para>
+                <para>Defaults to <see langword="true" />.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration.EnableDefaultUserAppsHelp">
+            <summary>
+                <para>This option enables the default help command with user apps capability.</para>
+                <para>Mutually exclusive with <see cref="P:DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration.EnableDefaultHelp" />.</para>
+                <para>Defaults to <see langword="false" />.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration.EnableLocalization">
+            <summary>
+                This option enables the localization feature.
+                <para>Defaults to <see langword="false" />.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration.AutoDefer">
+            <summary>
+                <para>Automatically defer all responses.</para>
+                <note type="note">If you enable this, you can't use CreateResponse. Use EditResponse instead.</note>
+                <para>Defaults to <see langword="false" />.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration.CheckAllGuilds">
+            <summary>
+                <para>
+                    This option informs the module to check through all guilds whether the
+                    <see target="_blank" alt="Application Commands Scope"
+                        href="https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes">
+                        application.commands
+                    </see>
+                    scope is set.
+                </para>
+                <note type="warning">This will take quite a while, when the bot is on more than 1k guilds.</note>
+                <para>Defaults to <see langword="false" />.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration.DebugStartup">
+            <summary>
+                <para>This option increases the debug output of the module.</para>
+                <note type="warning">
+                    <para>This is not recommended for production use.</para>
+                    <para>Enable this option only if DisCatSharp support advises you to do so.</para>
+                </note>
+                <para>Defaults to <see langword="false" />.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration.GenerateTranslationFilesOnly">
+            <summary>
+                <para>Whether to only generate translations files and abort after that.</para>
+                <para>Defaults to <see langword="false" />.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration.UnitTestMode">
+            <summary>
+                Whether to enable unit test mode.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension">
+            <summary>
+                A class that handles slash commands for a client.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.Configuration">
+            <summary>
+                Configuration for Discord.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.s_registeredCommands">
+            <summary>
+                Sets a list of registered commands. The key is the guild id (null if global).
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GlobalCommandsInternal">
+            <summary>
+                Sets a list of registered global commands.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GuildCommandsInternal">
+            <summary>
+                Sets a list of registered guild commands mapped by guild id.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.HandledInteractions">
+            <summary>
+                Gets a list of handled interactions. Fix for double interaction execution bug.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension._applicationCommandsModuleReady">
+            <summary>
+                Fires the application command module ready event.
+                <para>
+                    This is fired when the whole module for the <see cref="T:DisCatSharp.DiscordClient" /> finished the startup and
+                    registration.
+                </para>
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension._applicationCommandsModuleStartupFinished">
+            <summary>
+                Fires the application command module startup finished event.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension._contextMenuErrored">
+            <summary>
+                Fires the context menu error event.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension._contextMenuExecuted">
+            <summary>
+                Fires the context menu executed event.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension._globalApplicationCommandsRegistered">
+            <summary>
+                Fires the global application command registered event.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension._guildApplicationCommandsRegistered">
+            <summary>
+                Fires the guild application command registered event.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension._slashError">
+            <summary>
+                Fires the slash command error event.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension._slashExecuted">
+            <summary>
+                Fires the slash command executed event.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension._updateList">
+            <summary>
+                List of modules to register.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.#ctor(DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension" /> class.
+            </summary>
+            <param name="configuration">The configuration.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.CommandMethods">
+            <summary>
+                A list of methods for top level commands.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GroupCommands">
+            <summary>
+                List of groups.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.SubGroupCommands">
+            <summary>
+                List of groups with subgroups.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ContextMenuCommands">
+            <summary>
+                List of context menus.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GlobalDiscordCommands">
+            <summary>
+                List of global commands on discords backend.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GuildDiscordCommands">
+            <summary>
+                List of guild commands on discords backend.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.s_singletonModules">
+            <summary>
+                Singleton modules.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.s_errored">
+            <summary>
+                Set to true if anything fails when registering.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.RegisteredCommands">
+            <summary>
+                Gets a list of registered commands. The key is the guild id (null if global).
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GlobalCommands">
+            <summary>
+                Gets a list of registered global commands.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GuildCommands">
+            <summary>
+                Gets a list of registered guild commands mapped by guild id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.MISSING_SCOPE_GUILD_IDS">
+            <summary>
+                Gets the guild ids where the applications.commands scope is missing.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.s_missingScopeGuildIdsGlobal">
+            <summary>
+                Gets the guild ids where the applications.commands scope is missing.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.DebugEnabled">
+            <summary>
+                Gets whether debug is enabled.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ApplicationCommandsLogLevel">
+            <summary>
+                Gets the debug level for the logs.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.Logger">
+            <summary>
+                Gets the logger.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.CheckAllGuilds">
+            <summary>
+                Gets whether check through all guilds is enabled.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ManOr">
+            <summary>
+                Gets whether the registration check should be manually overridden.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.AutoDeferEnabled">
+            <summary>
+                Gets whether interactions should be automatically deffered.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ShardStartupFinished">
+            <summary>
+                Whether this module finished the startup.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.StartupFinished">
+            <summary>
+                Whether this module finished the startup.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.Services">
+            <summary>
+                Gets the service provider this module was configured with.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.IsCalledByUnitTest">
+            <summary>
+                Whether this module is called by an unit test.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ShardCount">
+            <summary>
+                Gets the shard count.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.FinishedShardCount">
+            <summary>
+                Gets the count of shards who finished initializing the module.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.FinishFired">
+            <summary>
+                Gets whether the finish event was fired.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.Setup(DisCatSharp.DiscordClient)">
+            <summary>
+                Runs setup.
+                <note type="caution">DO NOT RUN THIS MANUALLY. DO NOT DO ANYTHING WITH THIS.</note>
+            </summary>
+            <param name="client">The client to setup on.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.CatchInteractionsOnStartup(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.InteractionCreateEventArgs)">
+            <summary>
+                Catches all interactions during the startup.
+            </summary>
+            <param name="sender">The client.</param>
+            <param name="e">The interaction create event args.</param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.CatchContextMenuInteractionsOnStartup(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.ContextMenuInteractionCreateEventArgs)">
+            <summary>
+                Catches all context menu interactions during the startup.
+            </summary>
+            <param name="sender">The client.</param>
+            <param name="e">The context menu interaction create event args.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.FinishedRegistration">
+            <summary>
+                Fired when the startup is completed.
+                <para>
+                    Switches the interaction handling from <see cref="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.CatchInteractionsOnStartup(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.InteractionCreateEventArgs)" /> and
+                    <see cref="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.CatchContextMenuInteractionsOnStartup(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.ContextMenuInteractionCreateEventArgs)" /> to <see cref="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.InteractionHandler(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.InteractionCreateEventArgs)" /> and
+                    <see cref="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ContextMenuHandler(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.ContextMenuInteractionCreateEventArgs)" />.
+                </para>
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.CleanModule">
+            <summary>
+                Cleans the module for a new start of the bot.
+                DO NOT USE IF YOU DON'T KNOW WHAT IT DOES.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.CleanGuildCommandsAsync">
+            <summary>
+                Cleans all guild application commands.
+                <note type="caution">You normally don't need to execute it.</note>
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.CleanGlobalCommandsAsync">
+            <summary>
+                Cleans all global application commands.
+                <note type="caution">You normally don't need to execute it.</note>
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.RegisterGuildCommands(System.Reflection.Assembly,System.UInt64)">
+            <summary>
+                Registers all commands from a given assembly. The command classes need to be public to be considered for
+                registration.
+            </summary>
+            <param name="assembly">Assembly to register commands from.</param>
+            <param name="guildId">The guild id to register it on.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.RegisterGlobalCommands(System.Reflection.Assembly)">
+            <summary>
+                Registers all commands from a given assembly. The command classes need to be public to be considered for
+                registration.
+            </summary>
+            <param name="assembly">Assembly to register commands from.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.RegisterGuildCommands``1(System.UInt64,System.Action{DisCatSharp.ApplicationCommands.Context.ApplicationCommandsTranslationContext})">
+            <summary>
+                Registers a command class with optional translation setup for a guild.
+            </summary>
+            <typeparam name="T">The command class to register.</typeparam>
+            <param name="guildId">The guild id to register it on.</param>
+            <param name="translationSetup">A callback to setup translations with.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.RegisterGuildCommands(System.Type,System.UInt64,System.Action{DisCatSharp.ApplicationCommands.Context.ApplicationCommandsTranslationContext})">
+            <summary>
+                Registers a command class with optional translation setup for a guild.
+            </summary>
+            <param name="type">The <see cref="T:System.Type" /> of the command class to register.</param>
+            <param name="guildId">The guild id to register it on.</param>
+            <param name="translationSetup">A callback to setup translations with.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.RegisterGlobalCommands``1(System.Action{DisCatSharp.ApplicationCommands.Context.ApplicationCommandsTranslationContext})">
+            <summary>
+                Registers a command class with optional translation setup globally.
+            </summary>
+            <typeparam name="T">The command class to register.</typeparam>
+            <param name="translationSetup">A callback to setup translations with.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.RegisterGlobalCommands(System.Type,System.Action{DisCatSharp.ApplicationCommands.Context.ApplicationCommandsTranslationContext})">
+            <summary>
+                Registers a command class with optional translation setup globally.
+            </summary>
+            <param name="type">The <see cref="T:System.Type" /> of the command class to register.</param>
+            <param name="translationSetup">A callback to setup translations with.</param>
+        </member>
+        <member name="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ApplicationCommandsModuleReady">
+            <summary>
+                Fired when the application commands module is ready.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ApplicationCommandsModuleStartupFinished">
+            <summary>
+                Fired when the application commands modules startup is finished.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GuildApplicationCommandsRegistered">
+            <summary>
+                Fired when guild commands are registered on a guild.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GlobalApplicationCommandsRegistered">
+            <summary>
+                Fired when the global commands are registered.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.UpdateAsync">
+            <summary>
+                Used for RegisterCommands and the <see cref="E:DisCatSharp.DiscordClient.Ready" /> event.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.RegisterCommands(System.Collections.Generic.List{DisCatSharp.ApplicationCommands.ApplicationCommandsModuleConfiguration},System.Nullable{System.UInt64})">
+            <summary>
+                Method for registering commands for a target from modules.
+            </summary>
+            <param name="types">The types.</param>
+            <param name="guildId">The optional guild id.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.CheckRegistrationStartup(System.Collections.Generic.List{DisCatSharp.ApplicationCommands.Entities.CommandTranslator},System.Collections.Generic.List{DisCatSharp.ApplicationCommands.Entities.GroupTranslator},System.Nullable{System.UInt64})">
+            <summary>
+                Checks the registration startup.
+            </summary>
+            <param name="translation">The optional translations.</param>
+            <param name="groupTranslation">The optional group translations.</param>
+            <param name="guildId">The optional guild id.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.CheckStartupFinishAsync(DisCatSharp.ApplicationCommands.ApplicationCommandsExtension,DisCatSharp.ApplicationCommands.EventArgs.ApplicationCommandsModuleStartupFinishedEventArgs)">
+            <summary>
+                Checks whether we finished up the complete startup.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.InteractionHandler(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.InteractionCreateEventArgs)">
+            <summary>
+                Interaction handler.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="e">The event args.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GetInteractionType(DisCatSharp.Entities.DiscordInteractionData)">
+            <summary>
+                Gets the interaction type from the interaction data.
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ContextMenuHandler(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.ContextMenuInteractionCreateEventArgs)">
+            <summary>
+                Context menu handler.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="e">The event args.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.RunCommandAsync(DisCatSharp.ApplicationCommands.Context.BaseContext,System.Reflection.MethodInfo,System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+                Runs a command.
+            </summary>
+            <param name="context">The base context.</param>
+            <param name="method">The method info.</param>
+            <param name="args">The arguments.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.CreateInstance(System.Type,System.IServiceProvider)">
+            <summary>
+                Property injection
+            </summary>
+            <param name="t">The type.</param>
+            <param name="services">The services.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ResolveInteractionCommandParameters(DisCatSharp.EventArgs.InteractionCreateEventArgs,DisCatSharp.ApplicationCommands.Context.InteractionContext,System.Reflection.MethodBase,System.Collections.Generic.IReadOnlyList{DisCatSharp.Entities.DiscordInteractionDataOption})">
+            <summary>
+                Resolves the slash command parameters.
+            </summary>
+            <param name="e">The event arguments.</param>
+            <param name="context">The interaction context.</param>
+            <param name="method">The method info.</param>
+            <param name="options">The options.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.RunPreexecutionChecksAsync(System.Reflection.MemberInfo,DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Runs the pre-execution checks.
+            </summary>
+            <param name="method">The method info.</param>
+            <param name="context">The base context.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GetChoiceAttributesFromProvider(System.Collections.Generic.List{DisCatSharp.ApplicationCommands.Attributes.ChoiceProviderAttribute},System.Nullable{System.UInt64})">
+            <summary>
+                Gets the choice attributes from choice provider.
+            </summary>
+            <param name="customAttributes">The custom attributes.</param>
+            <param name="guildId">The optional guild id</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GetChoiceAttributesFromEnumParameter(System.Type)">
+            <summary>
+                Gets the choice attributes from enum parameter.
+            </summary>
+            <param name="enumParam">The enum parameter.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GetParameterType(System.Type)">
+            <summary>
+                Gets the parameter type.
+            </summary>
+            <param name="type">The type.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GetChoiceAttributesFromParameter(System.Collections.Generic.List{DisCatSharp.ApplicationCommands.Attributes.ChoiceAttribute})">
+            <summary>
+                Gets the choice attributes from parameter.
+            </summary>
+            <param name="choiceAttributes">The choice attributes.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ParseParametersAsync(System.Collections.Generic.IEnumerable{System.Reflection.ParameterInfo},System.String,System.Nullable{System.UInt64})">
+            <summary>
+                Parses the parameters.
+            </summary>
+            <param name="parameters">The parameters.</param>
+            <param name="commandName">The command name.</param>
+            <param name="guildId">The optional guild id.</param>
+        </member>
+        <member name="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.SlashCommandErrored">
+            <summary>
+                Fires when the execution of a slash command fails.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.SlashCommandExecuted">
+            <summary>
+                Fires when the execution of a slash command is successful.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ContextMenuErrored">
+            <summary>
+                Fires when the execution of a context menu fails.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ContextMenuExecuted">
+            <summary>
+                Fire when the execution of a context menu is successful.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.ApplicationCommandsModuleConfiguration">
+            <summary>
+                Holds configuration data for setting up an application command.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsModuleConfiguration.#ctor(System.Type,System.Action{DisCatSharp.ApplicationCommands.Context.ApplicationCommandsTranslationContext})">
+            <summary>
+                Creates a new command configuration.
+            </summary>
+            <param name="type">The type of the command module.</param>
+            <param name="translations">The translation setup callback.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsModuleConfiguration.Type">
+            <summary>
+                The type of the command module.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsModuleConfiguration.Translations">
+            <summary>
+                The translation setup.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.ApplicationCommandSourceLink">
+            <summary>
+                Links a command to its original command module.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandSourceLink.ApplicationCommand">
+            <summary>
+                The command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandSourceLink.RootCommandContainerType">
+            <summary>
+                The base/root module the command is contained in.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandSourceLink.CommandContainerType">
+            <summary>
+                The direct group the command is contained in.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.CommandMethod">
+            <summary>
+                The command method.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.CommandMethod.CommandId">
+            <summary>
+                Gets or sets the command id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.CommandMethod.Name">
+            <summary>
+                Gets or sets the name.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.CommandMethod.Method">
+            <summary>
+                Gets or sets the method.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.GroupCommand">
+            <summary>
+                The group command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.GroupCommand.CommandId">
+            <summary>
+                Gets or sets the command id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.GroupCommand.Name">
+            <summary>
+                Gets or sets the name.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.GroupCommand.Methods">
+            <summary>
+                Gets or sets the methods.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.SubGroupCommand">
+            <summary>
+                The sub group command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.SubGroupCommand.CommandId">
+            <summary>
+                Gets or sets the command id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.SubGroupCommand.Name">
+            <summary>
+                Gets or sets the name.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.SubGroupCommand.SubCommands">
+            <summary>
+                Gets or sets the sub commands.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.ContextMenuCommand">
+            <summary>
+                The context menu command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ContextMenuCommand.CommandId">
+            <summary>
+                Gets or sets the command id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ContextMenuCommand.Name">
+            <summary>
+                Gets or sets the name.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.ContextMenuCommand.Method">
+            <summary>
+                Gets or sets the method.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.DefaultHelpModule">
+            <summary>
+                Represents the default help module.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.DefaultUserAppsHelpModule">
+            <summary>
+                Represents the default user apps help module.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.ApplicationCommandsModule">
+            <summary>
+                Represents a base class for application command modules
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsModule.BeforeSlashExecutionAsync(DisCatSharp.ApplicationCommands.Context.InteractionContext)">
+            <summary>
+                Called before the execution of a slash command in the module.
+            </summary>
+            <param name="ctx">The context.</param>
+            <returns> Whether or not to execute the slash command.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsModule.AfterSlashExecutionAsync(DisCatSharp.ApplicationCommands.Context.InteractionContext)">
+            <summary>
+                Called after the execution of a slash command in the module.
+            </summary>
+            <param name="ctx">The context.</param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsModule.BeforeContextMenuExecutionAsync(DisCatSharp.ApplicationCommands.Context.ContextMenuContext)">
+            <summary>
+                Called before the execution of a context menu in the module.
+            </summary>
+            <param name="ctx">The context.</param>
+            <returns> Whether or not to execute the slash command. </returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsModule.AfterContextMenuExecutionAsync(DisCatSharp.ApplicationCommands.Context.ContextMenuContext)">
+            <summary>
+                Called after the execution of a context menu in the module.
+            </summary>
+            <param name="ctx">The context.</param>
+            <returns></returns>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.ApplicationCommandsUtilities">
+            <summary>
+                Provides a set of utility methods for application commands.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsUtilities.IsModuleCandidateType(System.Type)">
+            <summary>
+                Whether this module is a candidate type.
+            </summary>
+            <param name="type">The type.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsUtilities.IsModuleCandidateType(System.Reflection.TypeInfo)">
+            <summary>
+                Whether this module is a candidate type.
+            </summary>
+            <param name="ti">The type info.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsUtilities.IsCommandCandidate(System.Reflection.MethodInfo,System.Reflection.ParameterInfo[]@)">
+            <summary>
+                Whether this is a command candidate.
+            </summary>
+            <param name="method">The method.</param>
+            <param name="parameters">The parameters.</param>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandModuleLifespanAttribute">
+            <summary>
+                Defines this application command module's lifespan. Module lifespans are transient by default.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandModuleLifespanAttribute.#ctor(DisCatSharp.ApplicationCommands.Enums.ApplicationCommandModuleLifespan)">
+            <summary>
+                Defines this application command module's lifespan.
+            </summary>
+            <param name="lifespan">The lifespan of the module. Module lifespans are transient by default.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandModuleLifespanAttribute.Lifespan">
+            <summary>
+                Gets the lifespan.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandCheckBaseAttribute">
+            <summary>
+                The base class for a pre-execution check for a application command.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandCheckBaseAttribute.ExecuteChecksAsync(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Checks whether this command can be executed within the current context.
+            </summary>
+            <param name="ctx">The context.</param>
+            <returns>Whether the checks passed.</returns>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ContextMenuAttribute">
+            <summary>
+                Represents a <see cref="T:DisCatSharp.Entities.DiscordApplicationCommand" /> with the type of
+                <see cref="F:DisCatSharp.Enums.ApplicationCommandType.User" /> or <see cref="F:DisCatSharp.Enums.ApplicationCommandType.Message" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ContextMenuAttribute.#ctor(DisCatSharp.Enums.ApplicationCommandType,System.String,System.Boolean,DisCatSharp.Enums.InteractionContextType[],DisCatSharp.Enums.ApplicationCommandIntegrationTypes[])">
+            <summary>
+                Marks this method as a context menu.
+            </summary>
+            <param name="type">The type of the context menu.</param>
+            <param name="name">The name of the context menu.</param>
+            <param name="isNsfw">Whether the context menu is marked as NSFW.</param>
+            <param name="allowedContexts">The allowed contexts of the context menu.</param>
+            <param name="integrationTypes">The allowed integration types of the context menu.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ContextMenuAttribute.#ctor(DisCatSharp.Enums.ApplicationCommandType,System.String,System.Int64,System.Boolean,DisCatSharp.Enums.InteractionContextType[],DisCatSharp.Enums.ApplicationCommandIntegrationTypes[])">
+            <summary>
+                Marks this method as a context menu.
+            </summary>
+            <param name="type">The type of the context menu.</param>
+            <param name="name">The name of the context menu.</param>
+            <param name="defaultMemberPermissions">The default member permissions of the context menu.</param>
+            <param name="isNsfw">Whether the context menu is marked as NSFW.</param>
+            <param name="allowedContexts">The allowed contexts of the context menu.</param>
+            <param name="integrationTypes">The allowed integration types of the context menu.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ContextMenuAttribute.Name">
+            <summary>
+                Gets the name of this context menu.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ContextMenuAttribute.Type">
+            <summary>
+                Gets the type of this context menu.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ContextMenuAttribute.DefaultMemberPermissions">
+            <summary>
+                Gets this context menu's needed permissions.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ContextMenuAttribute.AllowedContexts">
+            <summary>
+                Gets the allowed contexts of this context menu.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ContextMenuAttribute.IntegrationTypes">
+            <summary>
+                Gets the allowed integration types of this context menu.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ContextMenuAttribute.IsNsfw">
+            <summary>
+                Gets whether this context menu is marked as NSFW.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ContextMenuCooldownAttribute">
+            <summary>
+                Defines a cooldown for this command. This allows you to define how many times can users execute a specific command
+            </summary>
+            <remarks>
+                Defines a cooldown for this command. This means that users will be able to use the command a specific number of
+                times before they have to wait to use it again.
+            </remarks>
+            <param name="maxUses">Number of times the command can be used before triggering a cooldown.</param>
+            <param name="resetAfter">Number of seconds after which the cooldown is reset.</param>
+            <param name="bucketType">
+                Type of cooldown bucket. This allows controlling whether the bucket will be cooled down per
+                user, guild, member, channel, and/or globally.
+            </param>
+            <param name="cooldownResponderType">The responder type used to respond to cooldown ratelimit hits.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ContextMenuCooldownAttribute.#ctor(System.Int32,System.Double,DisCatSharp.Enums.Core.CooldownBucketType,System.Type)">
+            <summary>
+                Defines a cooldown for this command. This allows you to define how many times can users execute a specific command
+            </summary>
+            <remarks>
+                Defines a cooldown for this command. This means that users will be able to use the command a specific number of
+                times before they have to wait to use it again.
+            </remarks>
+            <param name="maxUses">Number of times the command can be used before triggering a cooldown.</param>
+            <param name="resetAfter">Number of seconds after which the cooldown is reset.</param>
+            <param name="bucketType">
+                Type of cooldown bucket. This allows controlling whether the bucket will be cooled down per
+                user, guild, member, channel, and/or globally.
+            </param>
+            <param name="cooldownResponderType">The responder type used to respond to cooldown ratelimit hits.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ContextMenuCooldownAttribute.ResponderType">
+            <summary>
+                Gets the responder type.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ContextMenuCooldownAttribute.MaxUses">
+            <summary>
+                Gets the maximum number of uses before this command triggers a cooldown for its bucket.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ContextMenuCooldownAttribute.Reset">
+            <summary>
+                Gets the time after which the cooldown is reset.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ContextMenuCooldownAttribute.BucketType">
+            <summary>
+                Gets the type of the cooldown bucket. This determines how cooldowns are applied.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ContextMenuCooldownAttribute.GetBucket(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Gets a cooldown bucket for given command context.
+            </summary>
+            <param name="ctx">Command context to get cooldown bucket for.</param>
+            <returns>Requested cooldown bucket, or null if one wasn't present.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ContextMenuCooldownAttribute.GetRemainingCooldown(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Calculates the cooldown remaining for given command context.
+            </summary>
+            <param name="ctx">Context for which to calculate the cooldown.</param>
+            <returns>Remaining cooldown, or zero if no cooldown is active.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ContextMenuCooldownAttribute.RespondRatelimitHitAsync(DisCatSharp.ApplicationCommands.Context.BaseContext,System.Boolean,DisCatSharp.Entities.Core.CooldownBucket)">
+            <inheritdoc />
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ContextMenuCooldownAttribute.GetBucketId(DisCatSharp.ApplicationCommands.Context.BaseContext,System.UInt64@,System.UInt64@,System.UInt64@,System.UInt64@)">
+            <summary>
+                Calculates bucket ID for given command context.
+            </summary>
+            <param name="ctx">Context for which to calculate bucket ID for.</param>
+            <param name="userId">ID of the user with which this bucket is associated.</param>
+            <param name="channelId">ID of the channel with which this bucket is associated.</param>
+            <param name="guildId">ID of the guild with which this bucket is associated.</param>
+            <param name="memberId">ID of the member with which this bucket is associated.</param>
+            <returns>Calculated bucket ID.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ContextMenuCooldownAttribute.ExecuteChecksAsync(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Executes a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.DontInjectAttribute">
+            <summary>
+                Prevents this field or property from having its value injected by dependency injection.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.RequireAnyPermissionsAttribute">
+            <summary>
+                Defines that usage of this application command is restricted to members with any of the specified permissions. This
+                check also verifies that the bot has the same permissions.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.RequireAnyPermissionsAttribute.#ctor(DisCatSharp.Enums.Permissions[])">
+            <summary>
+                Defines that usage of this command is restricted to members with any of the specified permissions. This check also
+                verifies that the bot has the same permissions.
+            </summary>
+            <param name="permissions">Permissions required to execute this command.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.RequireAnyPermissionsAttribute.AnyPermissions">
+            <summary>
+                Gets the permissions required by this attribute.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.RequireAnyPermissionsAttribute.ExecuteChecksAsync(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Runs checks.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireBotPermissionsAttribute">
+            <summary>
+                Defines that usage of this application command is only possible when the bot is granted a specific permission.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireBotPermissionsAttribute.#ctor(DisCatSharp.Enums.Permissions,System.Boolean)">
+            <summary>
+                Defines that usage of this application command is only possible when the bot is granted a specific permission.
+            </summary>
+            <param name="permissions">Permissions required to execute this command.</param>
+            <param name="ignoreDms">
+                Sets this check's behaviour in DMs. True means the check will always pass in DMs, whereas false
+                means that it will always fail.
+            </param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireBotPermissionsAttribute.Permissions">
+            <summary>
+                Gets the permissions required by this attribute.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireBotPermissionsAttribute.IgnoreDms">
+            <summary>
+                Gets or sets this check's behaviour in DMs. True means the check will always pass in DMs, whereas false means that
+                it will always fail.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireBotPermissionsAttribute.ExecuteChecksAsync(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Runs checks.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireDirectMessageAttribute">
+            <summary>
+                Defines that this application command is only usable within a direct message channel.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireDirectMessageAttribute.#ctor">
+            <summary>
+                Defines that this command is only usable within a direct message channel.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireDirectMessageAttribute.ExecuteChecksAsync(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Runs checks.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireGuildAttribute">
+            <summary>
+                Defines that this application command is only usable within a guild.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireGuildAttribute.#ctor">
+            <summary>
+                Defines that this command is only usable within a guild.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireGuildAttribute.ExecuteChecksAsync(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Runs checks.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireGuildOwnerAttributeAttribute">
+            <summary>
+                Defines that this application command is only usable within a guild by its owner.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireGuildOwnerAttributeAttribute.#ctor">
+            <summary>
+                Defines that this command is only usable within a guild by its owner.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireGuildOwnerAttributeAttribute.ExecuteChecksAsync(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Runs checks.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireNsfwAttribute">
+            <summary>
+                Defines that this application command is only usable within a guild.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireNsfwAttribute.#ctor">
+            <summary>
+                Defines that this command is only usable within a guild.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireNsfwAttribute.ExecuteChecksAsync(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Runs checks.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequirePermissionsAttribute">
+            <summary>
+                Defines that usage of this application command is restricted to members with specified permissions. This check also
+                verifies that the bot has the same permissions.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequirePermissionsAttribute.#ctor(DisCatSharp.Enums.Permissions,System.Boolean)">
+            <summary>
+                Defines that usage of this command is restricted to members with specified permissions. This check also verifies
+                that the bot has the same permissions.
+            </summary>
+            <param name="permissions">Permissions required to execute this command.</param>
+            <param name="ignoreDms">
+                Sets this check's behaviour in DMs. True means the check will always pass in DMs, whereas false
+                means that it will always fail.
+            </param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequirePermissionsAttribute.Permissions">
+            <summary>
+                Gets the permissions required by this attribute.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequirePermissionsAttribute.IgnoreDms">
+            <summary>
+                Gets or sets this check's behaviour in DMs. True means the check will always pass in DMs, whereas false means that
+                it will always fail.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequirePermissionsAttribute.ExecuteChecksAsync(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Runs checks.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireSkuEntitlementAttribute">
+            <summary>
+                Defines that usage of this application command is restricted to users with a specified entitlement.
+            </summary>
+            <remarks>
+                Defines that usage of this command is restricted to users with a specified entitlement.
+            </remarks>
+            <param name="skuId">Sku id for which an entitlement is required to execute this command.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireSkuEntitlementAttribute.#ctor(System.UInt64)">
+            <summary>
+                Defines that usage of this application command is restricted to users with a specified entitlement.
+            </summary>
+            <remarks>
+                Defines that usage of this command is restricted to users with a specified entitlement.
+            </remarks>
+            <param name="skuId">Sku id for which an entitlement is required to execute this command.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireSkuEntitlementAttribute.SkuId">
+            <summary>
+                Gets the sku id requiring an entitlement.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireSkuEntitlementAttribute.ExecuteChecksAsync(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Runs checks.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireTeamAdminAttribute">
+            <summary>
+                Defines that this application command is restricted to team members of the bot with admin role or higher.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireTeamAdminAttribute.#ctor">
+            <summary>
+                Defines that this application command is restricted to team members of the bot with admin role or higher.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireTeamAdminAttribute.ExecuteChecksAsync(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Runs checks.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireTeamDeveloperAttribute">
+            <summary>
+                Defines that this application command is restricted to team members of the bot with developer role or higher.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireTeamDeveloperAttribute.#ctor">
+            <summary>
+                Defines that this application command is restricted to team members of the bot with developer role or higher.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireTeamDeveloperAttribute.ExecuteChecksAsync(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Runs checks.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireTeamMemberAttribute">
+            <summary>
+                Defines that this application command is restricted to the team members of the bot.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireTeamMemberAttribute.#ctor">
+            <summary>
+                Defines that this application command is restricted to the team members of the bot.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireTeamMemberAttribute.ExecuteChecksAsync(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Runs checks.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireTeamOwnerAttribute">
+            <summary>
+                Defines that this application command is restricted to team members of the bot with owner role.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireTeamOwnerAttribute.#ctor">
+            <summary>
+                Defines that this application command is restricted to team members of the bot with owner role.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireTeamOwnerAttribute.ExecuteChecksAsync(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Runs checks.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireTeamReadOnlyAttribute">
+            <summary>
+                Defines that this application command is restricted to team members of the bot with read-only role or higher.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireTeamReadOnlyAttribute.#ctor">
+            <summary>
+                Defines that this application command is restricted to team members of the bot with read-only role or higher.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireTeamReadOnlyAttribute.ExecuteChecksAsync(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Runs checks.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireUserPermissionsAttribute">
+            <summary>
+                Defines that usage of this application command is restricted to members with specified permissions.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireUserPermissionsAttribute.#ctor(DisCatSharp.Enums.Permissions,System.Boolean)">
+            <summary>
+                Defines that usage of this command is restricted to members with specified permissions.
+            </summary>
+            <param name="permissions">Permissions required to execute this command.</param>
+            <param name="ignoreDms">
+                Sets this check's behaviour in DMs. True means the check will always pass in DMs, whereas false
+                means that it will always fail.
+            </param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireUserPermissionsAttribute.Permissions">
+            <summary>
+                Gets the permissions required by this attribute.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireUserPermissionsAttribute.IgnoreDms">
+            <summary>
+                Gets or sets this check's behaviour in DMs. True means the check will always pass in DMs, whereas false means that
+                it will always fail.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandRequireUserPermissionsAttribute.ExecuteChecksAsync(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Runs checks.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.AutocompleteAttribute">
+            <summary>
+                The autocomplete attribute.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.AutocompleteAttribute.#ctor(System.Type)">
+            <summary>
+                Adds an autocomplete provider to this command option.
+            </summary>
+            <param name="providerType">The type of the provider.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.AutocompleteAttribute.ProviderType">
+            <summary>
+                The type of the provider.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ChannelTypesAttribute">
+            <summary>
+                Defines allowed channel types for a channel parameter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ChannelTypesAttribute.#ctor(DisCatSharp.Enums.ChannelType[])">
+            <summary>
+                Defines allowed channel types for a channel parameter.
+            </summary>
+            <param name="channelTypes">The channel types to allow.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ChannelTypesAttribute.ChannelTypes">
+            <summary>
+                Allowed channel types.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ChoiceAttribute">
+            <summary>
+                Adds a choice for this slash command option
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ChoiceAttribute.#ctor(System.String,System.String)">
+            <summary>
+                Adds a choice to the slash command option
+            </summary>
+            <param name="name">The name of the choice.</param>
+            <param name="value">The value of the choice.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ChoiceAttribute.#ctor(System.String,System.Int64)">
+            <summary>
+                Adds a choice to the slash command option
+            </summary>
+            <param name="name">The name of the choice.</param>
+            <param name="value">The value of the choice.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ChoiceAttribute.#ctor(System.String,System.Int32)">
+            <summary>
+                Adds a choice to the slash command option
+            </summary>
+            <param name="name">The name of the choice.</param>
+            <param name="value">The value of the choice.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ChoiceAttribute.#ctor(System.String,System.Double)">
+            <summary>
+                Adds a choice to the slash command option
+            </summary>
+            <param name="name">The name of the choice.</param>
+            <param name="value">The value of the choice.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ChoiceAttribute.Name">
+            <summary>
+                Gets the name of the choice
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ChoiceAttribute.Value">
+            <summary>
+                Gets the value of the choice
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ChoiceNameAttribute">
+            <summary>
+                Sets the name for this enum choice.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ChoiceNameAttribute.#ctor(System.String)">
+            <summary>
+                Sets the name for this enum choice.
+            </summary>
+            <param name="name">The name for this enum choice.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ChoiceNameAttribute.Name">
+            <summary>
+                The name.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ChoiceProvider">
+            <summary>
+                Implementation of <see cref="T:DisCatSharp.ApplicationCommands.Attributes.IChoiceProvider" /> with access to service collection.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ChoiceProvider.Services">
+            <summary>
+                Sets the service provider.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ChoiceProvider.GuildId">
+            <summary>
+                The optional ID of the Guild the command got registered for.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ChoiceProvider.Provider">
+            <summary>
+                Sets the choices for the slash command.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.ChoiceProviderAttribute">
+            <summary>
+                Sets a IChoiceProvider for a command options. ChoiceProviders can be used to provide
+                DiscordApplicationCommandOptionChoice from external sources such as a database.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.ChoiceProviderAttribute.#ctor(System.Type)">
+            <summary>
+                Adds a choice provider to this command.
+            </summary>
+            <param name="providerType">The type of the provider.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.ChoiceProviderAttribute.ProviderType">
+            <summary>
+                The type of the provider.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.IAutocompleteProvider">
+            <summary>
+                The autocomplete provider.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.IAutocompleteProvider.Provider(DisCatSharp.ApplicationCommands.Context.AutocompleteContext)">
+            <summary>
+                Provider the autocompletion.
+            </summary>
+            <param name="context">The context.</param>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.IChoiceProvider">
+            <summary>
+                All choice providers must inherit from this interface
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.IChoiceProvider.Provider">
+            <summary>
+                Sets the choices for the slash command
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.MinimumValueAttribute">
+            <summary>
+                Sets a minimum value for this slash command option. Only valid for <see cref="T:System.Int32" />, <see cref="T:System.Int64" /> or
+                <see cref="T:System.Double" /> parameters.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.MinimumValueAttribute.#ctor(System.Int32)">
+            <summary>
+                Sets a minimum value for this slash command option. Only valid for <see cref="T:System.Int32" />, <see cref="T:System.Int64" /> or
+                <see cref="T:System.Double" /> parameters.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.MinimumValueAttribute.#ctor(System.Int64)">
+            <summary>
+                Sets a minimum value for this slash command option. Only valid for <see cref="T:System.Int32" />, <see cref="T:System.Int64" /> or
+                <see cref="T:System.Double" /> parameters.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.MinimumValueAttribute.#ctor(System.Double)">
+            <summary>
+                Sets a minimum value for this slash command option. Only valid for <see cref="T:System.Int32" />, <see cref="T:System.Int64" /> or
+                <see cref="T:System.Double" /> parameters.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.MinimumValueAttribute.Value">
+            <summary>
+                The value.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.MaximumValueAttribute">
+            <summary>
+                Sets a maximum value for this slash command option. Only valid for <see cref="T:System.Int32" />, <see cref="T:System.Int64" /> or
+                <see cref="T:System.Double" /> parameters.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.MaximumValueAttribute.#ctor(System.Int32)">
+            <summary>
+                Sets a maximum value for this slash command option. Only valid for <see cref="T:System.Int32" />, <see cref="T:System.Int64" /> or
+                <see cref="T:System.Double" /> parameters.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.MaximumValueAttribute.#ctor(System.Int64)">
+            <summary>
+                Sets a maximum value for this slash command option. Only valid for <see cref="T:System.Int32" />, <see cref="T:System.Int64" /> or
+                <see cref="T:System.Double" /> parameters.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.MaximumValueAttribute.#ctor(System.Double)">
+            <summary>
+                Sets a maximum value for this slash command option. Only valid for <see cref="T:System.Int32" />, <see cref="T:System.Int64" /> or
+                <see cref="T:System.Double" /> parameters.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.MaximumValueAttribute.Value">
+            <summary>
+                The value.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.MinimumLengthAttribute">
+            <summary>
+                Sets a minimum value for this slash command option. Only valid for <see cref="T:System.String" /> parameters.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.MinimumLengthAttribute.#ctor(System.Int32)">
+            <summary>
+                Sets a minimum value for this slash command option. Only valid for <see cref="T:System.String" /> parameters.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.MinimumLengthAttribute.Value">
+            <summary>
+                The value.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.MaximumLengthAttribute">
+            <summary>
+                Sets a maximum value for this slash command option.  Only valid for <see cref="T:System.String" /> parameters.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.MaximumLengthAttribute.#ctor(System.Int32)">
+            <summary>
+                Sets a maximum value for this slash command option. Only valid for <see cref="T:System.String" /> parameters.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.MaximumLengthAttribute.Value">
+            <summary>
+                The value.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.OptionAttribute">
+            <summary>
+                Marks this parameter as an option for a slash command
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.Attributes.OptionAttribute.Autocomplete">
+            <summary>
+                Whether to autocomplete this option.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.Attributes.OptionAttribute.Description">
+            <summary>
+                Gets the description of this option.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.Attributes.OptionAttribute.Name">
+            <summary>
+                Gets the name of this option.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.OptionAttribute.#ctor(System.String,System.String,System.Boolean)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.ApplicationCommands.Attributes.OptionAttribute" /> class.
+            </summary>
+            <param name="name">The name.</param>
+            <param name="description">The description.</param>
+            <param name="autocomplete">If true, autocomplete.</param>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.SlashCommandAttribute">
+            <summary>
+                Represents a <see cref="T:DisCatSharp.Entities.DiscordApplicationCommand" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.SlashCommandAttribute.#ctor(System.String,System.String,System.Boolean,DisCatSharp.Enums.InteractionContextType[],DisCatSharp.Enums.ApplicationCommandIntegrationTypes[])">
+            <summary>
+                Marks this method as a slash command.
+            </summary>
+            <param name="name">The name of this slash command.</param>
+            <param name="description">The description of this slash command.</param>
+            <param name="isNsfw">Whether this command is marked as NSFW.</param>
+            <param name="allowedContexts">The allowed contexts of this slash command.</param>
+            <param name="integrationTypes">The allowed integration types.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.SlashCommandAttribute.#ctor(System.String,System.String,System.Int64,System.Boolean,DisCatSharp.Enums.InteractionContextType[],DisCatSharp.Enums.ApplicationCommandIntegrationTypes[])">
+            <summary>
+                Marks this method as a slash command.
+            </summary>
+            <param name="name">The name of this slash command.</param>
+            <param name="description">The description of this slash command.</param>
+            <param name="defaultMemberPermissions">The default member permissions.</param>
+            <param name="isNsfw">Whether this command is marked as NSFW.</param>
+            <param name="allowedContexts">The allowed contexts of this slash command.</param>
+            <param name="integrationTypes">The allowed integration types.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.SlashCommandAttribute.Name">
+            <summary>
+                Gets the name of this command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.SlashCommandAttribute.Description">
+            <summary>
+                Gets the description of this command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.SlashCommandAttribute.DefaultMemberPermissions">
+            <summary>
+                Gets the needed permission of this command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.SlashCommandAttribute.AllowedContexts">
+            <summary>
+                Gets the allowed contexts of this command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.SlashCommandAttribute.IntegrationTypes">
+            <summary>
+                Gets the allowed integration types of this command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.SlashCommandAttribute.IsNsfw">
+            <summary>
+                Gets whether this command is marked as NSFW.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.SlashCommandCooldownAttribute">
+            <summary>
+                Defines a cooldown for this command. This allows you to define how many times can users execute a specific command.
+            </summary>
+            <remarks>
+                Defines a cooldown for this command. This means that users will be able to use the command a specific number of
+                times before they have to wait to use it again.
+            </remarks>
+            <param name="maxUses">Number of times the command can be used before triggering a cooldown.</param>
+            <param name="resetAfter">Number of seconds after which the cooldown is reset.</param>
+            <param name="bucketType">
+                Type of cooldown bucket. This allows controlling whether the bucket will be cooled down per
+                user, guild, member, channel, and/or globally.
+            </param>
+            <param name="cooldownResponderType">The responder type used to respond to cooldown ratelimit hits.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.SlashCommandCooldownAttribute.#ctor(System.Int32,System.Double,DisCatSharp.Enums.Core.CooldownBucketType,System.Type)">
+            <summary>
+                Defines a cooldown for this command. This allows you to define how many times can users execute a specific command.
+            </summary>
+            <remarks>
+                Defines a cooldown for this command. This means that users will be able to use the command a specific number of
+                times before they have to wait to use it again.
+            </remarks>
+            <param name="maxUses">Number of times the command can be used before triggering a cooldown.</param>
+            <param name="resetAfter">Number of seconds after which the cooldown is reset.</param>
+            <param name="bucketType">
+                Type of cooldown bucket. This allows controlling whether the bucket will be cooled down per
+                user, guild, member, channel, and/or globally.
+            </param>
+            <param name="cooldownResponderType">The responder type used to respond to cooldown ratelimit hits.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.SlashCommandCooldownAttribute.ResponderType">
+            <summary>
+                Gets the responder type.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.SlashCommandCooldownAttribute.MaxUses">
+            <summary>
+                Gets the maximum number of uses before this command triggers a cooldown for its bucket.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.SlashCommandCooldownAttribute.Reset">
+            <summary>
+                Gets the time after which the cooldown is reset.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.SlashCommandCooldownAttribute.BucketType">
+            <summary>
+                Gets the type of the cooldown bucket. This determines how cooldowns are applied.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.SlashCommandCooldownAttribute.GetBucket(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Gets a cooldown bucket for given command context.
+            </summary>
+            <param name="ctx">Command context to get cooldown bucket for.</param>
+            <returns>Requested cooldown bucket, or null if one wasn't present.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.SlashCommandCooldownAttribute.GetRemainingCooldown(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Calculates the cooldown remaining for given command context.
+            </summary>
+            <param name="ctx">Context for which to calculate the cooldown.</param>
+            <returns>Remaining cooldown, or zero if no cooldown is active.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.SlashCommandCooldownAttribute.RespondRatelimitHitAsync(DisCatSharp.ApplicationCommands.Context.BaseContext,System.Boolean,DisCatSharp.Entities.Core.CooldownBucket)">
+            <inheritdoc />
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.SlashCommandCooldownAttribute.GetBucketId(DisCatSharp.ApplicationCommands.Context.BaseContext,System.UInt64@,System.UInt64@,System.UInt64@,System.UInt64@)">
+            <summary>
+                Calculates bucket ID for given command context.
+            </summary>
+            <param name="ctx">Context for which to calculate bucket ID for.</param>
+            <param name="userId">ID of the user with which this bucket is associated.</param>
+            <param name="channelId">ID of the channel with which this bucket is associated.</param>
+            <param name="guildId">ID of the guild with which this bucket is associated.</param>
+            <param name="memberId">ID of the member with which this bucket is associated.</param>
+            <returns>Calculated bucket ID.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.SlashCommandCooldownAttribute.ExecuteChecksAsync(DisCatSharp.ApplicationCommands.Context.BaseContext)">
+            <summary>
+                Executes a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Attributes.SlashCommandGroupAttribute">
+            <summary>
+                Represents a <see cref="T:DisCatSharp.Entities.DiscordApplicationCommand" /> group.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.SlashCommandGroupAttribute.#ctor(System.String,System.String,System.Boolean,DisCatSharp.Enums.InteractionContextType[],DisCatSharp.Enums.ApplicationCommandIntegrationTypes[])">
+            <summary>
+                Marks this class as a slash command group.
+            </summary>
+            <param name="name">The name of the slash command group.</param>
+            <param name="description">The description of the slash command group.</param>
+            <param name="isNsfw">Whether the slash command group is marked as NSFW.</param>
+            <param name="allowedContexts">The allowed contexts of the slash command group.</param>
+            <param name="integrationTypes">The allowed integration types of the slash command group.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Attributes.SlashCommandGroupAttribute.#ctor(System.String,System.String,System.Int64,System.Boolean,DisCatSharp.Enums.InteractionContextType[],DisCatSharp.Enums.ApplicationCommandIntegrationTypes[])">
+            <summary>
+                Marks this method as a slash command group.
+            </summary>
+            <param name="name">The name of the slash command group.</param>
+            <param name="description">The description of the slash command group.</param>
+            <param name="defaultMemberPermissions">The default member permissions of the slash command group.</param>
+            <param name="isNsfw">Whether the slash command group is marked as NSFW.</param>
+            <param name="allowedContexts">The allowed contexts of the slash command group.</param>
+            <param name="integrationTypes">The allowed integration types of the slash command group.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.SlashCommandGroupAttribute.Name">
+            <summary>
+                Gets the name of this slash command group.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.SlashCommandGroupAttribute.Description">
+            <summary>
+                Gets the description of this slash command group.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.SlashCommandGroupAttribute.DefaultMemberPermissions">
+            <summary>
+                Gets the needed permission of this slash command group.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.SlashCommandGroupAttribute.AllowedContexts">
+            <summary>
+                Gets the allowed contexts of this slash command group.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.SlashCommandGroupAttribute.IntegrationTypes">
+            <summary>
+                Gets the allowed integration types of this slash command group.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Attributes.SlashCommandGroupAttribute.IsNsfw">
+            <summary>
+                Gets whether this slash command group is marked as NSFW.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Checks.ApplicationCommandEqualityChecks">
+            <summary>
+                The application command equality checks.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Checks.ApplicationCommandEqualityChecks.IsEqualTo(DisCatSharp.Entities.DiscordApplicationCommand,DisCatSharp.Entities.DiscordApplicationCommand,DisCatSharp.DiscordClient,System.Boolean)">
+            <summary>
+                Whether two application commands are equal.
+            </summary>
+            <param name="ac1">Source command.</param>
+            <param name="targetApplicationCommand">Command to check against.</param>
+            <param name="client">The discord client.</param>
+            <param name="isGuild">Whether the equal check is performed for a guild command.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Checks.ApplicationCommandEqualityChecks.SoftEqual(DisCatSharp.Entities.DiscordApplicationCommand,DisCatSharp.Entities.DiscordApplicationCommand,DisCatSharp.Enums.ApplicationCommandType,DisCatSharp.BaseDiscordClient,System.Boolean,System.Boolean)">
+            <summary>
+                Checks softly whether two <see cref="T:DisCatSharp.Entities.DiscordApplicationCommand" />s are the same.
+                Excluding id, application id and version here.
+            </summary>
+            <param name="source">Source application command.</param>
+            <param name="target">Application command to check against.</param>
+            <param name="type">The application command type.</param>
+            <param name="client">The discord client.</param>
+            <param name="localizationEnabled">Whether localization is enabled.</param>
+            <param name="guild">Whether the equal check is performed for a guild command.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Checks.ApplicationCommandEqualityChecks.NullableSequenceEqual``1(System.Collections.Generic.List{``0},System.Collections.Generic.List{``0})">
+            <summary>
+                Performs a SequenceEqual on an enumerable if both <paramref name="source" /> and <paramref name="target" /> is not
+                null.
+            </summary>
+            <typeparam name="T">The containing type within the list.</typeparam>
+            <param name="source">The source enumerable.</param>
+            <param name="target">The target enumerable.</param>
+            <returns>Whether both nullable enumerable are equal.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Checks.ApplicationCommandEqualityChecks.AreDictionariesEqual(System.Collections.Generic.Dictionary{System.String,System.String},System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+                Checks whether two dictionaries are equal.
+            </summary>
+            <param name="sourceDictionary">The source dictionary.</param>
+            <param name="targetDictionary">The target dictionary.</param>
+            <returns>Whether both dictionaries are equal.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Checks.ApplicationCommandEqualityChecks.DeepEqual(DisCatSharp.Entities.DiscordApplicationCommand,DisCatSharp.Entities.DiscordApplicationCommand,DisCatSharp.BaseDiscordClient,System.Boolean)">
+            <summary>
+                Checks deeply whether two <see cref="T:DisCatSharp.Entities.DiscordApplicationCommand" />s are the same.
+                Excluding id, application id and version here.
+            </summary>
+            <param name="source">Source application command.</param>
+            <param name="target">Application command to check against.</param>
+            <param name="client">The discord client.</param>
+            <param name="localizationEnabled">Whether localization is enabled.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Checks.ApplicationCommandEqualityChecks.DeepEqualOptions(System.Collections.Generic.IReadOnlyList{DisCatSharp.Entities.DiscordApplicationCommandOption},System.Collections.Generic.IReadOnlyList{DisCatSharp.Entities.DiscordApplicationCommandOption},System.Boolean)">
+            <summary>
+                Checks deeply whether <see cref="T:DisCatSharp.Entities.DiscordApplicationCommandOption" />s are the same.
+            </summary>
+            <param name="sourceOptions">Source options.</param>
+            <param name="targetOptions">Options to check against.</param>
+            <param name="localizationEnabled">Whether localization is enabled.</param>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Context.ApplicationCommandsTranslationContext">
+            <summary>
+                The application commands translation context.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Context.ApplicationCommandsTranslationContext.#ctor(System.Type,System.String)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.ApplicationCommands.Context.ApplicationCommandsTranslationContext" /> class.
+            </summary>
+            <param name="type">The type.</param>
+            <param name="name">The name.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.ApplicationCommandsTranslationContext.Type">
+            <summary>
+                Gets the type.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.ApplicationCommandsTranslationContext.Name">
+            <summary>
+                Gets the name.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.ApplicationCommandsTranslationContext.GroupTranslations">
+            <summary>
+                Gets the group translation json.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.ApplicationCommandsTranslationContext.SingleTranslations">
+            <summary>
+                Gets the single translation json.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Context.ApplicationCommandsTranslationContext.AddGroupTranslation(System.String)">
+            <summary>
+                Adds the group translation.
+            </summary>
+            <param name="translationJson"></param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Context.ApplicationCommandsTranslationContext.AddSingleTranslation(System.String)">
+            <summary>
+                Adds the single translation.
+            </summary>
+            <param name="translationJson"></param>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Context.AutocompleteContext">
+            <summary>
+                Represents a context for an autocomplete interaction.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.AutocompleteContext.Interaction">
+            <summary>
+                The interaction created.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.AutocompleteContext.Client">
+            <summary>
+                Gets the client for this interaction.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.AutocompleteContext.Guild">
+            <summary>
+                Gets the guild this interaction was executed in.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.AutocompleteContext.Channel">
+            <summary>
+                Gets the channel this interaction was executed in.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.AutocompleteContext.User">
+            <summary>
+                Gets the user which executed this interaction.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.AutocompleteContext.Member">
+            <summary>
+                Gets the member which executed this interaction, or null if the command is in a DM.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.AutocompleteContext.Locale">
+            <summary>
+                Gets the invoking user locale.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.AutocompleteContext.GuildLocale">
+            <summary>
+                Gets the guild locale if applicable.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.AutocompleteContext.AppPermissions">
+            <summary>
+                Gets the applications permissions.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.AutocompleteContext.Entitlements">
+            <summary>
+                <para>Gets the entitlements.</para>
+                <para>This is related to premium subscriptions for bots.</para>
+                <para>
+                    <note type="warning">Can only be used if you have an associated application subscription sku.</note>
+                </para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.AutocompleteContext.EntitlementSkuIds">
+            <summary>
+                <para>Gets the entitlement sku ids.</para>
+                <para>This is related to premium subscriptions for bots.</para>
+                <para>
+                    <note type="warning">Can only be used if you have an associated application subscription sku.</note>
+                </para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.AutocompleteContext.ApplicationCommandsExtension">
+            <summary>
+                Gets the slash command module this interaction was created in.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.AutocompleteContext.Services">
+            <summary>
+                <para>Gets the service provider.</para>
+                <para>This allows passing data around without resorting to static members.</para>
+                <para>Defaults to an empty service provider.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.AutocompleteContext.Options">
+            <summary>
+                The options already provided.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.AutocompleteContext.FocusedOption">
+            <summary>
+                The option to autocomplete.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Context.BaseContext">
+            <summary>
+                Represents a base context for application command contexts.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.#ctor(DisCatSharp.Enums.Core.DisCatSharpCommandType)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.ApplicationCommands.Context.BaseContext" /> class.
+            </summary>
+            <param name="type">The command type.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.BaseContext.Interaction">
+            <summary>
+                Gets the interaction that was created.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.BaseContext.Guild">
+            <summary>
+                Gets the guild this interaction was executed in.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.BaseContext.Channel">
+            <summary>
+                Gets the channel this interaction was executed in.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.BaseContext.User">
+            <summary>
+                Gets the user which executed this interaction.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.BaseContext.Member">
+            <summary>
+                Gets the member which executed this interaction, or null if the command is in a DM.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.BaseContext.ApplicationCommandsExtension">
+            <summary>
+                Gets the application command module this interaction was created in.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.BaseContext.Token">
+            <summary>
+                Gets the token for this interaction.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.BaseContext.InteractionId">
+            <summary>
+                Gets the id for this interaction.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.BaseContext.FullCommandName">
+            <summary>
+                Gets the full command string, including the subcommand.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.BaseContext.Locale">
+            <summary>
+                Gets the invoking user locale.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.BaseContext.GuildLocale">
+            <summary>
+                Gets the guild locale if applicable.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.BaseContext.AppPermissions">
+            <summary>
+                Gets the applications permissions.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.BaseContext.Entitlements">
+            <summary>
+                <para>Gets the entitlements.</para>
+                <para>This is related to premium subscriptions for bots.</para>
+                <para>
+                    <note type="warning">Can only be used if you have an associated application subscription sku.</note>
+                </para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.BaseContext.EntitlementSkuIds">
+            <summary>
+                <para>Gets the entitlement sku ids.</para>
+                <para>This is related to premium subscriptions for bots.</para>
+                <para>
+                    <note type="warning">Can only be used if you have an associated application subscription sku.</note>
+                </para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.BaseContext.Type">
+            <summary>
+                Gets the type of this interaction.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.BaseContext.Services">
+            <summary>
+                <para>Gets the service provider.</para>
+                <para>This allows passing data around without resorting to static members.</para>
+                <para>Defaults to an empty service provider.</para>
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.CreateResponseAsync(DisCatSharp.Enums.InteractionResponseType,DisCatSharp.Entities.DiscordInteractionResponseBuilder)">
+            <summary>
+                Creates a response to this interaction.
+                <para>
+                    You must create a response within 3 seconds of this interaction being executed; if the command has the
+                    potential to take more than 3 seconds, create a
+                    <see cref="F:DisCatSharp.Enums.InteractionResponseType.DeferredChannelMessageWithSource" /> at the start, and edit the response
+                    later.
+                </para>
+            </summary>
+            <param name="type">The type of the response.</param>
+            <param name="builder">The data to be sent, if any.</param>
+            <returns>
+                The created <see cref="T:DisCatSharp.Entities.DiscordMessage" />, or <see langword="null" /> if <paramref name="type" /> creates no
+                content.
+            </returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.CreateModalResponseAsync(DisCatSharp.Entities.DiscordInteractionModalBuilder)">
+            <summary>
+                Creates a modal response to this interaction.
+            </summary>
+            <param name="builder">The data to send.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.CreateInteractionIframeResponseAsync(System.String,System.String,DisCatSharp.Enums.IframeModalSize,System.String)">
+            <summary>
+                Creates an iframe response to this interaction.
+            </summary>
+            <param name="customId">The custom id of the iframe.</param>
+            <param name="title">The title of the iframe.</param>
+            <param name="modalSize">The size of the iframe.</param>
+            <param name="iFramePath">The path of the iframe.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.EditResponseAsync(DisCatSharp.Entities.DiscordWebhookBuilder)">
+            <summary>
+                Edits the interaction response.
+            </summary>
+            <param name="builder">The data to edit the response with.</param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.EditResponseAsync(System.String)">
+            <summary>
+                Edits the interaction response.
+            </summary>
+            <param name="content">The content to edit the response with.</param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.DeleteResponseAsync">
+            <summary>
+                Deletes the interaction response.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.FollowUpAsync(DisCatSharp.Entities.DiscordFollowupMessageBuilder)">
+            <summary>
+                Creates a follow up message to the interaction.
+            </summary>
+            <param name="builder">The message to be sent, in the form of a webhook.</param>
+            <returns>The created message.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.FollowUpAsync(System.String)">
+            <summary>
+                Creates a follow up message to the interaction.
+            </summary>
+            <param name="content">The content of the message to be sent.</param>
+            <returns>The created message.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.EditFollowupAsync(System.UInt64,DisCatSharp.Entities.DiscordWebhookBuilder)">
+            <summary>
+                Edits a followup message.
+            </summary>
+            <param name="followupMessageId">The id of the followup message to edit.</param>
+            <param name="builder">The webhook builder.</param>
+            <returns>The created message.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.EditFollowupAsync(System.UInt64,System.String)">
+            <summary>
+                Edits a followup message.
+            </summary>
+            <param name="followupMessageId">The id of the followup message to edit.</param>
+            <param name="content">The content of the webhook.</param>
+            <returns>The created message.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.DeleteFollowupAsync(System.UInt64)">
+            <summary>
+                Deletes a followup message.
+            </summary>
+            <param name="followupMessageId">The id of the followup message to delete.</param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.GetFollowupMessageAsync(System.UInt64)">
+            <summary>
+                Gets the followup message.
+            </summary>
+            <param name="followupMessageId">The followup message id.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.GetOriginalResponseAsync">
+            <summary>
+                Gets the original interaction response.
+            </summary>
+            <returns>The original interaction response.</returns>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Context.ContextMenuContext">
+            <summary>
+                Represents a context for a context menu.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Context.ContextMenuContext.#ctor(DisCatSharp.Enums.Core.DisCatSharpCommandType)">
+            <summary>
+                Represents a context for a context menu.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.ContextMenuContext.TargetUser">
+            <summary>
+                The user this command targets, if applicable.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.ContextMenuContext.TargetMember">
+            <summary>
+                The member this command targets, if applicable.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.ContextMenuContext.TargetMessage">
+            <summary>
+                The message this command targets, if applicable.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Context.InteractionContext">
+            <summary>
+                Represents a context for an interaction.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Context.InteractionContext.#ctor">
+            <summary>
+                Represents a context for an interaction.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.InteractionContext.ResolvedUserMentions">
+            <summary>
+                Gets the users mentioned in the command parameters.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.InteractionContext.ResolvedRoleMentions">
+            <summary>
+                Gets the roles mentioned in the command parameters.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.InteractionContext.ResolvedChannelMentions">
+            <summary>
+                Gets the channels mentioned in the command parameters.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.InteractionContext.ResolvedAttachments">
+            <summary>
+                Gets the attachments in the command parameters, if applicable.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator">
+            <summary>
+                Represents a choice translator.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator.Name">
+            <summary>
+                Gets the choice name.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator.NameTranslationsDictionary">
+            <summary>
+                Gets the choice name translations.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator.FromApplicationCommandChoice(DisCatSharp.Entities.DiscordApplicationCommandOptionChoice)">
+            <summary>
+                Converts a <see cref="T:DisCatSharp.Entities.DiscordApplicationCommandOptionChoice" /> to a <see cref="T:DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator" />.
+            </summary>
+            <param name="choice">The choice to convert.</param>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Entities.CommandTranslator">
+            <summary>
+                Represents a command translator.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.CommandTranslator.Name">
+            <summary>
+                Gets the command name.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.CommandTranslator.Description">
+            <summary>
+                Gets the command description.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.CommandTranslator.Type">
+            <summary>
+                Gets the application command type.
+                Used to determine whether it is an translator for context menu or not.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.CommandTranslator.NameTranslationsDictionary">
+            <summary>
+                Gets the command name translations.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.CommandTranslator.NameTranslations">
+            <summary>
+                Gets the command name translations.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.CommandTranslator.DescriptionTranslationsDictionary">
+            <summary>
+                Gets the command description translations.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.CommandTranslator.DescriptionTranslations">
+            <summary>
+                Gets the command description translations.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.CommandTranslator.Options">
+            <summary>
+                Gets the option translators, if applicable.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Entities.GroupTranslator">
+            <summary>
+                Represents a group translator.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.GroupTranslator.Name">
+            <summary>
+                Gets the group name.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.GroupTranslator.Description">
+            <summary>
+                Gets the group description.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.GroupTranslator.Type">
+            <summary>
+                Gets the application command type.
+                Used to determine whether it is an translator for context menu or not.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.GroupTranslator.NameTranslationsDictionary">
+            <summary>
+                Gets the group name translations.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.GroupTranslator.NameTranslations">
+            <summary>
+                Gets the group name translations.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.GroupTranslator.DescriptionTranslationsDictionary">
+            <summary>
+                Gets the group description translations.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.GroupTranslator.DescriptionTranslations">
+            <summary>
+                Gets the group description translations.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.GroupTranslator.SubGroups">
+            <summary>
+                Gets the sub group translators, if applicable.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.GroupTranslator.Commands">
+            <summary>
+                Gets the command translators, if applicable.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Entities.ICooldownResponder">
+            <summary>
+                The cooldown responder.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Entities.ICooldownResponder.Responder(DisCatSharp.ApplicationCommands.Context.BaseContext,DisCatSharp.Entities.Core.CooldownBucket)">
+            <summary>
+                Responds to cooldown ratelimit hits with given response.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="cooldownBucket">Gets the current cooldown bucket.</param>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Entities.OptionTranslator">
+            <summary>
+                Represents a option translator.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.OptionTranslator.Name">
+            <summary>
+                Gets the option name.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.OptionTranslator.Description">
+            <summary>
+                Gets the option description.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.OptionTranslator.Type">
+            <summary>
+                Gets the option type
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.OptionTranslator.NameTranslationsDictionary">
+            <summary>
+                Gets the option name translations.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.OptionTranslator.DescriptionTranslationsDictionary">
+            <summary>
+                Gets the option description translations.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.OptionTranslator.Choices">
+            <summary>
+                Gets the choice translators, if applicable.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Entities.OptionTranslator.FromApplicationCommandOption(DisCatSharp.Entities.DiscordApplicationCommandOption)">
+            <summary>
+                Converts a <see cref="T:DisCatSharp.Entities.DiscordApplicationCommandOption" /> to a <see cref="T:DisCatSharp.ApplicationCommands.Entities.OptionTranslator" />.
+            </summary>
+            <param name="option">The option to convert.</param>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Entities.RegisteredDiscordApplicationCommand">
+            <summary>
+                Represents a discord application command registered by the ApplicationCommands extensions.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Entities.RegisteredDiscordApplicationCommand.#ctor">
+            <summary>
+                Creates a new empty registered discord application command.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Entities.RegisteredDiscordApplicationCommand.#ctor(DisCatSharp.Entities.DiscordApplicationCommand)">
+            <summary>
+                Creates a new registered discord application command.
+            </summary>
+            <param name="parent">The original application command</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.RegisteredDiscordApplicationCommand.CommandMethod">
+            <summary>
+                The method that will be executed when somebody runs this command.
+                <see langword="null" /> if command is a group command or reflection failed.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.RegisteredDiscordApplicationCommand.CommandType">
+            <summary>
+                The type that contains the sub commands of this command.
+                <see langword="null" /> if command is not a group command or reflection failed.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.RegisteredDiscordApplicationCommand.ContainingType">
+            <summary>
+                The type this command is contained in.
+                <see langword="null" /> if reflection failed.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.RegisteredDiscordApplicationCommand.CustomAttributes">
+            <summary>
+                Gets all Non-DisCatSharp attributes this command has.
+                <see langword="null" /> if reflection failed.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator">
+            <summary>
+                Represents a sub group translator.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator.Name">
+            <summary>
+                Gets the sub group name.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator.Description">
+            <summary>
+                Gets the sub group description.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator.NameTranslationsDictionary">
+            <summary>
+                Gets the sub group name translations.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator.NameTranslations">
+            <summary>
+                Gets the sub group name translations.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator.DescriptionTranslationsDictionary">
+            <summary>
+                Gets the sub group description translations.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator.DescriptionTranslations">
+            <summary>
+                Gets the sub group description translations.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Entities.SubGroupTranslator.Commands">
+            <summary>
+                Gets the command translators.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Enums.ApplicationCommandModuleLifespan">
+            <summary>
+                Represents a application command module lifespan.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.Enums.ApplicationCommandModuleLifespan.Scoped">
+            <summary>
+                Whether this module should be initiated every time a command is run, with dependencies injected from a scope.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.Enums.ApplicationCommandModuleLifespan.Transient">
+            <summary>
+                Whether this module should be initiated every time a command is run.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.Enums.ApplicationCommandModuleLifespan.Singleton">
+            <summary>
+                Whether this module should be initiated at startup.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.EventArgs.ContextMenuErrorEventArgs">
+            <summary>
+                Represents arguments for a <see cref="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ContextMenuErrored" />
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.EventArgs.ContextMenuErrorEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.ApplicationCommands.EventArgs.ContextMenuErrorEventArgs" /> class.
+            </summary>
+            <param name="provider">The provider.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.EventArgs.ContextMenuErrorEventArgs.Context">
+            <summary>
+                The context of the command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.EventArgs.ContextMenuErrorEventArgs.Exception">
+            <summary>
+                The exception thrown.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.EventArgs.ContextMenuExecutedEventArgs">
+            <summary>
+                Represents the arguments for a <see cref="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ContextMenuExecuted" /> event
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.EventArgs.ContextMenuExecutedEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.ApplicationCommands.EventArgs.ContextMenuExecutedEventArgs" /> class.
+            </summary>
+            <param name="provider">The provider.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.EventArgs.ContextMenuExecutedEventArgs.Context">
+            <summary>
+                The context of the command.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.EventArgs.ApplicationCommandsModuleReadyEventArgs">
+            <summary>
+                Represents arguments for a <see cref="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ApplicationCommandsModuleReady" /> event.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.EventArgs.ApplicationCommandsModuleReadyEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.ApplicationCommands.EventArgs.ApplicationCommandsModuleReadyEventArgs" /> class.
+            </summary>
+            <param name="provider">The provider.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.EventArgs.ApplicationCommandsModuleReadyEventArgs.GuildsWithoutScope">
+            <summary>
+                Gets a list of all guild ids missing the application commands scope.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.EventArgs.ApplicationCommandsModuleStartupFinishedEventArgs">
+            <summary>
+                Represents arguments for a <see cref="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ApplicationCommandsModuleStartupFinished" />
+                event.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.EventArgs.ApplicationCommandsModuleStartupFinishedEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.ApplicationCommands.EventArgs.ApplicationCommandsModuleStartupFinishedEventArgs" /> class.
+            </summary>
+            <param name="provider">The provider.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.EventArgs.ApplicationCommandsModuleStartupFinishedEventArgs.GuildsWithoutScope">
+            <summary>
+                Gets a list of all guild ids missing the application commands scope.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.EventArgs.ApplicationCommandsModuleStartupFinishedEventArgs.RegisteredGlobalCommands">
+            <summary>
+                Gets all registered global commands.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.EventArgs.ApplicationCommandsModuleStartupFinishedEventArgs.RegisteredGuildCommands">
+            <summary>
+                Gets all registered guild commands mapped by guild id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.EventArgs.ApplicationCommandsModuleStartupFinishedEventArgs.ShardId">
+            <summary>
+                Gets the shard id of the shard that finished loading.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.EventArgs.GlobalApplicationCommandsRegisteredEventArgs">
+            <summary>
+                Represents arguments for a <see cref="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GlobalApplicationCommandsRegistered" /> event.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.EventArgs.GlobalApplicationCommandsRegisteredEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.ApplicationCommands.EventArgs.GlobalApplicationCommandsRegisteredEventArgs" /> class.
+            </summary>
+            <param name="provider">The provider.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.EventArgs.GlobalApplicationCommandsRegisteredEventArgs.RegisteredCommands">
+            <summary>
+                Gets all registered global commands.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.EventArgs.GuildApplicationCommandsRegisteredEventArgs">
+            <summary>
+                Represents arguments for a <see cref="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GuildApplicationCommandsRegistered" /> event.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.EventArgs.GuildApplicationCommandsRegisteredEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.ApplicationCommands.EventArgs.GuildApplicationCommandsRegisteredEventArgs" /> class.
+            </summary>
+            <param name="provider">The provider.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.EventArgs.GuildApplicationCommandsRegisteredEventArgs.GuildId">
+            <summary>
+                Gets the target guild id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.EventArgs.GuildApplicationCommandsRegisteredEventArgs.RegisteredCommands">
+            <summary>
+                Gets all registered guild commands.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.EventArgs.SlashCommandErrorEventArgs">
+            <summary>
+                Represents arguments for a <see cref="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.SlashCommandErrored" /> event
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.EventArgs.SlashCommandErrorEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.ApplicationCommands.EventArgs.SlashCommandErrorEventArgs" /> class.
+            </summary>
+            <param name="provider">The provider.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.EventArgs.SlashCommandErrorEventArgs.Context">
+            <summary>
+                The context of the command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.EventArgs.SlashCommandErrorEventArgs.Exception">
+            <summary>
+                The exception thrown.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.EventArgs.SlashCommandExecutedEventArgs">
+            <summary>
+                Represents the arguments for a <see cref="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.SlashCommandExecuted" /> event
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.EventArgs.SlashCommandExecutedEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.ApplicationCommands.EventArgs.SlashCommandExecutedEventArgs" /> class.
+            </summary>
+            <param name="provider">The provider.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.EventArgs.SlashCommandExecutedEventArgs.Context">
+            <summary>
+                The context of the command.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Exceptions.ContextMenuExecutionChecksFailedException">
+            <summary>
+                Thrown when a pre-execution check for a context menu command fails.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.Exceptions.ContextMenuExecutionChecksFailedException.FailedChecks">
+            <summary>
+                The list of failed checks.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Exceptions.SlashExecutionChecksFailedException">
+            <summary>
+                Thrown when a pre-execution check for a slash command fails.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.Exceptions.SlashExecutionChecksFailedException.FailedChecks">
+            <summary>
+                The list of failed checks.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.ExtensionMethods">
+            <summary>
+                Defines various extension methods for application commands.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ExtensionMethods.UseApplicationCommands(DisCatSharp.DiscordClient,DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration)">
+            <summary>
+                Enables application commands on this <see cref="T:DisCatSharp.DiscordClient" />.
+            </summary>
+            <param name="client">Client to enable application commands for.</param>
+            <param name="config">Configuration to use.</param>
+            <returns>Created <see cref="T:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ExtensionMethods.GetApplicationCommands(DisCatSharp.DiscordClient)">
+            <summary>
+                Gets the application commands module for this client.
+            </summary>
+            <param name="client">Client to get application commands for.</param>
+            <returns>The module, or null if not activated.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ExtensionMethods.GetApplicationCommandsAsync(DisCatSharp.DiscordShardedClient)">
+            <summary>
+                Gets the application commands from this <see cref="T:DisCatSharp.DiscordShardedClient" />.
+            </summary>
+            <param name="client">Client to get application commands from.</param>
+            <returns>A dictionary of current <see cref="T:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension" /> with the key being the shard id.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ExtensionMethods.RegisterGlobalCommands``1(System.Collections.Generic.IReadOnlyDictionary{System.Int32,DisCatSharp.ApplicationCommands.ApplicationCommandsExtension},System.Action{DisCatSharp.ApplicationCommands.Context.ApplicationCommandsTranslationContext})">
+            <summary>
+                Registers a command class with optional translation setup globally.
+            </summary>
+            <param name="extensions">Sharding extensions.</param>
+            <typeparam name="T">The command class to register.</typeparam>
+            <param name="translationSetup">A callback to setup translations with.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ExtensionMethods.RegisterGlobalCommands(System.Collections.Generic.IReadOnlyDictionary{System.Int32,DisCatSharp.ApplicationCommands.ApplicationCommandsExtension},System.Type,System.Action{DisCatSharp.ApplicationCommands.Context.ApplicationCommandsTranslationContext})">
+            <summary>
+                Registers a command class with optional translation setup globally.
+            </summary>
+            <param name="extensions">Sharding extensions.</param>
+            <param name="type">The <see cref="T:System.Type" /> of the command class to register.</param>
+            <param name="translationSetup">A callback to setup translations with.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ExtensionMethods.RegisterGuildCommands``1(System.Collections.Generic.IReadOnlyDictionary{System.Int32,DisCatSharp.ApplicationCommands.ApplicationCommandsExtension},System.UInt64,System.Action{DisCatSharp.ApplicationCommands.Context.ApplicationCommandsTranslationContext})">
+            <summary>
+                Registers a command class with optional translation setup for a guild.
+            </summary>
+            <typeparam name="T">The command class to register.</typeparam>
+            <param name="extensions">Sharding extensions.</param>
+            <param name="guildId">The guild id to register it on.</param>
+            <param name="translationSetup">A callback to setup translations with.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ExtensionMethods.RegisterGuildCommands(System.Collections.Generic.IReadOnlyDictionary{System.Int32,DisCatSharp.ApplicationCommands.ApplicationCommandsExtension},System.Type,System.UInt64,System.Action{DisCatSharp.ApplicationCommands.Context.ApplicationCommandsTranslationContext})">
+            <summary>
+                Registers a command class with optional translation setup for a guild.
+            </summary>
+            <param name="extensions">Sharding extensions.</param>
+            <param name="type">The <see cref="T:System.Type" /> of the command class to register.</param>
+            <param name="guildId">The guild id to register it on.</param>
+            <param name="translationSetup">A callback to setup translations with.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ExtensionMethods.UseApplicationCommandsAsync(DisCatSharp.DiscordShardedClient,DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration)">
+            <summary>
+                Enables application commands on this <see cref="T:DisCatSharp.DiscordShardedClient" />.
+            </summary>
+            <param name="client">Client to enable application commands on.</param>
+            <param name="config">Configuration to use.</param>
+            <returns>A dictionary of created <see cref="T:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension" /> with the key being the shard id.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ExtensionMethods.GetName``1(``0)">
+            <summary>
+                Gets the name from the <see cref="T:DisCatSharp.ApplicationCommands.Attributes.ChoiceNameAttribute" /> for this enum value.
+            </summary>
+            <returns>The name.</returns>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Workers.CommandWorker">
+            <summary>
+                Represents a <see cref="T:DisCatSharp.ApplicationCommands.Workers.CommandWorker" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Workers.CommandWorker.ParseContextMenuCommands(System.Type,System.Collections.Generic.IEnumerable{System.Reflection.MethodInfo},System.Collections.Generic.List{DisCatSharp.ApplicationCommands.Entities.CommandTranslator})">
+            <summary>
+                Parses context menu application commands.
+            </summary>
+            <param name="type">The type.</param>
+            <param name="methods">List of method infos.</param>
+            <param name="translator">The optional command translations.</param>
+            <returns>Too much.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Workers.CommandWorker.ParseBasicSlashCommandsAsync(System.Type,System.Collections.Generic.IEnumerable{System.Reflection.MethodInfo},System.Nullable{System.UInt64},System.Collections.Generic.List{DisCatSharp.ApplicationCommands.Entities.CommandTranslator})">
+            <summary>
+                Parses single application commands.
+            </summary>
+            <param name="type">The type.</param>
+            <param name="methods">List of method infos.</param>
+            <param name="guildId">The optional guild id.</param>
+            <param name="translator">The optional command translations.</param>
+            <returns>Too much.</returns>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Workers.NestedCommandWorker">
+            <summary>
+                Represents a <see cref="T:DisCatSharp.ApplicationCommands.Workers.NestedCommandWorker" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Workers.NestedCommandWorker.ParseSlashGroupsAsync(System.Type,System.Collections.Generic.List{System.Reflection.TypeInfo},System.Nullable{System.UInt64},System.Collections.Generic.List{DisCatSharp.ApplicationCommands.Entities.GroupTranslator})">
+            <summary>
+                Parses application command groups.
+            </summary>
+            <param name="type">The type.</param>
+            <param name="types">List of type infos.</param>
+            <param name="guildId">The optional guild id.</param>
+            <param name="translator">The optional group translations.</param>
+            <returns>Too much.</returns>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker">
+            <summary>
+                Represents a <see cref="T:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker.RegisterGlobalCommandsAsync(DisCatSharp.DiscordClient,System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommand},DisCatSharp.Entities.DiscordApplicationCommand)">
+            <summary>
+                Registers the global commands.
+            </summary>
+            <param name="client">The discord client.</param>
+            <param name="commands">The command list.</param>
+            <param name="entryPointCommand">The entry point command.</param>
+            <returns>A list of registered commands.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker.RegisterGuildCommandsAsync(DisCatSharp.DiscordClient,System.UInt64,System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommand})">
+            <summary>
+                Registers the guild commands.
+            </summary>
+            <param name="client">The discord client.</param>
+            <param name="guildId">The target guild id.</param>
+            <param name="commands">The command list.</param>
+            <returns>A list of registered commands.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker.BuildGuildDeleteList(DisCatSharp.DiscordClient,System.UInt64,System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommand})">
+            <summary>
+                Builds a list of guild command ids to be deleted on discords backend.
+            </summary>
+            <param name="client">The discord client.</param>
+            <param name="guildId">The guild id these commands belong to.</param>
+            <param name="updateList">The command list.</param>
+            <returns>A list of command ids.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker.BuildGuildCreateList(DisCatSharp.DiscordClient,System.UInt64,System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommand})">
+            <summary>
+                Builds a list of guild commands to be created on discords backend.
+            </summary>
+            <param name="client">The discord client.</param>
+            <param name="guildId">The guild id these commands belong to.</param>
+            <param name="updateList">The command list.</param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker.BuildGuildOverwriteList(DisCatSharp.DiscordClient,System.UInt64,System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommand})">
+            <summary>
+                Builds a list of guild commands to be overwritten on discords backend.
+            </summary>
+            <param name="client">The discord client.</param>
+            <param name="guildId">The guild id these commands belong to.</param>
+            <param name="updateList">The command list.</param>
+            <returns>A dictionary of command id and command.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker.BuildGlobalDeleteList(DisCatSharp.DiscordClient,System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommand},DisCatSharp.Entities.DiscordApplicationCommand)">
+            <summary>
+                Builds a list of global command ids to be deleted on discords backend.
+            </summary>
+            <param name="client">The discord client.</param>
+            <param name="updateList">The command list.</param>
+            <param name="entryPointCommand">The entry point command.</param>
+            <returns>A list of command ids.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker.BuildGlobalCreateList(DisCatSharp.DiscordClient,System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommand},DisCatSharp.Entities.DiscordApplicationCommand)">
+            <summary>
+                Builds a list of global commands to be created on discords backend.
+            </summary>
+            <param name="client">The discord client.</param>
+            <param name="updateList">The command list.</param>
+            <param name="entryPointCommand">The entry point command.</param>
+            <returns>A list of commands.</returns>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker.BuildGlobalOverwriteList(DisCatSharp.DiscordClient,System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommand})">
+            <summary>
+                Builds a list of global commands to be overwritten on discords backend.
+            </summary>
+            <param name="client">The discord client.</param>
+            <param name="updateList">The command list.</param>
+            <returns>A dictionary of command ids and commands.</returns>
+        </member>
+    </members>
+</doc>

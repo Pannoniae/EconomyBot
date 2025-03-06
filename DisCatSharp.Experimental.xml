@@ -1,0 +1,815 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DisCatSharp.Experimental</name>
+    </assembly>
+    <members>
+        <member name="T:DisCatSharp.Experimental.AudioHelper">
+            <summary>
+                Represents various <see cref="T:DisCatSharp.Experimental.AudioHelper" />s.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Experimental.AudioHelper.GetOpusAudioDurationInSeconds(System.IO.Stream)">
+            <summary>
+                Gets the audio duration in seconds.
+            </summary>
+            <param name="opusStream">The audio stream.</param>
+            <returns>The duration in seconds.</returns>
+        </member>
+        <member name="M:DisCatSharp.Experimental.AudioHelper.GenerateWaveformBytes(System.IO.Stream,System.Int32)">
+            <summary>
+                Generates the waveform data.
+            </summary>
+            <param name="opusStream">The audio stream.</param>
+            <param name="maxWaveformSize">The maximal waveform size.</param>
+            <returns>The waveform as a byte array.</returns>
+        </member>
+        <member name="M:DisCatSharp.Experimental.AudioHelper.GetDurationAndWaveformBytes(System.IO.Stream)">
+            <summary>
+                Generates the waveform bytes and calculates the duration in seconds.
+            </summary>
+            <param name="opusStream">The audio stream.</param>
+            <returns>The generated data.</returns>
+        </member>
+        <member name="M:DisCatSharp.Experimental.AudioHelper.ConvertToOggOpusAsync(System.IO.Stream)">
+            <summary>
+                Converts an input stream to Discord's expected voice message format.
+            </summary>
+            <param name="inputStream">The audio source stream.</param>
+            <returns>The audio result stream.</returns>
+        </member>
+        <member name="T:DisCatSharp.Experimental.DisCatSharpExtensions">
+            <summary>
+                Represents experimental extension methods for DisCatSharp.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Experimental.DisCatSharpExtensions.GetClydeProfileAsync(DisCatSharp.DiscordClient,System.UInt64)">
+            <summary>
+                Gets the clyde profile for the given <paramref name="profileId" />.
+            </summary>
+            <param name="client">The discord client.</param>
+            <param name="profileId">The profile id to get.</param>
+        </member>
+        <member name="M:DisCatSharp.Experimental.DisCatSharpExtensions.GetClydeSettingsAsync(DisCatSharp.Entities.DiscordGuild)">
+            <summary>
+                Gets the clyde settings for the given <paramref name="guild" />.
+            </summary>
+            <param name="guild">The guild to get clyde's settings for.</param>
+        </member>
+        <member name="M:DisCatSharp.Experimental.DisCatSharpExtensions.ModifyClydeSettingsAsync(DisCatSharp.Entities.DiscordGuild,System.UInt64)">
+            <summary>
+                Modifies the clyde settings for the given <paramref name="guild" /> by applying a <paramref name="profileId" />.
+            </summary>
+            <param name="guild">The guild to modify clyde's settings for.</param>
+            <param name="profileId">The profile id to apply.</param>
+        </member>
+        <member name="M:DisCatSharp.Experimental.DisCatSharpExtensions.ModifyClydeSettingsAsync(DisCatSharp.Entities.DiscordGuild,DisCatSharp.Entities.Optional{System.String},DisCatSharp.Entities.Optional{System.String},DisCatSharp.Entities.Optional{System.IO.Stream},DisCatSharp.Entities.Optional{System.IO.Stream},DisCatSharp.Entities.Optional{System.Collections.Generic.List{DisCatSharp.Entities.DiscordColor}})">
+            <summary>
+                Modifies the clyde settings for the given <paramref name="guild" />.
+            </summary>
+            <param name="guild">The guild to modify clyde's settings for.</param>
+            <param name="name">The new name.</param>
+            <param name="personality">The new basePersonality.</param>
+            <param name="avatar">The new avatar.</param>
+            <param name="banner">The new banner.</param>
+            <param name="themeColors">The new theme colors.</param>
+        </member>
+        <member name="M:DisCatSharp.Experimental.DisCatSharpExtensions.GenerateClydePersonalityAsync(DisCatSharp.DiscordClient,System.String)">
+            <summary>
+                Generates a basePersonality for clyde based on the given <paramref name="basePersonality" />.
+            </summary>
+            <param name="client">The discord client.</param>
+            <param name="basePersonality">The base base personality to generate a new one from.</param>
+        </member>
+        <member name="T:DisCatSharp.Experimental.DiscordApiClientHook">
+            <summary>
+                Represents a hook for the discord api client.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.#ctor(DisCatSharp.Net.DiscordApiClient)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Experimental.DiscordApiClientHook" /> class.
+            </summary>
+            <param name="apiClient">The api client.</param>
+        </member>
+        <member name="P:DisCatSharp.Experimental.DiscordApiClientHook.ApiClient">
+            <summary>
+                Gets the api client.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.GetClydeProfileAsync(System.UInt64)">
+            <summary>
+                Gets the clyde profile for the given <paramref name="profileId" />.
+            </summary>
+            <param name="profileId">The profile id to get.</param>
+        </member>
+        <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.GetClydeSettingsAsync(System.UInt64)">
+            <summary>
+                Gets the clyde settings for the given <paramref name="guildId" />.
+            </summary>
+            <param name="guildId">The guild id to get clyde's settings for.</param>
+        </member>
+        <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.ModifyClydeSettingsAsync(System.UInt64,System.UInt64)">
+            <summary>
+                Modifies the clyde settings for the given <paramref name="guildId" /> by applying a <paramref name="profileId" />.
+            </summary>
+            <param name="guildId">The guild id to modify clyde's settings for.</param>
+            <param name="profileId">The profile id to apply.</param>
+        </member>
+        <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.ModifyClydeSettingsAsync(System.UInt64,DisCatSharp.Entities.Optional{System.String},DisCatSharp.Entities.Optional{System.String},DisCatSharp.Entities.Optional{System.String},DisCatSharp.Entities.Optional{System.String},DisCatSharp.Entities.Optional{System.Collections.Generic.List{System.Int32}})">
+            <summary>
+                Modifies the clyde settings for the given <paramref name="guildId" />.
+            </summary>
+            <param name="guildId">The guild id to modify clyde's settings for.</param>
+            <param name="name">The new name.</param>
+            <param name="personality">The new basePersonality.</param>
+            <param name="avatarBase64">The new avatar.</param>
+            <param name="bannerBase64">The new banner.</param>
+            <param name="themeColors">The new theme colors.</param>
+        </member>
+        <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.GenerateClydePersonalityAsync(System.String)">
+            <summary>
+                Generates a basePersonality for clyde based on the given <paramref name="basePersonality" />.
+            </summary>
+            <param name="basePersonality">The base base personality to generate a new one from.</param>
+        </member>
+        <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.SearchGuildMembersAsync(System.UInt64,DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchParams)">
+            <summary>
+                Searches the guild members asynchronously based on the provided search parameters.
+            </summary>
+            <param name="guildId">The ID of the guild.</param>
+            <param name="searchParams">The search parameters.</param>
+            <exception cref="T:DisCatSharp.Exceptions.ValidationException">Thrown if the user gave an invalid input.</exception>
+            <exception cref="T:DisCatSharp.Exceptions.NotIndexedException">Thrown if the elastisearch endpoint has not finished indexing yet.</exception>
+            <exception cref="T:DisCatSharp.Exceptions.UnauthorizedException">
+                Thrown when the client does not have the <see cref="F:DisCatSharp.Enums.Permissions.ManageGuild" />
+                permission.
+            </exception>
+            <exception cref="T:DisCatSharp.Exceptions.BadRequestException">Thrown when an invalid parameter was provided.</exception>
+            <exception cref="T:DisCatSharp.Exceptions.ServerErrorException">Thrown when Discord is unable to process the request.</exception>
+            <returns>A list of supplemental guild members that match the search criteria.</returns>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Entities.DiscordChannelMethodHooks">
+            <summary>
+                Adds methods to <see cref="T:DisCatSharp.Entities.DiscordChannel" />
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Experimental.Entities.DiscordChannelMethodHooks.UploadFileAsync(DisCatSharp.Entities.DiscordChannel,System.String,System.IO.Stream,System.String)">
+            <summary>
+                Uploads a file to the channel for later use in a <see cref="T:DisCatSharp.Entities.DiscordMessageBuilder" />.
+            </summary>
+            <param name="channel">The channel to upload the file to.</param>
+            <param name="name">The name of the file to upload.</param>
+            <param name="stream">The stream of the file to upload.</param>
+            <param name="description">The description of the file to upload.</param>
+            <returns>The upload information.</returns>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Entities.ClydeProfile">
+            <summary>
+                Represents a clyde profile.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.ClydeProfile.Name">
+            <summary>
+                Gets clyde's profile name.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.ClydeProfile.Personality">
+            <summary>
+                Gets clyde's profile personality.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.ClydeProfile.AvatarHash">
+            <summary>
+                Gets clyde's profile avatar hash.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.ClydeProfile.BannerHash">
+            <summary>
+                Gets clyde's profile banner hash.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.ClydeProfile.Bio">
+            <summary>
+                Gets clyde's profile bio.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.ClydeProfile.AuthorId">
+            <summary>
+                Gets the user who authored this clyde profile.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.ClydeProfile.ThemeColorsInternal">
+            <summary>
+                Gets clyde's profile theme color ints.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.ClydeProfile.ThemeColors">
+            <summary>
+                Gets the clyde's profile theme colors, if set.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.ClydeProfile.ClydeProfileId">
+            <summary>
+                Gets clyde's profile id.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Entities.ClydeSettings">
+            <summary>
+                Represents a clyde settings object in guilds.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.ClydeSettings.GuildId">
+            <summary>
+                Gets the guild id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.ClydeSettings.Personality">
+            <summary>
+                Gets the personality.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.ClydeSettings.LastEditedById">
+            <summary>
+                Gets the id of the last user who edited the settings, if applicable.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.ClydeSettings.ClydeProfileId">
+            <summary>
+                Gets the clyde profile id.
+                Use <see cref="M:DisCatSharp.Experimental.DisCatSharpExtensions.GetClydeProfileAsync(DisCatSharp.DiscordClient,System.UInt64)" /> to fetch details about this profile.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchParams">
+            <summary>
+                Represents guild member search params.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchParams.Limit">
+            <summary>
+                Max number of members to return (<c>1</c>-<c>1000</c>, default <c>25</c>).
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchParams.Sort">
+            <summary>
+                The sorting algorithm to use (default <see cref="F:DisCatSharp.Experimental.Enums.MemberSortType.JoinedAtDesc" />).
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchParams.OrQuery">
+            <summary>
+                The filter criteria to match against members using OR logic.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchParams.AndQuery">
+            <summary>
+                The filter criteria to match against members using AND logic.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchParams.Before">
+            <summary>
+                Get members before this member.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchParams.After">
+            <summary>
+                Get members after this member.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchValidator">
+            <summary>
+                Provides a validator for <see cref="T:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchParams" />.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchValidator.MAX_OR_QUERY_ITEMS">
+            <summary>
+                Gets the max OR query item count.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchValidator.MAX_AND_QUERY_ITEMS">
+            <summary>
+                Gets the max AND query item count.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchValidator.MAX_LIMIT">
+            <summary>
+                Gets the max limit count.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchValidator.MIN_LIMIT">
+            <summary>
+                Gets the min limit count.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchValidator.MAX_QUERY_LENGTH">
+            <summary>
+                Gets the max query length.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchValidator.Validate(DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchParams)">
+            <summary>
+                Validates the guild member search parameters.
+            </summary>
+            <param name="searchParams">The search parameters to validate.</param>
+            <returns>A tuple containing a boolean indicating validity and an optional error message.</returns>
+        </member>
+        <member name="M:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchValidator.ValidateQuery(DisCatSharp.Experimental.Entities.DiscordMemberFilter,System.String,System.Boolean)">
+            <summary>
+                Validates a DiscordMemberFilter query.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchValidator.ValidateQueryConditions(DisCatSharp.Experimental.Entities.DiscordQuery,System.String,System.String,System.Func{System.String,System.Boolean},System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+                Validates the conditions and types of an individual query within a filter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchValidator.ValidateSafetySignals(DisCatSharp.Experimental.Entities.DiscordSafetySignals)">
+            <summary>
+                Validates safety signals queries.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchValidator.ValidateSnowflakeType(System.String)">
+            <summary>
+                Validates that the query type is snowflake.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchValidator.ValidateIntegerType(System.String)">
+            <summary>
+                Validates that the query type is integer.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchValidator.ValidateStringType(System.String)">
+            <summary>
+                Validates that the query type is string.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Entities.DiscordGuildMethodsHook">
+            <summary>
+                Adds methods to <see cref="T:DisCatSharp.Entities.DiscordGuild" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Experimental.Entities.DiscordGuildMethodsHook.SearchMembersAsync(DisCatSharp.Entities.DiscordGuild,DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchParams)">
+            <summary>
+                Searches the guild for members through elasticsearch.
+                If the guild isn't indexed yet, it'll return a 202 accepted response, we're gonna throw at this point.
+                Access the <see cref="T:DisCatSharp.Exceptions.NotIndexedException" />'s <see cref="P:DisCatSharp.Exceptions.NotIndexedException.RetryAfter" /> field to know when to
+                retry this request.
+            </summary>
+            <param name="guild">The guild.</param>
+            <param name="searchParams">The guild member search params</param>
+            <exception cref="T:DisCatSharp.Exceptions.ValidationException">Thrown if the user gave an invalid input.</exception>
+            <exception cref="T:DisCatSharp.Exceptions.NotIndexedException">Thrown if the elasticsearch endpoint has not finished indexing yet.</exception>
+            <exception cref="T:DisCatSharp.Exceptions.UnauthorizedException">
+                Thrown when the client does not have the <see cref="F:DisCatSharp.Enums.Permissions.ManageGuild" />
+                permission.
+            </exception>
+            <exception cref="T:DisCatSharp.Exceptions.BadRequestException">Thrown when an invalid parameter was provided.</exception>
+            <exception cref="T:DisCatSharp.Exceptions.ServerErrorException">Thrown when Discord is unable to process the request.</exception>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Entities.DiscordMemberFilter">
+            <summary>
+                Represents a member filter.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordMemberFilter.UserId">
+            <summary>
+                Query to match member IDs against.
+                Possible query types: <see cref="P:DisCatSharp.Experimental.Entities.DiscordQuery.OrQuery" /> or <see cref="P:DisCatSharp.Experimental.Entities.DiscordQuery.RangeQuery" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordMemberFilter.Usernames">
+            <summary>
+                Query to match display name(s), username(s), and nickname(s) against.
+                Possible query types: <see cref="P:DisCatSharp.Experimental.Entities.DiscordQuery.OrQuery" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordMemberFilter.RoleIds">
+            <summary>
+                IDs of roles to match members against.
+                Possible query types: <see cref="P:DisCatSharp.Experimental.Entities.DiscordQuery.OrQuery" /> or <see cref="P:DisCatSharp.Experimental.Entities.DiscordQuery.AndQuery" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordMemberFilter.GuildJoinedAt">
+            <summary>
+                When the user joined the guild.
+                Possible query types: <see cref="P:DisCatSharp.Experimental.Entities.DiscordQuery.RangeQuery" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordMemberFilter.SafetySignals">
+            <summary>
+                Safety signals to match members against.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordMemberFilter.IsPending">
+            <summary>
+                Whether the member has not yet passed the guild's member verification requirements.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordMemberFilter.DidRejoin">
+            <summary>
+                Whether the member left and rejoined the guild.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordMemberFilter.JoinSourceType">
+            <summary>
+                How the user joined the guild.
+                Possible query types: <see cref="P:DisCatSharp.Experimental.Entities.DiscordQuery.OrQuery" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordMemberFilter.SourceInviteCode">
+            <summary>
+                The invite code or vanity used to join the guild.
+                Possible query types: <see cref="P:DisCatSharp.Experimental.Entities.DiscordQuery.OrQuery" />.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Entities.DiscordMemberPaginationFilter">
+            <summary>
+                Represents a member pagination filter.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordMemberPaginationFilter.UserId">
+            <summary>
+                The ID of the user to paginate past.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordMemberPaginationFilter.GuildJoinedAt">
+            <summary>
+                When the user to paginate past joined the guild.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Entities.DiscordQuery">
+            <summary>
+                Represents a search query.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordQuery.OrQuery">
+            <summary>
+                Builds a OR query.
+                Array of ulongs, strings, or integers.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordQuery.AndQuery">
+            <summary>
+                Builds a AND query
+                Array of ulongs, strings, or integers.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordQuery.RangeQuery">
+            <summary>
+                Builds a RANGE query.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Entities.DiscordRangeQuery">
+            <summary>
+                Represents a range query.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordRangeQuery.Gte">
+            <summary>
+                Inclusive lower bound value to match.
+                Ulong or integer.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordRangeQuery.Lte">
+            <summary>
+                Inclusive upper bound value to match.
+                Ulong or integer.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Entities.DiscordSafetySignals">
+            <summary>
+                Represents safety signal queries.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordSafetySignals.UnusualDmActivityUntil">
+            <summary>
+                When the member's unusual DM activity flag will expire.
+                Possible query types: <see cref="P:DisCatSharp.Experimental.Entities.DiscordQuery.RangeQuery" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordSafetySignals.CommunicationDisabledUntil">
+            <summary>
+                When the member's timeout will expire.
+                Possible query types: <see cref="P:DisCatSharp.Experimental.Entities.DiscordQuery.RangeQuery" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordSafetySignals.UnusualAccountActivity">
+            <summary>
+                Whether unusual account activity is detected.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordSafetySignals.AutomodQuarantinedUsername">
+            <summary>
+                Whether the member has been indefinitely quarantined by an AutoMod Rule for their username, display name, or
+                nickname.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Entities.DiscordSearchGuildMembersResponse">
+            <summary>
+                Represents a search guild members response.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordSearchGuildMembersResponse.GuildId">
+            <summary>
+                The ID of the guild searched.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordSearchGuildMembersResponse.Members">
+            <summary>
+                The resulting members.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordSearchGuildMembersResponse.PageResultCount">
+            <summary>
+                The number of results returned.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordSearchGuildMembersResponse.TotalResultCount">
+            <summary>
+                The total number of results found.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Entities.DiscordSupplementalGuildMember">
+            <summary>
+                Represents supplemental information about a user's join source in a guild.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordSupplementalGuildMember.Member">
+            <summary>
+                Gets the associated guild member.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordSupplementalGuildMember.TransportMember">
+            <summary>
+                Gets the associated transport member.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordSupplementalGuildMember.JoinSourceType">
+            <summary>
+                Gets how the user joined the guild.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordSupplementalGuildMember.SourceInviteCode">
+            <summary>
+                Gets the invite code or vanity used to join the guild, if applicable.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordSupplementalGuildMember.InviterId">
+            <summary>
+                Gets the ID of the user who invited the user to the guild, if applicable.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordSupplementalGuildMember.IntegrationType">
+            <summary>
+                Gets the type of integration that added the user to the guild, if applicable.
+                I.e. integration type (twitch, youtube, discord, or guild_subscription).
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Entities.DiscordMessageBuilderMethodHooks">
+            <summary>
+                Adds methods to <see cref="T:DisCatSharp.Entities.DiscordMessageBuilder" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Experimental.Entities.DiscordMessageBuilderMethodHooks.AddGcpAttachment(DisCatSharp.Entities.DiscordMessageBuilder,DisCatSharp.Experimental.Entities.GcpAttachmentUploadInformation,System.Boolean,System.IO.Stream)">
+            <summary>
+                Adds a <see cref="T:DisCatSharp.Experimental.Entities.GcpAttachment" /> to the <see cref="T:DisCatSharp.Entities.DiscordMessageBuilder" />.
+            </summary>
+            <param name="builder">The  <see cref="T:DisCatSharp.Entities.DiscordMessageBuilder" /> to add the attachment to.</param>
+            <param name="gcpAttachment">The attachment to add.</param>
+            <param name="isVoice">Whether this is a voice message attachment.</param>
+            <param name="originalStream">
+                The voice message's stream, required if <paramref name="isVoice" /> is
+                <see langword="true" />.
+            </param>
+            <returns>The chained <see cref="T:DisCatSharp.Entities.DiscordMessageBuilder" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Experimental.Entities.DiscordMessageBuilderMethodHooks.AddGcpAttachment(DisCatSharp.Entities.DiscordInteractionResponseBuilder,DisCatSharp.Experimental.Entities.GcpAttachmentUploadInformation)">
+            <summary>
+                Adds a <see cref="T:DisCatSharp.Experimental.Entities.GcpAttachment" /> to the <see cref="T:DisCatSharp.Entities.DiscordInteractionResponseBuilder" />.
+            </summary>
+            <param name="builder">The  <see cref="T:DisCatSharp.Entities.DiscordInteractionResponseBuilder" /> to add the attachment to.</param>
+            <param name="gcpAttachment">The attachment to add.</param>
+            <returns>The chained <see cref="T:DisCatSharp.Entities.DiscordInteractionResponseBuilder" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Experimental.Entities.DiscordMessageBuilderMethodHooks.AddGcpAttachment(DisCatSharp.Entities.DiscordWebhookBuilder,DisCatSharp.Experimental.Entities.GcpAttachmentUploadInformation)">
+            <summary>
+                Adds a <see cref="T:DisCatSharp.Experimental.Entities.GcpAttachment" /> to the <see cref="T:DisCatSharp.Entities.DiscordWebhookBuilder" />.
+            </summary>
+            <param name="builder">The  <see cref="T:DisCatSharp.Entities.DiscordWebhookBuilder" /> to add the attachment to.</param>
+            <param name="gcpAttachment">The attachment to add.</param>
+            <returns>The chained <see cref="T:DisCatSharp.Entities.DiscordWebhookBuilder" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Experimental.Entities.DiscordMessageBuilderMethodHooks.AddGcpAttachment(DisCatSharp.Entities.DiscordFollowupMessageBuilder,DisCatSharp.Experimental.Entities.GcpAttachmentUploadInformation)">
+            <summary>
+                Adds a <see cref="T:DisCatSharp.Experimental.Entities.GcpAttachment" /> to the <see cref="T:DisCatSharp.Entities.DiscordFollowupMessageBuilder" />.
+            </summary>
+            <param name="builder">The  <see cref="T:DisCatSharp.Entities.DiscordFollowupMessageBuilder" /> to add the attachment to.</param>
+            <param name="gcpAttachment">The attachment to add.</param>
+            <returns>The chained <see cref="T:DisCatSharp.Entities.DiscordFollowupMessageBuilder" />.</returns>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Entities.GcpAttachment">
+            <summary>
+                Represents a gcp attachment.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Experimental.Entities.GcpAttachment.#ctor(System.String,System.Int32)">
+            <summary>
+                Constructs a new <see cref="T:DisCatSharp.Experimental.Entities.GcpAttachment" />.
+            </summary>
+            <param name="filename">The file name.</param>
+            <param name="fileSize">The file size.</param>
+        </member>
+        <member name="M:DisCatSharp.Experimental.Entities.GcpAttachment.#ctor(System.String,System.IO.Stream)">
+            <summary>
+                Constructs a new <see cref="T:DisCatSharp.Experimental.Entities.GcpAttachment" />.
+            </summary>
+            <param name="filename">The file name.</param>
+            <param name="file">The file stream.</param>
+            <exception cref="T:System.IO.FileLoadException"></exception>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.GcpAttachment.FileSize">
+            <summary>
+                Gets the file size.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.GcpAttachment.Filename">
+            <summary>
+                Gets the filename.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Entities.GcpAttachmentsResponse">
+            <summary>
+                Represents a gcp attachments response.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.GcpAttachmentsResponse.Attachments">
+            <summary>
+                Gets the attachments.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Entities.GcpAttachmentUploadInformation">
+            <summary>
+                Represents a gcp attachment upload information.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.GcpAttachmentUploadInformation.UploadUrl">
+            <summary>
+                Gets or sets the upload url.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.GcpAttachmentUploadInformation.UploadFilename">
+            <summary>
+                Gets the upload filename.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.GcpAttachmentUploadInformation.Filename">
+            <summary>
+                Gets the filename.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Entities.GcpAttachmentUploadInformation.Description">
+            <summary>
+                Gets the description.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Enums.JoinSourceType">
+            <summary>
+                Represents how a user joined the guild.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Experimental.Enums.JoinSourceType.Unspecified">
+            <summary>
+                The user joined the guild through an unknown source.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Experimental.Enums.JoinSourceType.Bot">
+            <summary>
+                The user was added to the guild by a bot using the guilds.join OAuth2 scope.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Experimental.Enums.JoinSourceType.Integration">
+            <summary>
+                The user was added to the guild by an integration.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Experimental.Enums.JoinSourceType.Discovery">
+            <summary>
+                The user joined the guild through guild discovery.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Experimental.Enums.JoinSourceType.Hub">
+            <summary>
+                The user joined the guild through a student hub.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Experimental.Enums.JoinSourceType.Invite">
+            <summary>
+                The user joined the guild through an invite.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Experimental.Enums.JoinSourceType.VanityUrl">
+            <summary>
+                The user joined the guild through a vanity URL.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Experimental.Enums.JoinSourceType.ManualMemberVerification">
+            <summary>
+                The user was accepted into the guild after applying for membership.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Enums.MemberSortType">
+            <summary>
+                Represents the sorting algorithm used when searching for guild members.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Experimental.Enums.MemberSortType.JoinedAtDesc">
+            <summary>
+                Sort by when the user joined the guild descending (default).
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Experimental.Enums.MemberSortType.JoinedAtAsc">
+            <summary>
+                Sort by when the user joined the guild ascending.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Experimental.Enums.MemberSortType.UserIdDesc">
+            <summary>
+                Sort by when the user joined Discord descending.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Experimental.Enums.MemberSortType.UserIdAsc">
+            <summary>
+                Sort by when the user joined Discord ascending.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Payloads.ClydeSettingsProfileIdOnlyUpdatePayload">
+            <summary>
+                Represents a clyde settings update payload with a profile id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Payloads.ClydeSettingsProfileIdOnlyUpdatePayload.ClydeProfileId">
+            <summary>
+                Sets clyde's profile id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Payloads.ClydeSettingsProfileIdOnlyUpdatePayload.PersonalityPreset">
+            <summary>
+                Sets clyde's personality preset.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Payloads.ClydeSettingsProfileUpdatePayload">
+            <summary>
+                Represents a clyde settings update payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Payloads.ClydeSettingsProfileUpdatePayload.Avatar">
+            <summary>
+                Sets clyde's avatar.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Payloads.ClydeSettingsProfileUpdatePayload.Banner">
+            <summary>
+                Sets clyde's banner.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Payloads.ClydeSettingsProfileUpdatePayload.Nick">
+            <summary>
+                Sets clyde's nick.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Payloads.ClydeSettingsProfileUpdatePayload.Personality">
+            <summary>
+                Sets clyde's personality.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Payloads.ClydeSettingsProfileUpdatePayload.PersonalityPreset">
+            <summary>
+                Sets clyde's personality preset.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Payloads.ClydeSettingsProfileUpdatePayload.ThemeColors">
+            <summary>
+                Sets clyde's theme colors.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Payloads.PersonalityGenerationPayload">
+            <summary>
+                Represents a personality generation payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Payloads.PersonalityGenerationPayload.Personality">
+            <summary>
+                Sets the base personality to generate a new one from.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Experimental.Payloads.RestGcpAttachmentsPayload">
+            <summary>
+                Represents a gcp attachment payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Experimental.Payloads.RestGcpAttachmentsPayload.GcpAttachments">
+            <summary>
+                Sets the files.
+            </summary>
+        </member>
+    </members>
+</doc>

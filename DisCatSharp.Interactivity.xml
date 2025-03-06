@@ -1,0 +1,2190 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DisCatSharp.Interactivity</name>
+    </assembly>
+    <members>
+        <member name="T:DisCatSharp.Interactivity.Page">
+            <summary>
+                The page.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Page.#ctor(System.String,DisCatSharp.Entities.DiscordEmbedBuilder)">
+            <summary>
+                <para>Initializes a new instance of the <see cref="T:DisCatSharp.Interactivity.Page" /> class.</para>
+                <para>You need to specify at least <paramref name="content" /> or <paramref name="embed" /> or both.</para>
+            </summary>
+            <param name="content">The content.</param>
+            <param name="embed">The embed.</param>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.Page.Content">
+            <summary>
+                Gets or sets the content.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.Page.Embed">
+            <summary>
+                Gets or sets the embed.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.PaginationEmojis">
+            <summary>
+                The pagination emojis.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.PaginationEmojis.Left">
+            <summary>
+                Gets or sets the left emoji.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.PaginationEmojis.Right">
+            <summary>
+                Gets or sets the right emoji.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.PaginationEmojis.SkipLeft">
+            <summary>
+                Gets or sets the skip left emoji.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.PaginationEmojis.SkipRight">
+            <summary>
+                Gets or sets the skip right emoji.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.PaginationEmojis.Stop">
+            <summary>
+                Gets or sets the stop emoji.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.PaginationEmojis.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Interactivity.PaginationEmojis" /> class.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.Enums.ButtonPaginationBehavior">
+            <summary>
+                Represents options of how to handle pagination timing out.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Interactivity.Enums.ButtonPaginationBehavior.Disable">
+            <summary>
+                The buttons should be disabled when pagination times out.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Interactivity.Enums.ButtonPaginationBehavior.Ignore">
+            <summary>
+                The buttons should be left as is when pagination times out.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Interactivity.Enums.ButtonPaginationBehavior.DeleteMessage">
+            <summary>
+                The entire message should be deleted when pagination times out.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Interactivity.Enums.ButtonPaginationBehavior.DeleteButtons">
+            <summary>
+                The buttons should be removed entirely when pagination times out.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.Enums.InteractionResponseBehavior">
+            <summary>
+                The interaction response behavior.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Interactivity.Enums.InteractionResponseBehavior.Ignore">
+            <summary>
+                Indicates that invalid input should be ignored when waiting for interactions. This will cause the interaction to
+                fail.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Interactivity.Enums.InteractionResponseBehavior.Ack">
+            <summary>
+                Indicates that invalid input should be ACK'd. The interaction will succeed, but nothing will happen.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Interactivity.Enums.InteractionResponseBehavior.Respond">
+            <summary>
+                Indicates that invalid input should warrant an ephemeral error message.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.Enums.ModalPage">
+            <summary>
+                A modal page.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Enums.ModalPage.#ctor(DisCatSharp.Entities.DiscordInteractionModalBuilder,DisCatSharp.Entities.DiscordButtonComponent,System.String)">
+            <summary>
+                Creates a new modal page for the paginated modal builder.
+            </summary>
+            <param name="modal">The modal to display.</param>
+            <param name="openButton">The button to display to open the current page. This is skipped if possible.</param>
+            <param name="openText">The text to display to open the current page. This is skipped if possible.</param>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.Enums.ModalPage.Modal">
+            <summary>
+                The modal that will be displayed.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.Enums.ModalPage.OpenButton">
+            <summary>
+                The button that will be displayed on the ephemeral message.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.Enums.ModalPage.OpenMessage">
+            <summary>
+                The ephemeral message to display for this page.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.Enums.PaginatedModalResponse">
+            <summary>
+                A response from the paginated modal response
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.Enums.PaginatedModalResponse.Responses">
+            <summary>
+                The responses. The key is the customid of each component.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.Enums.PaginatedModalResponse.Interaction">
+            <summary>
+                The last interaction. This is automatically replied to with a ephemeral "thinking" state. Use
+                EditOriginalResponseAsync to modify this.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.Enums.PaginatedModalResponse.TimedOut">
+            <summary>
+                Whether the interaction timed out.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.Enums.PaginationBehaviour">
+            <summary>
+                Specifies how pagination will handle advancing past the first and last pages.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Interactivity.Enums.PaginationBehaviour.WrapAround">
+            <summary>
+                Going forward beyond the last page will loop back to the first page.
+                Likewise, going back from the first page will loop around to the last page.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Interactivity.Enums.PaginationBehaviour.Ignore">
+            <summary>
+                Attempting to go beyond the first or last page will be ignored.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.Enums.PaginationDeletion">
+            <summary>
+                Specifies what should be done once pagination times out.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Interactivity.Enums.PaginationDeletion.DeleteEmojis">
+            <summary>
+                Reaction emojis will be deleted on timeout.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Interactivity.Enums.PaginationDeletion.KeepEmojis">
+            <summary>
+                Reaction emojis will not be deleted on timeout.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Interactivity.Enums.PaginationDeletion.DeleteMessage">
+            <summary>
+                The message will be completely deleted on timeout.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.Enums.PollBehaviour">
+            <summary>
+                Specifies what should be done when a poll times out.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Interactivity.Enums.PollBehaviour.KeepEmojis">
+            <summary>
+                Reaction emojis will not be deleted.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Interactivity.Enums.PollBehaviour.DeleteEmojis">
+            <summary>
+                Reaction emojis will be deleted.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.Enums.SplitType">
+            <summary>
+                Specifies how to split a string.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Interactivity.Enums.SplitType.Character">
+            <summary>
+                Splits string per 500 characters.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Interactivity.Enums.SplitType.Line">
+            <summary>
+                Splits string per 15 lines.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.ComponentEventWaiter">
+            <summary>
+                A component-based version of <see cref="T:DisCatSharp.Interactivity.EventHandling.EventWaiter`1" />
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ComponentEventWaiter.#ctor(DisCatSharp.DiscordClient,DisCatSharp.Interactivity.InteractivityConfiguration)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Interactivity.EventHandling.ComponentEventWaiter" /> class.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="config">The config.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ComponentEventWaiter.Dispose">
+            <summary>
+                Disposes the waiter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ComponentEventWaiter.WaitForMatchAsync(DisCatSharp.Interactivity.EventHandling.ComponentMatchRequest)">
+            <summary>
+                Waits for a specified <see cref="T:DisCatSharp.Interactivity.EventHandling.ComponentMatchRequest" />'s predicate to be fulfilled.
+            </summary>
+            <param name="request">The request to wait for.</param>
+            <returns>The returned args, or null if it timed out.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ComponentEventWaiter.CollectMatchesAsync(DisCatSharp.Interactivity.EventHandling.ComponentCollectRequest)">
+            <summary>
+                Collects reactions and returns the result when the <see cref="T:DisCatSharp.Interactivity.EventHandling.ComponentMatchRequest" />'s cancellation token is
+                canceled.
+            </summary>
+            <param name="request">The request to wait on.</param>
+            <returns>The result from request's predicate over the period of time leading up to the token's cancellation.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ComponentEventWaiter.Handle(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.ComponentInteractionCreateEventArgs)">
+            <summary>
+                Handles the waiter.
+            </summary>
+            <param name="_">The client.</param>
+            <param name="args">The args.</param>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.ComponentPaginator">
+            <summary>
+                The component paginator.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ComponentPaginator.#ctor(DisCatSharp.DiscordClient,DisCatSharp.Interactivity.InteractivityConfiguration)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Interactivity.EventHandling.ComponentPaginator" /> class.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="config">The config.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ComponentPaginator.DoPaginationAsync(DisCatSharp.Interactivity.EventHandling.IPaginationRequest)">
+            <summary>
+                Does the pagination async.
+            </summary>
+            <param name="request">The request.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ComponentPaginator.Dispose">
+            <summary>
+                Disposes the paginator.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ComponentPaginator.Handle(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.ComponentInteractionCreateEventArgs)">
+            <summary>
+                Handles the pagination event.
+            </summary>
+            <param name="_">The client.</param>
+            <param name="e">The event arguments.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ComponentPaginator.HandlePaginationAsync(DisCatSharp.Interactivity.EventHandling.IPaginationRequest,DisCatSharp.EventArgs.ComponentInteractionCreateEventArgs)">
+            <summary>
+                Handles the pagination async.
+            </summary>
+            <param name="request">The request.</param>
+            <param name="args">The arguments.</param>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.ModalEventWaiter">
+            <summary>
+                A modal-based version of <see cref="T:DisCatSharp.Interactivity.EventHandling.EventWaiter`1" />
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ModalEventWaiter.#ctor(DisCatSharp.DiscordClient,DisCatSharp.Interactivity.InteractivityConfiguration)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Interactivity.EventHandling.ComponentEventWaiter" /> class.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="config">The config.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ModalEventWaiter.Dispose">
+            <summary>
+                Disposes the waiter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ModalEventWaiter.WaitForModalMatchAsync(DisCatSharp.Interactivity.EventHandling.ModalMatchRequest)">
+            <summary>
+                Waits for a specified <see cref="T:DisCatSharp.Interactivity.EventHandling.ModalMatchRequest" />'s predicate to be fulfilled.
+            </summary>
+            <param name="request">The request to wait for.</param>
+            <returns>The returned args, or null if it timed out.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ModalEventWaiter.Handle(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.ComponentInteractionCreateEventArgs)">
+            <summary>
+                Handles the waiter.
+            </summary>
+            <param name="_">The client.</param>
+            <param name="args">The args.</param>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.PaginationButtons">
+            <summary>
+                The pagination buttons.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PaginationButtons.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Interactivity.EventHandling.PaginationButtons" /> class.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PaginationButtons.#ctor(DisCatSharp.Interactivity.EventHandling.PaginationButtons)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Interactivity.EventHandling.PaginationButtons" /> class.
+            </summary>
+            <param name="other">The other <see cref="T:DisCatSharp.Interactivity.EventHandling.PaginationButtons" />.</param>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.PaginationButtons.SkipLeft">
+            <summary>
+                Gets or sets the skip left button.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.PaginationButtons.Left">
+            <summary>
+                Gets or sets the left button.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.PaginationButtons.Stop">
+            <summary>
+                Gets or sets the stop button.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.PaginationButtons.Right">
+            <summary>
+                Gets or sets the right button.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.PaginationButtons.SkipRight">
+            <summary>
+                Gets or sets the skip right button.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.PaginationButtons.ButtonArray">
+            <summary>
+                Gets the button array.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.ButtonPaginationRequest">
+            <summary>
+                The button pagination request.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ButtonPaginationRequest.#ctor(DisCatSharp.Entities.DiscordMessage,DisCatSharp.Entities.DiscordUser,DisCatSharp.Interactivity.Enums.PaginationBehaviour,DisCatSharp.Interactivity.Enums.ButtonPaginationBehavior,DisCatSharp.Interactivity.EventHandling.PaginationButtons,System.Collections.Generic.IEnumerable{DisCatSharp.Interactivity.Page},System.Threading.CancellationToken)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Interactivity.EventHandling.ButtonPaginationRequest" /> class.
+            </summary>
+            <param name="message">The message.</param>
+            <param name="user">The user.</param>
+            <param name="behavior">The behavior.</param>
+            <param name="buttonBehavior">The button behavior.</param>
+            <param name="buttons">The buttons.</param>
+            <param name="pages">The pages.</param>
+            <param name="token">The token.</param>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.ButtonPaginationRequest.PageCount">
+            <summary>
+                Gets the page count.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ButtonPaginationRequest.GetPageAsync">
+            <summary>
+                Gets the page.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ButtonPaginationRequest.SkipLeftAsync">
+            <summary>
+                Skips the left.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ButtonPaginationRequest.SkipRightAsync">
+            <summary>
+                Skips the right.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ButtonPaginationRequest.NextPageAsync">
+            <summary>
+                Gets the next page.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ButtonPaginationRequest.PreviousPageAsync">
+            <summary>
+                Gets the previous page.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ButtonPaginationRequest.GetEmojisAsync">
+            <summary>
+                Gets the emojis.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ButtonPaginationRequest.GetButtonsAsync">
+            <summary>
+                Gets the buttons.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ButtonPaginationRequest.GetMessageAsync">
+            <summary>
+                Gets the message.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ButtonPaginationRequest.GetUserAsync">
+            <summary>
+                Gets the user.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ButtonPaginationRequest.GetTaskCompletionSourceAsync">
+            <summary>
+                Gets the task completion source.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ButtonPaginationRequest.DoCleanupAsync">
+            <summary>
+                Does the cleanup.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.ComponentCollectRequest">
+            <summary>
+                Represents a component event that is being waited for.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ComponentCollectRequest.#ctor(DisCatSharp.Entities.DiscordMessage,System.Func{DisCatSharp.EventArgs.ComponentInteractionCreateEventArgs,System.Boolean},System.Threading.CancellationToken)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Interactivity.EventHandling.ComponentCollectRequest" /> class.
+            </summary>
+            <param name="message"></param>
+            <param name="predicate">The predicate.</param>
+            <param name="cancellation">The cancellation token.</param>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.ComponentCollectRequest.Collected">
+            <summary>
+                Gets the collected.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.ComponentMatchRequest">
+            <summary>
+                Represents a match that is being waited for.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ComponentMatchRequest.#ctor(DisCatSharp.Entities.DiscordMessage,System.Func{DisCatSharp.EventArgs.ComponentInteractionCreateEventArgs,System.Boolean},System.Threading.CancellationToken)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Interactivity.EventHandling.ComponentMatchRequest" /> class.
+            </summary>
+            <param name="message">The message.</param>
+            <param name="predicate">The predicate.</param>
+            <param name="cancellation">The cancellation token.</param>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.ComponentMatchRequest.Message">
+            <summary>
+                The id to wait on. This should be uniquely formatted to avoid collisions.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.ComponentMatchRequest.Tcs">
+            <summary>
+                The completion source that represents the result of the match.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ComponentMatchRequest.IsMatch(DisCatSharp.EventArgs.ComponentInteractionCreateEventArgs)">
+            <summary>
+                Whether it is a match.
+            </summary>
+            <param name="args">The arguments.</param>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.InteractionPaginationRequest">
+            <summary>
+                The interaction pagination request.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.InteractionPaginationRequest.#ctor(DisCatSharp.Entities.DiscordInteraction,DisCatSharp.Entities.DiscordMessage,DisCatSharp.Entities.DiscordUser,DisCatSharp.Interactivity.Enums.PaginationBehaviour,DisCatSharp.Interactivity.Enums.ButtonPaginationBehavior,DisCatSharp.Interactivity.EventHandling.PaginationButtons,System.Collections.Generic.IEnumerable{DisCatSharp.Interactivity.Page},System.Threading.CancellationToken)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Interactivity.EventHandling.InteractionPaginationRequest" /> class.
+            </summary>
+            <param name="interaction">The interaction.</param>
+            <param name="message">The message.</param>
+            <param name="user">The user.</param>
+            <param name="behavior">The behavior.</param>
+            <param name="behaviorBehavior">The behavior behavior.</param>
+            <param name="buttons">The buttons.</param>
+            <param name="pages">The pages.</param>
+            <param name="token">The token.</param>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.InteractionPaginationRequest.PageCount">
+            <summary>
+                Gets the page count.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.InteractionPaginationRequest.GetPageAsync">
+            <summary>
+                Gets the page.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.InteractionPaginationRequest.SkipLeftAsync">
+            <summary>
+                Skips the left page.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.InteractionPaginationRequest.SkipRightAsync">
+            <summary>
+                Skips the right page.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.InteractionPaginationRequest.NextPageAsync">
+            <summary>
+                Gets the next page.
+            </summary>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.InteractionPaginationRequest.PreviousPageAsync">
+            <summary>
+                Gets the previous page.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.InteractionPaginationRequest.GetEmojisAsync">
+            <summary>
+                Gets the emojis.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.InteractionPaginationRequest.GetButtonsAsync">
+            <summary>
+                Gets the buttons.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.InteractionPaginationRequest.GetMessageAsync">
+            <summary>
+                Gets the message.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.InteractionPaginationRequest.GetUserAsync">
+            <summary>
+                Gets the user.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.InteractionPaginationRequest.GetTaskCompletionSourceAsync">
+            <summary>
+                Gets the task completion source.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.InteractionPaginationRequest.DoCleanupAsync">
+            <summary>
+                Cleanup.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.InteractionPaginationRequest.RegenerateCts(DisCatSharp.Entities.DiscordInteraction)">
+            <summary>
+                Regenerates the cts.
+            </summary>
+            <param name="interaction">The interaction.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.InteractionPaginationRequest.GetLastInteractionAsync">
+            <summary>
+                Gets the message.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.ModalMatchRequest">
+            <summary>
+                Represents a match that is being waited for.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ModalMatchRequest.#ctor(System.String,System.Func{DisCatSharp.EventArgs.ComponentInteractionCreateEventArgs,System.Boolean},System.Threading.CancellationToken)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Interactivity.EventHandling.ModalMatchRequest" /> class.
+            </summary>
+            <param name="customId">The custom id.</param>
+            <param name="predicate">The predicate.</param>
+            <param name="cancellation">The cancellation token.</param>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.ModalMatchRequest.CustomId">
+            <summary>
+                The id to wait on. This should be uniquely formatted to avoid collisions.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.ModalMatchRequest.Tcs">
+            <summary>
+                The completion source that represents the result of the match.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ModalMatchRequest.IsMatch(DisCatSharp.EventArgs.ComponentInteractionCreateEventArgs)">
+            <summary>
+                Whether it is a match.
+            </summary>
+            <param name="args">The arguments.</param>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.EventWaiter`1">
+            <summary>
+                EventWaiter is a class that serves as a layer between the InteractivityExtension
+                and the DiscordClient to listen to an event and check for matches to a predicate.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.EventWaiter`1.#ctor(DisCatSharp.DiscordClient)">
+            <summary>
+                Creates a new EventWaiter object.
+            </summary>
+            <param name="client">Your DiscordClient</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.EventWaiter`1.Dispose">
+            <summary>
+                Disposes this EventWaiter
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.EventWaiter`1.WaitForMatchAsync(DisCatSharp.Interactivity.EventHandling.MatchRequest{`0})">
+            <summary>
+                Waits for a match to a specific request, else returns null.
+            </summary>
+            <param name="request">Request to match</param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.EventWaiter`1.CollectMatchesAsync(DisCatSharp.Interactivity.EventHandling.CollectRequest{`0})">
+            <summary>
+                Collects the matches async.
+            </summary>
+            <param name="request">The request.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.EventWaiter`1.HandleEvent(DisCatSharp.DiscordClient,`0)">
+            <summary>
+                Handles the event.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="eventArgs">The event's arguments.</param>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.IPaginator">
+            <summary>
+                The paginator.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.IPaginator.DoPaginationAsync(DisCatSharp.Interactivity.EventHandling.IPaginationRequest)">
+            <summary>
+                Paginates.
+            </summary>
+            <param name="request">The request to paginate.</param>
+            <returns>A task that completes when the pagination finishes or times out.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.IPaginator.Dispose">
+            <summary>
+                Disposes this EventWaiter
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.Paginator">
+            <summary>
+                The paginator.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.Paginator.#ctor(DisCatSharp.DiscordClient)">
+            <summary>
+                Creates a new EventWaiter object.
+            </summary>
+            <param name="client">Discord client</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.Paginator.DoPaginationAsync(DisCatSharp.Interactivity.EventHandling.IPaginationRequest)">
+            <summary>
+                Dos the pagination async.
+            </summary>
+            <param name="request">The request.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.Paginator.Dispose">
+            <summary>
+                Disposes this EventWaiter
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.Paginator.HandleReactionAdd(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.MessageReactionAddEventArgs)">
+            <summary>
+                Handles the reaction add.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="eventArgs">The event's arguments.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.Paginator.HandleReactionRemove(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.MessageReactionRemoveEventArgs)">
+            <summary>
+                Handles the reaction remove.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="eventArgs">The event's arguments.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.Paginator.HandleReactionClear(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.MessageReactionsClearEventArgs)">
+            <summary>
+                Handles the reaction clear.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="eventArgs">The eventArgs.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.Paginator.ResetReactionsAsync(DisCatSharp.Interactivity.EventHandling.IPaginationRequest)">
+            <summary>
+                Resets the reactions async.
+            </summary>
+            <param name="p">The p.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.Paginator.PaginateAsync(DisCatSharp.Interactivity.EventHandling.IPaginationRequest,DisCatSharp.Entities.DiscordEmoji)">
+            <summary>
+                Paginates the async.
+            </summary>
+            <param name="p">The p.</param>
+            <param name="emoji">The emoji.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.Paginator.Finalize">
+            <inheritdoc />
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.Poller">
+            <summary>
+                The poller.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.Poller.#ctor(DisCatSharp.DiscordClient)">
+            <summary>
+                Creates a new EventWaiter object.
+            </summary>
+            <param name="client">Your DiscordClient</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.Poller.DoPollAsync(DisCatSharp.Interactivity.EventHandling.PollRequest)">
+            <summary>
+                Dos the poll async.
+            </summary>
+            <param name="request">The request.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.Poller.HandleReactionAdd(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.MessageReactionAddEventArgs)">
+            <summary>
+                Handles the reaction add.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="eventArgs">The event's arguments.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.Poller.HandleReactionRemove(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.MessageReactionRemoveEventArgs)">
+            <summary>
+                Handles the reaction remove.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="eventArgs">The event's arguments.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.Poller.HandleReactionClear(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.MessageReactionsClearEventArgs)">
+            <summary>
+                Handles the reaction clear.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="eventArgs">The event's arguments.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.Poller.Dispose">
+            <summary>
+                Disposes this EventWaiter
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.ReactionCollector">
+            <summary>
+                EventWaiter is a class that serves as a layer between the InteractivityExtension
+                and the DiscordClient to listen to an event and check for matches to a predicate.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ReactionCollector.#ctor(DisCatSharp.DiscordClient)">
+            <summary>
+                Creates a new EventWaiter object.
+            </summary>
+            <param name="client">Your DiscordClient</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ReactionCollector.Dispose">
+            <summary>
+                Disposes this EventWaiter
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ReactionCollector.CollectAsync(DisCatSharp.Interactivity.EventHandling.ReactionCollectRequest)">
+            <summary>
+                Collects the async.
+            </summary>
+            <param name="request">The request.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ReactionCollector.HandleReactionAdd(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.MessageReactionAddEventArgs)">
+            <summary>
+                Handles the reaction add.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="eventArgs">The event's arguments.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ReactionCollector.HandleReactionRemove(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.MessageReactionRemoveEventArgs)">
+            <summary>
+                Handles the reaction remove.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="eventArgs">The event's arguments.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ReactionCollector.HandleReactionClear(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.MessageReactionsClearEventArgs)">
+            <summary>
+                Handles the reaction clear.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="eventArgs">The event's arguments.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.ReactionCollectRequest">
+            <summary>
+                The reaction collect request.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ReactionCollectRequest.#ctor(DisCatSharp.Entities.DiscordMessage,System.TimeSpan)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Interactivity.EventHandling.ReactionCollectRequest" /> class.
+            </summary>
+            <param name="msg">The msg.</param>
+            <param name="timeout">The timeout.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.ReactionCollectRequest.Dispose">
+            <summary>
+                Disposes the.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.Reaction">
+            <summary>
+                The reaction.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.Reaction.Emoji">
+            <summary>
+                Gets the emoji.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.Reaction.Users">
+            <summary>
+                Gets the users.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.Reaction.Total">
+            <summary>
+                Gets the total.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.CollectRequest`1">
+            <summary>
+                CollectRequest is a class that serves as a representation of
+                EventArgs that are being collected within a specific time frame.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.CollectRequest`1.#ctor(System.Func{`0,System.Boolean},System.TimeSpan)">
+            <summary>
+                Creates a new CollectRequest object.
+            </summary>
+            <param name="predicate">Predicate to match</param>
+            <param name="timeout">Timeout time</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.CollectRequest`1.Dispose">
+            <summary>
+                Disposes this CollectRequest.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.IPaginationRequest">
+            <summary>
+                The pagination request.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.IPaginationRequest.PageCount">
+            <summary>
+                Returns the number of pages.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.IPaginationRequest.GetPageAsync">
+            <summary>
+                Returns the current page.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.IPaginationRequest.SkipLeftAsync">
+            <summary>
+                Tells the request to set its index to the first page.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.IPaginationRequest.SkipRightAsync">
+            <summary>
+                Tells the request to set its index to the last page.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.IPaginationRequest.NextPageAsync">
+            <summary>
+                Tells the request to increase its index by one.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.IPaginationRequest.PreviousPageAsync">
+            <summary>
+                Tells the request to decrease its index by one.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.IPaginationRequest.GetButtonsAsync">
+            <summary>
+                Requests the message buttons from the pagination request.
+            </summary>
+            <returns>The buttons.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.IPaginationRequest.GetEmojisAsync">
+            <summary>
+                Requests message emojis from pagination request.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.IPaginationRequest.GetMessageAsync">
+            <summary>
+                Gets pagination message from this request.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.IPaginationRequest.GetUserAsync">
+            <summary>
+                Gets the user this pagination applies to.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.IPaginationRequest.GetTaskCompletionSourceAsync">
+            <summary>
+                Get this request's Task Completion Source.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.IPaginationRequest.DoCleanupAsync">
+            <summary>
+                Tells the request to perform cleanup.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.MatchRequest`1">
+            <summary>
+                MatchRequest is a class that serves as a representation of a
+                match that is being waited for.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.MatchRequest`1.#ctor(System.Func{`0,System.Boolean},System.TimeSpan)">
+            <summary>
+                Creates a new MatchRequest object.
+            </summary>
+            <param name="predicate">Predicate to match</param>
+            <param name="timeout">Timeout time</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.MatchRequest`1.Dispose">
+            <summary>
+                Disposes this MatchRequest.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.PaginationRequest">
+            <summary>
+                The pagination request.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PaginationRequest.#ctor(DisCatSharp.Entities.DiscordMessage,DisCatSharp.Entities.DiscordUser,DisCatSharp.Interactivity.Enums.PaginationBehaviour,DisCatSharp.Interactivity.Enums.PaginationDeletion,DisCatSharp.Interactivity.PaginationEmojis,System.TimeSpan,System.Collections.Generic.IEnumerable{DisCatSharp.Interactivity.Page})">
+            <summary>
+                Creates a new Pagination request
+            </summary>
+            <param name="message">Message to paginate</param>
+            <param name="user">User to allow control for</param>
+            <param name="behaviour">Behaviour during pagination</param>
+            <param name="deletion">Behavior on pagination end</param>
+            <param name="emojis">Emojis for this pagination object</param>
+            <param name="timeout">Timeout time</param>
+            <param name="pages">Pagination pages</param>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.PaginationRequest.PaginationDeletion">
+            <summary>
+                Gets the pagination deletion.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.PaginationRequest.PageCount">
+            <summary>
+                Gets the page count.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PaginationRequest.GetPageAsync">
+            <summary>
+                Gets the page async.
+            </summary>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PaginationRequest.SkipLeftAsync">
+            <summary>
+                Skips the left async.
+            </summary>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PaginationRequest.SkipRightAsync">
+            <summary>
+                Skips the right async.
+            </summary>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PaginationRequest.NextPageAsync">
+            <summary>
+                Nexts the page async.
+            </summary>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PaginationRequest.PreviousPageAsync">
+            <summary>
+                Previous the page async.
+            </summary>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PaginationRequest.GetButtonsAsync">
+            <summary>
+                Gets the buttons async.
+            </summary>
+            <returns>
+                <see cref="T:System.NotSupportedException" />
+            </returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PaginationRequest.GetEmojisAsync">
+            <summary>
+                Gets the emojis async.
+            </summary>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PaginationRequest.GetMessageAsync">
+            <summary>
+                Gets the message async.
+            </summary>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PaginationRequest.GetUserAsync">
+            <summary>
+                Gets the user async.
+            </summary>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PaginationRequest.DoCleanupAsync">
+            <summary>
+                Dos the cleanup async.
+            </summary>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PaginationRequest.GetTaskCompletionSourceAsync">
+            <summary>
+                Gets the task completion source async.
+            </summary>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PaginationRequest.Dispose">
+            <summary>
+                Disposes this PaginationRequest.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.PollRequest">
+            <summary>
+                The poll request.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PollRequest.#ctor(DisCatSharp.Entities.DiscordMessage,System.TimeSpan,System.Collections.Generic.IEnumerable{DisCatSharp.Entities.DiscordEmoji})">
+            <summary>
+            </summary>
+            <param name="message"></param>
+            <param name="timeout"></param>
+            <param name="emojis"></param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PollRequest.ClearCollected">
+            <summary>
+                Clears the collected.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PollRequest.RemoveReaction(DisCatSharp.Entities.DiscordEmoji,DisCatSharp.Entities.DiscordUser)">
+            <summary>
+                Removes the reaction.
+            </summary>
+            <param name="emoji">The emoji.</param>
+            <param name="member">The member.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PollRequest.AddReaction(DisCatSharp.Entities.DiscordEmoji,DisCatSharp.Entities.DiscordUser)">
+            <summary>
+                Adds the reaction.
+            </summary>
+            <param name="emoji">The emoji.</param>
+            <param name="member">The member.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PollRequest.Dispose">
+            <summary>
+                Disposes this PollRequest.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.EventHandling.PollEmoji">
+            <summary>
+                The poll emoji.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.EventHandling.PollEmoji.#ctor(DisCatSharp.Entities.DiscordEmoji)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Interactivity.EventHandling.PollEmoji" /> class.
+            </summary>
+            <param name="emoji">The emoji.</param>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.EventHandling.PollEmoji.Total">
+            <summary>
+                Gets the total.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.Extensions.ChannelExtensions">
+            <summary>
+                Interactivity extension methods for <see cref="T:DisCatSharp.Entities.DiscordChannel" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.ChannelExtensions.GetNextMessageAsync(DisCatSharp.Entities.DiscordChannel,System.Func{DisCatSharp.Entities.DiscordMessage,System.Boolean},System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for the next message sent in this channel that satisfies the predicate.
+            </summary>
+            <param name="channel">The channel to monitor.</param>
+            <param name="predicate">A predicate that should return <see langword="true" /> if a message matches.</param>
+            <param name="timeoutOverride">Overrides the timeout set in <see cref="P:DisCatSharp.Interactivity.InteractivityConfiguration.Timeout" /></param>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown if interactivity is not enabled for the client associated with the
+                channel.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.ChannelExtensions.GetNextMessageAsync(DisCatSharp.Entities.DiscordChannel,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for the next message sent in this channel.
+            </summary>
+            <param name="channel">The channel to monitor.</param>
+            <param name="timeoutOverride">Overrides the timeout set in <see cref="P:DisCatSharp.Interactivity.InteractivityConfiguration.Timeout" /></param>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown if interactivity is not enabled for the client associated with the
+                channel.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.ChannelExtensions.GetNextMessageAsync(DisCatSharp.Entities.DiscordChannel,DisCatSharp.Entities.DiscordUser,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for the next message sent in this channel from a specific user.
+            </summary>
+            <param name="channel">The channel to monitor.</param>
+            <param name="user">The target user.</param>
+            <param name="timeoutOverride">Overrides the timeout set in <see cref="P:DisCatSharp.Interactivity.InteractivityConfiguration.Timeout" /></param>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown if interactivity is not enabled for the client associated with the
+                channel.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.ChannelExtensions.WaitForUserTypingAsync(DisCatSharp.Entities.DiscordChannel,DisCatSharp.Entities.DiscordUser,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for a specific user to start typing in this channel.
+            </summary>
+            <param name="channel">The target channel.</param>
+            <param name="user">The target user.</param>
+            <param name="timeoutOverride">Overrides the timeout set in <see cref="P:DisCatSharp.Interactivity.InteractivityConfiguration.Timeout" /></param>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown if interactivity is not enabled for the client associated with the
+                channel.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.ChannelExtensions.SendPaginatedMessageAsync(DisCatSharp.Entities.DiscordChannel,DisCatSharp.Entities.DiscordUser,System.Collections.Generic.IEnumerable{DisCatSharp.Interactivity.Page},DisCatSharp.Interactivity.PaginationEmojis,System.Nullable{DisCatSharp.Interactivity.Enums.PaginationBehaviour},System.Nullable{DisCatSharp.Interactivity.Enums.PaginationDeletion},System.Nullable{System.TimeSpan})">
+            <summary>
+                Sends a new paginated message.
+            </summary>
+            <param name="channel">Target channel.</param>
+            <param name="user">The user that will be able to control the pages.</param>
+            <param name="pages">A collection of <see cref="T:DisCatSharp.Interactivity.Page" /> to display.</param>
+            <param name="emojis">Pagination emojis.</param>
+            <param name="behaviour">Pagination behaviour (when hitting max and min indices).</param>
+            <param name="deletion">Deletion behaviour.</param>
+            <param name="timeoutOverride">Override timeout period.</param>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown if interactivity is not enabled for the client associated with the
+                channel.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.ChannelExtensions.SendPaginatedMessageAsync(DisCatSharp.Entities.DiscordChannel,DisCatSharp.Entities.DiscordUser,System.Collections.Generic.IEnumerable{DisCatSharp.Interactivity.Page},DisCatSharp.Interactivity.EventHandling.PaginationButtons,System.Nullable{DisCatSharp.Interactivity.Enums.PaginationBehaviour},System.Nullable{DisCatSharp.Interactivity.Enums.ButtonPaginationBehavior},System.Threading.CancellationToken)">
+            <summary>
+                Sends a new paginated message with buttons.
+            </summary>
+            <param name="channel">Target channel.</param>
+            <param name="user">The user that will be able to control the pages.</param>
+            <param name="pages">A collection of <see cref="T:DisCatSharp.Interactivity.Page" /> to display.</param>
+            <param name="buttons">Pagination buttons (leave null to default to ones on configuration).</param>
+            <param name="behaviour">Pagination behaviour.</param>
+            <param name="deletion">Deletion behaviour</param>
+            <param name="token">A custom cancellation token that can be cancelled at any point.</param>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown if interactivity is not enabled for the client associated with the
+                channel.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.ChannelExtensions.SendPaginatedMessageAsync(DisCatSharp.Entities.DiscordChannel,DisCatSharp.Entities.DiscordUser,System.Collections.Generic.IEnumerable{DisCatSharp.Interactivity.Page},System.Nullable{DisCatSharp.Interactivity.Enums.PaginationBehaviour},System.Nullable{DisCatSharp.Interactivity.Enums.ButtonPaginationBehavior},System.Threading.CancellationToken)">
+            <inheritdoc
+                cref="M:DisCatSharp.Interactivity.Extensions.ChannelExtensions.SendPaginatedMessageAsync(DisCatSharp.Entities.DiscordChannel,DisCatSharp.Entities.DiscordUser,System.Collections.Generic.IEnumerable{DisCatSharp.Interactivity.Page},DisCatSharp.Interactivity.EventHandling.PaginationButtons,System.Nullable{DisCatSharp.Interactivity.Enums.PaginationBehaviour},System.Nullable{DisCatSharp.Interactivity.Enums.ButtonPaginationBehavior},System.Threading.CancellationToken)" />
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.ChannelExtensions.SendPaginatedMessageAsync(DisCatSharp.Entities.DiscordChannel,DisCatSharp.Entities.DiscordUser,System.Collections.Generic.IEnumerable{DisCatSharp.Interactivity.Page},DisCatSharp.Interactivity.EventHandling.PaginationButtons,System.Nullable{System.TimeSpan},System.Nullable{DisCatSharp.Interactivity.Enums.PaginationBehaviour},System.Nullable{DisCatSharp.Interactivity.Enums.ButtonPaginationBehavior})">
+            <summary>
+                Sends a new paginated message with buttons.
+            </summary>
+            <param name="channel">Target channel.</param>
+            <param name="user">The user that will be able to control the pages.</param>
+            <param name="pages">A collection of <see cref="T:DisCatSharp.Interactivity.Page" /> to display.</param>
+            <param name="buttons">Pagination buttons (leave null to default to ones on configuration).</param>
+            <param name="behaviour">Pagination behaviour.</param>
+            <param name="deletion">Deletion behaviour.</param>
+            <param name="timeoutOverride">Override timeout period.</param>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown if interactivity is not enabled for the client associated with the
+                channel.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.ChannelExtensions.SendPaginatedMessageAsync(DisCatSharp.Entities.DiscordChannel,DisCatSharp.Entities.DiscordUser,System.Collections.Generic.IEnumerable{DisCatSharp.Interactivity.Page},System.Nullable{System.TimeSpan},System.Nullable{DisCatSharp.Interactivity.Enums.PaginationBehaviour},System.Nullable{DisCatSharp.Interactivity.Enums.ButtonPaginationBehavior})">
+            <summary>
+                Sends the paginated message async.
+            </summary>
+            <param name="channel">The channel.</param>
+            <param name="user">The user.</param>
+            <param name="pages">The pages.</param>
+            <param name="timeoutOverride">Override timeout period.</param>
+            <param name="behaviour">The behaviour.</param>
+            <param name="deletion">The deletion.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.ChannelExtensions.GetInteractivity(DisCatSharp.Entities.DiscordChannel)">
+            <summary>
+                Retrieves an interactivity instance from a channel instance.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.Extensions.ClientExtensions">
+            <summary>
+                Interactivity extension methods for <see cref="T:DisCatSharp.DiscordClient" /> and <see cref="T:DisCatSharp.DiscordShardedClient" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.ClientExtensions.UseInteractivity(DisCatSharp.DiscordClient,DisCatSharp.Interactivity.InteractivityConfiguration)">
+            <summary>
+                Enables interactivity for this <see cref="T:DisCatSharp.DiscordClient" /> instance.
+            </summary>
+            <param name="client">The client to enable interactivity for.</param>
+            <param name="configuration">A configuration instance. Default configuration values will be used if none is provided.</param>
+            <returns>A brand new <see cref="T:DisCatSharp.Interactivity.InteractivityExtension" /> instance.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown if interactivity has already been enabled for the client instance.</exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.ClientExtensions.UseInteractivityAsync(DisCatSharp.DiscordShardedClient,DisCatSharp.Interactivity.InteractivityConfiguration)">
+            <summary>
+                Enables interactivity for each shard.
+            </summary>
+            <param name="client">The shard client to enable interactivity for.</param>
+            <param name="configuration">
+                Configuration to use for all shards. If one isn't provided, default configuration values
+                will be used.
+            </param>
+            <returns>A dictionary containing new <see cref="T:DisCatSharp.Interactivity.InteractivityExtension" /> instances for each shard.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.ClientExtensions.GetInteractivity(DisCatSharp.DiscordClient)">
+            <summary>
+                Retrieves the registered <see cref="T:DisCatSharp.Interactivity.InteractivityExtension" /> instance for this client.
+            </summary>
+            <param name="client">The client to retrieve an <see cref="T:DisCatSharp.Interactivity.InteractivityExtension" /> instance from.</param>
+            <returns>
+                An existing <see cref="T:DisCatSharp.Interactivity.InteractivityExtension" /> instance, or <see langword="null" /> if interactivity is not
+                enabled for the <see cref="T:DisCatSharp.DiscordClient" /> instance.
+            </returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.ClientExtensions.GetInteractivityAsync(DisCatSharp.DiscordShardedClient)">
+            <summary>
+                Retrieves a <see cref="T:DisCatSharp.Interactivity.InteractivityExtension" /> instance for each shard.
+            </summary>
+            <param name="client">The shard client to retrieve interactivity instances from.</param>
+            <returns>A dictionary containing <see cref="T:DisCatSharp.Interactivity.InteractivityExtension" /> instances for each shard.</returns>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.Extensions.InteractionExtensions">
+            <summary>
+                The interaction extensions.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.InteractionExtensions.SendPaginatedResponseAsync(DisCatSharp.Entities.DiscordInteraction,System.Boolean,System.Boolean,DisCatSharp.Entities.DiscordUser,System.Collections.Generic.IEnumerable{DisCatSharp.Interactivity.Page},DisCatSharp.Interactivity.EventHandling.PaginationButtons,System.Nullable{DisCatSharp.Interactivity.Enums.PaginationBehaviour},System.Nullable{DisCatSharp.Interactivity.Enums.ButtonPaginationBehavior},System.Threading.CancellationToken)">
+            <summary>
+                Sends a paginated message in response to an interaction.
+                <para>
+                    <b>Pass the interaction directly. Interactivity will ACK it.</b>
+                </para>
+            </summary>
+            <param name="interaction">The interaction to create a response to.</param>
+            <param name="deferred">Whether the interaction was deferred.</param>
+            <param name="ephemeral">Whether the response should be ephemeral.</param>
+            <param name="user">The user to listen for button presses from.</param>
+            <param name="pages">The pages to paginate.</param>
+            <param name="buttons">Optional: custom buttons</param>
+            <param name="behaviour">Pagination behaviour.</param>
+            <param name="deletion">Deletion behaviour</param>
+            <param name="token">A custom cancellation token that can be cancelled at any point.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.InteractionExtensions.CreatePaginatedModalResponseAsync(DisCatSharp.Entities.DiscordInteraction,System.Collections.Generic.IReadOnlyList{DisCatSharp.Interactivity.Enums.ModalPage},System.Nullable{System.TimeSpan})">
+            <summary>
+                Sends multiple modals to the user with a prompt to open the next one.
+                <para>
+                    <b>
+                        After the last modal, this method automatically responds with the thinking state. Use
+                        <see cref="M:DisCatSharp.Entities.DiscordInteraction.EditOriginalResponseAsync(DisCatSharp.Entities.DiscordWebhookBuilder)" /> to interact with the
+                        response.
+                    </b>
+                </para>
+            </summary>
+            <param name="interaction">The interaction to create a response to.</param>
+            <param name="modals">The modal pages.</param>
+            <param name="timeOutOverride">A custom timeout. (Default: 15 minutes)</param>
+            <returns>A read-only dictionary with the customid of the components as the key.</returns>
+            <exception cref="T:System.ArgumentException">Is thrown when no modals are defined.</exception>
+            <exception cref="T:System.InvalidOperationException">Is thrown when interactivity is not enabled for the client/shard.</exception>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.Extensions.MessageExtensions">
+            <summary>
+                Interactivity extension methods for <see cref="T:DisCatSharp.Entities.DiscordMessage" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.GetNextMessageAsync(DisCatSharp.Entities.DiscordMessage,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for the next message that has the same author and channel as this message.
+            </summary>
+            <param name="message">Original message.</param>
+            <param name="timeoutOverride">Overrides the timeout set in <see cref="P:DisCatSharp.Interactivity.InteractivityConfiguration.Timeout" /></param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.GetNextMessageAsync(DisCatSharp.Entities.DiscordMessage,System.Func{DisCatSharp.Entities.DiscordMessage,System.Boolean},System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for the next message with the same author and channel as this message, which also satisfies a predicate.
+            </summary>
+            <param name="message">Original message.</param>
+            <param name="predicate">A predicate that should return <see langword="true" /> if a message matches.</param>
+            <param name="timeoutOverride">Overrides the timeout set in <see cref="P:DisCatSharp.Interactivity.InteractivityConfiguration.Timeout" /></param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.WaitForButtonAsync(DisCatSharp.Entities.DiscordMessage)">
+            <summary>
+                Waits for any button to be pressed on the specified message.
+            </summary>
+            <param name="message">The message to wait on.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.WaitForButtonAsync(DisCatSharp.Entities.DiscordMessage,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for any button to be pressed on the specified message.
+            </summary>
+            <param name="message">The message to wait on.</param>
+            <param name="timeoutOverride">Overrides the timeout set in <see cref="P:DisCatSharp.Interactivity.InteractivityConfiguration.Timeout" /></param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.WaitForButtonAsync(DisCatSharp.Entities.DiscordMessage,System.Threading.CancellationToken)">
+            <summary>
+                Waits for any button to be pressed on the specified message.
+            </summary>
+            <param name="message">The message to wait on.</param>
+            <param name="token">A custom cancellation token that can be cancelled at any point.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.WaitForButtonAsync(DisCatSharp.Entities.DiscordMessage,System.String,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for a button with the specified Id to be pressed on the specified message.
+            </summary>
+            <param name="message">The message to wait on.</param>
+            <param name="id">The Id of the button to wait for.</param>
+            <param name="timeoutOverride">Overrides the timeout set in <see cref="P:DisCatSharp.Interactivity.InteractivityConfiguration.Timeout" /></param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.WaitForButtonAsync(DisCatSharp.Entities.DiscordMessage,System.String,System.Threading.CancellationToken)">
+            <summary>
+                Waits for a button with the specified Id to be pressed on the specified message.
+            </summary>
+            <param name="message">The message to wait on.</param>
+            <param name="id">The Id of the button to wait for.</param>
+            <param name="token">A custom cancellation token that can be cancelled at any point.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.WaitForButtonAsync(DisCatSharp.Entities.DiscordMessage,DisCatSharp.Entities.DiscordUser,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for any button to be pressed on the specified message by the specified user.
+            </summary>
+            <param name="message">The message to wait on.</param>
+            <param name="user">The user to wait for button input from.</param>
+            <param name="timeoutOverride">Overrides the timeout set in <see cref="P:DisCatSharp.Interactivity.InteractivityConfiguration.Timeout" /></param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.WaitForButtonAsync(DisCatSharp.Entities.DiscordMessage,DisCatSharp.Entities.DiscordUser,System.Threading.CancellationToken)">
+            <summary>
+                Waits for any button to be pressed on the specified message by the specified user.
+            </summary>
+            <param name="message">The message to wait on.</param>
+            <param name="user">The user to wait for button input from.</param>
+            <param name="token">A custom cancellation token that can be cancelled at any point.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.WaitForButtonAsync(DisCatSharp.Entities.DiscordMessage,System.Func{DisCatSharp.EventArgs.ComponentInteractionCreateEventArgs,System.Boolean},System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for any button to be interacted with.
+            </summary>
+            <param name="message">The message to wait on.</param>
+            <param name="predicate">The predicate to filter interactions by.</param>
+            <param name="timeoutOverride">Override the timeout specified in <see cref="T:DisCatSharp.Interactivity.InteractivityConfiguration" /></param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.WaitForButtonAsync(DisCatSharp.Entities.DiscordMessage,System.Func{DisCatSharp.EventArgs.ComponentInteractionCreateEventArgs,System.Boolean},System.Threading.CancellationToken)">
+            <summary>
+                Waits for any button to be interacted with.
+            </summary>
+            <param name="message">The message to wait on.</param>
+            <param name="predicate">The predicate to filter interactions by.</param>
+            <param name="token">
+                A token to cancel interactivity with at any time. Pass <see cref="P:System.Threading.CancellationToken.None" /> to
+                wait indefinitely.
+            </param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.WaitForSelectAsync(DisCatSharp.Entities.DiscordMessage,System.Func{DisCatSharp.EventArgs.ComponentInteractionCreateEventArgs,System.Boolean},DisCatSharp.Enums.ComponentType,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for any dropdown to be interacted with.
+            </summary>
+            <param name="message">The message to wait for.</param>
+            <param name="predicate">A filter predicate.</param>
+            <param name="selectType">The <see cref="T:DisCatSharp.Enums.ComponentType">type</see> of the select menu.</param>
+            <param name="timeoutOverride">Override the timeout period specified in <see cref="T:DisCatSharp.Interactivity.InteractivityConfiguration" />.</param>
+            <exception cref="T:System.ArgumentException">Thrown when the message doesn't contain any dropdowns</exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.WaitForSelectAsync(DisCatSharp.Entities.DiscordMessage,System.Func{DisCatSharp.EventArgs.ComponentInteractionCreateEventArgs,System.Boolean},DisCatSharp.Enums.ComponentType,System.Threading.CancellationToken)">
+            <summary>
+                Waits for any dropdown to be interacted with.
+            </summary>
+            <param name="message">The message to wait for.</param>
+            <param name="predicate">A filter predicate.</param>
+            <param name="selectType">The <see cref="T:DisCatSharp.Enums.ComponentType">type</see> of the select menu.</param>
+            <param name="token">
+                A token that can be used to cancel interactivity. Pass <see cref="P:System.Threading.CancellationToken.None" /> to
+                wait indefinitely.
+            </param>
+            <exception cref="T:System.ArgumentException">Thrown when the message doesn't contain any dropdowns</exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.WaitForSelectAsync(DisCatSharp.Entities.DiscordMessage,System.String,DisCatSharp.Enums.ComponentType,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for a dropdown to be interacted with.
+            </summary>
+            <param name="message">The message to wait on.</param>
+            <param name="id">The Id of the dropdown to wait for.</param>
+            <param name="selectType">The <see cref="T:DisCatSharp.Enums.ComponentType">type</see> of the select menu.</param>
+            <param name="timeoutOverride">Overrides the timeout set in <see cref="P:DisCatSharp.Interactivity.InteractivityConfiguration.Timeout" /></param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.WaitForSelectAsync(DisCatSharp.Entities.DiscordMessage,System.String,DisCatSharp.Enums.ComponentType,System.Threading.CancellationToken)">
+            <summary>
+                Waits for a dropdown to be interacted with.
+            </summary>
+            <param name="message">The message to wait on.</param>
+            <param name="id">The Id of the dropdown to wait for.</param>
+            <param name="selectType">The <see cref="T:DisCatSharp.Enums.ComponentType">type</see> of the select menu.</param>
+            <param name="token">A custom cancellation token that can be cancelled at any point.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.WaitForSelectAsync(DisCatSharp.Entities.DiscordMessage,DisCatSharp.Entities.DiscordUser,System.String,DisCatSharp.Enums.ComponentType,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for a dropdown to be interacted with by the specified user.
+            </summary>
+            <param name="message">The message to wait on.</param>
+            <param name="user">The user to wait for.</param>
+            <param name="id">The Id of the dropdown to wait for.</param>
+            <param name="selectType">The <see cref="T:DisCatSharp.Enums.ComponentType">type</see> of the select menu.</param>
+            <param name="timeoutOverride"></param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.WaitForSelectAsync(DisCatSharp.Entities.DiscordMessage,DisCatSharp.Entities.DiscordUser,System.String,DisCatSharp.Enums.ComponentType,System.Threading.CancellationToken)">
+            <summary>
+                Waits for a dropdown to be interacted with by the specified user.
+            </summary>
+            <param name="message">The message to wait on.</param>
+            <param name="user">The user to wait for.</param>
+            <param name="id">The Id of the dropdown to wait for.</param>
+            <param name="selectType">The <see cref="T:DisCatSharp.Enums.ComponentType">type</see> of the select menu.</param>
+            <param name="token">A custom cancellation token that can be cancelled at any point.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.WaitForReactionAsync(DisCatSharp.Entities.DiscordMessage,DisCatSharp.Entities.DiscordUser,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for a reaction on this message from a specific user.
+            </summary>
+            <param name="message">Target message.</param>
+            <param name="user">The target user.</param>
+            <param name="timeoutOverride">Overrides the timeout set in <see cref="P:DisCatSharp.Interactivity.InteractivityConfiguration.Timeout" /></param>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown if interactivity is not enabled for the client associated with the
+                message.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.WaitForReactionAsync(DisCatSharp.Entities.DiscordMessage,DisCatSharp.Entities.DiscordUser,DisCatSharp.Entities.DiscordEmoji,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for a specific reaction on this message from the specified user.
+            </summary>
+            <param name="message">Target message.</param>
+            <param name="user">The target user.</param>
+            <param name="emoji">The target emoji.</param>
+            <param name="timeoutOverride">Overrides the timeout set in <see cref="P:DisCatSharp.Interactivity.InteractivityConfiguration.Timeout" /></param>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown if interactivity is not enabled for the client associated with the
+                message.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.CollectReactionsAsync(DisCatSharp.Entities.DiscordMessage,System.Nullable{System.TimeSpan})">
+            <summary>
+                Collects all reactions on this message within the timeout duration.
+            </summary>
+            <param name="message">The message to collect reactions from.</param>
+            <param name="timeoutOverride">Overrides the timeout set in <see cref="P:DisCatSharp.Interactivity.InteractivityConfiguration.Timeout" /></param>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown if interactivity is not enabled for the client associated with the
+                message.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.DoPollAsync(DisCatSharp.Entities.DiscordMessage,System.Collections.Generic.IEnumerable{DisCatSharp.Entities.DiscordEmoji},System.Nullable{DisCatSharp.Interactivity.Enums.PollBehaviour},System.Nullable{System.TimeSpan})">
+            <summary>
+                Begins a poll using this message.
+            </summary>
+            <param name="message">Target message.</param>
+            <param name="emojis">Options for this poll.</param>
+            <param name="behaviorOverride">
+                Overrides the action set in
+                <see cref="P:DisCatSharp.Interactivity.InteractivityConfiguration.PaginationBehaviour" />
+            </param>
+            <param name="timeoutOverride">Overrides the timeout set in <see cref="P:DisCatSharp.Interactivity.InteractivityConfiguration.Timeout" /></param>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown if interactivity is not enabled for the client associated with the
+                message.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.Extensions.MessageExtensions.GetInteractivity(DisCatSharp.Entities.DiscordMessage)">
+            <summary>
+                Retrieves an interactivity instance from a message instance.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.InteractivityHelpers">
+            <summary>
+                Provides helper methods for interactivity features.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityHelpers.Recalculate(System.Collections.Generic.List{DisCatSharp.Interactivity.Page})">
+            <summary>
+                Recalculates the pages to include a footer with the current page number and total page count.
+            </summary>
+            <param name="pages">The list of pages to recalculate.</param>
+            <returns>A new list of pages with updated footers.</returns>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.InteractivityConfiguration">
+            <summary>
+                Configuration class for your Interactivity extension
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityConfiguration.#ctor">
+            <summary>
+                Creates a new instance of <see cref="T:DisCatSharp.Interactivity.InteractivityConfiguration" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityConfiguration.#ctor(DisCatSharp.Interactivity.InteractivityConfiguration)">
+            <summary>
+                Creates a new instance of <see cref="T:DisCatSharp.Interactivity.InteractivityConfiguration" />, copying the properties of another
+                configuration.
+            </summary>
+            <param name="other">Configuration the properties of which are to be copied.</param>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.InteractivityConfiguration.Timeout">
+            <summary>
+                <para>Sets the default interactivity action timeout.</para>
+                <para>Defaults to 1 minute.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.InteractivityConfiguration.PollBehaviour">
+            <summary>
+                What to do after the poll ends
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.InteractivityConfiguration.PaginationEmojis">
+            <summary>
+                Emojis to use for pagination
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.InteractivityConfiguration.PaginationButtons">
+            <summary>
+                Buttons to use for pagination.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.InteractivityConfiguration.AckPaginationButtons">
+            <summary>
+                Whether interactivity should ACK buttons that are pushed.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.InteractivityConfiguration.ButtonBehavior">
+            <summary>
+                How to handle buttons after pagination ends.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.InteractivityConfiguration.PaginationBehaviour">
+            <summary>
+                How to handle pagination. Defaults to WrapAround.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.InteractivityConfiguration.PaginationDeletion">
+            <summary>
+                How to handle pagination deletion. Defaults to DeleteEmojis.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.InteractivityConfiguration.ResponseBehavior">
+            <summary>
+                How to handle invalid interactions. Defaults to Ignore.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.InteractivityConfiguration.ResponseMessage">
+            <summary>
+                The message to send to the user when processing invalid interactions. Ignored if <see cref="P:DisCatSharp.Interactivity.InteractivityConfiguration.ResponseBehavior" /> is
+                not set to <see cref="F:DisCatSharp.Interactivity.Enums.InteractionResponseBehavior.Respond" />.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.InteractivityEvents">
+            <summary>
+                Contains well-defined event IDs used by the Interactivity extension.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.InteractivityEvents.Misc">
+            <summary>
+                Miscellaneous events, that do not fit in any other category.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.InteractivityEvents.InteractivityWaitError">
+            <summary>
+                Events pertaining to errors that happen during waiting for events.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.InteractivityEvents.InteractivityPaginationError">
+            <summary>
+                Events pertaining to pagination.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.InteractivityEvents.InteractivityPollError">
+            <summary>
+                Events pertaining to polling.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.InteractivityEvents.InteractivityCollectorError">
+            <summary>
+                Events pertaining to event collection.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.InteractivityExtension">
+            <summary>
+                Extension class for DisCatSharp.Interactivity
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.#ctor(DisCatSharp.Interactivity.InteractivityConfiguration)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Interactivity.InteractivityExtension" /> class.
+            </summary>
+            <param name="cfg">The configuration.</param>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.InteractivityExtension.Config">
+            <summary>
+                Gets the config.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.Setup(DisCatSharp.DiscordClient)">
+            <summary>
+                Setups the Interactivity Extension.
+            </summary>
+            <param name="client">Discord client.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.DoPollAsync(DisCatSharp.Entities.DiscordMessage,System.Collections.Generic.IEnumerable{DisCatSharp.Entities.DiscordEmoji},System.Nullable{DisCatSharp.Interactivity.Enums.PollBehaviour},System.Nullable{System.TimeSpan})">
+            <summary>
+                Makes a poll and returns poll results.
+            </summary>
+            <param name="m">Message to create poll on.</param>
+            <param name="emojis">Emojis to use for this poll.</param>
+            <param name="behaviour">What to do when the poll ends.</param>
+            <param name="timeout">Override timeout period.</param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForButtonAsync(DisCatSharp.Entities.DiscordMessage,System.Collections.Generic.IEnumerable{DisCatSharp.Entities.DiscordButtonComponent},System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for any button in the specified collection to be pressed.
+            </summary>
+            <param name="message">The message to wait on.</param>
+            <param name="buttons">A collection of buttons to listen for.</param>
+            <param name="timeoutOverride">Override the timeout period in <see cref="T:DisCatSharp.Interactivity.InteractivityConfiguration" />.</param>
+            <returns>A <see cref="T:DisCatSharp.Interactivity.InteractivityResult`1" /> with the result of button that was pressed, if any.</returns>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown when attempting to wait for a message that is not authored by the
+                current user.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+                Thrown when the message does not contain a button with the specified Id, or any
+                buttons at all.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForButtonAsync(DisCatSharp.Entities.DiscordMessage,System.Collections.Generic.IEnumerable{DisCatSharp.Entities.DiscordButtonComponent},System.Threading.CancellationToken)">
+            <summary>
+                Waits for any button in the specified collection to be pressed.
+            </summary>
+            <param name="message">The message to wait on.</param>
+            <param name="buttons">A collection of buttons to listen for.</param>
+            <param name="token">A custom cancellation token that can be cancelled at any point.</param>
+            <returns>A <see cref="T:DisCatSharp.Interactivity.InteractivityResult`1" /> with the result of button that was pressed, if any.</returns>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown when attempting to wait for a message that is not authored by the
+                current user.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+                Thrown when the message does not contain a button with the specified Id, or any
+                buttons at all.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForModalAsync(System.String,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for a user modal submit.
+            </summary>
+            <param name="customId">The custom id of the modal to wait for.</param>
+            <param name="timeoutOverride">Override the timeout period specified in <see cref="T:DisCatSharp.Interactivity.InteractivityConfiguration" />.</param>
+            <returns>A <see cref="T:DisCatSharp.Interactivity.InteractivityResult`1" /> with the result of the modal.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForModalAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+                Waits for a user modal submit.
+            </summary>
+            <param name="customId">The custom id of the modal to wait for.</param>
+            <param name="token">A custom cancellation token that can be cancelled at any point.</param>
+            <returns>A <see cref="T:DisCatSharp.Interactivity.InteractivityResult`1" /> with the result of the modal.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForButtonAsync(DisCatSharp.Entities.DiscordMessage,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for any button on the specified message to be pressed.
+            </summary>
+            <param name="message">The message to wait for the button on.</param>
+            <param name="timeoutOverride">Override the timeout period specified in <see cref="T:DisCatSharp.Interactivity.InteractivityConfiguration" />.</param>
+            <returns>A <see cref="T:DisCatSharp.Interactivity.InteractivityResult`1" /> with the result of button that was pressed, if any.</returns>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown when attempting to wait for a message that is not authored by the
+                current user.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+                Thrown when the message does not contain a button with the specified Id, or any
+                buttons at all.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForButtonAsync(DisCatSharp.Entities.DiscordMessage,System.Threading.CancellationToken)">
+            <summary>
+                Waits for any button on the specified message to be pressed.
+            </summary>
+            <param name="message">The message to wait for the button on.</param>
+            <param name="token">A custom cancellation token that can be cancelled at any point.</param>
+            <returns>A <see cref="T:DisCatSharp.Interactivity.InteractivityResult`1" /> with the result of button that was pressed, if any.</returns>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown when attempting to wait for a message that is not authored by the
+                current user.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+                Thrown when the message does not contain a button with the specified Id, or any
+                buttons at all.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForButtonAsync(DisCatSharp.Entities.DiscordMessage,DisCatSharp.Entities.DiscordUser,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for any button on the specified message to be pressed by the specified user.
+            </summary>
+            <param name="message">The message to wait for the button on.</param>
+            <param name="user">The user to wait for the button press from.</param>
+            <param name="timeoutOverride">Override the timeout period specified in <see cref="T:DisCatSharp.Interactivity.InteractivityConfiguration" />.</param>
+            <returns>A <see cref="T:DisCatSharp.Interactivity.InteractivityResult`1" /> with the result of button that was pressed, if any.</returns>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown when attempting to wait for a message that is not authored by the
+                current user.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+                Thrown when the message does not contain a button with the specified Id, or any
+                buttons at all.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForButtonAsync(DisCatSharp.Entities.DiscordMessage,DisCatSharp.Entities.DiscordUser,System.Threading.CancellationToken)">
+            <summary>
+                Waits for any button on the specified message to be pressed by the specified user.
+            </summary>
+            <param name="message">The message to wait for the button on.</param>
+            <param name="user">The user to wait for the button press from.</param>
+            <param name="token">A custom cancellation token that can be cancelled at any point.</param>
+            <returns>A <see cref="T:DisCatSharp.Interactivity.InteractivityResult`1" /> with the result of button that was pressed, if any.</returns>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown when attempting to wait for a message that is not authored by the
+                current user.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+                Thrown when the message does not contain a button with the specified Id, or any
+                buttons at all.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForButtonAsync(DisCatSharp.Entities.DiscordMessage,System.String,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for a button with the specified Id to be pressed.
+            </summary>
+            <param name="message">The message to wait for the button on.</param>
+            <param name="id">The Id of the button to wait for.</param>
+            <param name="timeoutOverride">Override the timeout period specified in <see cref="T:DisCatSharp.Interactivity.InteractivityConfiguration" />.</param>
+            <returns>A <see cref="T:DisCatSharp.Interactivity.InteractivityResult`1" /> with the result of the operation.</returns>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown when attempting to wait for a message that is not authored by the
+                current user.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+                Thrown when the message does not contain a button with the specified Id, or any
+                buttons at all.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForButtonAsync(DisCatSharp.Entities.DiscordMessage,System.String,System.Threading.CancellationToken)">
+            <summary>
+                Waits for a button with the specified Id to be pressed.
+            </summary>
+            <param name="message">The message to wait for the button on.</param>
+            <param name="id">The Id of the button to wait for.</param>
+            <param name="token">Override the timeout period specified in <see cref="T:DisCatSharp.Interactivity.InteractivityConfiguration" />.</param>
+            <returns>A <see cref="T:DisCatSharp.Interactivity.InteractivityResult`1" /> with the result of the operation.</returns>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown when attempting to wait for a message that is not authored by the
+                current user.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+                Thrown when the message does not contain a button with the specified Id, or any
+                buttons at all.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForButtonAsync(DisCatSharp.Entities.DiscordMessage,System.Func{DisCatSharp.EventArgs.ComponentInteractionCreateEventArgs,System.Boolean},System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for any button to be interacted with.
+            </summary>
+            <param name="message">The message to wait on.</param>
+            <param name="predicate">The predicate to filter interactions by.</param>
+            <param name="timeoutOverride">Override the timeout specified in <see cref="T:DisCatSharp.Interactivity.InteractivityConfiguration" /></param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForButtonAsync(DisCatSharp.Entities.DiscordMessage,System.Func{DisCatSharp.EventArgs.ComponentInteractionCreateEventArgs,System.Boolean},System.Threading.CancellationToken)">
+            <summary>
+                Waits for any button to be interacted with.
+            </summary>
+            <param name="message">The message to wait on.</param>
+            <param name="predicate">The predicate to filter interactions by.</param>
+            <param name="token">
+                A token to cancel interactivity with at any time. Pass <see cref="P:System.Threading.CancellationToken.None" /> to
+                wait indefinitely.
+            </param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForSelectAsync(DisCatSharp.Entities.DiscordMessage,System.Func{DisCatSharp.EventArgs.ComponentInteractionCreateEventArgs,System.Boolean},DisCatSharp.Enums.ComponentType,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for any dropdown to be interacted with.
+            </summary>
+            <param name="message">The message to wait for.</param>
+            <param name="predicate">A filter predicate.</param>
+            <param name="selectType">The <see cref="T:DisCatSharp.Enums.ComponentType">type</see> of the select menu.</param>
+            <param name="timeoutOverride">Override the timeout period specified in <see cref="T:DisCatSharp.Interactivity.InteractivityConfiguration" />.</param>
+            <exception cref="T:System.ArgumentException">Thrown when the Provided message does not contain any dropdowns</exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForSelectAsync(DisCatSharp.Entities.DiscordMessage,System.Func{DisCatSharp.EventArgs.ComponentInteractionCreateEventArgs,System.Boolean},DisCatSharp.Enums.ComponentType,System.Threading.CancellationToken)">
+            <summary>
+                Waits for any dropdown to be interacted with.
+            </summary>
+            <param name="message">The message to wait for.</param>
+            <param name="predicate">A filter predicate.</param>
+            <param name="selectType">The <see cref="T:DisCatSharp.Enums.ComponentType">type</see> of the select menu.</param>
+            <param name="token">
+                A token that can be used to cancel interactivity. Pass <see cref="P:System.Threading.CancellationToken.None" /> to
+                wait indefinitely.
+            </param>
+            <exception cref="T:System.ArgumentException">Thrown when the Provided message does not contain any dropdowns</exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForSelectAsync(DisCatSharp.Entities.DiscordMessage,System.String,DisCatSharp.Enums.ComponentType,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for a dropdown to be interacted with.
+            </summary>
+            <remarks>This is here for backwards-compatibility and will internally create a cancellation token.</remarks>
+            <param name="message">The message to wait on.</param>
+            <param name="id">The Id of the dropdown to wait on.</param>
+            <param name="selectType">The <see cref="T:DisCatSharp.Enums.ComponentType">type</see> of the select menu.</param>
+            <param name="timeoutOverride">Override the timeout period specified in <see cref="T:DisCatSharp.Interactivity.InteractivityConfiguration" />.</param>
+            <exception cref="T:System.ArgumentException">
+                Thrown when the message does not have any dropdowns or any dropdown with the
+                specified Id.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForSelectAsync(DisCatSharp.Entities.DiscordMessage,System.String,DisCatSharp.Enums.ComponentType,System.Threading.CancellationToken)">
+            <summary>
+                Waits for a dropdown to be interacted with.
+            </summary>
+            <param name="message">The message to wait on.</param>
+            <param name="id">The Id of the dropdown to wait on.</param>
+            <param name="selectType">The <see cref="T:DisCatSharp.Enums.ComponentType">type</see> of the select menu.</param>
+            <param name="token">A custom cancellation token that can be cancelled at any point.</param>
+            <exception cref="T:System.ArgumentException">
+                Thrown when the message does not have any dropdowns or any dropdown with the
+                specified Id.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForSelectAsync(DisCatSharp.Entities.DiscordMessage,DisCatSharp.Entities.DiscordUser,System.String,DisCatSharp.Enums.ComponentType,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for a dropdown to be interacted with by a specific user.
+            </summary>
+            <param name="message">The message to wait on.</param>
+            <param name="user">The user to wait on.</param>
+            <param name="id">The Id of the dropdown to wait on.</param>
+            <param name="selectType">The <see cref="T:DisCatSharp.Enums.ComponentType">type</see> of the select menu.</param>
+            <param name="timeoutOverride">Override the timeout period specified in <see cref="T:DisCatSharp.Interactivity.InteractivityConfiguration" />.</param>
+            <exception cref="T:System.ArgumentException">
+                Thrown when the message does not have any dropdowns or any dropdown with the
+                specified Id.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForSelectAsync(DisCatSharp.Entities.DiscordMessage,DisCatSharp.Entities.DiscordUser,System.String,DisCatSharp.Enums.ComponentType,System.Threading.CancellationToken)">
+            <summary>
+                Waits for a dropdown to be interacted with by a specific user.
+            </summary>
+            <param name="message">The message to wait on.</param>
+            <param name="user">The user to wait on.</param>
+            <param name="id">The Id of the dropdown to wait on.</param>
+            <param name="selectType">The <see cref="T:DisCatSharp.Enums.ComponentType">type</see> of the select menu.</param>
+            <param name="token">A custom cancellation token that can be cancelled at any point.</param>
+            <exception cref="T:System.ArgumentException">
+                Thrown when the message does not have any dropdowns or any dropdown with the
+                specified Id.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForMessageAsync(System.Func{DisCatSharp.Entities.DiscordMessage,System.Boolean},System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for a specific message.
+            </summary>
+            <param name="predicate">Predicate to match.</param>
+            <param name="timeoutOverride">Override timeout period.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForReactionAsync(System.Func{DisCatSharp.EventArgs.MessageReactionAddEventArgs,System.Boolean},System.Nullable{System.TimeSpan})">
+            <summary>
+                Wait for a specific reaction.
+            </summary>
+            <param name="predicate">Predicate to match.</param>
+            <param name="timeoutOverride">Override timeout period.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForReactionAsync(DisCatSharp.Entities.DiscordMessage,DisCatSharp.Entities.DiscordUser,System.Nullable{System.TimeSpan})">
+            <summary>
+                Wait for a specific reaction.
+                For this Event you need the <see cref="F:DisCatSharp.Enums.DiscordIntents.GuildMessageReactions" /> intent specified in
+                <seealso cref="P:DisCatSharp.DiscordConfiguration.Intents" />
+            </summary>
+            <param name="message">Message reaction was added to.</param>
+            <param name="user">User that made the reaction.</param>
+            <param name="timeoutOverride">Override timeout period.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForReactionAsync(System.Func{DisCatSharp.EventArgs.MessageReactionAddEventArgs,System.Boolean},DisCatSharp.Entities.DiscordMessage,DisCatSharp.Entities.DiscordUser,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for a specific reaction.
+                For this Event you need the <see cref="F:DisCatSharp.Enums.DiscordIntents.GuildMessageReactions" /> intent specified in
+                <seealso cref="P:DisCatSharp.DiscordConfiguration.Intents" />
+            </summary>
+            <param name="predicate">Predicate to match.</param>
+            <param name="message">Message reaction was added to.</param>
+            <param name="user">User that made the reaction.</param>
+            <param name="timeoutOverride">Override timeout period.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForReactionAsync(System.Func{DisCatSharp.EventArgs.MessageReactionAddEventArgs,System.Boolean},DisCatSharp.Entities.DiscordUser,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for a specific reaction.
+                For this Event you need the <see cref="F:DisCatSharp.Enums.DiscordIntents.GuildMessageReactions" /> intent specified in
+                <seealso cref="P:DisCatSharp.DiscordConfiguration.Intents" />
+            </summary>
+            <param name="predicate">predicate to match.</param>
+            <param name="user">User that made the reaction.</param>
+            <param name="timeoutOverride">Override timeout period.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForUserTypingAsync(DisCatSharp.Entities.DiscordUser,DisCatSharp.Entities.DiscordChannel,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for a user to start typing.
+            </summary>
+            <param name="user">User that starts typing.</param>
+            <param name="channel">Channel the user is typing in.</param>
+            <param name="timeoutOverride">Override timeout period.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForUserTypingAsync(DisCatSharp.Entities.DiscordUser,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for a user to start typing.
+            </summary>
+            <param name="user">User that starts typing.</param>
+            <param name="timeoutOverride">Override timeout period.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForTypingAsync(DisCatSharp.Entities.DiscordChannel,System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for any user to start typing.
+            </summary>
+            <param name="channel">Channel to type in.</param>
+            <param name="timeoutOverride">Override timeout period.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.CollectReactionsAsync(DisCatSharp.Entities.DiscordMessage,System.Nullable{System.TimeSpan})">
+            <summary>
+                Collects reactions on a specific message.
+            </summary>
+            <param name="m">Message to collect reactions on.</param>
+            <param name="timeoutOverride">Override timeout period.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForEventArgsAsync``1(System.Func{``0,System.Boolean},System.Nullable{System.TimeSpan})">
+            <summary>
+                Waits for specific event args to be received. Make sure the appropriate <see cref="T:DisCatSharp.Enums.DiscordIntents" /> are
+                registered, if needed.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="predicate">The predicate.</param>
+            <param name="timeoutOverride">Override timeout period.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.CollectEventArgsAsync``1(System.Func{``0,System.Boolean},System.Nullable{System.TimeSpan})">
+            <summary>
+                Collects the event arguments.
+            </summary>
+            <param name="predicate">The predicate.</param>
+            <param name="timeoutOverride">Override timeout period.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.SendPaginatedMessageAsync(DisCatSharp.Entities.DiscordChannel,DisCatSharp.Entities.DiscordUser,System.Collections.Generic.IEnumerable{DisCatSharp.Interactivity.Page},DisCatSharp.Interactivity.EventHandling.PaginationButtons,System.Nullable{DisCatSharp.Interactivity.Enums.PaginationBehaviour},System.Nullable{DisCatSharp.Interactivity.Enums.ButtonPaginationBehavior},System.Threading.CancellationToken)">
+            <summary>
+                Sends a paginated message with buttons.
+            </summary>
+            <param name="channel">The channel to send it on.</param>
+            <param name="user">User to give control.</param>
+            <param name="pages">The pages.</param>
+            <param name="buttons">
+                Pagination buttons (pass null to use buttons defined in <see cref="T:DisCatSharp.Interactivity.InteractivityConfiguration" />
+                ).
+            </param>
+            <param name="behaviour">Pagination behaviour.</param>
+            <param name="deletion">Deletion behaviour.</param>
+            <param name="token">A custom cancellation token that can be cancelled at any point.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.SendPaginatedMessageAsync(DisCatSharp.Entities.DiscordChannel,DisCatSharp.Entities.DiscordUser,System.Collections.Generic.IEnumerable{DisCatSharp.Interactivity.Page},DisCatSharp.Interactivity.EventHandling.PaginationButtons,System.Nullable{System.TimeSpan},System.Nullable{DisCatSharp.Interactivity.Enums.PaginationBehaviour},System.Nullable{DisCatSharp.Interactivity.Enums.ButtonPaginationBehavior})">
+            <summary>
+                Sends a paginated message with buttons.
+            </summary>
+            <param name="channel">The channel to send it on.</param>
+            <param name="user">User to give control.</param>
+            <param name="pages">The pages.</param>
+            <param name="buttons">
+                Pagination buttons (pass null to use buttons defined in <see cref="T:DisCatSharp.Interactivity.InteractivityConfiguration" />
+                ).
+            </param>
+            <param name="behaviour">Pagination behaviour.</param>
+            <param name="deletion">Deletion behaviour.</param>
+            <param name="timeoutOverride">Override timeout period.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.SendPaginatedMessageAsync(DisCatSharp.Entities.DiscordChannel,DisCatSharp.Entities.DiscordUser,System.Collections.Generic.IEnumerable{DisCatSharp.Interactivity.Page},System.Nullable{DisCatSharp.Interactivity.Enums.PaginationBehaviour},System.Nullable{DisCatSharp.Interactivity.Enums.ButtonPaginationBehavior},System.Threading.CancellationToken)">
+            <summary>
+                Sends the paginated message.
+            </summary>
+            <param name="channel">The channel.</param>
+            <param name="user">The user.</param>
+            <param name="pages">The pages.</param>
+            <param name="behaviour">The behaviour.</param>
+            <param name="deletion">The deletion.</param>
+            <param name="token">The token.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.SendPaginatedMessageAsync(DisCatSharp.Entities.DiscordChannel,DisCatSharp.Entities.DiscordUser,System.Collections.Generic.IEnumerable{DisCatSharp.Interactivity.Page},System.Nullable{System.TimeSpan},System.Nullable{DisCatSharp.Interactivity.Enums.PaginationBehaviour},System.Nullable{DisCatSharp.Interactivity.Enums.ButtonPaginationBehavior})">
+            <summary>
+                Sends the paginated message.
+            </summary>
+            <param name="channel">The channel.</param>
+            <param name="user">The user.</param>
+            <param name="pages">The pages.</param>
+            <param name="timeoutOverride">Override timeout period.</param>
+            <param name="behaviour">The behaviour.</param>
+            <param name="deletion">The deletion.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.SendPaginatedMessageAsync(DisCatSharp.Entities.DiscordChannel,DisCatSharp.Entities.DiscordUser,System.Collections.Generic.IEnumerable{DisCatSharp.Interactivity.Page},DisCatSharp.Interactivity.PaginationEmojis,System.Nullable{DisCatSharp.Interactivity.Enums.PaginationBehaviour},System.Nullable{DisCatSharp.Interactivity.Enums.PaginationDeletion},System.Nullable{System.TimeSpan})">
+            <summary>
+                Sends a paginated message.
+                For this Event you need the <see cref="F:DisCatSharp.Enums.DiscordIntents.GuildMessageReactions" /> intent specified in
+                <seealso cref="P:DisCatSharp.DiscordConfiguration.Intents" />
+            </summary>
+            <param name="channel">Channel to send paginated message in.</param>
+            <param name="user">User to give control.</param>
+            <param name="pages">Pages.</param>
+            <param name="emojis">Pagination emojis.</param>
+            <param name="behaviour">Pagination behaviour (when hitting max and min indices).</param>
+            <param name="deletion">Deletion behaviour.</param>
+            <param name="timeoutOverride">Override timeout period.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.SendPaginatedResponseAsync(DisCatSharp.Entities.DiscordInteraction,System.Boolean,System.Boolean,DisCatSharp.Entities.DiscordUser,System.Collections.Generic.IEnumerable{DisCatSharp.Interactivity.Page},DisCatSharp.Interactivity.EventHandling.PaginationButtons,System.Nullable{DisCatSharp.Interactivity.Enums.PaginationBehaviour},System.Nullable{DisCatSharp.Interactivity.Enums.ButtonPaginationBehavior},System.Threading.CancellationToken)">
+            <summary>
+                Sends a paginated message in response to an interaction.
+                <para>
+                    <b>Pass the interaction directly. Interactivity will ACK it.</b>
+                </para>
+            </summary>
+            <param name="interaction">The interaction to create a response to.</param>
+            <param name="deferred">Whether the interaction was deferred.</param>
+            <param name="ephemeral">Whether the response should be ephemeral.</param>
+            <param name="user">The user to listen for button presses from.</param>
+            <param name="pages">The pages to paginate.</param>
+            <param name="buttons">Optional: custom buttons.</param>
+            <param name="behaviour">Pagination behaviour.</param>
+            <param name="deletion">Deletion behaviour.</param>
+            <param name="token">A custom cancellation token that can be cancelled at any point.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForCustomPaginationAsync(DisCatSharp.Interactivity.EventHandling.IPaginationRequest)">
+            <summary>
+                Waits for a custom pagination request to finish.
+                This does NOT handle removing emojis after finishing for you.
+            </summary>
+            <param name="request">The request to wait for.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.WaitForCustomComponentPaginationAsync(DisCatSharp.Interactivity.EventHandling.IPaginationRequest)">
+            <summary>
+                Waits for custom button-based pagination request to finish.
+                <br />
+                This does
+                <i>
+                    <b>not</b>
+                </i>
+                invoke <see cref="M:DisCatSharp.Interactivity.EventHandling.IPaginationRequest.DoCleanupAsync" />.
+            </summary>
+            <param name="request">The request to wait for.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.GeneratePagesInContent(System.String,DisCatSharp.Interactivity.Enums.SplitType)">
+            <summary>
+                Generates pages from a string, and puts them in message content.
+            </summary>
+            <param name="input">Input string.</param>
+            <param name="splitType">How to split input string.</param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.GeneratePagesInEmbed(System.String,DisCatSharp.Interactivity.Enums.SplitType,DisCatSharp.Entities.DiscordEmbedBuilder)">
+            <summary>
+                Generates pages from a string, and puts them in message embeds.
+            </summary>
+            <param name="input">Input string.</param>
+            <param name="splitType">How to split input string.</param>
+            <param name="embedBase">Base embed for output embeds.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.SplitString(System.String,System.Int32)">
+            <summary>
+                Splits the string.
+            </summary>
+            <param name="str">The string.</param>
+            <param name="chunkSize">The chunk size.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.GetCancellationToken(System.Nullable{System.TimeSpan})">
+            <summary>
+                Gets the cancellation token.
+            </summary>
+            <param name="timeout">The timeout.</param>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityExtension.HandleInvalidInteraction(DisCatSharp.Entities.DiscordInteraction)">
+            <summary>
+                Handles an invalid interaction.
+            </summary>
+            <param name="interaction">The interaction.</param>
+        </member>
+        <member name="T:DisCatSharp.Interactivity.InteractivityResult`1">
+            <summary>
+                Interactivity result
+            </summary>
+            <typeparam name="T">Type of result</typeparam>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.InteractivityResult`1.TimedOut">
+            <summary>
+                Whether interactivity was timed out
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Interactivity.InteractivityResult`1.Result">
+            <summary>
+                Result
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Interactivity.InteractivityResult`1.#ctor(System.Boolean,`0)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Interactivity.InteractivityResult`1" /> class.
+            </summary>
+            <param name="timedOut">If true, timed out.</param>
+            <param name="result">The result.</param>
+        </member>
+    </members>
+</doc>

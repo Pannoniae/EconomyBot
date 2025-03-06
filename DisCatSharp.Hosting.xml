@@ -1,0 +1,191 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DisCatSharp.Hosting</name>
+    </assembly>
+    <members>
+        <member name="T:DisCatSharp.Hosting.BaseHostedService">
+            <summary>
+                Contains the common logic between having a <see cref="T:DisCatSharp.DiscordClient" /> or
+                <see cref="T:DisCatSharp.DiscordShardedClient" /> as a Hosted Service
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.BaseHostedService.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{DisCatSharp.Hosting.BaseHostedService},System.IServiceProvider,Microsoft.Extensions.Hosting.IHostApplicationLifetime,System.String)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.BaseHostedService" /> class.
+            </summary>
+            <param name="config">The config.</param>
+            <param name="logger">The logger.</param>
+            <param name="serviceProvider">The service provider.</param>
+            <param name="applicationLifetime">The application lifetime.</param>
+            <param name="configBotSection">The config bot section.</param>
+        </member>
+        <member name="M:DisCatSharp.Hosting.BaseHostedService.OnInitializationError(System.Exception)">
+            <summary>
+                When the bot(s) fail to start, this method will be invoked. (Default behavior is to shutdown)
+            </summary>
+            <param name="ex">The exception/reason for not starting</param>
+        </member>
+        <member name="M:DisCatSharp.Hosting.BaseHostedService.ConnectAsync">
+            <summary>
+                Connect your client(s) to Discord
+            </summary>
+            <returns>Task</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.BaseHostedService.InitializeExtensions(DisCatSharp.DiscordClient)">
+            <summary>
+                Dynamically load extensions by using <see cref="F:DisCatSharp.Hosting.BaseHostedService.Configuration" /> and
+                <see cref="F:DisCatSharp.Hosting.BaseHostedService.ServiceProvider" />
+            </summary>
+            <param name="client">Client to add extension method(s) to</param>
+            <returns>Task</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.BaseHostedService.ConfigureAsync">
+            <summary>
+                Configure / Initialize the <see cref="T:DisCatSharp.DiscordClient" /> or
+                <see cref="T:DisCatSharp.DiscordShardedClient" />
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.BaseHostedService.ConfigureExtensionsAsync">
+            <summary>
+                Configure the extensions for your <see cref="T:DisCatSharp.DiscordShardedClient" /> or
+                <see cref="T:DisCatSharp.DiscordClient" />
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.BaseHostedService.PreConnectAsync">
+            <summary>
+                Runs just prior to <see cref="M:DisCatSharp.Hosting.BaseHostedService.ConnectAsync" />.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.BaseHostedService.PostConnectAsync">
+            <summary>
+                Runs immediately after <see cref="M:DisCatSharp.Hosting.BaseHostedService.ConnectAsync" />.
+            </summary>
+            <returns>Task</returns>
+        </member>
+        <member name="P:DisCatSharp.Hosting.ExtensionConfigResult.Section">
+            <summary>
+                Gets or sets the section.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.ExtensionConfigResult.ConfigType">
+            <summary>
+                Gets or sets the config type.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.ExtensionConfigResult.ImplementationType">
+            <summary>
+                Gets or sets the implementation type.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.ConfigurationExtensions">
+            <summary>
+                The configuration extensions.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.ConfigurationExtensions.FindAssemblies(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+                Find assemblies that match the names provided via <paramref name="names" />.
+            </summary>
+            <remarks>
+                In some cases the assembly the user is after could be used in the application but
+                not appear within the <see cref="T:System.AppDomain" />. <br />
+                The workaround for this is to check the assemblies in the <see cref="T:System.AppDomain" />, as well as referenced
+                assemblies. If the targeted assembly is a reference, we need to load it into our workspace to get more info.
+            </remarks>
+            <param name="names">Names of assemblies to look for</param>
+            <returns>Assemblies which meet the given names. No duplicates</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.ConfigurationExtensions.FindImplementedExtensions(Microsoft.Extensions.Configuration.IConfiguration,System.String)">
+            <summary>
+                Easily identify which configuration types have been added to the <paramref name="configuration" /> <br />
+                This way we can dynamically load extensions without explicitly doing so
+            </summary>
+            <param name="configuration"></param>
+            <param name="rootName"></param>
+            <returns>Dictionary where Key -> Name of implemented type<br />Value -> <see cref="T:DisCatSharp.Hosting.ExtensionConfigResult" /></returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.Constants">
+            <summary>
+                The constants.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.Constants.LibName">
+            <summary>
+                Gets the lib name.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.Constants.ConfigSuffix">
+            <summary>
+                Gets the config suffix.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.Constants.ExtensionSuffix">
+            <summary>
+                Gets the extension suffix.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.DiscordHostedService">
+            <summary>
+                Simple implementation for <see cref="T:DisCatSharp.DiscordClient" /> to work as a
+                <see cref="T:Microsoft.Extensions.Hosting.BackgroundService" />
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.DiscordHostedService.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{DisCatSharp.Hosting.DiscordHostedService},System.IServiceProvider,Microsoft.Extensions.Hosting.IHostApplicationLifetime,System.String)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.DiscordHostedService" /> class.
+            </summary>
+            <param name="config">IConfiguration provided via Dependency Injection. Aggregate method to access configuration files </param>
+            <param name="logger">An ILogger to work with, provided via Dependency Injection</param>
+            <param name="serviceProvider">
+                ServiceProvider reference which contains all items currently registered for Dependency
+                Injection
+            </param>
+            <param name="applicationLifetime">
+                Contains the appropriate methods for disposing / stopping BackgroundServices during
+                runtime
+            </param>
+            <param name="configBotSection">
+                The name of the JSON/Config Key which contains the configuration for this Discord
+                Service
+            </param>
+        </member>
+        <member name="P:DisCatSharp.Hosting.DiscordHostedService.Client">
+            <inheritdoc />
+        </member>
+        <member name="T:DisCatSharp.Hosting.DiscordShardedHostedService">
+            <summary>
+                Simple Implementation for <see cref="T:DisCatSharp.DiscordShardedClient" /> to work as a
+                <see cref="T:Microsoft.Extensions.Hosting.BackgroundService" />
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.DiscordShardedHostedService.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{DisCatSharp.Hosting.DiscordShardedHostedService},System.IServiceProvider,Microsoft.Extensions.Hosting.IHostApplicationLifetime,System.String)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.DiscordShardedHostedService" /> class.
+            </summary>
+            <param name="config">The config.</param>
+            <param name="logger">The logger.</param>
+            <param name="serviceProvider">The service provider.</param>
+            <param name="applicationLifetime">The application lifetime.</param>
+            <param name="configBotSection">The config bot section.</param>
+        </member>
+        <member name="T:DisCatSharp.Hosting.IDiscordHostedService">
+            <summary>
+                Contract required for <see cref="T:DisCatSharp.DiscordClient" /> to work in a web hosting environment
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.IDiscordHostedService.Client">
+            <summary>
+                Reference to connected client
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.IDiscordHostedShardService">
+            <summary>
+                Contract required for <see cref="T:DisCatSharp.DiscordShardedClient" /> to work in a web hosting environment
+            </summary>
+        </member>
+    </members>
+</doc>

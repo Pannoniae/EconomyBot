@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>preview</LangVersion>
@@ -54,6 +54,16 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="ConcurrentHashSet" Version="1.3.0"/>
+        <PackageReference Include="BooruSharp" Version="4.0.0-beta"/>
+        <PackageReference Include="DetectLanguage" Version="1.0.0-beta"/>
+        <PackageReference Include="FuzzierSharp" Version="3.0.1" />
+        <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.0-preview.1.25080.5" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="Reddit" Version="1.5.2" />
+        <PackageReference Include="Spectre.Console" Version="0.49.2-preview.0.76" />
+        <PackageReference Include="SpotifyAPI.Web" Version="7.2.1"/>
+        <PackageReference Include="Soulseek" Version="6.5.0" />
         <Reference Include="DisCatSharp">
             <HintPath>DisCatSharp.dll</HintPath>
         </Reference>
@@ -80,6 +90,4 @@
         </Reference>
     </ItemGroup>
 
-
-    <Import Project=".paket\Paket.Restore.targets"/>
 </Project>

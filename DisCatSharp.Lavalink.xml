@@ -1,0 +1,3601 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DisCatSharp.Lavalink</name>
+    </assembly>
+    <members>
+        <member name="T:DisCatSharp.Lavalink.Entities.DefaultQueueEntry">
+            <summary>
+                Represents a default queue entry.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.DefaultQueueEntry.Track">
+            <inheritdoc />
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.DefaultQueueEntry.BeforePlayingAsync(DisCatSharp.Lavalink.LavalinkGuildPlayer)">
+            <inheritdoc />
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.DefaultQueueEntry.AfterPlayingAsync(DisCatSharp.Lavalink.LavalinkGuildPlayer)">
+            <inheritdoc />
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Filters.IPluginFilter">
+            <summary>
+                Represents an plugin filter.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Filters.LavalinkChannelMix">
+            <summary>
+                Mixes both channels (left and right), with a configurable factor on how much each channel affects the other. With
+                the defaults, both channels are kept independent of each other. Setting all factors to 0.5 means both channels get
+                the same audio.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.Filters.LavalinkChannelMix.#ctor(DisCatSharp.Entities.Optional{System.Single},DisCatSharp.Entities.Optional{System.Single},DisCatSharp.Entities.Optional{System.Single},DisCatSharp.Entities.Optional{System.Single})">
+            <inheritdoc cref="T:DisCatSharp.Lavalink.Entities.Filters.LavalinkChannelMix" />
+            <param name="leftToLeft">The left to left channel mix factor (<c>0.0</c> to <c>1.0</c> where <c>0.5</c> is no effect)</param>
+            <param name="leftToRight">The left to right channel mix factor (<c>0.0</c> to <c>1.0</c> where <c>0.5</c> is no effect)</param>
+            <param name="rightToLeft">The right to left channel mix factor (<c>0.0</c> to <c>1.0</c> where <c>0.5</c> is no effect)</param>
+            <param name="rightToRight">
+                The right to right channel mix factor (<c>0.0</c> to <c>1.0</c> where <c>0.5</c> is no
+                effect)
+            </param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkChannelMix.LeftToLeft">
+            <summary>
+                Gets or sets the left to left channel mix factor (<c>0.0</c> to <c>1.0</c> where <c>0.5</c> is no effect)
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkChannelMix.LeftToRight">
+            <summary>
+                Gets or sets the left to right channel mix factor (<c>0.0</c> to <c>1.0</c> where <c>0.5</c> is no effect)
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkChannelMix.RightToLeft">
+            <summary>
+                Gets or sets the right to left channel mix factor (<c>0.0</c> to <c>1.0</c> where <c>0.5</c> is no effect)
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkChannelMix.RightToRight">
+            <summary>
+                Gets or sets the right to right channel mix factor (<c>0.0</c> to <c>1.0</c> where <c>0.5</c> is no effect)
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Filters.LavalinkDisortion">
+            <summary>
+                Distortion effect. It can generate some pretty unique audio effects.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.Filters.LavalinkDisortion.#ctor(DisCatSharp.Entities.Optional{System.Single},DisCatSharp.Entities.Optional{System.Single},DisCatSharp.Entities.Optional{System.Single},DisCatSharp.Entities.Optional{System.Single},DisCatSharp.Entities.Optional{System.Single},DisCatSharp.Entities.Optional{System.Single},DisCatSharp.Entities.Optional{System.Single},DisCatSharp.Entities.Optional{System.Single})">
+            <inheritdoc cref="T:DisCatSharp.Lavalink.Entities.Filters.LavalinkDisortion" />
+            <param name="sinOffset">The sin offset</param>
+            <param name="sinScale">The sin scale</param>
+            <param name="cosOffset">The cos offset</param>
+            <param name="cosScale">The cos scale</param>
+            <param name="tanOffset">The tan offset</param>
+            <param name="tanScale">The tan scale</param>
+            <param name="offset">The offset</param>
+            <param name="scale">The scale</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkDisortion.SinOffset">
+            <summary>
+                The sin offset
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkDisortion.SinScale">
+            <summary>
+                The sin scale
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkDisortion.CosOffset">
+            <summary>
+                The cos offset
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkDisortion.CosScale">
+            <summary>
+                The cos scale
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkDisortion.TanOffset">
+            <summary>
+                The tan offset
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkDisortion.TanScale">
+            <summary>
+                The tan scale
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkDisortion.Offset">
+            <summary>
+                The offset
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkDisortion.Scale">
+            <summary>
+                The scale
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Filters.LavalinkEqualizer">
+            <summary>
+                There are 15 bands (0-14) that can be changed. "gain" is the multiplier for the given band. The default value is 0.
+                Valid values range from -0.25 to 1.0, where -0.25 means the given band is completely muted, and 0.25 means it is
+                doubled. Modifying the gain could also change the volume of the output.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.Filters.LavalinkEqualizer.#ctor(DisCatSharp.Lavalink.Enums.Filters.LavalinkFilterBand,System.Single)">
+            <inheritdoc cref="T:DisCatSharp.Lavalink.Entities.Filters.LavalinkEqualizer" />
+            <param name="band">The band</param>
+            <param name="gain">The gain (<c>-0.25</c> to <c>1.0</c>)</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkEqualizer.Band">
+            <summary>
+                The band.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkEqualizer.Gain">
+            <summary>
+                The gain (<c>-0.25</c> to <c>1.0</c>)
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Filters.LavalinkFilters">
+            <summary>
+                Represents various lavalink filters.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkFilters.Volume">
+            <summary>
+                Gets or sets the player volume from <c>0.0</c> to <c>5.0</c>, where <c>1.0</c> is 100%. Values ><c>1.0</c> may
+                cause clipping.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkFilters.Equalizers">
+            <summary>
+                Gets or sets the equalizer.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkFilters.Karaoke">
+            <summary>
+                Gets or sets the karaoke.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkFilters.Timescale">
+            <summary>
+                Gets or sets the timescale.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkFilters.Tremolo">
+            <summary>
+                Gets or sets the tremolo.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkFilters.Vibrato">
+            <summary>
+                Gets or sets the vibrato.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkFilters.Rotation">
+            <summary>
+                Gets or sets the rotation.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkFilters.Disortion">
+            <summary>
+                Gets or sets the disortion.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkFilters.ChannelMix">
+            <summary>
+                Gets or sets the channel-mix.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkFilters.LowPass">
+            <summary>
+                Gets or sets the low-pass.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkFilters.PluginFilters">
+            <summary>
+                Gets a dictionary of custom plugin filters.
+                <para><c>Key</c> is plugin name.</para>
+                <para><c>Value</c> is plugin object.</para>
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Filters.LavalinkKaraoke">
+            <summary>
+                Uses equalization to eliminate part of a band, usually targeting vocals.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.Filters.LavalinkKaraoke.#ctor(DisCatSharp.Entities.Optional{System.Single},DisCatSharp.Entities.Optional{System.Single},DisCatSharp.Entities.Optional{System.Single},DisCatSharp.Entities.Optional{System.Single})">
+            <inheritdoc cref="T:DisCatSharp.Lavalink.Entities.Filters.LavalinkKaraoke" />
+            <param name="level">The level</param>
+            <param name="monoLevel">The mono level</param>
+            <param name="filterBand">The filter band in Hz.</param>
+            <param name="filterWidth">The filter width.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkKaraoke.Level">
+            <summary>
+                Gets or sets the level (<c>0.0</c> to <c>1.0</c> where <c>0.0</c> is no effect and <c>1.0</c> is full effect).
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkKaraoke.MonoLevel">
+            <summary>
+                Gets or sets the mono level (<c>0.0</c> to <c>1.0</c> where <c>0.0</c> is no effect and <c>1.0</c> is full effect).
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkKaraoke.FilterBand">
+            <summary>
+                Gets or sets the filter band in Hz.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkKaraoke.FilterWidth">
+            <summary>
+                Gets or sets the filter width.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Filters.LavalinkLowPass">
+            <summary>
+                Higher frequencies get suppressed, while lower frequencies pass through this filter, thus the name low pass.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.Filters.LavalinkLowPass.#ctor(DisCatSharp.Entities.Optional{System.Single})">
+            <inheritdoc cref="T:DisCatSharp.Lavalink.Entities.Filters.LavalinkLowPass" />
+            <param name="smoothing">The smoothing factor</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkLowPass.Smoothing">
+            <summary>
+                The smoothing factor (<c>>1.0</c>, Any smoothing values equal to or less than 1.0 will disable the filter)
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Filters.LavalinkRotation">
+            <summary>
+                Rotates the sound around the stereo channels/user headphones (aka Audio Panning).
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.Filters.LavalinkRotation.#ctor(DisCatSharp.Entities.Optional{System.Single})">
+            <inheritdoc cref="T:DisCatSharp.Lavalink.Entities.Filters.LavalinkRotation" />
+            <param name="rotationHz">The frequency of the audio rotating around the listener in Hz.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkRotation.RotationHz">
+            <summary>
+                The frequency of the audio rotating around the listener in Hz.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Filters.LavalinkTimescale">
+            <summary>
+                Changes the speed, pitch, and rate.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.Filters.LavalinkTimescale.#ctor(DisCatSharp.Entities.Optional{System.Single},DisCatSharp.Entities.Optional{System.Single},DisCatSharp.Entities.Optional{System.Single})">
+            <inheritdoc cref="T:DisCatSharp.Lavalink.Entities.Filters.LavalinkTimescale" />
+            <param name="speed">The playback speed. (<c>>0.0</c> where <c>1.0</c> is default)</param>
+            <param name="pitch">The pitch. (<c>>0.0</c> where <c>1.0</c> is default)</param>
+            <param name="rate">The rate. (<c>>0.0</c> where <c>1.0</c> is default)</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkTimescale.Speed">
+            <summary>
+                The playback speed. (<c>>0.0</c> where <c>1.0</c> is default)
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkTimescale.Pitch">
+            <summary>
+                The pitch. (<c>>0.0</c> where <c>1.0</c> is default)
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkTimescale.Rate">
+            <summary>
+                The rate. (<c>>0.0</c> where <c>1.0</c> is default)
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Filters.LavalinkTremolo">
+            <summary>
+                Uses amplification to create a shuddering effect, where the volume quickly oscillates.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.Filters.LavalinkTremolo.#ctor(DisCatSharp.Entities.Optional{System.Single},DisCatSharp.Entities.Optional{System.Single})">
+            <inheritdoc cref="T:DisCatSharp.Lavalink.Entities.Filters.LavalinkTremolo" />
+            <param name="frequency">The frequency. (<c>>0.0</c>)</param>
+            <param name="depth">The tromelo depth. (<c>>0.0</c>)</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkTremolo.Frequency">
+            <summary>
+                The frequency. (<c>>0.0</c>)
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkTremolo.Depth">
+            <summary>
+                The tromelo depth. (<c>>0.0</c>)
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Filters.LavalinkVibrato">
+            <summary>
+                Similar to tremolo. While tremolo oscillates the volume, vibrato oscillates the pitch.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.Filters.LavalinkVibrato.#ctor(DisCatSharp.Entities.Optional{System.Single},DisCatSharp.Entities.Optional{System.Single})">
+            <inheritdoc cref="T:DisCatSharp.Lavalink.Entities.Filters.LavalinkVibrato" />
+            <param name="frequency">The frequency. (<c>>0.0</c>)</param>
+            <param name="depth">The vibrato depth. (<c>>0.0</c>)</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkVibrato.Frequency">
+            <summary>
+                The frequency. (<c>>0.0</c>)
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Filters.LavalinkVibrato.Depth">
+            <summary>
+                The vibrato depth. (<c>>0.0</c>)
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.IQueueEntry">
+            <summary>
+                Represents an interface for using the built-in DisCatSharp Lavalink queue.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.IQueueEntry.Track">
+            <summary>
+                The lavalink track to play.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.IQueueEntry.AddTrack(DisCatSharp.Lavalink.Entities.LavalinkTrack)">
+            <summary>
+                Adds a track.
+            </summary>
+            <param name="track">The track to add.</param>
+            <returns>The queue entry.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.IQueueEntry.BeforePlayingAsync(DisCatSharp.Lavalink.LavalinkGuildPlayer)">
+            <summary>
+                Actions to execute before this queue entry gets played.
+                Return <see langword="false" /> if entry shouldn't be played.
+            </summary>
+            <param name="player">The player.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.IQueueEntry.AfterPlayingAsync(DisCatSharp.Lavalink.LavalinkGuildPlayer)">
+            <summary>
+                Actions to execute after this queue entry was played.
+            </summary>
+            <param name="player">The player.</param>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.LavalinkException">
+            <summary>
+                Represents a lavalink exception.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkException.Message">
+            <summary>
+                Gets message of the exception.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkException.Severity">
+            <summary>
+                Gets the severity of the exception
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkException.Cause">
+            <summary>
+                Gets the cause of the exception.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.LavalinkInfo">
+            <summary>
+                Represents lavalink server information.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Entities.LavalinkInfo._buildTime">
+            <summary>
+                Gets the timestamp when this version was built.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkInfo.Version">
+            <summary>
+                Gets the lavalink version object.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkInfo.BuildTime">
+            <summary>
+                Gets the datetime offset when this version was built.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkInfo.Git">
+            <summary>
+                Gets the git information.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkInfo.Jvm">
+            <summary>
+                Gets the jvm version.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkInfo.Lavaplayer">
+            <summary>
+                Gets the lavaplayer version.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkInfo.SourceManagers">
+            <summary>
+                Gets a <see cref="T:System.Collections.Generic.List`1" /> of available source managers.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkInfo.Filters">
+            <summary>
+                Gets a <see cref="T:System.Collections.Generic.List`1" /> of available folters.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkInfo.Plugins">
+            <summary>
+                Gets a <see cref="T:System.Collections.Generic.List`1" /> of available plugins.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Git">
+            <summary>
+                Represents git information
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Entities.Git._commitTime">
+            <summary>
+                Gets the millisecond unix timestamp for when the commit was created.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Git.Branch">
+            <summary>
+                Gets the branch this Lavalink server was build on.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Git.Commit">
+            <summary>
+                Gets the commit hash this Lavalink server was build on.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Git.CommitTime">
+            <summary>
+                Gets the commit time as datetime offset when this Lavalink server was build.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Plugin">
+            <summary>
+                Represents a plugin.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Plugin.Name">
+            <summary>
+                Gets the plugin name.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Plugin.Version">
+            <summary>
+                Gets the plugin version.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Version">
+            <summary>
+                Represents a version object.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Version.Semver">
+            <summary>
+                Gets the full version string of the Lavalink server.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Version.Major">
+            <summary>
+                Gets the major version of the Lavalink server.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Version.Minor">
+            <summary>
+                Gets the minor version of the Lavalink server.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Version.Patch">
+            <summary>
+                Gets the patch version of the Lavalink server.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Version.PreRelease">
+            <summary>
+                Gets the pre-release version according to semver as a <c>.</c> separated list of identifiers.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Version.Build">
+            <summary>
+                The build metadata according to semver as a <c>.</c> separated list of identifiers
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.LavalinkLyricsResult">
+            <summary>
+                Represents a lavalink lyrics result.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkLyricsResult.SourceName">
+            <summary>
+                Gets the name of the source where the lyrics were fetched from.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkLyricsResult.Provider">
+            <summary>
+                Gets the name of the provider the lyrics was fetched from on the source.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkLyricsResult.Text">
+            <summary>
+                Gets the lyrics text.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkLyricsResult.Lines">
+            <summary>
+                Gets the lyrics lines.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkLyricsResult.Plugin">
+            <summary>
+                Gets additional plugin specific data.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.LavalinkPlayer">
+            <summary>
+                Represents a lavalink player.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkPlayer.GuildId">
+            <summary>
+                Gets the guild id this player belongs to.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkPlayer.Track">
+            <summary>
+                Gets the currently loaded track.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkPlayer.Volume">
+            <summary>
+                Gets the volume of this player.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkPlayer.Paused">
+            <summary>
+                Gets whether this player is paused.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkPlayer.PlayerState">
+            <summary>
+                Gets the player state.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkPlayer.VoiceState">
+            <summary>
+                Gets the player voice state.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkPlayer.Filters">
+            <summary>
+                Gets the player filters.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.LavalinkPlayerState">
+            <summary>
+                Represents a lavalink player state.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Entities.LavalinkPlayerState._position">
+            <summary>
+                Gets the position of the track in milliseconds.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Entities.LavalinkPlayerState._time">
+            <summary>
+                Gets the unix timestamp in milliseconds.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkPlayerState.Time">
+            <summary>
+                Gets the current datetime offset.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkPlayerState.Position">
+            <summary>
+                Gets the position of the track as <see cref="T:System.TimeSpan" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkPlayerState.IsConnected">
+            <summary>
+                Gets whether Lavalink is connected to the voice gateway.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkPlayerState.Ping">
+            <summary>
+                Gets the ping of the node to the Discord voice server in milliseconds (<c>-1</c> if not connected).
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.LavalinkPlaylist">
+            <summary>
+                Represents a lavalink playlist result.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkPlaylist.Info">
+            <summary>
+                Gets the lavalink playlist info.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkPlaylist.PluginInfo">
+            <summary>
+                Gets the lavalink plugin info.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkPlaylist.Tracks">
+            <summary>
+                Gets the loaded tracks.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.LavalinkPlaylistInfo">
+            <summary>
+                Represents a lavalink playlist info.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkPlaylistInfo.Name">
+            <summary>
+                Gets the name of the playlist.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkPlaylistInfo.SelectedTrack">
+            <summary>
+                Gets the selected track.
+                <para><c>-1</c> if none is selected.</para>
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.LavalinkRestResponse">
+            <summary>
+                Represents a response sent by the remote HTTP party.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.LavalinkRestResponse.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkRestResponse" /> class.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkRestResponse.ResponseCode">
+            <summary>
+                Gets the response code sent by the remote party.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkRestResponse.Headers">
+            <summary>
+                Gets the headers of the response send by the remote party.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkRestResponse.Response">
+            <summary>
+                Gets the contents of the response sent by the remote party.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.LavalinkSessionConfiguration">
+            <summary>
+                Represents a <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkSessionConfiguration" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.LavalinkSessionConfiguration.#ctor(DisCatSharp.Entities.Optional{System.Boolean},DisCatSharp.Entities.Optional{System.Int32})">
+            <summary>
+                Constructs a new <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkSessionConfiguration" />.
+            </summary>
+            <param name="resuming">Whether resuming is enabled for this session or not.</param>
+            <param name="timeoutSeconds">The timeout in seconds.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.LavalinkSessionConfiguration.#ctor">
+            <summary>
+                Constructs a new <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkSessionConfiguration" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkSessionConfiguration.Resuming">
+            <summary>
+                Whether resuming is enabled for this session or not.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkSessionConfiguration.TimeoutSeconds">
+            <summary>
+                The timeout in seconds (default is 60s)
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.LavalinkStats">
+            <summary>
+                Represents lavalink server statistics.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Entities.LavalinkStats._uptime">
+            <summary>
+                Gets the uptime of the lavalink server.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.LavalinkStats.#ctor">
+            <summary>
+                Constructs an empty <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkStats" /> object.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.LavalinkStats.#ctor(DisCatSharp.Lavalink.Entities.Websocket.StatsOp)">
+            <summary>
+                Constructs a new <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkStats" /> object from a <see cref="T:DisCatSharp.Lavalink.Entities.Websocket.StatsOp" /> received via websocket.
+                <para>This includes <see cref="P:DisCatSharp.Lavalink.Entities.LavalinkStats.Frames" />.</para>
+            </summary>
+            <param name="websocketStats">The gateway stats.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.LavalinkStats.#ctor(DisCatSharp.Lavalink.Entities.LavalinkStats,DisCatSharp.Lavalink.Entities.LavalinkStats)">
+            <summary>
+                Constructs a new <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkStats" /> object from a <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkStats" /> received via rest.
+                <para>
+                    Pulls <see cref="P:DisCatSharp.Lavalink.Entities.LavalinkStats.Frames" /> from existing <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkStats" /> received via gateway as
+                    <see cref="T:DisCatSharp.Lavalink.Entities.Websocket.StatsOp" />.
+                </para>
+            </summary>
+            <param name="restStats">The rest stats object.</param>
+            <param name="websocketStats">The gateway stats object (previous stats object).</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkStats.Players">
+            <summary>
+                Gets the total count of players.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkStats.PlayingPlayers">
+            <summary>
+                Gets the count of playing (active) players.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkStats.Uptime">
+            <summary>
+                Gets the uptime <see cref="T:System.TimeSpan" /> of the lavalink server.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkStats.Memory">
+            <summary>
+                Gets the memory stats.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkStats.Cpu">
+            <summary>
+                Gets the cpu stats.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkStats.Frames">
+            <summary>
+                Gets or sets the frames.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.MemoryStats">
+            <summary>
+                Represents memory stats.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.MemoryStats.Reservable">
+            <summary>
+                Gets the reservable memory.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.MemoryStats.Used">
+            <summary>
+                Gets the used memory.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.MemoryStats.Free">
+            <summary>
+                Gets the free memory.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.MemoryStats.Allocated">
+            <summary>
+                Gets the allocated memory.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.CpuStats">
+            <summary>
+                Represents cpu stats.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.CpuStats.Cores">
+            <summary>
+                Gets the cores.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.CpuStats.SystemLoad">
+            <summary>
+                Gets the system load.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.CpuStats.LavalinkLoad">
+            <summary>
+                Gets the lavalink load.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.FrameStats">
+            <summary>
+                Represents frame stats.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.FrameStats.Sent">
+            <summary>
+                Gets the sent frames count.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.FrameStats.Nulled">
+            <summary>
+                Gets the nulled frames count.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.FrameStats.Deficit">
+            <summary>
+                Gets the deficit.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.LavalinkTrack">
+            <summary>
+                Represents a lavalink track.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkTrack.Encoded">
+            <summary>
+                Gets the encoded track.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkTrack.Info">
+            <summary>
+                Gets the lavalink track info.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkTrack.PluginInfo">
+            <summary>
+                Gets the lavalink plugin info.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkTrack.UserData">
+            <summary>
+                Gets the user info.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.LavalinkPluginInfo">
+            <summary>
+                Represents lavalink plugin information.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Entities.LavalinkPluginInfo.UnknownProperties">
+            <summary>
+                Gets additional json properties that are not known to the deserializing object.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkPluginInfo.AdditionalProperties">
+            <summary>
+                Lets JsonConvert set the unknown properties.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.LavalinkTrackInfo">
+            <summary>
+                Represents track information.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkTrackInfo.Identifier">
+            <summary>
+                Gets the track identifier.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkTrackInfo.IsSeekable">
+            <summary>
+                Gets whether the track is seekable.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkTrackInfo.Author">
+            <summary>
+                Gets the track author.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkTrackInfo.Length">
+            <summary>
+                Gets the track length.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkTrackInfo.IsStream">
+            <summary>
+                Gets whether the track is a stream.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkTrackInfo.Position">
+            <summary>
+                Gets the current position.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkTrackInfo.Title">
+            <summary>
+                Gets the track title.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkTrackInfo.Uri">
+            <summary>
+                Gets the track url.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkTrackInfo.ArtworkUrl">
+            <summary>
+                Gets the tracks artwork url.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkTrackInfo.Isrc">
+            <summary>
+                Gets the tracks isrc.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkTrackInfo.SourceName">
+            <summary>
+                Gets the tracks source name.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.LavalinkTrackLoadingResult">
+            <summary>
+                Represents a loading result when looking up tracks with
+                <see cref="M:DisCatSharp.Lavalink.LavalinkSession.LoadTracksAsync(DisCatSharp.Lavalink.Enums.LavalinkSearchType,System.String)" /> or
+                <see cref="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.LoadTracksAsync(System.String)" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkTrackLoadingResult.LoadType">
+            <summary>
+                Gets the load result type.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkTrackLoadingResult.RawResult">
+            <summary>
+                Gets the raw result string.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkTrackLoadingResult.Result">
+            <summary>
+                Gets the load result.
+                <para>You need to convert the <see langword="object" /> to the corresponding type based on <see cref="P:DisCatSharp.Lavalink.Entities.LavalinkTrackLoadingResult.LoadType" />.</para>
+                <example>
+                    <code>var track = (LavalinkTrack)LavalinkTrackLoadingResult.Result;</code>
+                </example>
+                <list type="table">
+                    <listheader>
+                        <term>
+                            <see cref="P:DisCatSharp.Lavalink.Entities.LavalinkTrackLoadingResult.LoadType" />
+                        </term>
+                        <description>Convert to</description>
+                    </listheader>
+                    <item>
+                        <term>
+                            <see cref="F:DisCatSharp.Lavalink.Enums.LavalinkLoadResultType.Track" />
+                        </term>
+                        <description>
+                            <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />
+                        </description>
+                    </item>
+                    <item>
+                        <term>
+                            <see cref="F:DisCatSharp.Lavalink.Enums.LavalinkLoadResultType.Playlist" />
+                        </term>
+                        <description>
+                            <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkPlaylist" />
+                        </description>
+                    </item>
+                    <item>
+                        <term>
+                            <see cref="F:DisCatSharp.Lavalink.Enums.LavalinkLoadResultType.Search" />
+                        </term>
+                        <description><see cref="T:System.Collections.Generic.List`1" /> of <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" /></description>
+                    </item>
+                    <item>
+                        <term>
+                            <see cref="F:DisCatSharp.Lavalink.Enums.LavalinkLoadResultType.Empty" />
+                        </term>
+                        <description>
+                            <see langword="null" />
+                        </description>
+                    </item>
+                    <item>
+                        <term>
+                            <see cref="F:DisCatSharp.Lavalink.Enums.LavalinkLoadResultType.Error" />
+                        </term>
+                        <description>
+                            <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkException" />
+                        </description>
+                    </item>
+                </list>
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Entities.LavalinkTrackLoadingResult.GetResultAs``1">
+            <summary>
+                Gets the result as a specific type.
+            </summary>
+            <typeparam name="T">Type to convert to.</typeparam>
+            <returns>Result as the specified type.</returns>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.LavalinkVoiceState">
+            <summary>
+                Represents a lavalink voice state with credentials to connect to discord voice servers.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkVoiceState.Token">
+            <summary>
+                The token for the voice connection.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkVoiceState.Endpoint">
+            <summary>
+                The voice server to connect to.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkVoiceState.SessionId">
+            <summary>
+                The session id for the voice connection.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.LyricsLine">
+            <summary>
+                Represents a lyric line.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LyricsLine.Timestamp">
+            <summary>
+                Gets the timestamp of the line in milliseconds.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LyricsLine.Duration">
+            <summary>
+                Gets the duration of the line in milliseconds.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LyricsLine.Line">
+            <summary>
+                Gets the lyrics line.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LyricsLine.Plugin">
+            <summary>
+                Gets additional plugin specific data.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Websocket.EventOp">
+            <summary>
+                Represents an event op.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.EventOp.Type">
+            <summary>
+                Gets the op type of event.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.EventOp.GuildId">
+            <summary>
+                Gets the related guild id.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Websocket.LavalinkOp">
+            <summary>
+                Represents a lavalink op.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.LavalinkOp.Op">
+            <summary>
+                Gets the op type.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Websocket.PlayerUpdateOp">
+            <summary>
+                Represents a player update op.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.PlayerUpdateOp.GuildId">
+            <summary>
+                Gets the related guild id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.PlayerUpdateOp.State">
+            <summary>
+                Gets the updated player state.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Websocket.ReadyOp">
+            <summary>
+                Represents a ready op.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.ReadyOp.Resumed">
+            <summary>
+                Gets whether the session was resumed.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.ReadyOp.SessionId">
+            <summary>
+                Gets the lavalink session id.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Websocket.StatsOp">
+            <summary>
+                Represents lavalink server statistics received via websocket.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Entities.Websocket.StatsOp.UptimeInt">
+            <summary>
+                Gets or sets the uptime.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.StatsOp.Players">
+            <summary>
+                Gets the total count of players.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.StatsOp.PlayingPlayers">
+            <summary>
+                Gets the count of playing (active) players.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.StatsOp.Memory">
+            <summary>
+                Gets or sets the memory stats.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.StatsOp.Cpu">
+            <summary>
+                Gets or sets the cpu stats.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.StatsOp.Frames">
+            <summary>
+                Gets or sets the frame stats.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Websocket.TrackEndEvent">
+            <summary>
+                Represents a track end event.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.TrackEndEvent.Track">
+            <summary>
+                Gets the lavalink track.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.TrackEndEvent.Reason">
+            <summary>
+                Gets the end reason.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Websocket.TrackException">
+            <summary>
+                Represents a lavalink exception received via websocket.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.TrackException.Message">
+            <summary>
+                Gets message of the exception.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.TrackException.Severity">
+            <summary>
+                Gets the severity of the exception
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.TrackException.Cause">
+            <summary>
+                Gets the cause of the exception.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Websocket.TrackExceptionEvent">
+            <summary>
+                Represents a track exception.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.TrackExceptionEvent.Track">
+            <summary>
+                Gets the lavalink track.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.TrackExceptionEvent.Exception">
+            <summary>
+                Gets the track exception.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Websocket.TrackStartEvent">
+            <summary>
+                Represents a track start event.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.TrackStartEvent.Track">
+            <summary>
+                Gets the lavalink track.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Websocket.TrackStuckEvent">
+            <summary>
+                Represents a track stuck event.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.TrackStuckEvent.Track">
+            <summary>
+                Gets the lavalink track.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.TrackStuckEvent.ThresholdMs">
+            <summary>
+                Gets the threshold in milliseconds that was exceeded.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Entities.Websocket.WebSocketClosedEvent">
+            <summary>
+                Represents a websocket close event.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.WebSocketClosedEvent.Code">
+            <summary>
+                Gets the Discord close event code.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.WebSocketClosedEvent.Reason">
+            <summary>
+                Gets the close reason.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.Websocket.WebSocketClosedEvent.ByRemote">
+            <summary>
+                Gets whether the connection was closed by Discord.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Enums.Filters.LavalinkFilterBand">
+            <summary>
+                Represents the different filter bands.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Filters.LavalinkFilterBand.Zero">
+            <summary>
+                25 Hz
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Filters.LavalinkFilterBand.One">
+            <summary>
+                40 Hz
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Filters.LavalinkFilterBand.Two">
+            <summary>
+                63 Hz
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Filters.LavalinkFilterBand.Three">
+            <summary>
+                100 Hz
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Filters.LavalinkFilterBand.Four">
+            <summary>
+                160 Hz
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Filters.LavalinkFilterBand.Five">
+            <summary>
+                250 Hz
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Filters.LavalinkFilterBand.Six">
+            <summary>
+                400 Hz
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Filters.LavalinkFilterBand.Seven">
+            <summary>
+                630 Hz
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Filters.LavalinkFilterBand.Eight">
+            <summary>
+                1.000 Hz
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Filters.LavalinkFilterBand.Nine">
+            <summary>
+                1.600 Hz
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Filters.LavalinkFilterBand.Ten">
+            <summary>
+                2.500 Hz
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Filters.LavalinkFilterBand.Eleven">
+            <summary>
+                4.000 Hz
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Filters.LavalinkFilterBand.Twelve">
+            <summary>
+                6.300 Hz
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Filters.LavalinkFilterBand.Thirteen">
+            <summary>
+                10.000 Hz
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Filters.LavalinkFilterBand.Fourteen">
+            <summary>
+                16.000 Hz
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Enums.LavalinkEvents">
+            <summary>
+                Contains well-defined event IDs used by the Lavalink extension.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Enums.LavalinkEvents.Misc">
+            <summary>
+                Miscellaneous events, that do not fit in any other category.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Enums.LavalinkEvents.LavalinkConnectionError">
+            <summary>
+                Events pertaining to Lavalink node connection errors.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Enums.LavalinkEvents.LavalinkSessionConnectionClosed">
+            <summary>
+                Events emitted for clean disconnects from Lavalink.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Enums.LavalinkEvents.LavalinkSessionConnected">
+            <summary>
+                Events emitted for successful connections made to Lavalink.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Enums.LavalinkEvents.LavalinkRestError">
+            <summary>
+                Events emitted when the Lavalink REST API responds with an error.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Enums.LavalinkEvents.LavalinkWsRx">
+            <summary>
+                Events containing raw payloads, received from Lavalink nodes.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Enums.LavalinkEvents.LavalinkWsException">
+            <summary>
+                Events emitted when the Lavalink WebSocket connection sends invalid data.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Enums.LavalinkEvents.Intents">
+            <summary>
+                Events pertaining to Gateway Intents. Typically diagnostic information.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Enums.LavalinkLoadResultType">
+            <summary>
+                Represents Lavalink track loading results.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.LavalinkLoadResultType.Track">
+            <summary>
+                Specifies that track was loaded successfully.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.LavalinkLoadResultType.Playlist">
+            <summary>
+                Specifies that playlist was loaded successfully.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.LavalinkLoadResultType.Search">
+            <summary>
+                Specifies that the result set contains search results.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.LavalinkLoadResultType.Empty">
+            <summary>
+                Specifies that the search yielded no results.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.LavalinkLoadResultType.Error">
+            <summary>
+                Specifies that the track failed to load.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Enums.Endpoints">
+            <summary>
+                Represents the lavalink endpoints.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Endpoints.VERSION">
+            <summary>
+                The version endpoint.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Endpoints.WEBSOCKET">
+            <summary>
+                The websocket endpoint.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Endpoints.V4">
+            <summary>
+                The v4 endpoint.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Endpoints.INFO">
+            <summary>
+                The info endpoint.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Endpoints.STATS">
+            <summary>
+                The stats endpoint.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Endpoints.SESSIONS">
+            <summary>
+                THe sessions endpoint.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Endpoints.PLAYERS">
+            <summary>
+                The players endpoint.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Endpoints.LOAD_TRACKS">
+            <summary>
+                The load tracks endpoint.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Endpoints.DECODE_TRACK">
+            <summary>
+                The decode track endpoint.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Endpoints.DECODE_TRACKS">
+            <summary>
+                The decode tracks endpoint.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Endpoints.ROUTE_PLANNER">
+            <summary>
+                The route planner endpoint.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Endpoints.STATUS">
+            <summary>
+                The status endpoint.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Endpoints.FREE_ADDRESS">
+            <summary>
+                The free address endpoint.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Endpoints.FREE_ALL">
+            <summary>
+                The free all endpoint.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Endpoints.LYRICS">
+            <summary>
+                The lyrics endpoint.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Endpoints.TRACK">
+            <summary>
+                The track endpoint.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Enums.LavalinkSearchType">
+            <summary>
+                The lavalink search type.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.LavalinkSearchType.SoundCloud">
+            <summary>
+                Search on SoundCloud
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.LavalinkSearchType.Youtube">
+            <summary>
+                Search on Youtube.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.LavalinkSearchType.Plain">
+            <summary>
+                Provide Lavalink with a plain URL.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.LavalinkSearchType.AppleMusic">
+            <summary>
+                Search on Apple Music.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.LavalinkSearchType.Deezer">
+            <summary>
+                Search on Deezer.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.LavalinkSearchType.DeezerISrc">
+            <summary>
+                Search on Deezer with ISRC.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.LavalinkSearchType.YandexMusic">
+            <summary>
+                Search on Yandex Music.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.LavalinkSearchType.Spotify">
+            <summary>
+                Search on Spotify.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.LavalinkSearchType.SpotifyRec">
+            <summary>
+                Search on Spotify with recommendation seed.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Enums.LavalinkTrackEndReason">
+            <summary>
+                Represents reasons why a <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" /> ended.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.LavalinkTrackEndReason.Finished">
+            <summary>
+                The track was finished.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.LavalinkTrackEndReason.LoadFailed">
+            <summary>
+                The track was failed to load.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.LavalinkTrackEndReason.Stopped">
+            <summary>
+                The track was stopped.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.LavalinkTrackEndReason.Replaced">
+            <summary>
+                The track was replaced.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.LavalinkTrackEndReason.Cleanup">
+            <summary>
+                The track was cleaned up.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Enums.RepeatMode">
+            <summary>
+            Represents the repeat mode for the Lavalink player.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.RepeatMode.None">
+            <summary>
+            No repeat mode. The queue operates normally and does not repeat.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.RepeatMode.All">
+            <summary>
+            Repeat all mode. The entire queue repeats once it ends.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.RepeatMode.Current">
+            <summary>
+            Repeat current mode. The current track is played over and over again.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Enums.Severity">
+            <summary>
+                Represents the severity for exceptions.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Severity.Common">
+            <summary>
+                The cause is known and expected, indicates that there is nothing wrong with the library itself.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Severity.Suspicious">
+            <summary>
+                <para>The cause might not be exactly known, but is possibly caused by outside factors.</para>
+                <para>For example when an outside service responds in a format that we do not expect.</para>
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Severity.Fault">
+            <summary>
+                <para>The probable cause is an issue with the library or there is no way to tell what the cause might be.</para>
+                <para>
+                    This is the default level and other levels are used in cases where the thrower has more in-depth knowledge
+                    about the error.
+                </para>
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Enums.Websocket.EventOpType">
+            <summary>
+                Represents various event op types.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Websocket.EventOpType.TrackStartEvent">
+            <summary>
+                Event indicates that a track started. Fires <see cref="E:DisCatSharp.Lavalink.LavalinkGuildPlayer.TrackStarted" />.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Websocket.EventOpType.TrackEndEvent">
+            <summary>
+                Event indicates that a track ended. Fires <see cref="E:DisCatSharp.Lavalink.LavalinkGuildPlayer.TrackEnded" />.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Websocket.EventOpType.TrackExceptionEvent">
+            <summary>
+                Event indicates that a track encountered an exception. Fires <see cref="E:DisCatSharp.Lavalink.LavalinkGuildPlayer.TrackException" />.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Websocket.EventOpType.TrackStuckEvent">
+            <summary>
+                Event indicates that a track got stuck. Fires <see cref="E:DisCatSharp.Lavalink.LavalinkGuildPlayer.TrackStuck" />.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Websocket.EventOpType.WebsocketClosedEvent">
+            <summary>
+                Event indicates that a track started. Executes <see cref="M:DisCatSharp.Lavalink.LavalinkSession.Lavalink_WebSocket_Disconnected(DisCatSharp.Net.WebSocket.IWebSocketClient,DisCatSharp.EventArgs.SocketCloseEventArgs)" />.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Enums.Websocket.OpType">
+            <summary>
+                Represents various lavalink op types.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Websocket.OpType.Ready">
+            <summary>
+                Indicates that the lavalink session is ready. Fires <see cref="E:DisCatSharp.Lavalink.LavalinkSession.LavalinkSessionConnected" />.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Websocket.OpType.PlayerUpdate">
+            <summary>
+                Indicates that a <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkPlayer" /> got updated. Fires <see cref="E:DisCatSharp.Lavalink.LavalinkSession.StatsReceived" />.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Websocket.OpType.Stats">
+            <summary>
+                Indicates that the session stats got updated. Fires <see cref="E:DisCatSharp.Lavalink.LavalinkSession.StatsReceived" />.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.Enums.Websocket.OpType.Event">
+            <summary>
+                Indicates that the op contains further information about an event.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.EventArgs.GuildPlayerDestroyedEventArgs">
+            <summary>
+                Represents event arguments for guild player destroy events.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.EventArgs.GuildPlayerDestroyedEventArgs.#ctor(DisCatSharp.Lavalink.LavalinkGuildPlayer)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Lavalink.EventArgs.GuildPlayerDestroyedEventArgs" /> class.
+            </summary>
+            <param name="player">The player.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.GuildPlayerDestroyedEventArgs.Discord">
+            <summary>
+                Gets the discord client.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.GuildPlayerDestroyedEventArgs.Player">
+            <summary>
+                Gets the destroyed guild player.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.GuildPlayerDestroyedEventArgs.Guild">
+            <summary>
+                Gets the guild.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.EventArgs.LavalinkPlayerStateUpdateEventArgs">
+            <summary>
+                Represents event arguments for lavalink player state updates.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.EventArgs.LavalinkPlayerStateUpdateEventArgs.#ctor(DisCatSharp.DiscordClient,DisCatSharp.Lavalink.Entities.LavalinkPlayerState)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Lavalink.EventArgs.GuildPlayerDestroyedEventArgs" /> class.
+            </summary>
+            <param name="client">The discord client.</param>
+            <param name="state">The state.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkPlayerStateUpdateEventArgs.Discord">
+            <summary>
+                Gets the discord client.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkPlayerStateUpdateEventArgs.State">
+            <summary>
+                Gets the player state.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.EventArgs.LavalinkSessionConnectedEventArgs">
+            <summary>
+                Represents event arguments for lavalink session connection.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.EventArgs.LavalinkSessionConnectedEventArgs.#ctor(DisCatSharp.Lavalink.LavalinkSession)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Lavalink.EventArgs.LavalinkSessionConnectedEventArgs" /> class.
+            </summary>
+            <param name="session">The session.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkSessionConnectedEventArgs.Discord">
+            <summary>
+                Gets the discord client.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkSessionConnectedEventArgs.Session">
+            <summary>
+                Gets the session that was connected.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.EventArgs.LavalinkSessionDisconnectedEventArgs">
+            <summary>
+                Represents event arguments for lavalink session disconnection.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.EventArgs.LavalinkSessionDisconnectedEventArgs.#ctor(DisCatSharp.Lavalink.LavalinkSession,System.Boolean)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Lavalink.EventArgs.LavalinkSessionDisconnectedEventArgs" /> class.
+            </summary>
+            <param name="session">The session.</param>
+            <param name="isClean">If true, is clean.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkSessionDisconnectedEventArgs.Discord">
+            <summary>
+                Gets the discord client.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkSessionDisconnectedEventArgs.Session">
+            <summary>
+                Gets the session that was disconnected.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkSessionDisconnectedEventArgs.IsCleanClose">
+            <summary>
+                Gets whether disconnect was clean.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.EventArgs.LavalinkStatsReceivedEventArgs">
+            <summary>
+                Represents event arguments for lavalink stats events .
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.EventArgs.LavalinkStatsReceivedEventArgs.#ctor(DisCatSharp.DiscordClient,DisCatSharp.Lavalink.Entities.LavalinkStats)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Lavalink.EventArgs.LavalinkTrackEndedEventArgs" /> class.
+            </summary>
+            <param name="client">The discord client.</param>
+            <param name="stats">The received statistics.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkStatsReceivedEventArgs.Discord">
+            <summary>
+                Gets the discord client.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkStatsReceivedEventArgs.Statistics">
+            <summary>
+                Gets the updated statistics.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.EventArgs.LavalinkTrackEndedEventArgs">
+            <summary>
+                Represents event arguments for  lavalink track ended events.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.EventArgs.LavalinkTrackEndedEventArgs.#ctor(DisCatSharp.DiscordClient,DisCatSharp.Lavalink.Entities.Websocket.TrackEndEvent)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Lavalink.EventArgs.LavalinkTrackEndedEventArgs" /> class.
+            </summary>
+            <param name="client">The discord client.</param>
+            <param name="eventArgs">The event args.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackEndedEventArgs.Discord">
+            <summary>
+                Gets the discord client.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackEndedEventArgs.Track">
+            <summary>
+                Gets the related lavalink track.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackEndedEventArgs.Reason">
+            <summary>
+                Gets the track end reason.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackEndedEventArgs.GuildId">
+            <summary>
+                Gets the guild id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackEndedEventArgs.Guild">
+            <summary>
+                Gets the guild.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.EventArgs.LavalinkTrackExceptionEventArgs">
+            <summary>
+                Represents event arguments for lavalink track exceptions.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.EventArgs.LavalinkTrackExceptionEventArgs.#ctor(DisCatSharp.DiscordClient,DisCatSharp.Lavalink.Entities.Websocket.TrackExceptionEvent)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Lavalink.EventArgs.LavalinkTrackExceptionEventArgs" /> class.
+            </summary>
+            <param name="client">The discord client.</param>
+            <param name="eventArgs">The event args.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackExceptionEventArgs.Discord">
+            <summary>
+                Gets the discord client.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackExceptionEventArgs.Track">
+            <summary>
+                Gets the related lavalink track.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackExceptionEventArgs.Exception">
+            <summary>
+                Gets the exception.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackExceptionEventArgs.GuildId">
+            <summary>
+                Gets the guild id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackExceptionEventArgs.Guild">
+            <summary>
+                Gets the guild.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.EventArgs.LavalinkTrackStartedEventArgs">
+            <summary>
+                Represents event arguments for lavalink track started event.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.EventArgs.LavalinkTrackStartedEventArgs.#ctor(DisCatSharp.DiscordClient,DisCatSharp.Lavalink.Entities.Websocket.TrackStartEvent)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Lavalink.EventArgs.LavalinkTrackStartedEventArgs" /> class.
+            </summary>
+            <param name="client">The discord client.</param>
+            <param name="eventArgs">The event args.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackStartedEventArgs.Discord">
+            <summary>
+                Gets the discord client.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackStartedEventArgs.Track">
+            <summary>
+                Gets the related lavalink track.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackStartedEventArgs.GuildId">
+            <summary>
+                Gets the guild id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackStartedEventArgs.Guild">
+            <summary>
+                Gets the guild.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.EventArgs.LavalinkTrackStuckEventArgs">
+            <summary>
+                Represents event arguments for lavalink track stuck events.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.EventArgs.LavalinkTrackStuckEventArgs.#ctor(DisCatSharp.DiscordClient,DisCatSharp.Lavalink.Entities.Websocket.TrackStuckEvent)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Lavalink.EventArgs.LavalinkTrackStuckEventArgs" /> class.
+            </summary>
+            <param name="client">The discord client.</param>
+            <param name="eventArgs">The event args.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackStuckEventArgs.Discord">
+            <summary>
+                Gets the discord client.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackStuckEventArgs.Track">
+            <summary>
+                Gets the related lavalink track.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackStuckEventArgs.ThresholdMs">
+            <summary>
+                Gets the threshold in milliseconds that was exceeded as <see cref="T:System.TimeSpan" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackStuckEventArgs.ThresholdMilliseconds">
+            <summary>
+                Gets the threshold in milliseconds that was exceeded.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackStuckEventArgs.GuildId">
+            <summary>
+                Gets the guild id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkTrackStuckEventArgs.Guild">
+            <summary>
+                Gets the guild.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.EventArgs.LavalinkWebsocketClosedEventArgs">
+            <summary>
+                Represents event arguments for lavalink websocket closed events.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.EventArgs.LavalinkWebsocketClosedEventArgs.#ctor(DisCatSharp.DiscordClient,DisCatSharp.Lavalink.Entities.Websocket.WebSocketClosedEvent)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Lavalink.EventArgs.LavalinkWebsocketClosedEventArgs" /> class.
+            </summary>
+            <param name="client">The discord client.</param>
+            <param name="eventArgs">The event args.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkWebsocketClosedEventArgs.Discord">
+            <summary>
+                Gets the discord client.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkWebsocketClosedEventArgs.GuildId">
+            <summary>
+                Gets the guild id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkWebsocketClosedEventArgs.Guild">
+            <summary>
+                Gets the guild.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.EventArgs.LavalinkWebsocketClosedEventArgs.ByRemote">
+            <summary>
+                Whether the websocket was closed by discord.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Exceptions.LavalinkRestException">
+            <summary>
+                Represents a lavalink rest exception.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Exceptions.LavalinkRestException.Timestamp">
+            <summary>
+                Gets the datetime offset when the exception was thrown.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Exceptions.LavalinkRestException.Status">
+            <summary>
+                Gets the response http status code.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Exceptions.LavalinkRestException.Error">
+            <summary>
+                Gets the error message.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Exceptions.LavalinkRestException.Message">
+            <summary>
+                Gets the exception message.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Exceptions.LavalinkRestException.Path">
+            <summary>
+                Gets the path where the exception was thrown.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Exceptions.LavalinkRestException.Trace">
+            <summary>
+                Gets the trace information to this exception.
+                <para>Requires <see cref="P:DisCatSharp.Lavalink.LavalinkConfiguration.EnableTrace" /> to set to <see langword="true" />.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Exceptions.LavalinkRestException.Headers">
+            <summary>
+                Gets the response header.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Exceptions.LavalinkRestException.Json">
+            <summary>
+                Gets the response json.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.ExtensionMethods">
+            <summary>
+                The discord client extensions.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.ExtensionMethods.UseLavalink(DisCatSharp.DiscordClient)">
+            <summary>
+                Creates a new Lavalink client with specified settings.
+            </summary>
+            <param name="client">Discord client to create Lavalink instance for.</param>
+            <returns>Lavalink client instance.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.ExtensionMethods.UseLavalinkAsync(DisCatSharp.DiscordShardedClient)">
+            <summary>
+                Creates new Lavalink clients on all shards in a given sharded client.
+            </summary>
+            <param name="client">Discord sharded client to create Lavalink instances for.</param>
+            <returns>A dictionary of created Lavalink clients.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.ExtensionMethods.GetLavalink(DisCatSharp.DiscordClient)">
+            <summary>
+                Gets the active instance of the Lavalink client for the DiscordClient.
+            </summary>
+            <param name="client">Discord client to get Lavalink instance for.</param>
+            <returns>Lavalink client instance.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.ExtensionMethods.GetLavalinkAsync(DisCatSharp.DiscordShardedClient)">
+            <summary>
+                Retrieves a <see cref="T:DisCatSharp.Lavalink.LavalinkExtension" /> instance for each shard.
+            </summary>
+            <param name="client">The shard client to retrieve <see cref="T:DisCatSharp.Lavalink.LavalinkExtension" /> instances from.</param>
+            <returns>A dictionary containing <see cref="T:DisCatSharp.Lavalink.LavalinkExtension" /> instances for each shard.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.ExtensionMethods.ConnectAsync(DisCatSharp.Entities.DiscordChannel,DisCatSharp.Lavalink.LavalinkSession)">
+            <summary>
+                Connects to this voice channel using Lavalink.
+            </summary>
+            <param name="channel">Channel to connect to.</param>
+            <param name="session">Lavalink session to connect through.</param>
+            <returns>If successful, the Lavalink client.</returns>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.LavalinkConfiguration">
+            <summary>
+                Lavalink connection configuration.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkConfiguration.#ctor">
+            <summary>
+                Creates a new instance of <see cref="T:DisCatSharp.Lavalink.LavalinkConfiguration" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkConfiguration.#ctor(DisCatSharp.Lavalink.LavalinkConfiguration)">
+            <summary>
+                Creates a new instance of <see cref="T:DisCatSharp.Lavalink.LavalinkConfiguration" />, copying the properties of another configuration.
+            </summary>
+            <param name="other">Config the properties of which are to be copied.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkConfiguration.RestEndpoint">
+            <summary>
+                Sets the endpoint for Lavalink REST.
+                <para>Defaults to <c>127.0.0.1</c> on port <c>2333</c>.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkConfiguration.SocketEndpoint">
+            <summary>
+                Sets the endpoint for the Lavalink Websocket connection.
+                <para>Defaults to <c>127.0.0.1</c> on port <c>2333</c>.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkConfiguration.Proxy">
+            <summary>
+                <para>Sets the proxy to use for HTTP and WebSocket connections to Lavalink.</para>
+                <para>Defaults to <see langword="null" />.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkConfiguration.HttpTimeout">
+            <summary>
+                <para>Sets the timeout for HTTP requests.</para>
+                <para>Set to <see cref="F:System.Threading.Timeout.InfiniteTimeSpan" /> to disable timeouts.</para>
+                <para>Defaults to <c>20</c> seconds.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkConfiguration.SocketAutoReconnect">
+            <summary>
+                Sets whether the connection wrapper should attempt automatic reconnects should the connection drop.
+                <para>Defaults to true.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkConfiguration.Password">
+            <summary>
+                Sets the password for the Lavalink connection.
+                <para>Defaults to <c>youshallnotpass</c>.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkConfiguration.SessionId">
+            <summary>
+                Sets the resume key for the Lavalink connection.
+                <para>This will allow existing voice sessions to continue for a certain time after the client is disconnected.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkConfiguration.ResumeTimeout">
+            <summary>
+                Sets the time in seconds when all voice sessions are closed after the client disconnects.
+                <para>Defaults to <c>60</c> seconds.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkConfiguration.WebSocketCloseTimeout">
+            <summary>
+                Sets the time in milliseconds to wait for Lavalink's voice WebSocket to close after leaving a voice channel.
+                <para>This will be the delay before the guild connection is removed.</para>
+                <para>Defaults to <c>3000</c> milliseconds.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkConfiguration.Region">
+            <summary>
+                Sets the voice region ID for the Lavalink connection.
+                <para>
+                    This should be used if nodes should be filtered by region with
+                    <see cref="M:DisCatSharp.Lavalink.LavalinkExtension.GetIdealSession(DisCatSharp.Entities.DiscordVoiceRegion)" />.
+                </para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkConfiguration.EnableBuiltInQueueSystem">
+            <summary>
+                Sets whether the built in queue system should be used.
+                <para>Defaults to <see langword="false" />.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkConfiguration.QueueEntryFactory">
+            <summary>
+                Sets a factory function that creates queue entry objects.
+                This allows you to customize the type of queue entry used by the LavalinkGuildPlayer when
+                <see cref="P:DisCatSharp.Lavalink.LavalinkConfiguration.EnableBuiltInQueueSystem" /> is <see langword="true" />.
+                If set to <see langword="null" />, the default queue entry type (<see cref="T:DisCatSharp.Lavalink.Entities.DefaultQueueEntry" />) will be used.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkConfiguration.QueueEntry">
+            <summary>
+                Gets a new instance of a queue entry object.
+                The type of the object is determined by the <see cref="P:DisCatSharp.Lavalink.LavalinkConfiguration.QueueEntryFactory" />.
+                If <see cref="P:DisCatSharp.Lavalink.LavalinkConfiguration.QueueEntryFactory" /> is <see langword="null" />, a <see cref="T:DisCatSharp.Lavalink.Entities.DefaultQueueEntry" /> instance is
+                returned.
+                This property is only used when <see cref="P:DisCatSharp.Lavalink.LavalinkConfiguration.EnableBuiltInQueueSystem" /> is set to <see langword="true" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkConfiguration.EnableTrace">
+            <summary>
+                Sets whether trace should be enabled for more detailed error responses.
+                <para>Defaults to <see langword="false" />.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkConfiguration.DefaultVolume">
+            <summary>
+                Sets the default volume level players will be created with.
+                <para>Defaults to <c>70</c> percent.</para>
+                <para>Min <c>0</c>, max <c>1000</c>.</para>
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.LavalinkExtension">
+            <summary>
+                Represents the lavalink extension.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkExtension._connectedSessions">
+            <summary>
+                The internal dictionary of connected Lavalink sessions.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkExtension._sessionConnected">
+            <summary>
+                Triggers when a Lavalink session connects.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkExtension._sessionDisconnected">
+            <summary>
+                Triggers when a Lavalink session disconnects.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkExtension.#ctor">
+            <summary>
+                Creates a new instance of this Lavalink extension.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkExtension.ConnectedSessions">
+            <summary>
+                Gets a dictionary of connected Lavalink sessions for the extension.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkExtension.REST">
+            <summary>
+                Gets the rest client used to communicate with the lavalink server.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkExtension.CONFIGURATION">
+            <summary>
+                Gets the lavalink configuration.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Lavalink.LavalinkExtension.SessionDisconnected">
+            <summary>
+                Triggered whenever a session disconnects.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Lavalink.LavalinkExtension.SessionConnected">
+            <summary>
+                Triggered whenever a session connects.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkExtension.Setup(DisCatSharp.DiscordClient)">
+            <summary>
+                DO NOT USE THIS MANUALLY.
+            </summary>
+            <param name="client">DO NOT USE THIS MANUALLY.</param>
+            <exception cref="T:System.InvalidOperationException">Thrown when a developer tries to manually initialize it.</exception>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkExtension.ConnectAsync(DisCatSharp.Lavalink.LavalinkConfiguration)">
+            <summary>
+                Connect to a Lavalink session.
+            </summary>
+            <param name="config">Lavalink client configuration.</param>
+            <returns>The established Lavalink connection.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkExtension.GetSession(DisCatSharp.Net.ConnectionEndpoint)">
+            <summary>
+                Gets the Lavalink session connection for the specified endpoint.
+            </summary>
+            <param name="endpoint">Endpoint at which the session resides.</param>
+            <returns>Lavalink session connection.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkExtension.GetIdealSession(DisCatSharp.Entities.DiscordVoiceRegion)">
+            <summary>
+                Gets a Lavalink session connection based on load balancing and an optional voice region.
+            </summary>
+            <param name="region">The region to compare with the session's <see cref="P:DisCatSharp.Lavalink.LavalinkConfiguration.Region" />, if any.</param>
+            <returns>The least load affected session connection, or null if no sessions are present.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkExtension.GetGuildPlayer(DisCatSharp.Entities.DiscordGuild)">
+            <summary>
+                Gets a Lavalink guild player from a <see cref="T:DisCatSharp.Entities.DiscordGuild" />.
+            </summary>
+            <param name="guild">The guild the player is on.</param>
+            <returns>The found guild player, or null if one could not be found.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkExtension.FilterByLoad(DisCatSharp.Lavalink.LavalinkSession[])">
+            <summary>
+                Filters the by load.
+            </summary>
+            <param name="sessions">The sessions.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkExtension.LavalinkSessionConnect(DisCatSharp.Lavalink.LavalinkSession)">
+            <summary>
+                Fired when a session connects and adds it to <see cref="P:DisCatSharp.Lavalink.LavalinkExtension.ConnectedSessions" />.
+            </summary>
+            <param name="session">The disconnected session.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkExtension.LavalinkSessionDisconnect(DisCatSharp.Lavalink.LavalinkSession)">
+            <summary>
+                Fired when a session disconnected and removes it from <see cref="P:DisCatSharp.Lavalink.LavalinkExtension.ConnectedSessions" />.
+            </summary>
+            <param name="session">The disconnected session.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkExtension.LavalinkSessionDisconnected(DisCatSharp.Lavalink.LavalinkSession,DisCatSharp.Lavalink.EventArgs.LavalinkSessionDisconnectedEventArgs)">
+            <summary>
+                Fired when a session disconnected.
+            </summary>
+            <param name="session">The disconnected session.</param>
+            <param name="args">The event args.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkExtension.LavalinkSessionConnected(DisCatSharp.Lavalink.LavalinkSession,DisCatSharp.Lavalink.EventArgs.LavalinkSessionConnectedEventArgs)">
+            <summary>
+                Fired when a session connected.
+            </summary>
+            <param name="session">The connected session.</param>
+            <param name="args">The event args.</param>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.LavalinkGuildPlayer">
+            <summary>
+                Represents a guild player based on a <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkPlayer" />.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkGuildPlayer._playedTracks">
+            <summary>
+                Gets the list of tracks that have been played.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkGuildPlayer._voiceStateUpdated">
+            <summary>
+                Triggers when the voice state gets updated.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkGuildPlayer.CurrentUsersInternal">
+            <summary>
+                Gets the internal list of users.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkGuildPlayer.StateUpdatedEvent">
+            <summary>
+                Triggers when the player state is updated.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkGuildPlayer.TrackEndedEvent">
+            <summary>
+                Triggers when a track ends.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkGuildPlayer.TrackExceptionEvent">
+            <summary>
+                Triggers when a track throws an exception.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkGuildPlayer.TrackStartedEvent">
+            <summary>
+                Triggers when a track starts.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkGuildPlayer.TrackStuckEvent">
+            <summary>
+                Triggers when a track gets stuck.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkGuildPlayer._currentTrack">
+            <summary>
+                Gets or sets the current track being played.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkGuildPlayer._isDisposed">
+            <summary>
+                Gets whether this player is disposed.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkGuildPlayer._queueTsc">
+            <summary>
+                <see cref="T:System.Threading.Tasks.TaskCompletionSource" /> for the queue.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkGuildPlayer._repeatMode">
+            <summary>
+                Gets or sets the repeat mode for the queue.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.#ctor(DisCatSharp.Lavalink.LavalinkSession,System.UInt64,DisCatSharp.Lavalink.Entities.LavalinkPlayer)">
+            <summary>
+                Constructs a new <see cref="T:DisCatSharp.Lavalink.LavalinkGuildPlayer" />.
+            </summary>
+            <param name="session">The session this guild player is registered on.</param>
+            <param name="guildId">The guild id the player is registered for.</param>
+            <param name="player">The registered lavalink player.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkGuildPlayer.QueueInternal">
+            <summary>
+                Gets the internal queue of tracks for each guild.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkGuildPlayer.Queue">
+            <summary>
+                Gets the queue.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkGuildPlayer.QUEUE_SYSTEM_ENABLED">
+            <summary>
+                Gets whether the built-in queue system is enabled.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkGuildPlayer.GuildId">
+            <summary>
+                Gets the current guild id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkGuildPlayer.ChannelId">
+            <summary>
+                Gets the current channel id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkGuildPlayer.Session">
+            <summary>
+                Gets the session this player is attached to.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkGuildPlayer.Guild">
+            <summary>
+                Gets the guild this player is attached to.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkGuildPlayer.Discord">
+            <summary>
+                Gets the discord client.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkGuildPlayer.Channel">
+            <summary>
+                Gets the current channel this player is in.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkGuildPlayer.Player">
+            <summary>
+                Gets the lavalink player.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkGuildPlayer.CurrentTrack">
+            <summary>
+                Gets the current track.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkGuildPlayer.TrackPosition">
+            <summary>
+                Gets the current track position.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkGuildPlayer.Ping">
+            <summary>
+                Gets the current ping.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkGuildPlayer.CurrentUsers">
+            <summary>
+                Gets a list of current user in the <see cref="P:DisCatSharp.Lavalink.LavalinkGuildPlayer.Channel" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkGuildPlayer.IsConnected">
+            <summary>
+                Gets whether this player is currently connected.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Lavalink.LavalinkGuildPlayer.VoiceStateUpdated">
+            <summary>
+                Triggers when the voice state gets updated.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Lavalink.LavalinkGuildPlayer.TrackStarted">
+            <summary>
+                Triggers when a track started.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Lavalink.LavalinkGuildPlayer.TrackEnded">
+            <summary>
+                Triggers when a track ended.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Lavalink.LavalinkGuildPlayer.TrackException">
+            <summary>
+                Triggers when a track throws an exception.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Lavalink.LavalinkGuildPlayer.TrackStuck">
+            <summary>
+                Triggers when a track gets stuck.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Lavalink.LavalinkGuildPlayer.StateUpdated">
+            <summary>
+                Triggers when a player state updated.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.OnTrackEnded(DisCatSharp.Lavalink.LavalinkGuildPlayer,DisCatSharp.Lavalink.EventArgs.LavalinkTrackEndedEventArgs)">
+            <summary>
+                Fired when a track ended.
+                <para>Used to control the built-in queue.</para>
+            </summary>
+            <param name="sender">The guild player.</param>
+            <param name="args">The event args.</param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.DecodeTracksAsync(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+                Decodes encoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />s.
+                <para>Might not work with pre 4.0 tracks.</para>
+            </summary>
+            <param name="tracks">The tracks to decode.</param>
+            <returns>A <see cref="T:System.Collections.Generic.List`1" /> of decoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />s.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.DecodeTrackAsync(System.String)">
+            <summary>
+                Decodes an encoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />.
+                <para>Might not work with some pre 4.0 tracks.</para>
+            </summary>
+            <param name="track">The track to decode.</param>
+            <returns>The decoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.LoadTracksAsync(System.String)">
+            <summary>
+                Loads tracks by <paramref name="identifier" />.
+                Returns a dynamic object you have to parse with (Type)Result.
+            </summary>
+            <param name="identifier">The identifier to load.</param>
+            <returns>A track loading result.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.LoadTracksAsync(DisCatSharp.Lavalink.Enums.LavalinkSearchType,System.String)">
+            <summary>
+                Loads tracks by <paramref name="identifier" />.
+                Returns a dynamic object you have to parse with (Type)Result.
+            </summary>
+            <param name="searchType">The search type to use. Some types need additional setup.</param>
+            <param name="identifier">The identifier to load.</param>
+            <returns>A track loading result.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.GetLyricsAsync(System.Boolean)">
+            <summary>
+                Gets the lyrics for the currently playing track.
+            </summary>
+            <param name="skipTrackSource">Whether to skip the current track source and fetch from highest priority source.</param>
+            <returns>The <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkLyricsResult" /> or <see langword="null" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.UpdateAsync(System.Action{DisCatSharp.Lavalink.Models.LavalinkPlayerUpdateModel})">
+            <summary>
+                Updates the <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkPlayer" />.
+            </summary>
+            <param name="action">The action to perform on the player.</param>
+            <returns>The updated guild player.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when both <c>EncodedTrack</c> and <c>Identifier</c> are set.</exception>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayPartialAsync(System.String,System.TimeSpan,System.TimeSpan)">
+            <summary>
+                Plays a song partially by its identifier with a start and end-time.
+            </summary>
+            <param name="identifier">The identifier to play.</param>
+            <param name="startTime">The start time.</param>
+            <param name="endTime">The end time.</param>
+            <returns>The updated guild player.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayPartialAsync(DisCatSharp.Lavalink.Entities.LavalinkTrack,System.TimeSpan,System.TimeSpan)">
+            <summary>
+                Plays a track partially with a start and end-time.
+            </summary>
+            <param name="track">The track to play.</param>
+            <param name="startTime">The start time.</param>
+            <param name="endTime">The end time.</param>
+            <returns>The updated guild player.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayPartialEncodedAsync(System.String,System.TimeSpan,System.TimeSpan)">
+            <summary>
+                Plays a song by its encoded track string with a start and end-time.
+            </summary>
+            <param name="encodedTrack">The encoded track to play.</param>
+            <param name="startTime">The start time.</param>
+            <param name="endTime">The end time.</param>
+            <returns>The updated guild player.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayAsync(System.String)">
+            <summary>
+                Plays a song by its identifier.
+            </summary>
+            <param name="identifier">The identifier to play.</param>
+            <returns>The updated guild player.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayAsync(DisCatSharp.Lavalink.Entities.LavalinkTrack)">
+            <summary>
+                Plays a track.
+            </summary>
+            <param name="track">The track to play.</param>
+            <returns>The updated guild player.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayEncodedAsync(System.String)">
+            <summary>
+                Plays a song by its encoded track string.
+            </summary>
+            <param name="encodedTrack">The encoded track to play.</param>
+            <returns>The updated guild player.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.SeekAsync(System.Int32)">
+            <summary>
+                Seeks the player to the position in <paramref name="seconds" />.
+            </summary>
+            <param name="seconds">The seconds to seek to.</param>
+            <returns>The updated guild player.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.SeekAsync(System.TimeSpan)">
+            <summary>
+                Seeks the player to the position.
+            </summary>
+            <param name="position">The position to seek to.</param>
+            <returns>The updated guild player.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.SetVolumeAsync(System.Int32)">
+            <summary>
+                Modifies the volume of the player.
+            </summary>
+            <param name="volume">The volume of the player, range <c>0</c>-<c>1000</c>, in percentage.</param>
+            <returns>The updated guild player.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when the <paramref name="volume" /> is out of range.</exception>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PauseAsync">
+            <summary>
+                Pauses the player.
+            </summary>
+            <returns>The updated guild player.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.ResumeAsync">
+            <summary>
+                Resumes the player.
+            </summary>
+            <returns>The updated guild player.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.StopAsync">
+            <summary>
+                Stops the player.
+            </summary>
+            <returns>The updated guild player.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.SkipAsync">
+            <summary>
+                Skips the current track.
+            </summary>
+            <returns>The updated guild player.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayDirectUrlAsync(System.String)">
+            <summary>
+                Directly plays a song by url.
+            </summary>
+            <param name="url">The url to play.</param>
+            <returns></returns>
+            <exception cref="T:System.NotSupportedException">Thrown when the <paramref name="url" /> is a pure youtube playlist.</exception>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.SwitchChannelAsync(DisCatSharp.Entities.DiscordChannel,System.Boolean)">
+            <summary>
+                Switches the player to a new channel.
+            </summary>
+            <param name="channel">The new channel to switch to.</param>
+            <param name="deafened">Whether to join deafened.</param>
+            <exception cref="T:System.ArgumentException">Thrown when the target channel is not of the base type voice.</exception>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.UpdatePlayerState(DisCatSharp.Lavalink.Entities.LavalinkPlayerState)">
+            <summary>
+                Updates the player state.
+            </summary>
+            <param name="state">The player state to update with.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.UpdateVoiceState(DisCatSharp.Lavalink.Entities.LavalinkVoiceState)">
+            <summary>
+                Updates the voice state.
+            </summary>
+            <param name="voiceState">The voice state to update with.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.DisconnectAsync">
+            <summary>
+                Disconnect the guild player from the channel.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.DisconnectVoiceAsync">
+            <summary>
+                Informs discord to perform a voice disconnect.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.OnVoiceStateUpdated(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.VoiceStateUpdateEventArgs)">
+            <summary>
+                Handles the <see cref="E:DisCatSharp.DiscordClient.VoiceStateUpdated" /> event.
+            </summary>
+            <param name="sender">The discord client.</param>
+            <param name="args">The event args.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.AddToQueue(DisCatSharp.Lavalink.Entities.LavalinkTrack)">
+            <summary>
+                Adds a Lavalink track to the queue.
+            </summary>
+            <param name="track">The track to add.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.AddToQueue(DisCatSharp.Lavalink.Entities.LavalinkPlaylist)">
+            <summary>
+                Adds all tracks from a Lavalink playlist to the queue.
+            </summary>
+            <param name="playlist">The <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkPlaylist" /> containing the tracks to add.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.AddToQueueAt(System.Int32,DisCatSharp.Lavalink.Entities.LavalinkTrack)">
+            <summary>
+                Inserts a track at the specified index in the queue.
+            </summary>
+            <param name="index">The zero-based index at which the track should be inserted.</param>
+            <param name="track">The track to insert.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.AddToQueueAt(System.Int32,System.Collections.Generic.IEnumerable{DisCatSharp.Lavalink.Entities.LavalinkTrack})">
+            <summary>
+                Inserts a range of tracks at the specified index in the queue.
+            </summary>
+            <param name="index">The zero-based index at which the tracks should be inserted.</param>
+            <param name="tracks">The tracks to insert.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.TryPeekQueue(DisCatSharp.Lavalink.Entities.LavalinkTrack@)">
+            <summary>
+                Attempts to retrieve the next track in the queue without removing it.
+            </summary>
+            <param name="track">The next track in the queue, or null if the queue is empty.</param>
+            <returns>True if a track was found, false otherwise.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.ShuffleQueue">
+            <summary>
+                Shuffles the tracks in the queue.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.ReverseQueue">
+            <summary>
+                Reverses the order of the tracks in the queue.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.RemoveFromQueue(DisCatSharp.Lavalink.Entities.LavalinkTrack)">
+            <summary>
+                Removes the specified track from the queue.
+            </summary>
+            <param name="track">The track to remove.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.RemoveFromQueue(System.String)">
+            <summary>
+                Removes the track with the specified title (identifier) from the queue.
+            </summary>
+            <param name="identifier">The title (identifier) of the track to remove.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.RemoveFromQueueAt(System.Int32)">
+            <summary>
+                Removes the track at the specified index from the queue.
+            </summary>
+            <param name="index">The zero-based index of the track to remove.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.RemoveFromQueueAtRange(System.Int32,System.Int32)">
+            <summary>
+                Removes a range of tracks from the queue.
+            </summary>
+            <param name="index">The zero-based index of the first track to remove.</param>
+            <param name="count">The number of tracks to remove.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.ClearQueue">
+            <summary>
+                Clears all tracks from the queue.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.SetRepeatMode(DisCatSharp.Lavalink.Enums.RepeatMode)">
+            <summary>
+                Sets the repeat mode for the queue.
+            </summary>
+            <param name="mode">The repeat mode to set.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayQueue">
+            <summary>
+                Starts playing the next track in the queue.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayNextInQueue">
+            <summary>
+                Plays the next track in the queue.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.LavalinkJson">
+            <summary>
+                Represents a custom json (de-)serializer.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkJson.s_setting">
+            <summary>
+                The <see cref="T:Newtonsoft.Json.JsonSerializerSettings" /> with an <see cref="T:Newtonsoft.Json.Serialization.IContractResolver" />
+                for <see cref="T:DisCatSharp.Entities.Optional" /> types.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkJson.DeserializeObject``1(System.String)">
+            <summary>
+                Deserializes the JSON to the specified .NET type using <see cref="F:DisCatSharp.Lavalink.LavalinkJson.s_setting" />.
+            </summary>
+            <typeparam name="T">The type of the object to deserialize to.</typeparam>
+            <param name="value">The object to deserialize.</param>
+            <returns>The deserialized object from the JSON string.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkJson.SerializeObject(System.Object,Newtonsoft.Json.Formatting)">
+            <summary>
+                Serializes the specified object to a JSON string using formatting and <see cref="F:DisCatSharp.Lavalink.LavalinkJson.s_setting" />.
+            </summary>
+            <param name="value">The object to serialize.</param>
+            <param name="formatting">Indicates how the output should be formatted. Defaults to <see cref="F:Newtonsoft.Json.Formatting.Indented" />.</param>
+            <returns>A JSON string representation of the object.</returns>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.LavalinkQueue`1">
+            <summary>
+                Represents a queue of objects.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkQueue`1._list">
+            <summary>
+                Gets the internal entries.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkQueue`1.#ctor">
+            <summary>
+                Creates a new instance of <see cref="T:DisCatSharp.Lavalink.LavalinkQueue`1" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkQueue`1.Count">
+            <summary>
+                Gets the number of elements contained in the <see cref="T:DisCatSharp.Lavalink.LavalinkQueue`1" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkQueue`1.GetEnumerator">
+            <inheritdoc />
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkQueue`1.System#Collections#IEnumerable#GetEnumerator">
+            <inheritdoc />
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkQueue`1.Enqueue(`0)">
+            <summary>
+                Adds an object to the end of the <see cref="T:DisCatSharp.Lavalink.LavalinkQueue`1" />.
+            </summary>
+            <param name="value">The object to add to the <see cref="T:DisCatSharp.Lavalink.LavalinkQueue`1" />. The value cannot be null.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when the value is null.</exception>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkQueue`1.TryDequeue(`0@)">
+            <summary>
+                Attempts to remove and return the object at the beginning of the <see cref="T:DisCatSharp.Lavalink.LavalinkQueue`1" />.
+            </summary>
+            <param name="value">
+                When this method returns, contains the object removed from the beginning of the
+                <see cref="T:DisCatSharp.Lavalink.LavalinkQueue`1" />, or the default value of <typeparamref name="T" /> if the queue is empty.
+            </param>
+            <returns><see langword="true" /> if an object was successfully removed; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkQueue`1.TryPeek(`0@)">
+            <summary>
+                Attempts to return the object at the beginning of the <see cref="T:DisCatSharp.Lavalink.LavalinkQueue`1" /> without removing it.
+            </summary>
+            <param name="value">
+                When this method returns, contains the object at the beginning of the
+                <see cref="T:DisCatSharp.Lavalink.LavalinkQueue`1" />, or the default value of <typeparamref name="T" /> if the queue is empty.
+            </param>
+            <returns>
+                <see langword="true" /> if there is an object at the beginning of the <see cref="T:DisCatSharp.Lavalink.LavalinkQueue`1" />;
+                otherwise, <see langword="false" />.
+            </returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkQueue`1.Remove(`0)">
+            <summary>
+                Removes the first occurrence of a specific object from the <see cref="T:DisCatSharp.Lavalink.LavalinkQueue`1" />.
+            </summary>
+            <param name="value">The object to remove from the <see cref="T:DisCatSharp.Lavalink.LavalinkQueue`1" />. The value cannot be null.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when the value is null.</exception>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkQueue`1.Clear">
+            <summary>
+                Removes all elements from the <see cref="T:DisCatSharp.Lavalink.LavalinkQueue`1" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkQueue`1.Shuffle">
+            <summary>
+                Shuffles the elements in the <see cref="T:DisCatSharp.Lavalink.LavalinkQueue`1" /> randomly.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkQueue`1.RemoveAt(System.Int32)">
+            <summary>
+                Removes the element at the specified index of the <see cref="T:DisCatSharp.Lavalink.LavalinkQueue`1" />.
+            </summary>
+            <param name="index">The zero-based index of the element to remove.</param>
+            <returns>The value of the element that was removed.</returns>
+            <exception cref="T:System.Exception">Thrown when the node at the specified index is null.</exception>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkQueue`1.Reverse">
+            <summary>
+                Reverses the order of the elements in the entire <see cref="T:DisCatSharp.Lavalink.LavalinkQueue`1" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkQueue`1.RemoveRange(System.Int32,System.Int32)">
+            <summary>
+                Removes a range of elements from the <see cref="T:DisCatSharp.Lavalink.LavalinkQueue`1" />.
+            </summary>
+            <param name="index">The zero-based index of the first element to remove.</param>
+            <param name="count">The number of elements to remove.</param>
+            <returns>A collection containing the removed elements.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when the index or count is out of range.</exception>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkQueue`1.InsertAt(System.Int32,`0)">
+            <summary>
+                Inserts an object at the specified index in the <see cref="T:DisCatSharp.Lavalink.LavalinkQueue`1" />.
+            </summary>
+            <param name="index">The zero-based index at which the object should be inserted.</param>
+            <param name="value">The object to insert. The value cannot be null.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when the index is out of range.</exception>
+            <exception cref="T:System.ArgumentNullException">Thrown when the value is null.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when the index is out of range.</exception>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkQueue`1.InsertRange(System.Int32,System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+                Adds a range of objects at the specified index in the <see cref="T:DisCatSharp.Lavalink.LavalinkQueue`1" />.
+            </summary>
+            <param name="index">The zero-based index at which the objects should be inserted.</param>
+            <param name="values">The objects to insert. The values cannot be null.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when the index is out of range.</exception>
+            <exception cref="T:System.ArgumentNullException">Thrown when the values are null.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when the index is out of range.</exception>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.LavalinkRestClient">
+            <summary>
+                Provides various rest methods to interact with the Lavalink API.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.#ctor(DisCatSharp.Lavalink.LavalinkConfiguration,DisCatSharp.DiscordClient)">
+            <summary>
+                Constructs a new <see cref="T:DisCatSharp.Lavalink.LavalinkRestClient" />.
+            </summary>
+            <param name="configuration">The lavalink configuration to use.</param>
+            <param name="client">The discord client this rest client is attached to.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkRestClient.Discord">
+            <summary>
+                Gets the discord client.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkRestClient.HttpClient">
+            <summary>
+                Gets the http client.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkRestClient.TRACE_ENABLED">
+            <summary>
+                Gets whether trace is enabled.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.BuildQueryString(System.Collections.Generic.IDictionary{System.String,System.String},System.Boolean)">
+            <summary>
+                Builds the query string.
+            </summary>
+            <param name="values">The values.</param>
+            <param name="post">Whether this query will be transmitted via POST.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetPath(System.String,System.Object)">
+            <summary>
+                Gets the path with its <paramref name="routeParams" /> applied.
+            </summary>
+            <param name="route">The route.</param>
+            <param name="routeParams">The route params.</param>
+            <returns>The generated route.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.DoRequestAsync(System.Net.Http.HttpMethod,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String)">
+            <summary>
+                Executes a rest request.
+            </summary>
+            <param name="method">The method.</param>
+            <param name="path">The path.</param>
+            <param name="headers">The headers.</param>
+            <param name="payload">The payload.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetVersionAsync">
+            <summary>
+                Requests Lavalink server version.
+            </summary>
+            <returns>The version <see cref="T:System.String" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetInfoAsync">
+            <summary>
+                Requests Lavalink server information.
+            </summary>
+            <returns>A <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkInfo" /> object.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetStatsAsync">
+            <summary>
+                Requests Lavalink server statistics.
+            </summary>
+            <returns>A <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkStats" /> object.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.UpdateSessionAsync(System.String,DisCatSharp.Lavalink.Entities.LavalinkSessionConfiguration)">
+            <summary>
+                Updates a session with the resuming state and timeout.
+            </summary>
+            <param name="sessionId">The session id.</param>
+            <param name="config">The session config.</param>
+            <returns>The updated <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkSessionConfiguration" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetPlayersAsync(System.String)">
+            <summary>
+                Returns a list of players for the given session id.
+            </summary>
+            <param name="sessionId">The session id.</param>
+            <returns>A <see cref="T:System.Collections.Generic.IReadOnlyList`1" /> of <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkPlayer" />s.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.CreatePlayerAsync(System.String,System.UInt64,System.Int32)">
+            <summary>
+                Creates a player.
+            </summary>
+            <param name="sessionId">The session id.</param>
+            <param name="guildId">The guild id this player should be created for.</param>
+            <param name="defaultVolume">The default volume level which should be used.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetPlayerAsync(System.String,System.UInt64)">
+            <summary>
+                Returns the player for a guild for the given session id.
+            </summary>
+            <param name="sessionId">The session id.</param>
+            <param name="guildId">The guild id this player should be created/updated for.</param>
+            <returns>The <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkPlayer" /> for <paramref name="guildId" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.UpdatePlayerAsync(System.String,System.UInt64,System.Boolean,DisCatSharp.Entities.Optional{System.String},DisCatSharp.Entities.Optional{System.String},DisCatSharp.Entities.Optional{System.Int32},DisCatSharp.Entities.Optional{System.Nullable{System.Int32}},DisCatSharp.Entities.Optional{System.Int32},DisCatSharp.Entities.Optional{System.Boolean},DisCatSharp.Entities.Optional{DisCatSharp.Lavalink.Entities.Filters.LavalinkFilters},DisCatSharp.Entities.Optional{System.Object})">
+            <summary>
+                Updates or creates the player for a guild if it doesn't already exist for the given session id.
+            </summary>
+            <param name="sessionId">The session id.</param>
+            <param name="guildId">The guild id this player should be created/updated for.</param>
+            <param name="noReplace">Whether to replace the current track with the new track. Defaults to <see langword="false" />.</param>
+            <param name="encodedTrack">The encoded track to play.</param>
+            <param name="identifier">The identifier to play</param>
+            <param name="position">The position to jump to or start from.</param>
+            <param name="endTime">The time when the track should automatically end.</param>
+            <param name="volume">The volume.</param>
+            <param name="paused">Whether to pause the track.</param>
+            <param name="filters">The filters.</param>
+            <param name="userData">The user data.</param>
+            <returns>The updated <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkPlayer" /> object.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.UpdatePlayerVoiceStateAsync(System.String,System.UInt64,DisCatSharp.Lavalink.Entities.LavalinkVoiceState)">
+            <summary>
+                Updates the players voice state.
+            </summary>
+            <param name="sessionId">The session id.</param>
+            <param name="guildId">The guild id this player voice state should be updated for.</param>
+            <param name="state">The state to update with.</param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.DestroyPlayerAsync(System.String,System.UInt64)">
+            <summary>
+                Destroys the player for a guild for the given session id
+            </summary>
+            <param name="sessionId">The session id.</param>
+            <param name="guildId">The guild id this player should be created/updated for.</param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.LoadTracksAsync(System.String)">
+            <summary>
+                Resolves audio tracks for use with the <see cref="M:DisCatSharp.Lavalink.LavalinkRestClient.UpdatePlayerAsync(System.String,System.UInt64,System.Boolean,DisCatSharp.Entities.Optional{System.String},DisCatSharp.Entities.Optional{System.String},DisCatSharp.Entities.Optional{System.Int32},DisCatSharp.Entities.Optional{System.Nullable{System.Int32}},DisCatSharp.Entities.Optional{System.Int32},DisCatSharp.Entities.Optional{System.Boolean},DisCatSharp.Entities.Optional{DisCatSharp.Lavalink.Entities.Filters.LavalinkFilters},DisCatSharp.Entities.Optional{System.Object})" /> method.
+            </summary>
+            <param name="identifier">The identifier to resolve tracks with.</param>
+            <returns>
+                A <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrackLoadingResult" /> where <see cref="P:DisCatSharp.Lavalink.Entities.LavalinkTrackLoadingResult.Result" /> is dynamic
+                based on <see cref="P:DisCatSharp.Lavalink.Entities.LavalinkTrackLoadingResult.LoadType" />.
+            </returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetLyricsAsync(System.String,System.Boolean,System.String,System.Nullable{System.UInt64})">
+            <summary>
+                Gets the lyrics for a track.
+            </summary>
+            <param name="encodedTrack">The encoded track.</param>
+            <param name="skipTrackSource">Whether to skip the current track source and fetch from highest priority source.</param>
+            <param name="sessionId">The optional session id a player is associated with.</param>
+            <param name="guildId">The optional guild id a player is associated with.</param>
+            <returns>The <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkLyricsResult" /> or <see langword="null" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetLyricsForCurrentTrackAsync(System.String,System.UInt64,System.Boolean)">
+            <summary>
+                Gets the lyrics for a currently playing track.
+            </summary>
+            <param name="sessionId">The session id a player is associated with.</param>
+            <param name="guildId">The guild id a player is associated with.</param>
+            <param name="skipTrackSource">Whether to skip the current track source and fetch from highest priority source.</param>
+            <returns>The <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkLyricsResult" /> or <see langword="null" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.DecodeTrackAsync(System.String)">
+            <summary>
+                Decode a single track into its info, where <paramref name="base64Track" /> is the encoded base64 data.
+            </summary>
+            <param name="base64Track">The encoded track <see cref="T:System.String" />.</param>
+            <returns>The decoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.DecodeTracksAsync(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+                Decodes multiple tracks into their info.
+            </summary>
+            <param name="base64Tracks"><see cref="T:System.Collections.Generic.List`1" /> of encoded track <see cref="T:System.String" />s.</param>
+            <returns>A <see cref="T:System.Collections.Generic.IReadOnlyList`1" /> of decoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />s.</returns>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.SessionDisconnectedEventHandler">
+            <summary>
+                Defines the event handler for <see cref="T:DisCatSharp.Lavalink.EventArgs.LavalinkSessionDisconnectedEventArgs" />.
+            </summary>
+            <param name="node">The node.</param>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.SessionConnectedEventHandler">
+            <summary>
+                Defines the event handler for <see cref="T:DisCatSharp.Lavalink.EventArgs.LavalinkSessionConnectedEventArgs" />.
+            </summary>
+            <param name="node">The node.</param>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.LavalinkSession">
+            <summary>
+                Represents a <see cref="T:DisCatSharp.Lavalink.LavalinkSession" />.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkSession.MINIMUM_BACKOFF">
+            <summary>
+                Gets the minimum backoff.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkSession.MAXIMUM_BACKOFF">
+            <summary>
+                Gets the maximum backoff.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkSession._lavalinkSessionConnected">
+            <summary>
+                Triggers when the Lavalink session is connects.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkSession._lavalinkSessionDisconnected">
+            <summary>
+                Triggers when the Lavalink session is disconnected.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkSession._lavalinkSocketError">
+            <summary>
+                Triggers when a socket error occurs in the Lavalink session.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkSession._statsReceived">
+            <summary>
+                Triggers when Lavalink stats are received.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkSession._voiceServerUpdates">
+            <summary>
+                Gets the voice server updates.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkSession._voiceStateUpdates">
+            <summary>
+                Gets the voice state updates.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkSession._websocketClosed">
+            <summary>
+                Triggers when the Lavalink websocket is closed.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkSession.GuildPlayerDestroyedEvent">
+            <summary>
+                Triggers when a Lavalink guild player is destroyed.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkSession._backoff">
+            <summary>
+                Gets the current backoff for reconnecting.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkSession._isDisposed">
+            <summary>
+                Whether this <see cref="T:DisCatSharp.Lavalink.LavalinkSession" /> is disposed.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkSession._sessionIdReceived">
+            <summary>
+                <see cref="T:System.Threading.Tasks.TaskCompletionSource" /> for the <see cref="P:DisCatSharp.Lavalink.LavalinkConfiguration.SessionId" />.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkSession._webSocket">
+            <summary>
+                Gets the web socket.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkSession.ConnectedPlayersInternal">
+            <summary>
+                Gets the internal dictionary of connected players for each guild.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.#ctor(DisCatSharp.DiscordClient,DisCatSharp.Lavalink.LavalinkExtension,DisCatSharp.Lavalink.LavalinkConfiguration)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Lavalink.LavalinkSession" /> class.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="extension">The extension.</param>
+            <param name="config">The lavalink configuration.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkSession.NodeEndpoint">
+            <summary>
+                Gets the remote endpoint of this Lavalink node connection.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkSession.IsConnected">
+            <summary>
+                Gets whether the client is connected to Lavalink.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkSession.ConnectedPlayers">
+            <summary>
+                Gets a dictionary of Lavalink guild connections for this node.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkSession.Rest">
+            <summary>
+                Gets the REST client for this Lavalink connection.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkSession.Discord">
+            <summary>
+                Gets the Discord client this node connection belongs to.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkSession.Extension">
+            <summary>
+                Gets the parent <see cref="T:DisCatSharp.Lavalink.LavalinkExtension" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkSession.Config">
+            <summary>
+                Gets the <see cref="T:DisCatSharp.Lavalink.LavalinkConfiguration" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkSession.Region">
+            <summary>
+                Gets the voice region.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkSession.Statistics">
+            <summary>
+                Gets the current <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkStats" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkSession.Configuration">
+            <summary>
+                Gets the current <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkSessionConfiguration" />.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Lavalink.LavalinkSession.LavalinkSocketErrored">
+            <summary>
+                Triggered whenever Lavalink WebSocket throws an exception.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Lavalink.LavalinkSession.LavalinkSessionDisconnected">
+            <summary>
+                Triggered when this session disconnects.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Lavalink.LavalinkSession.LavalinkSessionConnected">
+            <summary>
+                Triggered when this session connects.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Lavalink.LavalinkSession.StatsReceived">
+            <summary>
+                Triggered when a <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkStats" /> are received.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Lavalink.LavalinkSession.GuildPlayerDestroyed">
+            <summary>
+                Triggered when a <see cref="T:DisCatSharp.Lavalink.LavalinkGuildPlayer" /> gets destroyed.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Lavalink.LavalinkSession.WebsocketClosed">
+            <summary>
+                Triggered when the websocket to discord gets closed.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Lavalink.LavalinkSession.SessionDisconnected">
+            <summary>
+                Fires when a <see cref="T:DisCatSharp.Lavalink.LavalinkSession" /> disconnected.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Lavalink.LavalinkSession.SessionConnected">
+            <summary>
+                Fires when a <see cref="T:DisCatSharp.Lavalink.LavalinkSession" /> disconnected.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetLavalinkInfoAsync">
+            <summary>
+                Gets the lavalink server information.
+            </summary>
+            <returns>A <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkInfo" /> object.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetLavalinkVersionAsync">
+            <summary>
+                Gets the lavalink server version
+            </summary>
+            <returns>The version <see langword="string" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetLavalinkStatsAsync">
+            <summary>
+                Gets the lavalink server statistics.
+            </summary>
+            <returns>A <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkStats" /> object.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.DestroyAsync">
+            <summary>
+                Destroys the current session, disconnecting all players.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.DestroyGuildPlayersAsync">
+            <summary>
+                Destroys all players.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.LavalinkGuildPlayerDestroyed(DisCatSharp.Lavalink.LavalinkSession,DisCatSharp.Lavalink.EventArgs.GuildPlayerDestroyedEventArgs)">
+            <summary>
+                Fires when a <see cref="T:DisCatSharp.Lavalink.LavalinkGuildPlayer" /> was destroyed.
+            </summary>
+            <param name="sender">The lavalink session.</param>
+            <param name="args">The guild player destroyed event args containing the destroyed <see cref="T:DisCatSharp.Lavalink.LavalinkGuildPlayer" />.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.ConnectAsync(DisCatSharp.Entities.DiscordChannel,System.Boolean)">
+            <summary>
+                Connects to a <see cref="T:DisCatSharp.Entities.DiscordChannel" />.
+            </summary>
+            <param name="channel">The channel to join.</param>
+            <param name="deafened">Whether to join the channel deafened.</param>
+            <returns>The created <see cref="T:DisCatSharp.Lavalink.LavalinkGuildPlayer" />.</returns>
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.ConfigureAsync(DisCatSharp.Lavalink.Entities.LavalinkSessionConfiguration)">
+            <summary>
+                Configures the current lavalink session.
+            </summary>
+            <param name="config">The config update to set.</param>
+            <returns>The updated session.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetGuildPlayer(DisCatSharp.Entities.DiscordGuild)">
+            <summary>
+                Gets the guild player attached to <paramref name="guild" />.
+            </summary>
+            <param name="guild">The guild to get the player for.</param>
+            <returns>The found player or <see langword="null" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetGuildPlayersAsync">
+            <summary>
+                Gets all guild players.
+            </summary>
+            <returns>The found players or <see langword="null" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetPlayerAsync(DisCatSharp.Entities.DiscordGuild)">
+            <summary>
+                Gets the lavalink player attached to <paramref name="guild" />.
+                <para>Use <see cref="M:DisCatSharp.Lavalink.LavalinkSession.GetGuildPlayer(DisCatSharp.Entities.DiscordGuild)" /> if you want to interact with the actual player.</para>
+            </summary>
+            <param name="guild">The guild to get the player for.</param>
+            <returns>The found player or <see langword="null" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetPlayersAsync">
+            <summary>
+                Gets all lavalink players.
+                <para>Use <see cref="M:DisCatSharp.Lavalink.LavalinkSession.GetGuildPlayersAsync" /> if you want to interact with the actual players.</para>
+            </summary>
+            <returns>The found players or <see langword="null" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.DecodeTracksAsync(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+                Decodes encoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />s.
+                <para>Might not work with pre 3.0 tracks.</para>
+            </summary>
+            <param name="tracks">The tracks to decode.</param>
+            <returns>A <see cref="T:System.Collections.Generic.List`1" /> of decoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />s.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.DecodeTrackAsync(System.String)">
+            <summary>
+                Decodes an encoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />.
+                <para>Might not work with pre 3.0 tracks.</para>
+            </summary>
+            <param name="track">The track to decode.</param>
+            <returns>The decoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.LoadTracksAsync(System.String)">
+            <summary>
+                Loads tracks by <paramref name="identifier" />.
+                Returns a dynamic object you have to parse with (Type)Result.
+            </summary>
+            <param name="identifier">The identifier to load.</param>
+            <returns>A track loading result.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetLyricsAsync(DisCatSharp.Lavalink.Entities.LavalinkTrack,System.Boolean)">
+            <summary>
+                Gets the lyrics for a track.
+            </summary>
+            <param name="track">The track to fetch the lyrics for.</param>
+            <param name="skipTrackSource">Whether to skip the current track source and fetch from highest priority source.</param>
+            <returns>The <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkLyricsResult" /> or <see langword="null" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetLyricsForCurrentTrackAsync(System.String,System.UInt64,System.Boolean)">
+            <summary>
+                Gets the lyrics for a currently playing track.
+            </summary>
+            <param name="sessionId">The session id a player is associated with.</param>
+            <param name="guildId">The guild id a player is associated with.</param>
+            <param name="skipTrackSource">Whether to skip the current track source and fetch from highest priority source.</param>
+            <returns>The <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkLyricsResult" /> or <see langword="null" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.LoadTracksAsync(DisCatSharp.Lavalink.Enums.LavalinkSearchType,System.String)">
+            <summary>
+                Loads tracks by <paramref name="identifier" />.
+                Returns a dynamic object you have to parse with (Type)Result.
+            </summary>
+            <param name="searchType">The search type to use. Some types need additional setup.</param>
+            <param name="identifier">The identifier to load.</param>
+            <returns>A track loading result.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.EstablishConnectionAsync">
+            <summary>
+                Establishes a connection to the lavalink server.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">Thrown when the <see cref="T:DisCatSharp.DiscordClient" /> is not fully initialized.</exception>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.Lavalink_WebSocket_MessageReceived(DisCatSharp.Net.WebSocket.IWebSocketClient,DisCatSharp.EventArgs.SocketMessageEventArgs)">
+            <summary>
+                Handles WebSocket messages from Lavalink.
+            </summary>
+            <param name="client">The websocket client.</param>
+            <param name="args">The event args.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.Lavalink_WebSocket_ExceptionThrown(DisCatSharp.Net.WebSocket.IWebSocketClient,DisCatSharp.EventArgs.SocketErrorEventArgs)">
+            <summary>
+                Handles exceptions thrown by the websocket.
+            </summary>
+            <param name="client">The websocket client.</param>
+            <param name="args">The event args.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.Lavalink_WebSocket_Disconnected(DisCatSharp.Net.WebSocket.IWebSocketClient,DisCatSharp.EventArgs.SocketCloseEventArgs)">
+            <summary>
+                Handles the event when the websocket disconnected.
+            </summary>
+            <param name="client">The websocket client.</param>
+            <param name="args">The event args.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.Lavalink_WebSocket_Connected(DisCatSharp.Net.WebSocket.IWebSocketClient,DisCatSharp.EventArgs.SocketEventArgs)">
+            <summary>
+                Handles the event when the websocket connected.
+            </summary>
+            <param name="client">The websocket client.</param>
+            <param name="args">The event args.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.Discord_VoiceStateUpdated(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.VoiceStateUpdateEventArgs)">
+            <summary>
+                Handles when discord fires a voice state update.
+            </summary>
+            <param name="client">The websocket client.</param>
+            <param name="args">The event args.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.Discord_VoiceServerUpdated(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.VoiceServerUpdateEventArgs)">
+            <summary>
+                Handles when discord fires a voice server update.
+            </summary>
+            <param name="client">The websocket client.</param>
+            <param name="args">The event args.</param>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Models.LavalinkPlayerUpdateModel">
+            <summary>
+                Represents an easy-to-use model to update a <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkPlayer" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Models.LavalinkPlayerUpdateModel.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Lavalink.Models.LavalinkPlayerUpdateModel" /> class.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Models.LavalinkPlayerUpdateModel.Replace">
+            <summary>
+                Sets whether to replace the current track.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Models.LavalinkPlayerUpdateModel.EncodedTrack">
+            <summary>
+                Sets the encoded track.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Models.LavalinkPlayerUpdateModel.Identifier">
+            <summary>
+                Sets the identifier.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Models.LavalinkPlayerUpdateModel.Position">
+            <summary>
+                Sets the start or seek position.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Models.LavalinkPlayerUpdateModel.EndTime">
+            <summary>
+                Sets the end time.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Models.LavalinkPlayerUpdateModel.Volume">
+            <summary>
+                Sets the volume.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Models.LavalinkPlayerUpdateModel.Paused">
+            <summary>
+                Sets whether the player is paused.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Models.LavalinkPlayerUpdateModel.Filters">
+            <summary>
+                Gets or sets the filters.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Models.LavalinkPlayerUpdateModel.UserData">
+            <summary>
+                Gets or sets the user data.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Payloads.LavalinkRestPlayerCreatePayload">
+            <summary>
+                The lavalink rest player create payload.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Payloads.LavalinkRestPlayerCreatePayload.#ctor(System.String,System.Int32)">
+            <summary>
+                Constructs a new <see cref="T:DisCatSharp.Lavalink.Payloads.LavalinkRestPlayerCreatePayload" />.
+            </summary>
+            <param name="guildId">The guild id.</param>
+            <param name="volume">The volume.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Payloads.LavalinkRestPlayerCreatePayload.GuildId">
+            <summary>
+                Gets or sets the guild id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Payloads.LavalinkRestPlayerCreatePayload.Volume">
+            <summary>
+                Gets or sets the volume.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Payloads.LavalinkRestPlayerUpdatePayload">
+            <summary>
+                The lavalink rest player update payload.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Payloads.LavalinkRestPlayerUpdatePayload.#ctor(System.String)">
+            <summary>
+                Constructs a new <see cref="T:DisCatSharp.Lavalink.Payloads.LavalinkRestPlayerUpdatePayload" />.
+            </summary>
+            <param name="guildId">The guild id.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Payloads.LavalinkRestPlayerUpdatePayload.GuildId">
+            <summary>
+                Gets or sets the guild id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Payloads.LavalinkRestPlayerUpdatePayload.Position">
+            <summary>
+                Gets or sets the start or seek position.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Payloads.LavalinkRestPlayerUpdatePayload.EndTime">
+            <summary>
+                Gets or sets the end time.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Payloads.LavalinkRestPlayerUpdatePayload.Volume">
+            <summary>
+                Gets or sets the volume.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Payloads.LavalinkRestPlayerUpdatePayload.Paused">
+            <summary>
+                Gets or sets whether the player is paused.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Payloads.LavalinkRestPlayerUpdatePayload.Filters">
+            <summary>
+                Gets or sets the filters.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Payloads.LavalinkRestPlayerUpdatePayload.Track">
+            <summary>
+                Gets or sets the track.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Payloads.PlayerBase">
+            <summary>
+                The lavalink rest player update player track payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Payloads.PlayerBase.UserData">
+            <summary>
+                Gets or sets the user data.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Payloads.PlayerWithIdentifier">
+            <summary>
+                The lavalink rest player update player track payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Payloads.PlayerWithIdentifier.Identifier">
+            <summary>
+                Gets or sets the identifier.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Payloads.PlayerWithEncoded">
+            <summary>
+                The lavalink rest player update player track payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Payloads.PlayerWithEncoded.Encoded">
+            <summary>
+                Gets or sets the encoded track.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Payloads.LavalinkRestVoiceStateUpdatePayload">
+            <summary>
+                The lavalink rest voice state update payload.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Payloads.LavalinkRestVoiceStateUpdatePayload.#ctor(DisCatSharp.Lavalink.Entities.LavalinkVoiceState,System.String)">
+            <summary>
+                Constructs a new <see cref="T:DisCatSharp.Lavalink.Payloads.LavalinkRestVoiceStateUpdatePayload" />.
+            </summary>
+            <param name="voiceState">The voice state.</param>
+            <param name="guildId">The guild id.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Payloads.LavalinkRestVoiceStateUpdatePayload.GuildId">
+            <summary>
+                Gets or sets the guild id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Payloads.LavalinkRestVoiceStateUpdatePayload.VoiceState">
+            <summary>
+                Gets or sets the voice state.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,2754 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DisCatSharp.CommandsNext</name>
+    </assembly>
+    <members>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.AliasesAttribute">
+            <summary>
+                Adds aliases to this command or group.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.AliasesAttribute.#ctor(System.String[])">
+            <summary>
+                Adds aliases to this command or group.
+            </summary>
+            <param name="aliases">Aliases to add to this command or group.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.AliasesAttribute.Aliases">
+            <summary>
+                Gets this group's aliases.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.CheckBaseAttribute">
+            <summary>
+                Represents a base for all command pre-execution check attributes.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.CheckBaseAttribute.ExecuteCheckAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Asynchronously checks whether this command can be executed within given context.
+            </summary>
+            <param name="ctx">Context to check execution ability for.</param>
+            <param name="help">
+                Whether this check is being executed from help or not. This can be used to probe whether command can
+                be run without setting off certain fail conditions (such as cooldowns).
+            </param>
+            <returns>Whether the command can be executed in given context.</returns>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.CommandAttribute">
+            <summary>
+                Marks this method as a command.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.CommandAttribute.#ctor">
+            <summary>
+                Marks this method as a command, using the method's name as command name.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.CommandAttribute.#ctor(System.String)">
+            <summary>
+                Marks this method as a command with specified name.
+            </summary>
+            <param name="name">Name of this command.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.CommandAttribute.Name">
+            <summary>
+                Gets the name of this command.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.GroupCommandAttribute">
+            <summary>
+                Marks this method as a group command.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.GroupCommandAttribute.#ctor">
+            <summary>
+                Marks this method as a group command.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.CooldownAttribute">
+            <summary>
+                Defines a cooldown for this command. This allows you to define how many times can users execute a specific command
+            </summary>
+            <remarks>
+                Defines a cooldown for this command. This means that users will be able to use the command a specific number of
+                times before they have to wait to use it again.
+            </remarks>
+            <param name="maxUses">Number of times the command can be used before triggering a cooldown.</param>
+            <param name="resetAfter">Number of seconds after which the cooldown is reset.</param>
+            <param name="bucketType">
+                Type of cooldown bucket. This allows controlling whether the bucket will be cooled down per
+                user, guild, channel, or globally.
+            </param>
+            <param name="cooldownResponderType">The responder type used to respond to cooldown ratelimit hits.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.CooldownAttribute.#ctor(System.Int32,System.Double,DisCatSharp.Enums.Core.CooldownBucketType,System.Type)">
+            <summary>
+                Defines a cooldown for this command. This allows you to define how many times can users execute a specific command
+            </summary>
+            <remarks>
+                Defines a cooldown for this command. This means that users will be able to use the command a specific number of
+                times before they have to wait to use it again.
+            </remarks>
+            <param name="maxUses">Number of times the command can be used before triggering a cooldown.</param>
+            <param name="resetAfter">Number of seconds after which the cooldown is reset.</param>
+            <param name="bucketType">
+                Type of cooldown bucket. This allows controlling whether the bucket will be cooled down per
+                user, guild, channel, or globally.
+            </param>
+            <param name="cooldownResponderType">The responder type used to respond to cooldown ratelimit hits.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.CooldownAttribute.ResponderType">
+            <summary>
+                Gets the responder type.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.CooldownAttribute.MaxUses">
+            <summary>
+                Gets the maximum number of uses before this command triggers a cooldown for its bucket.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.CooldownAttribute.Reset">
+            <summary>
+                Gets the time after which the cooldown is reset.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.CooldownAttribute.BucketType">
+            <summary>
+                Gets the type of the cooldown bucket. This determines how cooldowns are applied.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.CooldownAttribute.GetBucket(DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Gets a cooldown bucket for given command context.
+            </summary>
+            <param name="ctx">Command context to get cooldown bucket for.</param>
+            <returns>Requested cooldown bucket, or null if one wasn't present.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.CooldownAttribute.GetRemainingCooldown(DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Calculates the cooldown remaining for given command context.
+            </summary>
+            <param name="ctx">Context for which to calculate the cooldown.</param>
+            <returns>Remaining cooldown, or zero if no cooldown is active.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.CooldownAttribute.RespondRatelimitHitAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean,DisCatSharp.Entities.Core.CooldownBucket)">
+            <inheritdoc />
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.CooldownAttribute.GetBucketId(DisCatSharp.CommandsNext.CommandContext,System.UInt64@,System.UInt64@,System.UInt64@)">
+            <summary>
+                Calculates bucket ID for given command context.
+            </summary>
+            <param name="ctx">Context for which to calculate bucket ID for.</param>
+            <param name="userId">ID of the user with which this bucket is associated.</param>
+            <param name="channelId">ID of the channel with which this bucket is associated.</param>
+            <param name="guildId">ID of the guild with which this bucket is associated.</param>
+            <returns>Calculated bucket ID.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.CooldownAttribute.ExecuteCheckAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Executes a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+            <param name="help">If true, help - returns true.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.DescriptionAttribute">
+            <summary>
+                Gives this command, group, or argument a description, which is used when listing help.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.DescriptionAttribute.#ctor(System.String)">
+            <summary>
+                Gives this command, group, or argument a description, which is used when listing help.
+            </summary>
+            <param name="description"></param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.DescriptionAttribute.Description">
+            <summary>
+                Gets the description for this command, group, or argument.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.DontInjectAttribute">
+            <summary>
+                Prevents this field or property from having its value injected by dependency injection.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.GroupAttribute">
+            <summary>
+                Marks this class as a command group.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.GroupAttribute.#ctor">
+            <summary>
+                Marks this class as a command group, using the class' name as group name.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.GroupAttribute.#ctor(System.String)">
+            <summary>
+                Marks this class as a command group with specified name.
+            </summary>
+            <param name="name">Name of this group.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.GroupAttribute.Name">
+            <summary>
+                Gets the name of this group.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.HiddenAttribute">
+            <summary>
+                Marks this command or group as hidden.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.ModuleLifespanAttribute">
+            <summary>
+                Defines a lifespan for this command module.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.ModuleLifespanAttribute.#ctor(DisCatSharp.CommandsNext.Attributes.ModuleLifespan)">
+            <summary>
+                Defines a lifespan for this command module.
+            </summary>
+            <param name="lifespan">Lifespan for this module.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.ModuleLifespanAttribute.Lifespan">
+            <summary>
+                Gets the lifespan defined for this module.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.ModuleLifespan">
+            <summary>
+                Defines lifespan of a command module.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.Attributes.ModuleLifespan.Singleton">
+            <summary>
+                Defines that this module will be instantiated once.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.Attributes.ModuleLifespan.Transient">
+            <summary>
+                Defines that this module will be instantiated every time a containing command is called.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.PriorityAttribute">
+            <summary>
+                Defines this command overload's priority. This determines the order in which overloads will be attempted to be
+                called. Commands will be attempted in order of priority, in descending order.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.PriorityAttribute.#ctor(System.Int32)">
+            <summary>
+                Defines this command overload's priority. This determines the order in which overloads will be attempted to be
+                called. Commands will be attempted in order of priority, in descending order.
+            </summary>
+            <param name="priority">Priority of this command overload.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.PriorityAttribute.Priority">
+            <summary>
+                Gets the priority of this command overload.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RemainingTextAttribute">
+            <summary>
+                Indicates that the command argument takes the rest of the input without parsing.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RequireBoostingAttribute">
+            <summary>
+                Defines that usage of this command is restricted to boosters.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireBoostingAttribute.#ctor(System.Int32)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.CommandsNext.Attributes.RequireBoostingAttribute" /> class.
+            </summary>
+            <param name="days">Boosting since days.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireBoostingAttribute.#ctor(System.UInt64,System.Int32)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.CommandsNext.Attributes.RequireBoostingAttribute" /> class.
+            </summary>
+            <param name="guildId">Target guild id.</param>
+            <param name="days">Boosting since days.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.RequireBoostingAttribute.Since">
+            <summary>
+                Gets the required boost time.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.RequireBoostingAttribute.GuildId">
+            <summary>
+                Gets the required guild.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireBoostingAttribute.ExecuteCheckAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Executes the a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+            <param name="help">If true, help - returns true.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RequireBotPermissionsAttribute">
+            <summary>
+                Defines that usage of this command is only possible when the bot is granted a specific permission.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireBotPermissionsAttribute.#ctor(DisCatSharp.Enums.Permissions,System.Boolean)">
+            <summary>
+                Defines that usage of this command is only possible when the bot is granted a specific permission.
+            </summary>
+            <param name="permissions">Permissions required to execute this command.</param>
+            <param name="ignoreDms">
+                Sets this check's behaviour in DMs. True means the check will always pass in DMs, whereas false
+                means that it will always fail.
+            </param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.RequireBotPermissionsAttribute.Permissions">
+            <summary>
+                Gets the permissions required by this attribute.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.RequireBotPermissionsAttribute.IgnoreDms">
+            <summary>
+                Gets or sets this check's behaviour in DMs. True means the check will always pass in DMs, whereas false means that
+                it will always fail.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireBotPermissionsAttribute.ExecuteCheckAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Executes the a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+            <param name="help">If true, help - returns true.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RequireCertifiedModeratorAttribute">
+            <summary>
+                Defines that usage of this command is restricted to discord certified moderators.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireCertifiedModeratorAttribute.ExecuteCheckAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Executes the a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+            <param name="help">If true, help - returns true.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RequireCommunityAttribute">
+            <summary>
+                Defines that a command is only usable within a community-enabled guild.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireCommunityAttribute.#ctor">
+            <summary>
+                Defines that this command is only usable within a community-enabled guild.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireCommunityAttribute.ExecuteCheckAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Executes the a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+            <param name="help">If true, help - returns true.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RequireDirectMessageAttribute">
+            <summary>
+                Defines that a command is only usable within a direct message channel.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireDirectMessageAttribute.#ctor">
+            <summary>
+                Defines that this command is only usable within a direct message channel.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireDirectMessageAttribute.ExecuteCheckAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Executes the a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+            <param name="help">If true, help - returns true.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RequireGuildAttribute">
+            <summary>
+                Defines that a command is only usable within a guild.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireGuildAttribute.#ctor">
+            <summary>
+                Defines that this command is only usable within a guild.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireGuildAttribute.ExecuteCheckAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Executes the a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+            <param name="help">If true, help - returns true.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RequireGuildOwnerAttribute">
+            <summary>
+                Defines that usage of this command is restricted to the guild owner.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireGuildOwnerAttribute.ExecuteCheckAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Executes the a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+            <param name="help">If true, help - returns true.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RequireMemberVerificationGateAttribute">
+            <summary>
+                Defines that a command is only usable within a guild which has enabled the member verification gate.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireMemberVerificationGateAttribute.#ctor">
+            <summary>
+                Defines that this command is only usable within guild which has enabled the member verification gate.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireMemberVerificationGateAttribute.ExecuteCheckAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Executes the a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+            <param name="help">If true, help - returns true.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RequireNsfwAttribute">
+            <summary>
+                Defines that usage of this command is restricted to NSFW channels.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireNsfwAttribute.ExecuteCheckAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Executes the a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+            <param name="help">If true, help - returns true.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RequireOwnerAttribute">
+            <summary>
+                Defines that usage of this command is restricted to the owner(s) of the bot.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireOwnerAttribute.ExecuteCheckAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Executes the a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+            <param name="help">If true, help - returns true.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RequireOwnerOrIdAttribute">
+            <summary>
+                Requires ownership of the bot or a whitelisted id to execute this command.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireOwnerOrIdAttribute.#ctor(System.UInt64[])">
+            <summary>
+                Defines that usage of this command is restricted to the owner or whitelisted ids of the bot.
+            </summary>
+            <param name="userIds">List of allowed user ids</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.RequireOwnerOrIdAttribute.UserIds">
+            <summary>
+                Allowed user ids
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireOwnerOrIdAttribute.ExecuteCheckAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Executes the a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+            <param name="help">If true, help - returns true.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RequirePermissionsAttribute">
+            <summary>
+                Defines that usage of this command is restricted to members with specified permissions. This check also verifies
+                that the bot has the same permissions.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequirePermissionsAttribute.#ctor(DisCatSharp.Enums.Permissions,System.Boolean)">
+            <summary>
+                Defines that usage of this command is restricted to members with specified permissions. This check also verifies
+                that the bot has the same permissions.
+            </summary>
+            <param name="permissions">Permissions required to execute this command.</param>
+            <param name="ignoreDms">
+                Sets this check's behaviour in DMs. True means the check will always pass in DMs, whereas false
+                means that it will always fail.
+            </param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.RequirePermissionsAttribute.Permissions">
+            <summary>
+                Gets the permissions required by this attribute.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.RequirePermissionsAttribute.IgnoreDms">
+            <summary>
+                Gets or sets this check's behaviour in DMs. True means the check will always pass in DMs, whereas false means that
+                it will always fail.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequirePermissionsAttribute.ExecuteCheckAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Executes the a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+            <param name="help">If true, help - returns true.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RequirePrefixesAttribute">
+            <summary>
+                Defines that usage of this command is only allowed with specific prefixes.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequirePrefixesAttribute.#ctor(System.String[])">
+            <summary>
+                Defines that usage of this command is only allowed with specific prefixes.
+            </summary>
+            <param name="prefixes">Prefixes with which the execution of this command is allowed.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.RequirePrefixesAttribute.Prefixes">
+            <summary>
+                Gets the array of prefixes with which execution of this command is allowed.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.RequirePrefixesAttribute.ShowInHelp">
+            <summary>
+                <para>
+                    Gets or sets default help behaviour for this check. When this is enabled, invoking help without matching
+                    prefix will show the commands.
+                </para>
+                <para>Defaults to false.</para>
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequirePrefixesAttribute.ExecuteCheckAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Executes the a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+            <param name="help">If true, help - returns true.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RequireReferencedMessageAttribute">
+            <summary>
+                Defines that a command is only usable when sent in reply. Command will appear in help regardless of this attribute.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireReferencedMessageAttribute.#ctor">
+            <summary>
+                Defines that a command is only usable when sent in reply. Command will appear in help regardless of this attribute.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RequireRolesAttribute">
+            <summary>
+                Defines that usage of this command is restricted to members with specified role. Note that it's much preferred to
+                restrict access using <see cref="T:DisCatSharp.CommandsNext.Attributes.RequirePermissionsAttribute" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireRolesAttribute.#ctor(DisCatSharp.CommandsNext.Attributes.RoleCheckMode,System.String[])">
+            <summary>
+                Defines that usage of this command is restricted to members with specified role. Note that it's much preferred to
+                restrict access using <see cref="T:DisCatSharp.CommandsNext.Attributes.RequirePermissionsAttribute" />.
+            </summary>
+            <param name="checkMode">Role checking mode.</param>
+            <param name="roleNames">Names of the role to be verified by this check.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.RequireRolesAttribute.RoleNames">
+            <summary>
+                Gets the name of the role required to execute this command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.RequireRolesAttribute.CheckMode">
+            <summary>
+                Gets the role checking mode. Refer to <see cref="T:DisCatSharp.CommandsNext.Attributes.RoleCheckMode" /> for more information.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireRolesAttribute.ExecuteCheckAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Executes the a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+            <param name="help">If true, help - returns true.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RoleCheckMode">
+            <summary>
+                Specifies how does <see cref="T:DisCatSharp.CommandsNext.Attributes.RequireRolesAttribute" /> check for roles.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.Attributes.RoleCheckMode.Any">
+            <summary>
+                Member is required to have any of the specified roles.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.Attributes.RoleCheckMode.All">
+            <summary>
+                Member is required to have all of the specified roles.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.Attributes.RoleCheckMode.SpecifiedOnly">
+            <summary>
+                Member is required to have exactly the same roles as specified; no extra roles may be present.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.Attributes.RoleCheckMode.None">
+            <summary>
+                Member is required to have none of the specified roles.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RequireStaffAttribute">
+            <summary>
+                Defines that usage of this command is restricted to discord employees.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireStaffAttribute.ExecuteCheckAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Executes the a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+            <param name="help">If true, help - returns true.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RequireUserPermissionsAttribute">
+            <summary>
+                Defines that usage of this command is restricted to members with specified permissions.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireUserPermissionsAttribute.#ctor(DisCatSharp.Enums.Permissions,System.Boolean)">
+            <summary>
+                Defines that usage of this command is restricted to members with specified permissions.
+            </summary>
+            <param name="permissions">Permissions required to execute this command.</param>
+            <param name="ignoreDms">
+                Sets this check's behaviour in DMs. True means the check will always pass in DMs, whereas false
+                means that it will always fail.
+            </param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.RequireUserPermissionsAttribute.Permissions">
+            <summary>
+                Gets the permissions required by this attribute.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.RequireUserPermissionsAttribute.IgnoreDms">
+            <summary>
+                Gets or sets this check's behaviour in DMs. True means the check will always pass in DMs, whereas false means that
+                it will always fail.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireUserPermissionsAttribute.ExecuteCheckAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Executes the a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+            <param name="help">If true, help - returns true.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Attributes.RequireWelcomeScreenAttribute">
+            <summary>
+                Defines that a command is only usable within a guild which has enabled the welcome screen.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireWelcomeScreenAttribute.#ctor">
+            <summary>
+                Defines that this command is only usable within a guild which has enabled the welcome screen.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireWelcomeScreenAttribute.ExecuteCheckAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Executes a check.
+            </summary>
+            <param name="ctx">The command context.</param>
+            <param name="help">If true, help - returns true.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.BaseCommandModule">
+            <summary>
+                Represents a base class for all command modules.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.BaseCommandModule.BeforeExecutionAsync(DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Called before a command in the implementing module is executed.
+            </summary>
+            <param name="ctx">Context in which the method is being executed.</param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.BaseCommandModule.AfterExecutionAsync(DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Called after a command in the implementing module is successfully executed.
+            </summary>
+            <param name="ctx">Context in which the method is being executed.</param>
+            <returns></returns>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.PrefixResolverDelegate">
+            <summary>
+                <para>
+                    Represents a delegate for a function that takes a message, and returns the position of the start of command
+                    invocation in the message. It has to return -1 if prefix is not present.
+                </para>
+                <para>
+                    It is recommended that helper methods
+                    <see cref="M:DisCatSharp.CommandsNext.CommandsNextUtilities.GetStringPrefixLength(DisCatSharp.Entities.DiscordMessage,System.String,System.StringComparison)" /> and
+                    <see cref="M:DisCatSharp.CommandsNext.CommandsNextUtilities.GetMentionPrefixLength(DisCatSharp.Entities.DiscordMessage,DisCatSharp.Entities.DiscordUser)" />
+                    be used internally for checking. Their output can be passed through.
+                </para>
+            </summary>
+            <param name="msg">Message to check for prefix.</param>
+            <returns>Position of the command invocation or -1 if not present.</returns>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.CommandsNextConfiguration">
+            <summary>
+                Represents a configuration for <see cref="T:DisCatSharp.CommandsNext.CommandsNextExtension" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextConfiguration.#ctor">
+            <summary>
+                Creates a new configuration with default values.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextConfiguration.#ctor(System.IServiceProvider)">
+            <summary>
+                Utilized via dependency injection pipeline.
+            </summary>
+            <param name="provider">The service provider.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextConfiguration.#ctor(DisCatSharp.CommandsNext.CommandsNextConfiguration)">
+            <summary>
+                Creates a new instance of <see cref="T:DisCatSharp.CommandsNext.CommandsNextConfiguration" />, copying the properties of another
+                configuration.
+            </summary>
+            <param name="other">Configuration the properties of which are to be copied.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandsNextConfiguration.StringPrefixes">
+            <summary>
+                <para>Sets the string prefixes used for commands.</para>
+                <para>Defaults to no value (disabled).</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandsNextConfiguration.PrefixResolver">
+            <summary>
+                <para>Sets the custom prefix resolver used for commands.</para>
+                <para>Defaults to none (disabled).</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandsNextConfiguration.EnableMentionPrefix">
+            <summary>
+                <para>Sets whether to allow mentioning the bot to be used as command prefix.</para>
+                <para>Defaults to true.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandsNextConfiguration.CaseSensitive">
+            <summary>
+                <para>Sets whether strings should be matched in a case-sensitive manner.</para>
+                <para>This switch affects the behaviour of default prefix resolver, command searching, and argument conversion.</para>
+                <para>Defaults to false.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandsNextConfiguration.EnableDefaultHelp">
+            <summary>
+                <para>Sets whether to enable default help command.</para>
+                <para>Disabling this will allow you to make your own help command.</para>
+                <para>
+                    Modifying default help can be achieved via custom help formatters (see
+                    <see cref="T:DisCatSharp.CommandsNext.Converters.BaseHelpFormatter" /> and
+                    <see cref="M:DisCatSharp.CommandsNext.CommandsNextExtension.SetHelpFormatter``1" /> for more details).
+                    It is recommended to use help formatter instead of disabling help.
+                </para>
+                <para>Defaults to true.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandsNextConfiguration.DmHelp">
+            <summary>
+                <para>Controls whether the default help will be sent via DMs or not.</para>
+                <para>Enabling this will make the bot respond with help via direct messages.</para>
+                <para>Defaults to false.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandsNextConfiguration.DefaultHelpChecks">
+            <summary>
+                <para>Sets the default pre-execution checks for the built-in help command.</para>
+                <para>Only applicable if default help is enabled.</para>
+                <para>Defaults to null.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandsNextConfiguration.EnableDms">
+            <summary>
+                <para>Sets whether commands sent via direct messages should be processed.</para>
+                <para>Defaults to true.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandsNextConfiguration.ServiceProvider">
+            <summary>
+                <para>Sets the service provider for this CommandsNext instance.</para>
+                <para>
+                    Objects in this provider are used when instantiating command modules. This allows passing data around without
+                    resorting to static members.
+                </para>
+                <para>Defaults to an empty service provider.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandsNextConfiguration.IgnoreExtraArguments">
+            <summary>
+                <para>
+                    Gets whether any extra arguments passed to commands should be ignored or not. If this is set to false, extra
+                    arguments will throw, otherwise they will be ignored.
+                </para>
+                <para>Defaults to false.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandsNextConfiguration.UseDefaultCommandHandler">
+            <summary>
+                <para>Gets or sets whether to automatically enable handling commands.</para>
+                <para>If this is set to false, you will need to manually handle each incoming message and pass it to CommandsNext.</para>
+                <para>Defaults to true.</para>
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.CommandsNextEvents">
+            <summary>
+                Contains well-defined event IDs used by CommandsNext.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandsNextEvents.Misc">
+            <summary>
+                Miscellaneous events, that do not fit in any other category.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandsNextEvents.Intents">
+            <summary>
+                Events pertaining to Gateway Intents. Typically diagnostic information.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.CommandsNextExtension">
+            <summary>
+                This is the class which handles command registration, management, and execution.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.CommandsNextExtension._config">
+            <summary>
+                Gets the config.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.CommandsNextExtension._convertGeneric">
+            <summary>
+                Gets the convert generic.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.CommandsNextExtension._helpFormatter">
+            <summary>
+                Gets the help formatter.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.CommandsNextExtension._userFriendlyTypeNames">
+            <summary>
+                Gets the user friendly type names.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.#ctor(DisCatSharp.CommandsNext.CommandsNextConfiguration)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.CommandsNext.CommandsNextExtension" /> class.
+            </summary>
+            <param name="cfg">The cfg.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandsNextExtension.ArgumentConverters">
+            <summary>
+                Gets the argument converters.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandsNextExtension.Services">
+            <summary>
+                Gets the service provider this CommandsNext module was configured with.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.SetHelpFormatter``1">
+            <summary>
+                Sets the help formatter to use with the default help command.
+            </summary>
+            <typeparam name="T">Type of the formatter to use.</typeparam>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.Setup(DisCatSharp.DiscordClient)">
+            <summary>
+                DO NOT USE THIS MANUALLY.
+            </summary>
+            <param name="client">DO NOT USE THIS MANUALLY.</param>
+            <exception cref="T:System.InvalidOperationException" />
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.CreateFakeContext(DisCatSharp.Entities.DiscordUser,DisCatSharp.Entities.DiscordChannel,System.String,System.String,DisCatSharp.CommandsNext.Command,System.String)">
+            <summary>
+                Creates a fake command context to execute commands with.
+            </summary>
+            <param name="actor">The user or member to use as message author.</param>
+            <param name="channel">The channel the message is supposed to appear from.</param>
+            <param name="messageContents">Contents of the message.</param>
+            <param name="prefix">Command prefix, used to execute commands.</param>
+            <param name="cmd">Command to execute.</param>
+            <param name="rawArguments">Raw arguments to pass to command.</param>
+            <returns>Created fake context.</returns>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.CommandsNextExtension.DefaultHelpModule">
+            <summary>
+                Represents the default help module.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.DefaultHelpModule.DefaultHelpAsync(DisCatSharp.CommandsNext.CommandContext,System.String[])">
+            <summary>
+                Defaults the help async.
+            </summary>
+            <param name="ctx">The ctx.</param>
+            <param name="command">The command.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.HandleCommandsAsync(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.MessageCreateEventArgs)">
+            <summary>
+                Handles the commands async.
+            </summary>
+            <param name="sender">The sender.</param>
+            <param name="e">The e.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.FindCommand(System.String,System.String@)">
+            <summary>
+                Finds a specified command by its qualified name, then separates arguments.
+            </summary>
+            <param name="commandString">Qualified name of the command, optionally with arguments.</param>
+            <param name="rawArguments">Separated arguments.</param>
+            <returns>Found command or null if none was found.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.CreateContext(DisCatSharp.Entities.DiscordMessage,System.String,DisCatSharp.CommandsNext.Command,System.String)">
+            <summary>
+                Creates a command execution context from specified arguments.
+            </summary>
+            <param name="msg">Message to use for context.</param>
+            <param name="prefix">Command prefix, used to execute commands.</param>
+            <param name="cmd">Command to execute.</param>
+            <param name="rawArguments">Raw arguments to pass to command.</param>
+            <returns>Created command execution context.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.ExecuteCommandAsync(DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Executes specified command from given context.
+            </summary>
+            <param name="ctx">Context to execute command from.</param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.RunAllChecksAsync(DisCatSharp.CommandsNext.Command,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Runs the all checks async.
+            </summary>
+            <param name="cmd">The cmd.</param>
+            <param name="ctx">The ctx.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandsNextExtension.RegisteredCommands">
+            <summary>
+                Gets a dictionary of registered top-level commands.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.CommandsNextExtension._topLevelCommands">
+            <summary>
+                Gets or sets the top level commands.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.RegisterCommands(System.Reflection.Assembly)">
+            <summary>
+                Registers all commands from a given assembly. The command classes need to be public to be considered for
+                registration.
+            </summary>
+            <param name="assembly">Assembly to register commands from.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.RegisterCommands``1">
+            <summary>
+                Registers all commands from a given command class.
+            </summary>
+            <typeparam name="T">Class which holds commands to register.</typeparam>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.RegisterCommands(System.Type)">
+            <summary>
+                Registers all commands from a given command class.
+            </summary>
+            <param name="t">Type of the class which holds commands to register.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.RegisterCommands(System.Type,DisCatSharp.CommandsNext.Builders.CommandGroupBuilder,System.Collections.Generic.IEnumerable{DisCatSharp.CommandsNext.Attributes.CheckBaseAttribute},System.Collections.Generic.List{DisCatSharp.CommandsNext.Builders.CommandBuilder}@)">
+            <summary>
+                Registers the commands.
+            </summary>
+            <param name="t">The type.</param>
+            <param name="currentParent">The current parent.</param>
+            <param name="inheritedChecks">The inherited checks.</param>
+            <param name="foundCommands">The found commands.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.RegisterCommands(DisCatSharp.CommandsNext.Builders.CommandBuilder[])">
+            <summary>
+                Builds and registers all supplied commands.
+            </summary>
+            <param name="cmds">Commands to build and register.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.UnregisterCommands(DisCatSharp.CommandsNext.Command[])">
+            <summary>
+                Unregister specified commands from CommandsNext.
+            </summary>
+            <param name="cmds">Commands to unregister.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.AddToCommandDictionary(DisCatSharp.CommandsNext.Command)">
+            <summary>
+                Adds the to command dictionary.
+            </summary>
+            <param name="cmd">The cmd.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.ConvertArgument``1(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string to specified type.
+            </summary>
+            <typeparam name="T">Type to convert to.</typeparam>
+            <param name="value">Value to convert.</param>
+            <param name="ctx">Context in which to convert to.</param>
+            <returns>Converted object.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.ConvertArgument(System.String,DisCatSharp.CommandsNext.CommandContext,System.Type)">
+            <summary>
+                Converts a string to specified type.
+            </summary>
+            <param name="value">Value to convert.</param>
+            <param name="ctx">Context in which to convert to.</param>
+            <param name="type">Type to convert to.</param>
+            <returns>Converted object.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.RegisterConverter``1(DisCatSharp.CommandsNext.Converters.IArgumentConverter{``0})">
+            <summary>
+                Registers an argument converter for specified type.
+            </summary>
+            <typeparam name="T">Type for which to register the converter.</typeparam>
+            <param name="converter">Converter to register.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.UnregisterConverter``1">
+            <summary>
+                Unregister an argument converter for specified type.
+            </summary>
+            <typeparam name="T">Type for which to unregister the converter.</typeparam>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.RegisterUserFriendlyTypeName``1(System.String)">
+            <summary>
+                Registers a user-friendly type name.
+            </summary>
+            <typeparam name="T">Type to register the name for.</typeparam>
+            <param name="value">Name to register.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.GetUserFriendlyTypeName(System.Type)">
+            <summary>
+                Converts a type into user-friendly type name.
+            </summary>
+            <param name="t">Type to convert.</param>
+            <returns>User-friendly type name.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.ConvertArgumentToObj``1(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Allows easier interoperability with reflection by turning the <see cref="T:System.Threading.Tasks.Task`1" /> returned by
+                <see cref="M:DisCatSharp.CommandsNext.CommandsNextExtension.ConvertArgument(System.String,DisCatSharp.CommandsNext.CommandContext,System.Type)" />
+                into a task containing <see cref="T:System.Object" />, using the provided generic type information.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.GetStringComparer">
+            <summary>
+                Gets the configuration-specific string comparer. This returns <see cref="P:System.StringComparer.Ordinal" /> or
+                <see cref="P:System.StringComparer.OrdinalIgnoreCase" />,
+                depending on whether <see cref="P:DisCatSharp.CommandsNext.CommandsNextConfiguration.CaseSensitive" /> is set to <see langword="true" /> or
+                <see langword="false" />.
+            </summary>
+            <returns>A string comparer.</returns>
+        </member>
+        <member name="E:DisCatSharp.CommandsNext.CommandsNextExtension.CommandExecuted">
+            <summary>
+                Triggered whenever a command executes successfully.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.CommandsNext.CommandsNextExtension.CommandErrored">
+            <summary>
+                Triggered whenever a command throws an exception during execution.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.OnCommandExecuted(DisCatSharp.CommandsNext.CommandExecutionEventArgs)">
+            <summary>
+                Fires when a command gets executed.
+            </summary>
+            <param name="e">The command execution event arguments.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextExtension.OnCommandErrored(DisCatSharp.CommandsNext.CommandErrorEventArgs)">
+            <summary>
+                Fires when a command fails.
+            </summary>
+            <param name="e">The command error event arguments.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.CommandsNextUtilities">
+            <summary>
+                Various CommandsNext-related utilities.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextUtilities.GetStringPrefixLength(DisCatSharp.Entities.DiscordMessage,System.String,System.StringComparison)">
+            <summary>
+                Checks whether the message has a specified string prefix.
+            </summary>
+            <param name="msg">Message to check.</param>
+            <param name="str">String to check for.</param>
+            <param name="comparisonType">Method of string comparison for the purposes of finding prefixes.</param>
+            <returns>Positive number if the prefix is present, -1 otherwise.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextUtilities.GetMentionPrefixLength(DisCatSharp.Entities.DiscordMessage,DisCatSharp.Entities.DiscordUser)">
+            <summary>
+                Checks whether the message contains a specified mention prefix.
+            </summary>
+            <param name="msg">Message to check.</param>
+            <param name="user">User to check for.</param>
+            <returns>Positive number if the prefix is present, -1 otherwise.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextUtilities.ExtractNextArgument(System.String,System.Int32@)">
+            <summary>
+                Extracts the next argument.
+            </summary>
+            <param name="str">The string.</param>
+            <param name="startPos">The start position.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextUtilities.CleanupString(System.String,System.Collections.Generic.IList{System.Int32})">
+            <summary>
+                Cleanups the string.
+            </summary>
+            <param name="s">The string.</param>
+            <param name="indices">The indices.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextUtilities.BindArguments(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Binds the arguments.
+            </summary>
+            <param name="ctx">The command context.</param>
+            <param name="ignoreSurplus">If true, ignore further text in string.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextUtilities.IsModuleCandidateType(System.Type)">
+            <summary>
+                Whether this module is a candidate type.
+            </summary>
+            <param name="type">The type.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextUtilities.IsModuleCandidateType(System.Reflection.TypeInfo)">
+            <summary>
+                Whether this module is a candidate type.
+            </summary>
+            <param name="ti">The type info.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextUtilities.IsCommandCandidate(System.Reflection.MethodInfo,System.Reflection.ParameterInfo[]@)">
+            <summary>
+                Whether this is a command candidate.
+            </summary>
+            <param name="method">The method.</param>
+            <param name="parameters">The parameters.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandsNextUtilities.CreateInstance(System.Type,System.IServiceProvider)">
+            <summary>
+                Creates the instance.
+            </summary>
+            <param name="t">The type.</param>
+            <param name="services">The services provider.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.ArgumentBindingResult">
+            <summary>
+                Represents a argument binding result.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Converters.ArgumentBindingResult.IsSuccessful">
+            <summary>
+                Gets a value indicating whether the binding is successful.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Converters.ArgumentBindingResult.Converted">
+            <summary>
+                Gets the converted.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Converters.ArgumentBindingResult.Raw">
+            <summary>
+                Gets the raw.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Converters.ArgumentBindingResult.Reason">
+            <summary>
+                Gets the reason.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.ArgumentBindingResult.#ctor(System.Object[],System.Collections.Generic.IReadOnlyList{System.String})">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.CommandsNext.Converters.ArgumentBindingResult" /> class.
+            </summary>
+            <param name="converted">The converted.</param>
+            <param name="raw">The raw.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.ArgumentBindingResult.#ctor(System.Exception)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.CommandsNext.Converters.ArgumentBindingResult" /> class.
+            </summary>
+            <param name="ex">The ex.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.BaseHelpFormatter">
+            <summary>
+                Represents a base class for all default help formatters.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.BaseHelpFormatter.#ctor(DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Creates a new help formatter for specified CommandsNext extension instance.
+            </summary>
+            <param name="ctx">Context in which this formatter is being invoked.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Converters.BaseHelpFormatter.Context">
+            <summary>
+                Gets the context in which this formatter is being invoked.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Converters.BaseHelpFormatter.CommandsNext">
+            <summary>
+                Gets the CommandsNext extension which constructed this help formatter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.BaseHelpFormatter.WithCommand(DisCatSharp.CommandsNext.Command)">
+            <summary>
+                Sets the command this help message will be for.
+            </summary>
+            <param name="command">Command for which the help message is being produced.</param>
+            <returns>This help formatter.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.BaseHelpFormatter.WithSubcommands(System.Collections.Generic.IEnumerable{DisCatSharp.CommandsNext.Command})">
+            <summary>
+                Sets the subcommands for this command, if applicable. This method will be called with filtered data.
+            </summary>
+            <param name="subcommands">Subcommands for this command group.</param>
+            <returns>This help formatter.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.BaseHelpFormatter.Build">
+            <summary>
+                Constructs the help message.
+            </summary>
+            <returns>Data for the help message.</returns>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.DefaultHelpFormatter">
+            <summary>
+                Default CommandsNext help formatter.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.Converters.DefaultHelpFormatter._command">
+            <summary>
+                Gets or sets the command.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.DefaultHelpFormatter.#ctor(DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Creates a new default help formatter.
+            </summary>
+            <param name="ctx">Context in which this formatter is being invoked.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Converters.DefaultHelpFormatter.EmbedBuilder">
+            <summary>
+                Gets the embed builder.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.DefaultHelpFormatter.WithCommand(DisCatSharp.CommandsNext.Command)">
+            <summary>
+                Sets the command this help message will be for.
+            </summary>
+            <param name="command">Command for which the help message is being produced.</param>
+            <returns>This help formatter.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.DefaultHelpFormatter.WithSubcommands(System.Collections.Generic.IEnumerable{DisCatSharp.CommandsNext.Command})">
+            <summary>
+                Sets the subcommands for this command, if applicable. This method will be called with filtered data.
+            </summary>
+            <param name="subcommands">Subcommands for this command group.</param>
+            <returns>This help formatter.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.DefaultHelpFormatter.Build">
+            <summary>
+                Construct the help message.
+            </summary>
+            <returns>Data for the help message.</returns>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.DiscordUserConverter">
+            <summary>
+                Represents a discord user converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.DiscordUserConverter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{DisCatSharp#Entities#DiscordUser}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.DiscordMemberConverter">
+            <summary>
+                Represents a discord member converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.DiscordMemberConverter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{DisCatSharp#Entities#DiscordMember}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.DiscordChannelConverter">
+            <summary>
+                Represents a discord channel converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.DiscordChannelConverter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{DisCatSharp#Entities#DiscordChannel}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.DiscordThreadChannelConverter">
+            <summary>
+                Represents a discord thread channel converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.DiscordThreadChannelConverter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{DisCatSharp#Entities#DiscordThreadChannel}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.DiscordRoleConverter">
+            <summary>
+                Represents a discord role converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.DiscordRoleConverter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{DisCatSharp#Entities#DiscordRole}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.DiscordGuildConverter">
+            <summary>
+                Represents a discord guild converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.DiscordGuildConverter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{DisCatSharp#Entities#DiscordGuild}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.DiscordInviteConverter">
+            <summary>
+                Represents a discord invite converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.DiscordInviteConverter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{DisCatSharp#Entities#DiscordInvite}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.DiscordMessageConverter">
+            <summary>
+                Represents a discord message converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.DiscordMessageConverter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{DisCatSharp#Entities#DiscordMessage}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.DiscordScheduledEventConverter">
+            <summary>
+                Represents a discord scheduled event converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.DiscordScheduledEventConverter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{DisCatSharp#Entities#DiscordScheduledEvent}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.DiscordEmojiConverter">
+            <summary>
+                Represents a discord emoji converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.DiscordEmojiConverter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{DisCatSharp#Entities#DiscordEmoji}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.DiscordColorConverter">
+            <summary>
+                Represents a discord color converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.DiscordColorConverter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{DisCatSharp#Entities#DiscordColor}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.EnumConverter`1">
+            <summary>
+                Represents a enum converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.EnumConverter`1.DisCatSharp#CommandsNext#Converters#IArgumentConverter{T}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.HelpFormatterFactory">
+            <summary>
+                Represents the help formatter factory.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.Converters.HelpFormatterFactory._factory">
+            <summary>
+                Gets or sets the factory.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.HelpFormatterFactory.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.CommandsNext.Converters.HelpFormatterFactory" /> class.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.HelpFormatterFactory.SetFormatterType``1">
+            <summary>
+                Sets the formatter type.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.HelpFormatterFactory.Create(DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Creates the help formatter.
+            </summary>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.IArgumentConverter">
+            <summary>
+                Argument converter abstract.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.IArgumentConverter`1">
+            <summary>
+                Represents a converter for specific argument type.
+            </summary>
+            <typeparam name="T">Type for which the converter is to be registered.</typeparam>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.IArgumentConverter`1.ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts the raw value into the specified type.
+            </summary>
+            <param name="value">Value to convert.</param>
+            <param name="ctx">Context in which the value will be converted.</param>
+            <returns>A structure containing information whether the value was converted, and, if so, the converted value.</returns>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.NullableConverter`1">
+            <summary>
+                Represents a nullable converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.NullableConverter`1.DisCatSharp#CommandsNext#Converters#IArgumentConverter{T?}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.BoolConverter">
+            <summary>
+                The bool converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.BoolConverter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{System#Boolean}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.Int8Converter">
+            <summary>
+                The int8 converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.Int8Converter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{System#SByte}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.Uint8Converter">
+            <summary>
+                The uint8 converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.Uint8Converter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{System#Byte}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.Int16Converter">
+            <summary>
+                The int16 converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.Int16Converter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{System#Int16}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.Uint16Converter">
+            <summary>
+                The uint16 converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.Uint16Converter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{System#UInt16}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.Int32Converter">
+            <summary>
+                The int32 converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.Int32Converter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{System#Int32}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.Uint32Converter">
+            <summary>
+                The uint32 converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.Uint32Converter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{System#UInt32}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.Int64Converter">
+            <summary>
+                The int64 converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.Int64Converter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{System#Int64}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.Uint64Converter">
+            <summary>
+                The uint64 converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.Uint64Converter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{System#UInt64}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.Float32Converter">
+            <summary>
+                The float32 converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.Float32Converter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{System#Single}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.Float64Converter">
+            <summary>
+                The float64 converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.Float64Converter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{System#Double}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.Float128Converter">
+            <summary>
+                The float128 converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.Float128Converter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{System#Decimal}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.StringConverter">
+            <summary>
+                Represents a string converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.StringConverter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{System#String}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.UriConverter">
+            <summary>
+                Represents a uri converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.UriConverter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{System#Uri}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.DateTimeConverter">
+            <summary>
+                Represents a date time converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.DateTimeConverter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{System#DateTime}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.DateTimeOffsetConverter">
+            <summary>
+                Represents a date time offset converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.DateTimeOffsetConverter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{System#DateTimeOffset}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Converters.TimeSpanConverter">
+            <summary>
+                Represents a time span converter.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Converters.TimeSpanConverter.DisCatSharp#CommandsNext#Converters#IArgumentConverter{System#TimeSpan}#ConvertAsync(System.String,DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Converts a string.
+            </summary>
+            <param name="value">The string to convert.</param>
+            <param name="ctx">The command context.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Builders.CommandBuilder">
+            <summary>
+                Represents an interface to build a command.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.Builders.CommandBuilder._aliasList">
+            <summary>
+                Gets the alias list.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.Builders.CommandBuilder._customAttributeList">
+            <summary>
+                Gets the custom attribute list.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.Builders.CommandBuilder._executionCheckList">
+            <summary>
+                Gets the execution check list.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.Builders.CommandBuilder._overloadArgumentSets">
+            <summary>
+                Gets the overload argument sets.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.Builders.CommandBuilder._overloadList">
+            <summary>
+                Gets the overload list.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandBuilder.#ctor">
+            <summary>
+                Creates a new module-less command builder.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandBuilder.#ctor(DisCatSharp.CommandsNext.Entities.ICommandModule)">
+            <summary>
+                Creates a new command builder.
+            </summary>
+            <param name="module">Module on which this command is to be defined.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Builders.CommandBuilder.Name">
+            <summary>
+                Gets the name set for this command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Builders.CommandBuilder.Aliases">
+            <summary>
+                Gets the aliases set for this command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Builders.CommandBuilder.Description">
+            <summary>
+                Gets the description set for this command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Builders.CommandBuilder.IsHidden">
+            <summary>
+                Gets whether this command will be hidden or not.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Builders.CommandBuilder.ExecutionChecks">
+            <summary>
+                Gets the execution checks defined for this command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Builders.CommandBuilder.Overloads">
+            <summary>
+                Gets the collection of this command's overloads.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Builders.CommandBuilder.Module">
+            <summary>
+                Gets the module on which this command is to be defined.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Builders.CommandBuilder.CustomAttributes">
+            <summary>
+                Gets custom attributes defined on this command.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandBuilder.WithName(System.String)">
+            <summary>
+                Sets the name for this command.
+            </summary>
+            <param name="name">Name for this command.</param>
+            <returns>This builder.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandBuilder.WithAliases(System.String[])">
+            <summary>
+                Adds aliases to this command.
+            </summary>
+            <param name="aliases">Aliases to add to the command.</param>
+            <returns>This builder.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandBuilder.WithAlias(System.String)">
+            <summary>
+                Adds an alias to this command.
+            </summary>
+            <param name="alias">Alias to add to the command.</param>
+            <returns>This builder.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandBuilder.WithDescription(System.String)">
+            <summary>
+                Sets the description for this command.
+            </summary>
+            <param name="description">Description to use for this command.</param>
+            <returns>This builder.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandBuilder.WithHiddenStatus(System.Boolean)">
+            <summary>
+                Sets whether this command is to be hidden.
+            </summary>
+            <param name="hidden">Whether the command is to be hidden.</param>
+            <returns>This builder.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandBuilder.WithExecutionChecks(DisCatSharp.CommandsNext.Attributes.CheckBaseAttribute[])">
+            <summary>
+                Adds pre-execution checks to this command.
+            </summary>
+            <param name="checks">Pre-execution checks to add to this command.</param>
+            <returns>This builder.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandBuilder.WithExecutionCheck(DisCatSharp.CommandsNext.Attributes.CheckBaseAttribute)">
+            <summary>
+                Adds a pre-execution check to this command.
+            </summary>
+            <param name="check">Pre-execution check to add to this command.</param>
+            <returns>This builder.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandBuilder.WithOverloads(DisCatSharp.CommandsNext.Builders.CommandOverloadBuilder[])">
+            <summary>
+                Adds overloads to this command. An executable command needs to have at least one overload.
+            </summary>
+            <param name="overloads">Overloads to add to this command.</param>
+            <returns>This builder.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandBuilder.WithOverload(DisCatSharp.CommandsNext.Builders.CommandOverloadBuilder)">
+            <summary>
+                Adds an overload to this command. An executable command needs to have at least one overload.
+            </summary>
+            <param name="overload">Overload to add to this command.</param>
+            <returns>This builder.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandBuilder.WithCustomAttribute(System.Attribute)">
+            <summary>
+                Adds a custom attribute to this command. This can be used to indicate various custom information about a command.
+            </summary>
+            <param name="attribute">Attribute to add.</param>
+            <returns>This builder.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandBuilder.WithCustomAttributes(System.Attribute[])">
+            <summary>
+                Adds multiple custom attributes to this command. This can be used to indicate various custom information about a
+                command.
+            </summary>
+            <param name="attributes">Attributes to add.</param>
+            <returns>This builder.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandBuilder.Build(DisCatSharp.CommandsNext.CommandGroup)">
+            <summary>
+                Builds the command.
+            </summary>
+            <param name="parent">The parent command group.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Builders.CommandGroupBuilder">
+            <summary>
+                Represents an interface to build a command group.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.Builders.CommandGroupBuilder._childrenList">
+            <summary>
+                Gets the children list.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandGroupBuilder.#ctor">
+            <summary>
+                Creates a new module-less command group builder.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandGroupBuilder.#ctor(DisCatSharp.CommandsNext.Entities.ICommandModule)">
+            <summary>
+                Creates a new command group builder.
+            </summary>
+            <param name="module">Module on which this group is to be defined.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Builders.CommandGroupBuilder.Children">
+            <summary>
+                Gets the list of child commands registered for this group.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandGroupBuilder.WithChild(DisCatSharp.CommandsNext.Builders.CommandBuilder)">
+            <summary>
+                Adds a command to the collection of child commands for this group.
+            </summary>
+            <param name="child">Command to add to the collection of child commands for this group.</param>
+            <returns>This builder.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandGroupBuilder.Build(DisCatSharp.CommandsNext.CommandGroup)">
+            <summary>
+                Builds the command group.
+            </summary>
+            <param name="parent">The parent command group.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Builders.CommandModuleBuilder">
+            <summary>
+                Represents an interface to build a command module.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandModuleBuilder.#ctor">
+            <summary>
+                Creates a new command module builder.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Builders.CommandModuleBuilder.Type">
+            <summary>
+                Gets the type this build will construct a module out of.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Builders.CommandModuleBuilder.Lifespan">
+            <summary>
+                Gets the lifespan for the built module.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandModuleBuilder.WithType(System.Type)">
+            <summary>
+                Sets the type this builder will construct a module out of.
+            </summary>
+            <param name="t">Type to build a module out of. It has to derive from <see cref="T:DisCatSharp.CommandsNext.BaseCommandModule" />.</param>
+            <returns>This builder.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandModuleBuilder.WithLifespan(DisCatSharp.CommandsNext.Attributes.ModuleLifespan)">
+            <summary>
+                Lifespan to give this module.
+            </summary>
+            <param name="lifespan">Lifespan for this module.</param>
+            <returns>This builder.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandModuleBuilder.Build(System.IServiceProvider)">
+            <summary>
+                Builds the command module.
+            </summary>
+            <param name="services">The services.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Builders.CommandOverloadBuilder">
+            <summary>
+                Represents an interface to build a command overload.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.Builders.CommandOverloadBuilder._invocationTarget">
+            <summary>
+                Gets the invocation target.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandOverloadBuilder.#ctor(System.Reflection.MethodInfo)">
+            <summary>
+                Creates a new command overload builder from specified method.
+            </summary>
+            <param name="method">Method to use for this overload.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandOverloadBuilder.#ctor(System.Delegate)">
+            <summary>
+                Creates a new command overload builder from specified delegate.
+            </summary>
+            <param name="method">Delegate to use for this overload.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandOverloadBuilder.#ctor(System.Reflection.MethodInfo,System.Object)">
+            <summary>
+                Prevents a default instance of the <see cref="T:DisCatSharp.CommandsNext.Builders.CommandOverloadBuilder" /> class from being created.
+            </summary>
+            <param name="method">The method.</param>
+            <param name="target">The target.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Builders.CommandOverloadBuilder.ArgumentSet">
+            <summary>
+                Gets a value that uniquely identifies an overload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Builders.CommandOverloadBuilder.Arguments">
+            <summary>
+                Gets the collection of arguments this overload takes.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Builders.CommandOverloadBuilder.Priority">
+            <summary>
+                Gets this overload's priority when picking a suitable one for execution.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Builders.CommandOverloadBuilder.Callable">
+            <summary>
+                Gets the overload's callable delegate.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandOverloadBuilder.WithPriority(System.Int32)">
+            <summary>
+                Sets the priority for this command overload.
+            </summary>
+            <param name="priority">Priority for this command overload.</param>
+            <returns>This builder.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Builders.CommandOverloadBuilder.Build">
+            <summary>
+                Builds the command overload.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Command">
+            <summary>
+                Represents a command.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Command.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.CommandsNext.Command" /> class.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Command.Name">
+            <summary>
+                Gets this command's name.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Command.QualifiedName">
+            <summary>
+                Gets this command's qualified name (i.e. one that includes all module names).
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Command.Aliases">
+            <summary>
+                Gets this command's aliases.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Command.Parent">
+            <summary>
+                Gets this command's parent module, if any.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Command.Description">
+            <summary>
+                Gets this command's description.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Command.IsHidden">
+            <summary>
+                Gets whether this command is hidden.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Command.ExecutionChecks">
+            <summary>
+                Gets a collection of pre-execution checks for this command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Command.Overloads">
+            <summary>
+                Gets a collection of this command's overloads.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Command.Module">
+            <summary>
+                Gets the module in which this command is defined.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Command.CustomAttributes">
+            <summary>
+                Gets the custom attributes defined on this command.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Command.ExecuteAsync(DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Executes this command with specified context.
+            </summary>
+            <param name="ctx">Context to execute the command in.</param>
+            <returns>Command's execution results.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Command.RunChecksAsync(DisCatSharp.CommandsNext.CommandContext,System.Boolean)">
+            <summary>
+                Runs pre-execution checks for this command and returns any that fail for given context.
+            </summary>
+            <param name="ctx">Context in which the command is executed.</param>
+            <param name="help">
+                Whether this check is being executed from help or not. This can be used to probe whether command can
+                be run without setting off certain fail conditions (such as cooldowns).
+            </param>
+            <returns>Pre-execution checks that fail for given context.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Command.op_Equality(DisCatSharp.CommandsNext.Command,DisCatSharp.CommandsNext.Command)">
+            <summary>
+                Checks whether this command is equal to another one.
+            </summary>
+            <param name="cmd1">Command to compare to.</param>
+            <param name="cmd2">Command to compare.</param>
+            <returns>Whether the two commands are equal.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Command.op_Inequality(DisCatSharp.CommandsNext.Command,DisCatSharp.CommandsNext.Command)">
+            <summary>
+                Checks whether this command is not equal to another one.
+            </summary>
+            <param name="cmd1">Command to compare to.</param>
+            <param name="cmd2">Command to compare.</param>
+            <returns>Whether the two commands are not equal.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Command.Equals(System.Object)">
+            <summary>
+                Checks whether this command equals another object.
+            </summary>
+            <param name="obj">Object to compare to.</param>
+            <returns>Whether this command is equal to another object.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Command.GetHashCode">
+            <summary>
+                Gets this command's hash code.
+            </summary>
+            <returns>This command's hash code.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Command.ToString">
+            <summary>
+                Returns a string representation of this command.
+            </summary>
+            <returns>String representation of this command.</returns>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.CommandArgument">
+            <summary>
+                Represents a command argument.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandArgument.Name">
+            <summary>
+                Gets this argument's name.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandArgument.Type">
+            <summary>
+                Gets this argument's type.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandArgument.IsArray">
+            <summary>
+                Gets or sets whether this argument is an array argument.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandArgument.IsOptional">
+            <summary>
+                Gets whether this argument is optional.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandArgument.DefaultValue">
+            <summary>
+                Gets this argument's default value.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandArgument.IsCatchAll">
+            <summary>
+                Gets whether this argument catches all remaining arguments.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandArgument.Description">
+            <summary>
+                Gets this argument's description.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandArgument.CustomAttributes">
+            <summary>
+                Gets the custom attributes attached to this argument.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.CommandGroup">
+            <summary>
+                Represents a command group.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandGroup.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.CommandsNext.CommandGroup" /> class.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandGroup.Children">
+            <summary>
+                Gets all the commands that belong to this module.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandGroup.IsExecutableWithoutSubcommands">
+            <summary>
+                Gets whether this command is executable without subcommands.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandGroup.ExecuteAsync(DisCatSharp.CommandsNext.CommandContext)">
+            <summary>
+                Executes this command or its subcommand with specified context.
+            </summary>
+            <param name="ctx">Context to execute the command in.</param>
+            <returns>Command's execution results.</returns>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Entities.CommandHelpMessage">
+            <summary>
+                Represents a formatted help message.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Entities.CommandHelpMessage.Content">
+            <summary>
+                Gets the contents of the help message.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Entities.CommandHelpMessage.Embed">
+            <summary>
+                Gets the embed attached to the help message.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Entities.CommandHelpMessage.#ctor(System.String,DisCatSharp.Entities.DiscordEmbed)">
+            <summary>
+                Creates a new instance of a help message.
+            </summary>
+            <param name="content">Contents of the message.</param>
+            <param name="embed">Embed to attach to the message.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Entities.ICommandModule">
+            <summary>
+                Represents a base interface for all types of command modules.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Entities.ICommandModule.ModuleType">
+            <summary>
+                Gets the type of this module.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Entities.ICommandModule.GetInstance(System.IServiceProvider)">
+            <summary>
+                Returns an instance of this module.
+            </summary>
+            <param name="services">Services to instantiate the module with.</param>
+            <returns>A created instance of this module.</returns>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Entities.TransientCommandModule">
+            <summary>
+                Represents a transient command module. This type of module is reinstantiated on every command call.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Entities.TransientCommandModule.#ctor(System.Type)">
+            <summary>
+                Creates a new transient module.
+            </summary>
+            <param name="t">Type of the module to create.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Entities.TransientCommandModule.ModuleType">
+            <summary>
+                Gets the type of this module.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Entities.TransientCommandModule.GetInstance(System.IServiceProvider)">
+            <summary>
+                Creates a new instance of this module.
+            </summary>
+            <param name="services">Services to instantiate the module with.</param>
+            <returns>Created module.</returns>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Entities.SingletonCommandModule">
+            <summary>
+                Represents a singleton command module. This type of module is instantiated only when created.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Entities.SingletonCommandModule.#ctor(System.Type,System.IServiceProvider)">
+            <summary>
+                Creates a new singleton module, and instantiates it.
+            </summary>
+            <param name="t">Type of the module to create.</param>
+            <param name="services">Services to instantiate the module with.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Entities.SingletonCommandModule.Instance">
+            <summary>
+                Gets this module's instance.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Entities.SingletonCommandModule.ModuleType">
+            <summary>
+                Gets the type of this module.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Entities.SingletonCommandModule.GetInstance(System.IServiceProvider)">
+            <summary>
+                Returns the instance of this module.
+            </summary>
+            <param name="services">Services to instantiate the module with.</param>
+            <returns>This module's instance.</returns>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Entities.ICooldownResponder">
+            <summary>
+                The cooldown responder.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Entities.ICooldownResponder.Responder(DisCatSharp.CommandsNext.CommandContext,DisCatSharp.Entities.Core.CooldownBucket)">
+            <summary>
+                <para>Responds to cooldown ratelimit hits with given actions.</para>
+                <para>For example you could respond with a reaction or send a dm.</para>
+            </summary>
+            <param name="context">The context.</param>
+            <param name="cooldownBucket">Gets the current cooldown bucket.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.CommandOverload">
+            <summary>
+                Represents a specific overload of a command.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandOverload.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.CommandsNext.CommandOverload" /> class.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandOverload.Arguments">
+            <summary>
+                Gets this command overload's arguments.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandOverload.Priority">
+            <summary>
+                Gets this command overload's priority.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandOverload.Callable">
+            <summary>
+                Gets this command overload's delegate.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandOverload.InvocationTarget">
+            <summary>
+                Gets or sets the invocation target.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.CommandResult">
+            <summary>
+                Represents a command's execution result.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandResult.IsSuccessful">
+            <summary>
+                Gets whether the command execution succeeded.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandResult.Exception">
+            <summary>
+                Gets the exception (if any) that occurred when executing the command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandResult.Context">
+            <summary>
+                Gets the context in which the command was executed.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.CommandContext">
+            <summary>
+                Represents a context in which a command is executed.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandContext.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.CommandsNext.CommandContext" /> class.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandContext.Message">
+            <summary>
+                Gets the message that triggered the execution.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandContext.Channel">
+            <summary>
+                Gets the channel in which the execution was triggered,
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandContext.Guild">
+            <summary>
+                Gets the guild in which the execution was triggered. This property is null for commands sent over direct messages.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandContext.User">
+            <summary>
+                Gets the user who triggered the execution.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandContext.Member">
+            <summary>
+                Gets the member who triggered the execution. This property is null for commands sent over direct messages.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandContext.CommandsNext">
+            <summary>
+                Gets the CommandsNext service instance that handled this command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandContext.Services">
+            <summary>
+                Gets the service provider for this CNext instance.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandContext.Command">
+            <summary>
+                Gets the command that is being executed.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandContext.Overload">
+            <summary>
+                Gets the overload of the command that is being executed.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandContext.RawArguments">
+            <summary>
+                Gets the list of raw arguments passed to the command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandContext.RawArgumentString">
+            <summary>
+                Gets the raw string from which the arguments were extracted.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandContext.Prefix">
+            <summary>
+                Gets the prefix used to invoke the command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandContext.Config">
+            <summary>
+                Gets or sets the config.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandContext.ServiceScopeContext">
+            <summary>
+                Gets or sets the service scope context.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandContext.RespondAsync(System.String)">
+            <summary>
+                Quickly respond to the message that triggered the command.
+            </summary>
+            <param name="content">Message to respond with.</param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandContext.RespondAsync(DisCatSharp.Entities.DiscordEmbed)">
+            <summary>
+                Quickly respond to the message that triggered the command.
+            </summary>
+            <param name="embed">Embed to attach.</param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandContext.RespondAsync(System.String,DisCatSharp.Entities.DiscordEmbed)">
+            <summary>
+                Quickly respond to the message that triggered the command.
+            </summary>
+            <param name="content">Message to respond with.</param>
+            <param name="embed">Embed to attach.</param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandContext.RespondAsync(DisCatSharp.Entities.DiscordMessageBuilder)">
+            <summary>
+                Quickly respond to the message that triggered the command.
+            </summary>
+            <param name="builder">The Discord Message builder.</param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandContext.RespondAsync(System.Action{DisCatSharp.Entities.DiscordMessageBuilder})">
+            <summary>
+                Quickly respond to the message that triggered the command.
+            </summary>
+            <param name="action">The Discord Message builder.</param>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandContext.TriggerTypingAsync">
+            <summary>
+                Triggers typing in the channel containing the message that triggered the command.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandContext.ServiceContext.Provider">
+            <summary>
+                Gets the provider.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandContext.ServiceContext.Scope">
+            <summary>
+                Gets the scope.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandContext.ServiceContext.IsInitialized">
+            <summary>
+                Gets a value indicating whether is initialized.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandContext.ServiceContext.#ctor(System.IServiceProvider,Microsoft.Extensions.DependencyInjection.IServiceScope)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.CommandsNext.CommandContext.ServiceContext" /> class.
+            </summary>
+            <param name="services">The services.</param>
+            <param name="scope">The scope.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandContext.ServiceContext.Dispose">
+            <summary>
+                Disposes the command context.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.CommandErrorEventArgs">
+            <summary>
+                Represents arguments for <see cref="E:DisCatSharp.CommandsNext.CommandsNextExtension.CommandErrored" /> event.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandErrorEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.CommandsNext.CommandErrorEventArgs" /> class.
+            </summary>
+            <param name="provider">The provider.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandErrorEventArgs.Exception">
+            <summary>
+                Gets the exception.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.CommandEventArgs">
+            <summary>
+                Base class for all CNext-related events.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.CommandsNext.CommandEventArgs" /> class.
+            </summary>
+            <param name="provider">The provider.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandEventArgs.Context">
+            <summary>
+                Gets the context in which the command was executed.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandEventArgs.Command">
+            <summary>
+                Gets the command that was executed.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.CommandExecutionEventArgs">
+            <summary>
+                Represents arguments for <see cref="E:DisCatSharp.CommandsNext.CommandsNextExtension.CommandExecuted" /> event.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.CommandExecutionEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.CommandsNext.CommandExecutionEventArgs" /> class.
+            </summary>
+            <param name="provider">The provider.</param>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Exceptions.ChecksFailedException">
+            <summary>
+                Indicates that one or more checks for given command have failed.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Exceptions.ChecksFailedException.#ctor(DisCatSharp.CommandsNext.Command,DisCatSharp.CommandsNext.CommandContext,System.Collections.Generic.IEnumerable{DisCatSharp.CommandsNext.Attributes.CheckBaseAttribute})">
+            <summary>
+                Creates a new <see cref="T:DisCatSharp.CommandsNext.Exceptions.ChecksFailedException" />.
+            </summary>
+            <param name="command">Command that failed to execute.</param>
+            <param name="ctx">Context in which the command was executed.</param>
+            <param name="failedChecks">A collection of checks that failed.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Exceptions.ChecksFailedException.Command">
+            <summary>
+                Gets the command that was executed.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Exceptions.ChecksFailedException.Context">
+            <summary>
+                Gets the context in which given command was executed.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Exceptions.ChecksFailedException.FailedChecks">
+            <summary>
+                Gets the checks that failed.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Exceptions.CommandNotFoundException">
+            <summary>
+                Thrown when the command service fails to find a command.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Exceptions.CommandNotFoundException.#ctor(System.String)">
+            <summary>
+                Creates a new <see cref="T:DisCatSharp.CommandsNext.Exceptions.CommandNotFoundException" />.
+            </summary>
+            <param name="command">Name of the command that was not found.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Exceptions.CommandNotFoundException.CommandName">
+            <summary>
+                Gets the name of the command that was not found.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Exceptions.CommandNotFoundException.ToString">
+            <summary>
+                Returns a string representation of this <see cref="T:DisCatSharp.CommandsNext.Exceptions.CommandNotFoundException" />.
+            </summary>
+            <returns>A string representation.</returns>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Exceptions.DuplicateCommandException">
+            <summary>
+                Indicates that given command name or alias is taken.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Exceptions.DuplicateCommandException.#ctor(System.String)">
+            <summary>
+                Creates a new exception indicating that given command name is already taken.
+            </summary>
+            <param name="name">Name of the command that was taken.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Exceptions.DuplicateCommandException.CommandName">
+            <summary>
+                Gets the name of the command that already exists.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Exceptions.DuplicateCommandException.ToString">
+            <summary>
+                Returns a string representation of this <see cref="T:DisCatSharp.CommandsNext.Exceptions.DuplicateCommandException" />.
+            </summary>
+            <returns>A string representation.</returns>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Exceptions.DuplicateOverloadException">
+            <summary>
+                Indicates that given argument set already exists as an overload for specified command.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.CommandsNext.Exceptions.DuplicateOverloadException._argumentSetKey">
+            <summary>
+                Gets the argument set key.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Exceptions.DuplicateOverloadException.#ctor(System.String,System.Collections.Generic.IList{System.Type},System.String)">
+            <summary>
+                Creates a new exception indicating given argument set already exists as an overload for specified command.
+            </summary>
+            <param name="name">Name of the command with duplicated argument sets.</param>
+            <param name="argumentTypes">Collection of ordered argument types for the command.</param>
+            <param name="argumentSetKey">Overload identifier.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Exceptions.DuplicateOverloadException.CommandName">
+            <summary>
+                Gets the name of the command that already has the overload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Exceptions.DuplicateOverloadException.ArgumentTypes">
+            <summary>
+                Gets the ordered collection of argument types for the specified overload.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Exceptions.DuplicateOverloadException.ToString">
+            <summary>
+                Returns a string representation of this <see cref="T:DisCatSharp.CommandsNext.Exceptions.DuplicateOverloadException" />.
+            </summary>
+            <returns>A string representation.</returns>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.Exceptions.InvalidOverloadException">
+            <summary>
+                Thrown when the command service fails to build a command due to a problem with its overload.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Exceptions.InvalidOverloadException.#ctor(System.String,System.Reflection.MethodInfo,System.Reflection.ParameterInfo)">
+            <summary>
+                Creates a new <see cref="T:DisCatSharp.CommandsNext.Exceptions.InvalidOverloadException" />.
+            </summary>
+            <param name="message">Exception message.</param>
+            <param name="method">Method that caused the problem.</param>
+            <param name="parameter">Method argument that caused the problem.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Exceptions.InvalidOverloadException.#ctor(System.String,System.Reflection.MethodInfo)">
+            <summary>
+                Creates a new <see cref="T:DisCatSharp.CommandsNext.Exceptions.InvalidOverloadException" />.
+            </summary>
+            <param name="message">Exception message.</param>
+            <param name="method">Method that caused the problem.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Exceptions.InvalidOverloadException.Method">
+            <summary>
+                Gets the method that caused this exception.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Exceptions.InvalidOverloadException.Parameter">
+            <summary>
+                Gets or sets the argument that caused the problem. This can be null.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.Exceptions.InvalidOverloadException.ToString">
+            <summary>
+                Returns a string representation of this <see cref="T:DisCatSharp.CommandsNext.Exceptions.InvalidOverloadException" />.
+            </summary>
+            <returns>A string representation.</returns>
+        </member>
+        <member name="T:DisCatSharp.CommandsNext.ExtensionMethods">
+            <summary>
+                Defines various extensions specific to CommandsNext.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.ExtensionMethods.UseCommandsNext(DisCatSharp.DiscordClient,DisCatSharp.CommandsNext.CommandsNextConfiguration)">
+            <summary>
+                Enables CommandsNext module on this <see cref="T:DisCatSharp.DiscordClient" />.
+            </summary>
+            <param name="client">Client to enable CommandsNext for.</param>
+            <param name="cfg">CommandsNext configuration to use.</param>
+            <returns>Created <see cref="T:DisCatSharp.CommandsNext.CommandsNextExtension" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.ExtensionMethods.UseCommandsNextAsync(DisCatSharp.DiscordShardedClient,DisCatSharp.CommandsNext.CommandsNextConfiguration)">
+            <summary>
+                Enables CommandsNext module on all shards in this <see cref="T:DisCatSharp.DiscordShardedClient" />.
+            </summary>
+            <param name="client">Client to enable CommandsNext for.</param>
+            <param name="cfg">CommandsNext configuration to use.</param>
+            <returns>A dictionary of created <see cref="T:DisCatSharp.CommandsNext.CommandsNextExtension" />, indexed by shard id.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.ExtensionMethods.GetCommandsNext(DisCatSharp.DiscordClient)">
+            <summary>
+                Gets the active CommandsNext module for this client.
+            </summary>
+            <param name="client">Client to get CommandsNext module from.</param>
+            <returns>The module, or null if not activated.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.ExtensionMethods.GetCommandsNextAsync(DisCatSharp.DiscordShardedClient)">
+            <summary>
+                Gets the active CommandsNext modules for all shards in this client.
+            </summary>
+            <param name="client">Client to get CommandsNext instances from.</param>
+            <returns>A dictionary of the modules, indexed by shard id.</returns>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.ExtensionMethods.RegisterCommands(System.Collections.Generic.IReadOnlyDictionary{System.Int32,DisCatSharp.CommandsNext.CommandsNextExtension},System.Reflection.Assembly)">
+            <summary>
+                Registers all commands from a given assembly. The command classes need to be public to be considered for
+                registration.
+            </summary>
+            <param name="extensions">Extensions to register commands on.</param>
+            <param name="assembly">Assembly to register commands from.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.ExtensionMethods.RegisterCommands``1(System.Collections.Generic.IReadOnlyDictionary{System.Int32,DisCatSharp.CommandsNext.CommandsNextExtension})">
+            <summary>
+                Registers all commands from a given command class.
+            </summary>
+            <typeparam name="T">Class which holds commands to register.</typeparam>
+            <param name="extensions">Extensions to register commands on.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.ExtensionMethods.RegisterCommands(System.Collections.Generic.IReadOnlyDictionary{System.Int32,DisCatSharp.CommandsNext.CommandsNextExtension},System.Type)">
+            <summary>
+                Registers all commands from a given command class.
+            </summary>
+            <param name="extensions">Extensions to register commands on.</param>
+            <param name="t">Type of the class which holds commands to register.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.ExtensionMethods.RegisterCommands(System.Collections.Generic.IReadOnlyDictionary{System.Int32,DisCatSharp.CommandsNext.CommandsNextExtension},DisCatSharp.CommandsNext.Builders.CommandBuilder[])">
+            <summary>
+                Builds and registers all supplied commands.
+            </summary>
+            <param name="extensions">Extensions to register commands on.</param>
+            <param name="cmds">Commands to build and register.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.ExtensionMethods.UnregisterCommands(System.Collections.Generic.IReadOnlyDictionary{System.Int32,DisCatSharp.CommandsNext.CommandsNextExtension},DisCatSharp.CommandsNext.Command[])">
+            <summary>
+                Unregisters specified commands from CommandsNext.
+            </summary>
+            <param name="extensions">Extensions to unregister commands on.</param>
+            <param name="cmds">Commands to unregister.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.ExtensionMethods.RegisterConverter``1(System.Collections.Generic.IReadOnlyDictionary{System.Int32,DisCatSharp.CommandsNext.CommandsNextExtension},DisCatSharp.CommandsNext.Converters.IArgumentConverter{``0})">
+            <summary>
+                Registers an argument converter for specified type.
+            </summary>
+            <typeparam name="T">Type for which to register the converter.</typeparam>
+            <param name="extensions">Extensions to register the converter on.</param>
+            <param name="converter">Converter to register.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.ExtensionMethods.UnregisterConverter``1(System.Collections.Generic.IReadOnlyDictionary{System.Int32,DisCatSharp.CommandsNext.CommandsNextExtension})">
+            <summary>
+                Unregisters an argument converter for specified type.
+            </summary>
+            <typeparam name="T">Type for which to unregister the converter.</typeparam>
+            <param name="extensions">Extensions to unregister the converter on.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.ExtensionMethods.RegisterUserFriendlyTypeName``1(System.Collections.Generic.IReadOnlyDictionary{System.Int32,DisCatSharp.CommandsNext.CommandsNextExtension},System.String)">
+            <summary>
+                Registers a user-friendly type name.
+            </summary>
+            <typeparam name="T">Type to register the name for.</typeparam>
+            <param name="extensions">Extensions to register the name on.</param>
+            <param name="value">Name to register.</param>
+        </member>
+        <member name="M:DisCatSharp.CommandsNext.ExtensionMethods.SetHelpFormatter``1(System.Collections.Generic.IReadOnlyDictionary{System.Int32,DisCatSharp.CommandsNext.CommandsNextExtension})">
+            <summary>
+                Sets the help formatter to use with the default help command.
+            </summary>
+            <typeparam name="T">Type of the formatter to use.</typeparam>
+            <param name="extensions">Extensions to set the help formatter on.</param>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DisCatSharp.Hosting.DependencyInjection</name>
+    </assembly>
+    <members>
+        <member name="T:DisCatSharp.Hosting.DependencyInjection.ServiceCollectionExtensions">
+            <summary>
+                The service collection extensions.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.DependencyInjection.ServiceCollectionExtensions.AddDiscordHostedService``1(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+                Adds your bot as a BackgroundService, registered in Dependency Injection as <typeparamref name="TService" />
+            </summary>
+            <remarks>
+                <see cref="T:DisCatSharp.Hosting.IDiscordHostedService" /> is scoped to ServiceLifetime.Singleton. <br />
+                Maps to Implementation of <typeparamref name="TService" />
+            </remarks>
+            <param name="services"></param>
+            <typeparam name="TService"></typeparam>
+            <returns>Reference to <paramref name="services" /> for chaining purposes</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.DependencyInjection.ServiceCollectionExtensions.AddDiscordHostedShardService``1(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+                Adds your bot as a BackgroundService, registered in Dependency Injection as <typeparamref name="TService" />
+            </summary>
+            <remarks>
+                <see cref="T:DisCatSharp.Hosting.IDiscordHostedShardService" /> is scoped to ServiceLifetime.Singleton. <br />
+                Maps to Implementation of <typeparamref name="TService" />
+            </remarks>
+            <param name="services"></param>
+            <typeparam name="TService"></typeparam>
+            <returns>Reference to <paramref name="services" /> for chaining purposes</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.DependencyInjection.ServiceCollectionExtensions.AddDiscordHostedService``2(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+                Add <typeparamref name="TService" /> as a background service which derives from
+                <typeparamref name="TInterface" /> and <see cref="T:DisCatSharp.Hosting.IDiscordHostedService" />
+            </summary>
+            <remarks>
+                To retrieve your bot via Dependency Injection you can reference it via <typeparamref name="TInterface" />
+            </remarks>
+            <param name="services"></param>
+            <typeparam name="TInterface">Interface which <typeparamref name="TService" /> inherits from</typeparam>
+            <typeparam name="TService">Your custom bot</typeparam>
+            <returns>Reference to <paramref name="services" /> for chaining purposes</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.DependencyInjection.ServiceCollectionExtensions.AddDiscordHostedShardService``2(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+                Add <typeparamref name="TService" /> as a background service which derives from
+                <typeparamref name="TInterface" /> and <see cref="T:DisCatSharp.Hosting.IDiscordHostedShardService" />
+            </summary>
+            <remarks>
+                To retrieve your bot via Dependency Injection you can reference it via <typeparamref name="TInterface" />
+            </remarks>
+            <param name="services"></param>
+            <typeparam name="TInterface">Interface which <typeparamref name="TService" /> inherits from</typeparam>
+            <typeparam name="TService">Your custom bot</typeparam>
+            <returns>Reference to <paramref name="services" /> for chaining purposes</returns>
+        </member>
+    </members>
+</doc>

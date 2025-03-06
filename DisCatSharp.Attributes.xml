@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DisCatSharp.Attributes</name>
+    </assembly>
+    <members>
+        <member name="T:DisCatSharp.Attributes.DeprecatedAttribute">
+            <summary>
+            Marks something as deprecated by DisCatSharp.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Attributes.DeprecatedAttribute.Message">
+            <summary>
+            The additional information message.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Attributes.DiscordDeprecatedAttribute">
+            <summary>
+            Marks something as deprecated by discord.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Attributes.DiscordDeprecatedAttribute.Message">
+            <summary>
+            The additional information message.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Attributes.DiscordInExperimentAttribute">
+            <summary>
+            Marks something as in experiment by discord.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Attributes.DiscordInExperimentAttribute.Message">
+            <summary>
+            The additional information message.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Attributes.DiscordUnreleasedAttribute">
+            <summary>
+            Marks something as unreleased by discord.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Attributes.DiscordUnreleasedAttribute.Message">
+            <summary>
+            The additional information message.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Attributes.ExperimentalAttribute">
+            <summary>
+            Marks something as experimental by DisCatSharp.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Attributes.ExperimentalAttribute.Message">
+            <summary>
+            The additional information message.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Attributes.Features">
+            <summary>
+            Features enum.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Attributes.FeatureDescriptionAttribute">
+            <summary>
+            Defines a readable name for this feature requirement.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Attributes.FeatureDescriptionAttribute.Description">
+            <summary>
+            Gets the readable name for this feature requirement.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Attributes.FeatureDescriptionAttribute.#ctor(System.String)">
+            <summary>
+            Defines a readable name for this feature requirement.
+            </summary>
+            <param name="description">Readable name for this feature requirement.</param>
+        </member>
+        <member name="T:DisCatSharp.Attributes.RequiresFeatureAttribute">
+            <summary>
+            Informs that something requires a certain feature to use it.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Attributes.RequiresFeatureAttribute.Message">
+            <summary>
+            The additional information message.
+            </summary>
+        </member>
+    </members>
+</doc>

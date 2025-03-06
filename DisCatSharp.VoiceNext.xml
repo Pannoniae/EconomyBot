@@ -1,0 +1,2035 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DisCatSharp.VoiceNext</name>
+    </assembly>
+    <members>
+        <member name="T:DisCatSharp.VoiceNext.AudioFormat">
+            <summary>
+                Defines the format of PCM data consumed or produced by Opus.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.AudioFormat.AllowedSampleRates">
+            <summary>
+                Gets the collection of sampling rates (in Hz) the Opus encoder can use.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.AudioFormat.AllowedChannelCounts">
+            <summary>
+                Gets the collection of channel counts the Opus encoder can use.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.AudioFormat.AllowedSampleDurations">
+            <summary>
+                Gets the collection of sample durations (in ms) the Opus encoder can use.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.AudioFormat.Default">
+            <summary>
+                Gets the default audio format. This is a format configured for 48kHz sampling rate, 2 channels, with music quality
+                preset.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.AudioFormat.SampleRate">
+            <summary>
+                Gets the audio sampling rate in Hz.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.AudioFormat.ChannelCount">
+            <summary>
+                Gets the audio channel count.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.AudioFormat.VoiceApplication">
+            <summary>
+                Gets the voice application, which dictates the quality preset.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.AudioFormat.#ctor(System.Int32,System.Int32,DisCatSharp.VoiceNext.VoiceApplication)">
+            <summary>
+                Creates a new audio format for use with Opus encoder.
+            </summary>
+            <param name="sampleRate">Audio sampling rate in Hz.</param>
+            <param name="channelCount">Number of audio channels in the data.</param>
+            <param name="voiceApplication">Encoder preset to use.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.AudioFormat.CalculateSampleSize(System.Int32)">
+            <summary>
+                Calculates a sample size in bytes.
+            </summary>
+            <param name="sampleDuration">Millisecond duration of a sample.</param>
+            <returns>Calculated sample size in bytes.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.AudioFormat.GetMaximumBufferSize">
+            <summary>
+                Gets the maximum buffer size for decoding. This method should be called when decoding Opus data to PCM, to ensure
+                sufficient buffer size.
+            </summary>
+            <returns>Buffer size required to decode data.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.AudioFormat.CalculateSampleDuration(System.Int32)">
+            <summary>
+                Calculates the sample duration.
+            </summary>
+            <param name="sampleSize">The sample size.</param>
+            <returns>An int.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.AudioFormat.CalculateFrameSize(System.Int32)">
+            <summary>
+                Calculates the frame size.
+            </summary>
+            <param name="sampleDuration">The sample duration.</param>
+            <returns>An int.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.AudioFormat.CalculateMaximumFrameSize">
+            <summary>
+                Calculates the maximum frame size.
+            </summary>
+            <returns>An int.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.AudioFormat.SampleCountToSampleSize(System.Int32)">
+            <summary>
+                Samples the count to sample size.
+            </summary>
+            <param name="sampleCount">The sample count.</param>
+            <returns>An int.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.AudioFormat.IsValid">
+            <summary>
+                Are the valid.
+            </summary>
+            <returns>A bool.</returns>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Codec.Helpers">
+            <summary>
+                The helpers.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Helpers.ZeroFill(System.Span{System.Byte})">
+            <summary>
+                Fills the buffer with 0.
+            </summary>
+            <param name="buff">The buffer.</param>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Codec.Interop">
+            <summary>
+                This is an interop class. It contains wrapper methods for Opus and Sodium.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.Codec.Interop.SODIUM_LIBRARY_NAME">
+            <summary>
+                The sodium library name.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Codec.Interop.SodiumKeySize">
+            <summary>
+                Gets the Sodium key size for xsalsa20_poly1305 algorithm.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Codec.Interop.SodiumNonceSize">
+            <summary>
+                Gets the Sodium nonce size for xsalsa20_poly1305 algorithm.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Codec.Interop.SodiumMacSize">
+            <summary>
+                Gets the Sodium MAC size for xsalsa20_poly1305 algorithm.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop._SodiumSecretBoxKeySize">
+            <summary>
+                _S the sodium secret box key size.
+            </summary>
+            <returns>An UIntPtr.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop._SodiumSecretBoxNonceSize">
+            <summary>
+                _S the sodium secret box nonce size.
+            </summary>
+            <returns>An UIntPtr.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop._SodiumSecretBoxMacSize">
+            <summary>
+                _S the sodium secret box mac size.
+            </summary>
+            <returns>An UIntPtr.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop._SodiumSecretBoxCreate(System.Byte*,System.Byte*,System.UInt64,System.Byte*,System.Byte*)">
+            <summary>
+                _S the sodium secret box create.
+            </summary>
+            <param name="buffer">The buffer.</param>
+            <param name="message">The message.</param>
+            <param name="messageLength">The message length.</param>
+            <param name="nonce">The nonce.</param>
+            <param name="key">The key.</param>
+            <returns>An int.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop._SodiumSecretBoxOpen(System.Byte*,System.Byte*,System.UInt64,System.Byte*,System.Byte*)">
+            <summary>
+                _S the sodium secret box open.
+            </summary>
+            <param name="buffer">The buffer.</param>
+            <param name="encryptedMessage">The encrypted message.</param>
+            <param name="encryptedLength">The encrypted length.</param>
+            <param name="nonce">The nonce.</param>
+            <param name="key">The key.</param>
+            <returns>An int.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop.Encrypt(System.ReadOnlySpan{System.Byte},System.Span{System.Byte},System.ReadOnlySpan{System.Byte},System.ReadOnlySpan{System.Byte})">
+            <summary>
+                Encrypts supplied buffer using xsalsa20_poly1305 algorithm, using supplied key and nonce to perform encryption.
+            </summary>
+            <param name="source">Contents to encrypt.</param>
+            <param name="target">Buffer to encrypt to.</param>
+            <param name="key">Key to use for encryption.</param>
+            <param name="nonce">Nonce to use for encryption.</param>
+            <returns>Encryption status.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop.Decrypt(System.ReadOnlySpan{System.Byte},System.Span{System.Byte},System.ReadOnlySpan{System.Byte},System.ReadOnlySpan{System.Byte})">
+            <summary>
+                Decrypts supplied buffer using xsalsa20_poly1305 algorithm, using supplied key and nonce to perform decryption.
+            </summary>
+            <param name="source">Buffer to decrypt from.</param>
+            <param name="target">Decrypted message buffer.</param>
+            <param name="key">Key to use for decryption.</param>
+            <param name="nonce">Nonce to use for decryption.</param>
+            <returns>Decryption status.</returns>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.Codec.Interop.OPUS_LIBRARY_NAME">
+            <summary>
+                The opus library name.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop._OpusCreateEncoder(System.Int32,System.Int32,System.Int32,DisCatSharp.VoiceNext.Codec.OpusError@)">
+            <summary>
+                _S the opus create encoder.
+            </summary>
+            <param name="sampleRate">The sample rate.</param>
+            <param name="channels">The channels.</param>
+            <param name="application">The application.</param>
+            <param name="error">The error.</param>
+            <returns>An IntPtr.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop.OpusDestroyEncoder(System.IntPtr)">
+            <summary>
+                Opuses the destroy encoder.
+            </summary>
+            <param name="encoder">The encoder.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop._OpusEncode(System.IntPtr,System.Byte*,System.Int32,System.Byte*,System.Int32)">
+            <summary>
+                _S the opus encode.
+            </summary>
+            <param name="encoder">The encoder.</param>
+            <param name="pcmData">The pcm data.</param>
+            <param name="frameSize">The frame size.</param>
+            <param name="data">The data.</param>
+            <param name="maxDataBytes">The max data bytes.</param>
+            <returns>An int.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop._OpusEncoderControl(System.IntPtr,DisCatSharp.VoiceNext.Codec.OpusControl,System.Int32)">
+            <summary>
+                _S the opus encoder control.
+            </summary>
+            <param name="encoder">The encoder.</param>
+            <param name="request">The request.</param>
+            <param name="value">The value.</param>
+            <returns>An OpusError.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop._OpusCreateDecoder(System.Int32,System.Int32,DisCatSharp.VoiceNext.Codec.OpusError@)">
+            <summary>
+                _S the opus create decoder.
+            </summary>
+            <param name="sampleRate">The sample rate.</param>
+            <param name="channels">The channels.</param>
+            <param name="error">The error.</param>
+            <returns>An IntPtr.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop.OpusDestroyDecoder(System.IntPtr)">
+            <summary>
+                Opuses the destroy decoder.
+            </summary>
+            <param name="decoder">The decoder.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop._OpusDecode(System.IntPtr,System.Byte*,System.Int32,System.Byte*,System.Int32,System.Int32)">
+            <summary>
+                _S the opus decode.
+            </summary>
+            <param name="decoder">The decoder.</param>
+            <param name="opusData">The opus data.</param>
+            <param name="opusDataLength">The opus data length.</param>
+            <param name="data">The data.</param>
+            <param name="frameSize">The frame size.</param>
+            <param name="decodeFec">The decode fec.</param>
+            <returns>An int.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop._OpusGetPacketChannelCount(System.Byte*)">
+            <summary>
+                _S the opus get packet channel count.
+            </summary>
+            <param name="opusData">The opus data.</param>
+            <returns>An int.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop._OpusGetPacketFrameCount(System.Byte*,System.Int32)">
+            <summary>
+                _S the opus get packet frame count.
+            </summary>
+            <param name="opusData">The opus data.</param>
+            <param name="length">The length.</param>
+            <returns>An int.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop._OpusGetPacketSamplePerFrameCount(System.Byte*,System.Int32)">
+            <summary>
+                _S the opus get packet sample per frame count.
+            </summary>
+            <param name="opusData">The opus data.</param>
+            <param name="samplingRate">The sampling rate.</param>
+            <returns>An int.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop._OpusDecoderControl(System.IntPtr,DisCatSharp.VoiceNext.Codec.OpusControl,System.Int32@)">
+            <summary>
+                _S the opus decoder control.
+            </summary>
+            <param name="decoder">The decoder.</param>
+            <param name="request">The request.</param>
+            <param name="value">The value.</param>
+            <returns>An int.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop.OpusCreateEncoder(DisCatSharp.VoiceNext.AudioFormat)">
+            <summary>
+                Opuses the create encoder.
+            </summary>
+            <param name="audioFormat">The audio format.</param>
+            <returns>An IntPtr.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop.OpusSetEncoderOption(System.IntPtr,DisCatSharp.VoiceNext.Codec.OpusControl,System.Int32)">
+            <summary>
+                Opuses the set encoder option.
+            </summary>
+            <param name="encoder">The encoder.</param>
+            <param name="option">The option.</param>
+            <param name="value">The value.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop.OpusEncode(System.IntPtr,System.ReadOnlySpan{System.Byte},System.Int32,System.Span{System.Byte}@)">
+            <summary>
+                Opuses the encode.
+            </summary>
+            <param name="encoder">The encoder.</param>
+            <param name="pcm">The pcm.</param>
+            <param name="frameSize">The frame size.</param>
+            <param name="opus">The opus.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop.OpusCreateDecoder(DisCatSharp.VoiceNext.AudioFormat)">
+            <summary>
+                Opuses the create decoder.
+            </summary>
+            <param name="audioFormat">The audio format.</param>
+            <returns>An IntPtr.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop.OpusDecode(System.IntPtr,System.ReadOnlySpan{System.Byte},System.Int32,System.Span{System.Byte},System.Boolean)">
+            <summary>
+                Opuses the decode.
+            </summary>
+            <param name="decoder">The decoder.</param>
+            <param name="opus">The opus.</param>
+            <param name="frameSize">The frame size.</param>
+            <param name="pcm">The pcm.</param>
+            <param name="useFec">If true, use fec.</param>
+            <returns>An int.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop.OpusDecode(System.IntPtr,System.Int32,System.Span{System.Byte})">
+            <summary>
+                Opuses the decode.
+            </summary>
+            <param name="decoder">The decoder.</param>
+            <param name="frameSize">The frame size.</param>
+            <param name="pcm">The pcm.</param>
+            <returns>An int.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop.OpusGetPacketMetrics(System.ReadOnlySpan{System.Byte},System.Int32,System.Int32@,System.Int32@,System.Int32@,System.Int32@)">
+            <summary>
+                Opuses the get packet metrics.
+            </summary>
+            <param name="opus">The opus.</param>
+            <param name="samplingRate">The sampling rate.</param>
+            <param name="channels">The channels.</param>
+            <param name="frames">The frames.</param>
+            <param name="samplesPerFrame">The samples per frame.</param>
+            <param name="frameSize">The frame size.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Interop.OpusGetLastPacketDuration(System.IntPtr,System.Int32@)">
+            <summary>
+                Opuses the get last packet duration.
+            </summary>
+            <param name="decoder">The decoder.</param>
+            <param name="sampleCount">The sample count.</param>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Codec.Opus">
+            <summary>
+                The opus.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.Codec.Opus._encoder">
+            <summary>
+                Gets the encoder.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.Codec.Opus._managedDecoders">
+            <summary>
+                Gets the managed decoders.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Opus.#ctor(DisCatSharp.VoiceNext.AudioFormat)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.VoiceNext.Codec.Opus" /> class.
+            </summary>
+            <param name="audioFormat">The audio format.</param>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Codec.Opus.AudioFormat">
+            <summary>
+                Gets the audio format.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Opus.Dispose">
+            <summary>
+                Disposes the Opus.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Opus.Encode(System.ReadOnlySpan{System.Byte},System.Span{System.Byte}@)">
+            <summary>
+                Encodes the Opus.
+            </summary>
+            <param name="pcm">The pcm.</param>
+            <param name="target">The target.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Opus.Decode(DisCatSharp.VoiceNext.Codec.OpusDecoder,System.ReadOnlySpan{System.Byte},System.Span{System.Byte}@,System.Boolean,DisCatSharp.VoiceNext.AudioFormat@)">
+            <summary>
+                Decodes the Opus.
+            </summary>
+            <param name="decoder">The decoder.</param>
+            <param name="opus">The opus.</param>
+            <param name="target">The target.</param>
+            <param name="useFec">If true, use fec.</param>
+            <param name="outputFormat">The output format.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Opus.ProcessPacketLoss(DisCatSharp.VoiceNext.Codec.OpusDecoder,System.Int32,System.Span{System.Byte}@)">
+            <summary>
+                Processes the packet loss.
+            </summary>
+            <param name="decoder">The decoder.</param>
+            <param name="frameSize">The frame size.</param>
+            <param name="target">The target.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Opus.GetLastPacketSampleCount(DisCatSharp.VoiceNext.Codec.OpusDecoder)">
+            <summary>
+                Gets the last packet sample count.
+            </summary>
+            <param name="decoder">The decoder.</param>
+            <returns>An int.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Opus.CreateDecoder">
+            <summary>
+                Creates the decoder.
+            </summary>
+            <returns>An OpusDecoder.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Opus.DestroyDecoder(DisCatSharp.VoiceNext.Codec.OpusDecoder)">
+            <summary>
+                Destroys the decoder.
+            </summary>
+            <param name="decoder">The decoder.</param>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Codec.OpusDecoder">
+            <summary>
+                Represents an Opus decoder.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.Codec.OpusDecoder._isDisposed">
+            <summary>
+                Gets a value indicating whether this <see cref="T:DisCatSharp.VoiceNext.Codec.OpusDecoder" /> is disposed.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.OpusDecoder.#ctor(DisCatSharp.VoiceNext.Codec.Opus)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.VoiceNext.Codec.OpusDecoder" /> class.
+            </summary>
+            <param name="managedOpus">The managed opus.</param>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Codec.OpusDecoder.AudioFormat">
+            <summary>
+                Gets the audio format produced by this decoder.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Codec.OpusDecoder.Opus">
+            <summary>
+                Gets the opus.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Codec.OpusDecoder.Decoder">
+            <summary>
+                Gets the decoder.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.OpusDecoder.Dispose">
+            <summary>
+                Disposes of this Opus decoder.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.OpusDecoder.Initialize(DisCatSharp.VoiceNext.AudioFormat)">
+            <summary>
+                Used to lazily initialize the decoder to make sure we're
+                using the correct output format, this way we don't end up
+                creating more decoders than we need.
+            </summary>
+            <param name="outputFormat"></param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.OpusDecoder.Finalize">
+            <summary>
+                Disposes of this Opus decoder.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Codec.OpusError">
+            <summary>
+                The opus error.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Codec.OpusControl">
+            <summary>
+                The opus control.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Codec.OpusSignal">
+            <summary>
+                The opus signal.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Codec.Rtp">
+            <summary>
+                The rtp.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.Codec.Rtp.HEADER_SIZE">
+            <summary>
+                The header size.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.Codec.Rtp.RTP_NO_EXTENSION">
+            <summary>
+                The rtp no extension.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.Codec.Rtp.RTP_EXTENSION">
+            <summary>
+                The rtp extension.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.Codec.Rtp.RTP_VERSION">
+            <summary>
+                The rtp version.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Rtp.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.VoiceNext.Codec.Rtp" /> class.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Rtp.Dispose">
+            <summary>
+                Disposes the Rtp.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Rtp.EncodeHeader(System.UInt16,System.UInt32,System.UInt32,System.Span{System.Byte})">
+            <summary>
+                Encodes the header.
+            </summary>
+            <param name="sequence">The sequence.</param>
+            <param name="timestamp">The timestamp.</param>
+            <param name="ssrc">The ssrc.</param>
+            <param name="target">The target.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Rtp.IsRtpHeader(System.ReadOnlySpan{System.Byte})">
+            <summary>
+                Are the rtp header.
+            </summary>
+            <param name="source">The source.</param>
+            <returns>A bool.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Rtp.DecodeHeader(System.ReadOnlySpan{System.Byte},System.UInt16@,System.UInt32@,System.UInt32@,System.Boolean@)">
+            <summary>
+                Decodes the header.
+            </summary>
+            <param name="source">The source.</param>
+            <param name="sequence">The sequence.</param>
+            <param name="timestamp">The timestamp.</param>
+            <param name="ssrc">The ssrc.</param>
+            <param name="hasExtension">If true, has extension.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Rtp.CalculatePacketSize(System.Int32,DisCatSharp.VoiceNext.Codec.EncryptionMode)">
+            <summary>
+                Calculates the packet size.
+            </summary>
+            <param name="encryptedLength">The encrypted length.</param>
+            <param name="encryptionMode">The encryption mode.</param>
+            <returns>An int.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Rtp.GetDataFromPacket(System.ReadOnlySpan{System.Byte},System.ReadOnlySpan{System.Byte}@,DisCatSharp.VoiceNext.Codec.EncryptionMode)">
+            <summary>
+                Gets the data from packet.
+            </summary>
+            <param name="packet">The packet.</param>
+            <param name="data">The data.</param>
+            <param name="encryptionMode">The encryption mode.</param>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Codec.Sodium">
+            <summary>
+                The sodium.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.Codec.Sodium._buffer">
+            <summary>
+                Gets the buffer.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.Codec.Sodium._csprng">
+            <summary>
+                Gets the c s p r n g.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.Codec.Sodium._key">
+            <summary>
+                Gets the key.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Sodium.#cctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.VoiceNext.Codec.Sodium" /> class.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Sodium.#ctor(System.ReadOnlyMemory{System.Byte})">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.VoiceNext.Codec.Sodium" /> class.
+            </summary>
+            <param name="key">The key.</param>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Codec.Sodium.SupportedModes">
+            <summary>
+                Gets the supported modes.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Codec.Sodium.NonceSize">
+            <summary>
+                Gets the nonce size.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Sodium.Dispose">
+            <summary>
+                Disposes the Sodium.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Sodium.GenerateNonce(System.ReadOnlySpan{System.Byte},System.Span{System.Byte})">
+            <summary>
+                Generates the nonce.
+            </summary>
+            <param name="rtpHeader">The rtp header.</param>
+            <param name="target">The target.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Sodium.GenerateNonce(System.Span{System.Byte})">
+            <summary>
+                Generates the nonce.
+            </summary>
+            <param name="target">The target.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Sodium.GenerateNonce(System.UInt32,System.Span{System.Byte})">
+            <summary>
+                Generates the nonce.
+            </summary>
+            <param name="nonce">The nonce.</param>
+            <param name="target">The target.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Sodium.AppendNonce(System.ReadOnlySpan{System.Byte},System.Span{System.Byte},DisCatSharp.VoiceNext.Codec.EncryptionMode)">
+            <summary>
+                Appends the nonce.
+            </summary>
+            <param name="nonce">The nonce.</param>
+            <param name="target">The target.</param>
+            <param name="encryptionMode">The encryption mode.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Sodium.GetNonce(System.ReadOnlySpan{System.Byte},System.Span{System.Byte},DisCatSharp.VoiceNext.Codec.EncryptionMode)">
+            <summary>
+                Gets the nonce.
+            </summary>
+            <param name="source">The source.</param>
+            <param name="target">The target.</param>
+            <param name="encryptionMode">The encryption mode.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Sodium.Encrypt(System.ReadOnlySpan{System.Byte},System.Span{System.Byte},System.ReadOnlySpan{System.Byte})">
+            <summary>
+                Encrypts the Sodium.
+            </summary>
+            <param name="source">The source.</param>
+            <param name="target">The target.</param>
+            <param name="nonce">The nonce.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Sodium.Decrypt(System.ReadOnlySpan{System.Byte},System.Span{System.Byte},System.ReadOnlySpan{System.Byte})">
+            <summary>
+                Decrypts the Sodium.
+            </summary>
+            <param name="source">The source.</param>
+            <param name="target">The target.</param>
+            <param name="nonce">The nonce.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Sodium.SelectMode(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+                Selects the mode.
+            </summary>
+            <param name="availableModes">The available modes.</param>
+            <returns>A KeyValuePair.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Sodium.CalculateTargetSize(System.ReadOnlySpan{System.Byte})">
+            <summary>
+                Calculates the target size.
+            </summary>
+            <param name="source">The source.</param>
+            <returns>An int.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Codec.Sodium.CalculateSourceSize(System.ReadOnlySpan{System.Byte})">
+            <summary>
+                Calculates the source size.
+            </summary>
+            <param name="source">The source.</param>
+            <returns>An int.</returns>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Codec.EncryptionMode">
+            <summary>
+                Specifies an encryption mode to use with Sodium.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.Codec.EncryptionMode.XSalsa20Poly1305Lite">
+            <summary>
+                The nonce is an incrementing uint32 value. It is encoded as big endian value at the beginning of the nonce buffer.
+                The 4 bytes are also appended at the end of the packet.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.Codec.EncryptionMode.XSalsa20Poly1305Suffix">
+            <summary>
+                The nonce consists of random bytes. It is appended at the end of a packet.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.Codec.EncryptionMode.XSalsa20Poly1305">
+            <summary>
+                The nonce consists of the RTP header. Nothing is appended to the packet.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Entities.AudioSender">
+            <summary>
+                The audio sender.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Entities.AudioSender.#ctor(System.UInt32,DisCatSharp.VoiceNext.Codec.OpusDecoder)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.VoiceNext.Entities.AudioSender" /> class.
+            </summary>
+            <param name="ssrc">The ssrc.</param>
+            <param name="decoder">The decoder.</param>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.AudioSender.Ssrc">
+            <summary>
+                Gets the s s r c.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.AudioSender.Id">
+            <summary>
+                Gets the id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.AudioSender.Decoder">
+            <summary>
+                Gets the decoder.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.AudioSender.User">
+            <summary>
+                Gets or sets the user.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.AudioSender.LastTrueSequence">
+            <summary>
+                Gets or sets the last sequence.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Entities.AudioSender.Dispose">
+            <summary>
+                Disposes .
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Entities.AudioSender.GetTrueSequenceAfterWrapping(System.UInt16)">
+            <summary>
+                Accepts the 16-bit sequence number from the next RTP header in the associated stream and
+                uses heuristics to (attempt to) convert it into a 64-bit counter that takes into account
+                overflow wrapping around to zero.
+                <para />
+                This method only works properly if it is called for <b>every</b> sequence number that we
+                see in the stream.
+            </summary>
+            <param name="originalSequence">
+                The 16-bit sequence number from the next RTP header.
+            </param>
+            <returns>
+                Our best-effort guess of the value that <paramref name="originalSequence" /> <b>would</b>
+                have been, if the server had given us a 64-bit integer instead of a 16-bit one.
+            </returns>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Entities.VoiceDispatch">
+            <summary>
+                The voice dispatch.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceDispatch.OpCode">
+            <summary>
+                Gets or sets the op code.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceDispatch.Payload">
+            <summary>
+                Gets or sets the payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceDispatch.Sequence">
+            <summary>
+                Gets or sets the sequence.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceDispatch.EventName">
+            <summary>
+                Gets or sets the event name.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Entities.VoiceIdentifyPayload">
+            <summary>
+                The voice identify payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceIdentifyPayload.ServerId">
+            <summary>
+                Gets or sets the server id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceIdentifyPayload.UserId">
+            <summary>
+                Gets or sets the user id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceIdentifyPayload.SessionId">
+            <summary>
+                Gets or sets the session id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceIdentifyPayload.Token">
+            <summary>
+                Gets or sets the token.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoicePacket.Bytes">
+            <summary>
+                Gets the bytes.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoicePacket.MillisecondDuration">
+            <summary>
+                Gets the millisecond duration.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoicePacket.IsSilence">
+            <summary>
+                Gets or sets a value indicating whether is silence.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.Entities.VoicePacket.#ctor(System.ReadOnlyMemory{System.Byte},System.Int32,System.Boolean)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.VoiceNext.Entities.VoicePacket" /> class.
+            </summary>
+            <param name="bytes">The bytes.</param>
+            <param name="msDuration">The ms duration.</param>
+            <param name="isSilence">If true, is silence.</param>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Entities.VoiceReadyPayload">
+            <summary>
+                The voice ready payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceReadyPayload.Ssrc">
+            <summary>
+                Gets or sets the s s r c.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceReadyPayload.Address">
+            <summary>
+                Gets or sets the address.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceReadyPayload.Port">
+            <summary>
+                Gets or sets the port.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceReadyPayload.Modes">
+            <summary>
+                Gets or sets the modes.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceReadyPayload.HeartbeatInterval">
+            <summary>
+                Gets or sets the heartbeat interval.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Entities.VoiceSelectProtocolPayload">
+            <summary>
+                The voice select protocol payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceSelectProtocolPayload.Protocol">
+            <summary>
+                Gets or sets the protocol.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceSelectProtocolPayload.Data">
+            <summary>
+                Gets or sets the data.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Entities.VoiceSelectProtocolPayloadData">
+            <summary>
+                The voice select protocol payload data.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceSelectProtocolPayloadData.Address">
+            <summary>
+                Gets or sets the address.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceSelectProtocolPayloadData.Port">
+            <summary>
+                Gets or sets the port.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceSelectProtocolPayloadData.Mode">
+            <summary>
+                Gets or sets the mode.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Entities.VoiceServerUpdatePayload">
+            <summary>
+                The voice server update payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceServerUpdatePayload.Token">
+            <summary>
+                Gets or sets the token.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceServerUpdatePayload.GuildId">
+            <summary>
+                Gets or sets the guild id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceServerUpdatePayload.Endpoint">
+            <summary>
+                Gets or sets the endpoint.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Entities.VoiceSessionDescriptionPayload">
+            <summary>
+                The voice session description payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceSessionDescriptionPayload.SecretKey">
+            <summary>
+                Gets or sets the secret key.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceSessionDescriptionPayload.Mode">
+            <summary>
+                Gets or sets the mode.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Entities.VoiceSpeakingPayload">
+            <summary>
+                The voice speaking payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceSpeakingPayload.Speaking">
+            <summary>
+                Gets or sets a value indicating whether speaking.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceSpeakingPayload.Delay">
+            <summary>
+                Gets or sets the delay.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceSpeakingPayload.Ssrc">
+            <summary>
+                Gets or sets the s s r c.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceSpeakingPayload.UserId">
+            <summary>
+                Gets or sets the user id.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Entities.VoiceStateUpdatePayload">
+            <summary>
+                The voice state update payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceStateUpdatePayload.GuildId">
+            <summary>
+                Gets or sets the guild id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceStateUpdatePayload.ChannelId">
+            <summary>
+                Gets or sets the channel id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceStateUpdatePayload.UserId">
+            <summary>
+                Gets or sets the user id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceStateUpdatePayload.SessionId">
+            <summary>
+                Gets or sets the session id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceStateUpdatePayload.Deafened">
+            <summary>
+                Gets or sets a value indicating whether deafened.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceStateUpdatePayload.Muted">
+            <summary>
+                Gets or sets a value indicating whether muted.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Entities.VoiceUserJoinPayload">
+            <summary>
+                The voice user join payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceUserJoinPayload.UserId">
+            <summary>
+                Gets the user id.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceUserJoinPayload.Ssrc">
+            <summary>
+                Gets the s s r c.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.Entities.VoiceUserLeavePayload">
+            <summary>
+                The voice user leave payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.Entities.VoiceUserLeavePayload.UserId">
+            <summary>
+                Gets or sets the user id.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.EventArgs.VoiceReceiveEventArgs">
+            <summary>
+                Represents arguments for VoiceReceived events.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.EventArgs.VoiceReceiveEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.VoiceNext.EventArgs.VoiceReceiveEventArgs" /> class.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.EventArgs.VoiceReceiveEventArgs.Ssrc">
+            <summary>
+                Gets the SSRC of the audio source.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.EventArgs.VoiceReceiveEventArgs.User">
+            <summary>
+                Gets the user that sent the audio data.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.EventArgs.VoiceReceiveEventArgs.PcmData">
+            <summary>
+                Gets the received voice data, decoded to PCM format.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.EventArgs.VoiceReceiveEventArgs.OpusData">
+            <summary>
+                Gets the received voice data, in Opus format. Note that for packets that were lost and/or compensated for, this
+                will be empty.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.EventArgs.VoiceReceiveEventArgs.AudioFormat">
+            <summary>
+                Gets the format of the received PCM data.
+                <para>
+                    Important: This isn't always the format set in <see cref="P:DisCatSharp.VoiceNext.VoiceNextConfiguration.AudioFormat" />, and depends
+                    on the audio data received.
+                </para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.EventArgs.VoiceReceiveEventArgs.AudioDuration">
+            <summary>
+                Gets the millisecond duration of the PCM audio sample.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.EventArgs.VoiceUserJoinEventArgs">
+            <summary>
+                Arguments for <see cref="E:DisCatSharp.VoiceNext.VoiceNextConnection.UserJoined" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.EventArgs.VoiceUserJoinEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.VoiceNext.EventArgs.VoiceUserJoinEventArgs" /> class.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.EventArgs.VoiceUserJoinEventArgs.User">
+            <summary>
+                Gets the user who left.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.EventArgs.VoiceUserJoinEventArgs.Ssrc">
+            <summary>
+                Gets the SSRC of the user who joined.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.EventArgs.VoiceUserLeaveEventArgs">
+            <summary>
+                Arguments for <see cref="E:DisCatSharp.VoiceNext.VoiceNextConnection.UserLeft" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.EventArgs.VoiceUserLeaveEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.VoiceNext.EventArgs.VoiceUserLeaveEventArgs" /> class.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.EventArgs.VoiceUserLeaveEventArgs.User">
+            <summary>
+                Gets the user who left.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.EventArgs.VoiceUserLeaveEventArgs.Ssrc">
+            <summary>
+                Gets the SSRC of the user who left.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.ExtensionMethods">
+            <summary>
+                The discord client extensions.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.ExtensionMethods.UseVoiceNext(DisCatSharp.DiscordClient,DisCatSharp.VoiceNext.VoiceNextConfiguration)">
+            <summary>
+                Creates a new VoiceNext client with specified settings.
+            </summary>
+            <param name="client">Discord client to create VoiceNext instance for.</param>
+            <param name="config">Configuration for the VoiceNext client.</param>
+            <returns>VoiceNext client instance.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.ExtensionMethods.UseVoiceNextAsync(DisCatSharp.DiscordShardedClient,DisCatSharp.VoiceNext.VoiceNextConfiguration)">
+            <summary>
+                Creates new VoiceNext clients on all shards in a given sharded client.
+            </summary>
+            <param name="client">Discord sharded client to create VoiceNext instances for.</param>
+            <param name="config">Configuration for the VoiceNext clients.</param>
+            <returns>A dictionary of created VoiceNext clients.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.ExtensionMethods.GetVoiceNext(DisCatSharp.DiscordClient)">
+            <summary>
+                Gets the active instance of VoiceNext client for the DiscordClient.
+            </summary>
+            <param name="client">Discord client to get VoiceNext instance for.</param>
+            <returns>VoiceNext client instance.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.ExtensionMethods.GetVoiceNextAsync(DisCatSharp.DiscordShardedClient)">
+            <summary>
+                Retrieves a <see cref="T:DisCatSharp.VoiceNext.VoiceNextExtension" /> instance for each shard.
+            </summary>
+            <param name="client">The shard client to retrieve <see cref="T:DisCatSharp.VoiceNext.VoiceNextExtension" /> instances from.</param>
+            <returns>A dictionary containing <see cref="T:DisCatSharp.VoiceNext.VoiceNextExtension" /> instances for each shard.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.ExtensionMethods.ConnectAsync(DisCatSharp.Entities.DiscordChannel)">
+            <summary>
+                Connects to this voice channel using VoiceNext.
+            </summary>
+            <param name="channel">Channel to connect to.</param>
+            <returns>If successful, the VoiceNext connection.</returns>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.IVoiceFilter">
+            <summary>
+                Represents a filter for PCM data. PCM data submitted through a <see cref="T:DisCatSharp.VoiceNext.VoiceTransmitSink" /> will be sent
+                through all installed instances of <see cref="T:DisCatSharp.VoiceNext.IVoiceFilter" /> first.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.IVoiceFilter.Transform(System.Span{System.Int16},DisCatSharp.VoiceNext.AudioFormat,System.Int32)">
+            <summary>
+                Transforms the supplied PCM data using this filter.
+            </summary>
+            <param name="pcmData">PCM data to transform. The transformation happens in-place.</param>
+            <param name="pcmFormat">Format of the supplied PCM data.</param>
+            <param name="duration">Millisecond duration of the supplied PCM data.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.RawVoicePacket.#ctor(System.Memory{System.Byte},System.Int32,System.Boolean)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.VoiceNext.RawVoicePacket" /> class.
+            </summary>
+            <param name="bytes">The bytes.</param>
+            <param name="duration">The duration.</param>
+            <param name="silence">If true, silence.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.RawVoicePacket.#ctor(System.Memory{System.Byte},System.Int32,System.Boolean,System.Byte[])">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.VoiceNext.RawVoicePacket" /> class.
+            </summary>
+            <param name="bytes">The bytes.</param>
+            <param name="duration">The duration.</param>
+            <param name="silence">If true, silence.</param>
+            <param name="rentedBuffer">The rented buffer.</param>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.StreamExtensions">
+            <summary>
+                The stream extensions.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.StreamExtensions.CopyToAsync(System.IO.Stream,DisCatSharp.VoiceNext.VoiceTransmitSink,System.Nullable{System.Int32},System.Threading.CancellationToken)">
+            <summary>
+                Asynchronously reads the bytes from the current stream and writes them to the specified
+                <see cref="T:DisCatSharp.VoiceNext.VoiceTransmitSink" />.
+            </summary>
+            <param name="source">The source <see cref="T:System.IO.Stream" /></param>
+            <param name="destination">The target <see cref="T:DisCatSharp.VoiceNext.VoiceTransmitSink" /></param>
+            <param name="bufferSize">
+                The size, in bytes, of the buffer. This value must be greater than zero. If
+                <see langword="null" />, defaults to the packet size specified by <paramref name="destination" />.
+            </param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns></returns>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.VoiceApplication">
+            <summary>
+                Represents encoder settings preset for Opus.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceApplication.Voice">
+            <summary>
+                Defines that the encoder must optimize settings for voice data.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceApplication.Music">
+            <summary>
+                Defines that the encoder must optimize settings for music data.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceApplication.LowLatency">
+            <summary>
+                Defines that the encoder must optimize settings for low latency applications.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.VoiceNextConfiguration">
+            <summary>
+                VoiceNext client configuration.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConfiguration.#ctor">
+            <summary>
+                Creates a new instance of <see cref="T:DisCatSharp.VoiceNext.VoiceNextConfiguration" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConfiguration.#ctor(DisCatSharp.VoiceNext.VoiceNextConfiguration)">
+            <summary>
+                Creates a new instance of <see cref="T:DisCatSharp.VoiceNext.VoiceNextConfiguration" />, copying the properties of another configuration.
+            </summary>
+            <param name="other">Configuration the properties of which are to be copied.</param>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextConfiguration.AudioFormat">
+            <summary>
+                <para>Sets the audio format for Opus. This will determine the quality of the audio output.</para>
+                <para>Defaults to <see cref="P:DisCatSharp.VoiceNext.AudioFormat.Default" />.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextConfiguration.EnableIncoming">
+            <summary>
+                <para>Sets whether incoming voice receiver should be enabled.</para>
+                <para>Defaults to false.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextConfiguration.PacketQueueSize">
+            <summary>
+                <para>Sets the size of the packet queue.</para>
+                <para>Defaults to 25 or ~500ms.</para>
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.VoiceNextConnection">
+            <summary>
+                VoiceNext connection to a voice channel.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._configuration">
+            <summary>
+                Gets the configuration.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._discord">
+            <summary>
+                Gets the discord.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._guild">
+            <summary>
+                Gets the guild.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._keepaliveTimestamps">
+            <summary>
+                Gets the keepalive timestamps.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._pauseEvent">
+            <summary>
+                Gets the pause event.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._readyWait">
+            <summary>
+                Gets or sets the ready wait.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._transmitChannel">
+            <summary>
+                Gets the transmit channel.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._transmittingSsrCs">
+            <summary>
+                Gets the transmitting s s r cs.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._udpClient">
+            <summary>
+                Gets the udp client.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._discoveredEndpoint">
+            <summary>
+                Gets or sets the discovered endpoint.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._heartbeatInterval">
+            <summary>
+                Gets or sets the heartbeat interval.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._heartbeatTask">
+            <summary>
+                Gets or sets the heartbeat task.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._isDisposed">
+            <summary>
+                Gets or sets a value indicating whether is disposed.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._isInitialized">
+            <summary>
+                Gets or sets a value indicating whether is initialized.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._keepaliveTask">
+            <summary>
+                Gets or sets the keepalive task.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._keepaliveTokenSource">
+            <summary>
+                Gets or sets the keepalive token source.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._key">
+            <summary>
+                Gets or sets the key.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._lastHeartbeat">
+            <summary>
+                Gets or sets the last heartbeat.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._lastKeepalive">
+            <summary>
+                Gets the last keepalive.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._nonce">
+            <summary>
+                Gets or sets the nonce.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._opus">
+            <summary>
+                Gets or sets the opus.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._playingWait">
+            <summary>
+                Gets or sets the playing wait.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._queueCount">
+            <summary>
+                Gets the queue count.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._receiverTask">
+            <summary>
+                Gets or sets the receiver task.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._receiverTokenSource">
+            <summary>
+                Gets or sets the receiver token source.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._rtp">
+            <summary>
+                Gets or sets the rtp.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._selectedEncryptionMode">
+            <summary>
+                Gets or sets the selected encryption mode.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._senderTask">
+            <summary>
+                Gets or sets the sender task.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._senderTokenSource">
+            <summary>
+                Gets or sets the sender token source.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._sequence">
+            <summary>
+                Gets or sets the sequence.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._sodium">
+            <summary>
+                Gets or sets the sodium.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._speakingFlags">
+            <summary>
+                Saves the last speaking flag
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._ssrc">
+            <summary>
+                Gets or sets the s s r c.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._timestamp">
+            <summary>
+                Gets or sets the timestamp.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._tokenSource">
+            <summary>
+                Gets or sets the token source.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._transmitStream">
+            <summary>
+                Gets or sets the transmit stream.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._udpPing">
+            <summary>
+                Gets the ping.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextConnection._voiceWs">
+            <summary>
+                Gets or sets the voice ws.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.#ctor(DisCatSharp.DiscordClient,DisCatSharp.Entities.DiscordGuild,DisCatSharp.Entities.DiscordChannel,DisCatSharp.VoiceNext.VoiceNextConfiguration,DisCatSharp.VoiceNext.Entities.VoiceServerUpdatePayload,DisCatSharp.VoiceNext.Entities.VoiceStateUpdatePayload)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.VoiceNext.VoiceNextConnection" /> class.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="guild">The guild.</param>
+            <param name="channel">The channel.</param>
+            <param name="config">The config.</param>
+            <param name="server">The server.</param>
+            <param name="state">The state.</param>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextConnection.s_unixEpoch">
+            <summary>
+                Gets the unix epoch.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextConnection.TOKEN">
+            <summary>
+                Gets the token.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextConnection.ServerData">
+            <summary>
+                Gets or sets the server data.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextConnection.StateData">
+            <summary>
+                Gets or sets the state data.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextConnection.Resume">
+            <summary>
+                Gets or sets a value indicating whether resume.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextConnection.WebSocketEndpoint">
+            <summary>
+                Gets or sets the web socket endpoint.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextConnection.UdpEndpoint">
+            <summary>
+                Gets or sets the udp endpoint.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextConnection.SENDER_TOKEN">
+            <summary>
+                Gets the sender token.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextConnection.RECEIVER_TOKEN">
+            <summary>
+                Gets the receiver token.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextConnection.KEEPALIVE_TOKEN">
+            <summary>
+                Gets the keepalive token.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextConnection.AudioFormat">
+            <summary>
+                Gets the audio format used by the Opus encoder.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextConnection.IsPlaying">
+            <summary>
+                Gets whether this connection is still playing audio.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextConnection.WebSocketPing">
+            <summary>
+                Gets the websocket round-trip time in ms.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextConnection.UdpPing">
+            <summary>
+                Gets the UDP round-trip time in ms.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextConnection.TargetChannel">
+            <summary>
+                Gets the channel this voice client is connected to.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.Dispose">
+            <summary>
+                Disconnects and disposes this voice connection.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.VoiceNext.VoiceNextConnection.UserSpeaking">
+            <summary>
+                Triggered whenever a user speaks in the connected voice channel.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.VoiceNext.VoiceNextConnection.UserJoined">
+            <summary>
+                Triggered whenever a user joins voice in the connected guild.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.VoiceNext.VoiceNextConnection.UserLeft">
+            <summary>
+                Triggered whenever a user leaves voice in the connected guild.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.VoiceNext.VoiceNextConnection.VoiceReceived">
+            <summary>
+                Triggered whenever voice data is received from the connected voice channel.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.VoiceNext.VoiceNextConnection.VoiceSocketErrored">
+            <summary>
+                Triggered whenever voice WebSocket throws an exception.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.ConnectAsync">
+            <summary>
+                Connects to the specified voice channel.
+            </summary>
+            <returns>A task representing the connection operation.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.ReconnectAsync">
+            <summary>
+                Reconnects .
+            </summary>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.StartAsync">
+            <summary>
+                Starts .
+            </summary>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.WaitForReadyAsync">
+            <summary>
+                Waits the for ready async.
+            </summary>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.EnqueuePacketAsync(DisCatSharp.VoiceNext.RawVoicePacket,System.Threading.CancellationToken)">
+            <summary>
+                Enqueues the packet async.
+            </summary>
+            <param name="packet">The packet.</param>
+            <param name="token">The token.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.PreparePacket(System.ReadOnlySpan{System.Byte},System.Byte[]@,System.Int32@)">
+            <summary>
+                Prepares the packet.
+            </summary>
+            <param name="pcm">The pcm.</param>
+            <param name="target">The target.</param>
+            <param name="length">The length.</param>
+            <returns>A bool.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.VoiceSenderTask">
+            <summary>
+                Voices the sender task.
+            </summary>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.ProcessPacket(System.ReadOnlySpan{System.Byte},System.Memory{System.Byte}@,System.Memory{System.Byte}@,System.Collections.Generic.List{System.ReadOnlyMemory{System.Byte}},DisCatSharp.VoiceNext.Entities.AudioSender@,DisCatSharp.VoiceNext.AudioFormat@)">
+            <summary>
+                Processes the packet.
+            </summary>
+            <param name="data">The data.</param>
+            <param name="opus">The opus.</param>
+            <param name="pcm">The pcm.</param>
+            <param name="pcmPackets">The pcm packets.</param>
+            <param name="voiceSender">The voice sender.</param>
+            <param name="outputFormat">The output format.</param>
+            <returns>A bool.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.ProcessVoicePacket(System.Byte[])">
+            <summary>
+                Processes the voice packet.
+            </summary>
+            <param name="data">The data.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.ProcessKeepalive(System.Byte[])">
+            <summary>
+                Processes the keepalive.
+            </summary>
+            <param name="data">The data.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.UdpReceiverTask">
+            <summary>
+                Udps the receiver task.
+            </summary>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.SendSpeakingAsync(DisCatSharp.Enums.SpeakingFlags)">
+            <summary>
+                Sends a speaking status to the connected voice channel.
+            </summary>
+            <param name="flags">Set the speaking flags.</param>
+            <returns>A task representing the sending operation.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.GetTransmitSink(System.Int32)">
+            <summary>
+                Gets a transmit stream for this connection, optionally specifying a packet size to use with the stream. If a stream
+                is already configured, it will return the existing one.
+            </summary>
+            <param name="sampleDuration">Duration, in ms, to use for audio packets.</param>
+            <returns>Transmit stream.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.WaitForPlaybackFinishAsync">
+            <summary>
+                Asynchronously waits for playback to be finished. Playback is finished when speaking = false is signaled.
+            </summary>
+            <returns>A task representing the waiting operation.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.Pause">
+            <summary>
+                Pauses playback.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.ResumeAsync">
+            <summary>
+                Asynchronously resumes playback.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.Disconnect">
+            <summary>
+                Disconnects and disposes this voice connection.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.HeartbeatAsync">
+            <summary>
+                Heartbeats .
+            </summary>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.KeepaliveAsync">
+            <summary>
+                Keepalives .
+            </summary>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.Stage1(DisCatSharp.VoiceNext.Entities.VoiceReadyPayload)">
+            <summary>
+                Stage1S .
+            </summary>
+            <param name="voiceReady">The voice ready.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.Stage2(DisCatSharp.VoiceNext.Entities.VoiceSessionDescriptionPayload)">
+            <summary>
+                Stage2S .
+            </summary>
+            <param name="voiceSessionDescription">The voice session description.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.HandleDispatch(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+                Handles the dispatch.
+            </summary>
+            <param name="jo">The jo.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.VoiceWS_SocketClosed(DisCatSharp.Net.WebSocket.IWebSocketClient,DisCatSharp.EventArgs.SocketCloseEventArgs)">
+            <summary>
+                Voices the w s_ socket closed.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="e">The e.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.VoiceWS_SocketMessage(DisCatSharp.Net.WebSocket.IWebSocketClient,DisCatSharp.EventArgs.SocketMessageEventArgs)">
+            <summary>
+                Voices the w s_ socket message.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="e">The e.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.VoiceWS_SocketOpened(DisCatSharp.Net.WebSocket.IWebSocketClient,DisCatSharp.EventArgs.SocketEventArgs)">
+            <summary>
+                Voices the w s_ socket opened.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="e">The e.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.VoiceWs_SocketException(DisCatSharp.Net.WebSocket.IWebSocketClient,DisCatSharp.EventArgs.SocketErrorEventArgs)">
+            <summary>
+                Voices the ws_ socket exception.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="e">The e.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.WsSendAsync(System.String)">
+            <summary>
+                Ws the send async.
+            </summary>
+            <param name="payload">The payload.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextConnection.UnixTimestamp(System.DateTime)">
+            <summary>
+                Gets the unix timestamp.
+            </summary>
+            <param name="dt">The datetime.</param>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.VoiceNextEvents">
+            <summary>
+                Contains well-defined event IDs used by the VoiceNext extension.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextEvents.Misc">
+            <summary>
+                Miscellaneous events, that do not fit in any other category.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextEvents.VoiceHeartbeat">
+            <summary>
+                Events pertaining to Voice Gateway connection lifespan, specifically, heartbeats.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextEvents.VoiceHandshake">
+            <summary>
+                Events pertaining to Voice Gateway connection early lifespan, specifically, the establishing thereof as well as
+                negotiating various modes.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextEvents.VoiceReceiveFailure">
+            <summary>
+                Events emitted when incoming voice data is corrupted, or packets are being dropped.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextEvents.VoiceKeepalive">
+            <summary>
+                Events pertaining to UDP connection lifespan, specifically the keepalive (or heartbeats).
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextEvents.VoiceDispatch">
+            <summary>
+                Events emitted for high-level dispatch receive events.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextEvents.VoiceConnectionClose">
+            <summary>
+                Events emitted for Voice Gateway connection closes, clean or otherwise.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextEvents.VoiceGatewayError">
+            <summary>
+                Events emitted when decoding data received via Voice Gateway fails for any reason.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextEvents.VoiceWsRx">
+            <summary>
+                Events containing raw (but decompressed) payloads, received from Discord Voice Gateway.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextEvents.VoiceWsTx">
+            <summary>
+                Events containing raw payloads, as they're being sent to Discord Voice Gateway.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.VoiceNextExtension">
+            <summary>
+                Represents VoiceNext extension, which acts as Discord voice client.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextExtension._activeConnections">
+            <summary>
+                Gets or sets the active connections.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextExtension._configuration">
+            <summary>
+                Gets or sets the configuration.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextExtension._voiceServerUpdates">
+            <summary>
+                Gets or sets the voice server updates.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceNextExtension._voiceStateUpdates">
+            <summary>
+                Gets or sets the voice state updates.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextExtension.#ctor(DisCatSharp.VoiceNext.VoiceNextConfiguration)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.VoiceNext.VoiceNextExtension" /> class.
+            </summary>
+            <param name="config">The config.</param>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceNextExtension.IsIncomingEnabled">
+            <summary>
+                Gets whether this connection has incoming voice enabled.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextExtension.Setup(DisCatSharp.DiscordClient)">
+            <summary>
+                DO NOT USE THIS MANUALLY.
+            </summary>
+            <param name="client">DO NOT USE THIS MANUALLY.</param>
+            <exception cref="T:System.InvalidOperationException" />
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextExtension.ConnectAsync(DisCatSharp.Entities.DiscordChannel)">
+            <summary>
+                Create a VoiceNext connection for the specified channel.
+            </summary>
+            <param name="channel">Channel to connect to.</param>
+            <returns>VoiceNext connection for this channel.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextExtension.GetConnection(DisCatSharp.Entities.DiscordGuild)">
+            <summary>
+                Gets a VoiceNext connection for specified guild.
+            </summary>
+            <param name="guild">Guild to get VoiceNext connection for.</param>
+            <returns>VoiceNext connection for the specified guild.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextExtension.Vnc_VoiceDisconnected(DisCatSharp.Entities.DiscordGuild)">
+            <summary>
+                Vnc_S the voice disconnected.
+            </summary>
+            <param name="guild">The guild.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextExtension.Client_VoiceStateUpdate(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.VoiceStateUpdateEventArgs)">
+            <summary>
+                Client_S the voice state update.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="e">The e.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceNextExtension.Client_VoiceServerUpdate(DisCatSharp.DiscordClient,DisCatSharp.EventArgs.VoiceServerUpdateEventArgs)">
+            <summary>
+                Client_S the voice server update.
+            </summary>
+            <param name="client">The client.</param>
+            <param name="e">The e.</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="T:DisCatSharp.VoiceNext.VoiceTransmitSink">
+            <summary>
+                Sink used to transmit audio data via <see cref="T:DisCatSharp.VoiceNext.VoiceNextConnection" />.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceTransmitSink._connection">
+            <summary>
+                Gets the connection.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceTransmitSink._filters">
+            <summary>
+                Gets the filters.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceTransmitSink._pcmBuffer">
+            <summary>
+                Gets the pcm buffer.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceTransmitSink._pcmMemory">
+            <summary>
+                Gets the pcm memory.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceTransmitSink._writeSemaphore">
+            <summary>
+                Gets the write semaphore.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.VoiceNext.VoiceTransmitSink._pcmBufferLength">
+            <summary>
+                Gets or sets the pcm buffer length.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceTransmitSink.#ctor(DisCatSharp.VoiceNext.VoiceNextConnection,System.Int32)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.VoiceNext.VoiceTransmitSink" /> class.
+            </summary>
+            <param name="vnc">The vnc.</param>
+            <param name="pcmBufferDuration">The pcm buffer duration.</param>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceTransmitSink.SampleDuration">
+            <summary>
+                Gets the PCM sample duration for this sink.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceTransmitSink.SampleLength">
+            <summary>
+                Gets the length of the PCM buffer for this sink.
+                Written packets should adhere to this size, but the sink will adapt to fit.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.VoiceNext.VoiceTransmitSink.VolumeModifier">
+            <summary>
+                Gets or sets the volume modifier for this sink. Changing this will alter the volume of the output. 1.0 is 100%.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceTransmitSink.Dispose">
+            <summary>
+                Disposes .
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceTransmitSink.WriteAsync(System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <summary>
+                Writes PCM data to the sink. The data is prepared for transmission, and enqueued.
+            </summary>
+            <param name="buffer">PCM data buffer to send.</param>
+            <param name="offset">Start of the data in the buffer.</param>
+            <param name="count">Number of bytes from the buffer.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceTransmitSink.WriteAsync(System.ReadOnlyMemory{System.Byte},System.Threading.CancellationToken)">
+            <summary>
+                Writes PCM data to the sink. The data is prepared for transmission, and enqueued.
+            </summary>
+            <param name="buffer">PCM data buffer to send.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceTransmitSink.FlushAsync(System.Threading.CancellationToken)">
+            <summary>
+                Flushes the rest of the PCM data in this buffer to VoiceNext packet queue.
+            </summary>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceTransmitSink.Pause">
+            <summary>
+                Pauses playback.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceTransmitSink.ResumeAsync">
+            <summary>
+                Resumes playback.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceTransmitSink.GetInstalledFilters">
+            <summary>
+                Gets the collection of installed PCM filters, in order of their execution.
+            </summary>
+            <returns>Installed PCM filters, in order of execution.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceTransmitSink.InstallFilter(DisCatSharp.VoiceNext.IVoiceFilter,System.Int32)">
+            <summary>
+                Installs a new PCM filter, with specified execution order.
+            </summary>
+            <param name="filter">Filter to install.</param>
+            <param name="order">Order of the new filter. This determines where the filter will be inserted in the filter pipeline.</param>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceTransmitSink.UninstallFilter(DisCatSharp.VoiceNext.IVoiceFilter)">
+            <summary>
+                Uninstalls an installed PCM filter.
+            </summary>
+            <param name="filter">Filter to uninstall.</param>
+            <returns>Whether the filter was uninstalled.</returns>
+        </member>
+        <member name="M:DisCatSharp.VoiceNext.VoiceTransmitSink.ApplyFiltersSync(System.Memory{System.Byte})">
+            <summary>
+                Applies the filters sync.
+            </summary>
+            <param name="pcmSpan">The pcm span.</param>
+        </member>
+    </members>
+</doc>
