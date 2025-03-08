@@ -128,8 +128,13 @@ public class Program {
         discord.GetCommandsNext().UnregisterConverter<TimeSpan>();
         discord.GetCommandsNext().RegisterConverter(new CustomTimeSpanConverter());
         #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        discord.ClientErrored += async (sender, e) => logger.error(e.Exception);
-        discord.SocketErrored += async (sender, e) => logger.error(e.Exception);
+        discord.ClientErrored += async (sender, e) => {
+            logger.error($"An error occurred while connecting to Discord with type {e.EventName}");
+            logger.error(e.Exception);
+        };
+        discord.SocketErrored += async (sender, e) => {
+            logger.error(e.Exception);
+        };
         #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         await discord.ConnectAsync();
         MemoryUtils.cleanGC();

@@ -33,15 +33,23 @@ plugins:
     allowSearch: true # Whether "ytsearch:" and "ytmsearch:" can be used.
     allowDirectVideoIds: true # Whether just video IDs can match. If false, only complete URLs will be loaded.
     allowDirectPlaylistIds: true # Whether just playlist IDs can match. If false, only complete URLs will be loaded.
+    oauth:
+      # setting "enabled: true" is the bare minimum to get OAuth working.
+      enabled: true
+      refreshToken: "1//030t3hws1VQx6CgYIARAAGAMSNwF-L9IrBBCYHVTiT8RR_2l7FtUjVDysRGWci8ssJBvcj3NeWWRvhYgQItFEyhk6YDJ4EDmtQco"
     # The clients to use for track loading. See below for a list of valid clients.
     # Clients are queried in the order they are given (left-to-right)
     clients:
-      - WEB
       - MUSIC
+      - ANDROID_VR
+      - WEB
       - MWEB
       - ANDROID_MUSIC
+      - IOS
+      - TV
       - WEBEMBEDDED
-      - ANDROID_VR
+      - TVHTML5EMBEDDED
+
 
 metrics:
   prometheus:

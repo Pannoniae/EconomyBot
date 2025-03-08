@@ -300,14 +300,14 @@ public class MusicModule : BaseCommandModule {
         await common.respond(ctx, "Stopped jazz.");
     }
 
-    [Command("play"), Description("Plays supplied URL or searches for specified keywords."), Aliases("p"), Priority(1)]
+    [Command("play"), Description("Plays supplied URL or searches for specified keywords."), Aliases("p"), Priority(0)]
     public async Task PlayAsync(CommandContext ctx,
         [Description("URL to play from.")] Uri uri) {
         var trackLoad = await Music.GetTracksAsync(uri);
         var result = trackLoad.Result;
         List<LavalinkTrack> tracks = [];
         if (trackLoad.LoadType == LavalinkLoadResultType.Error) {
-            await common.respond(ctx, "No tracks were found at specified link.");
+            await common.respond(ctx, $"No tracks were found at specified link. {((LavalinkException)trackLoad.Result).Cause}: {((LavalinkException)trackLoad.Result).Message}");
             return;
         }
 
@@ -455,13 +455,18 @@ public class MusicModule : BaseCommandModule {
         await common.modify(ctx, msg, $"Added {track.ToLimitedTrackString()} to the playback queue.");
     }
 
-    [Command("play"), Priority(0)]
+    [Command("play"), Priority(1)]
     public async Task PlayAsync(CommandContext ctx,
         [RemainingText, Description("Terms to search for.")]
         string term) {
         var r = await Music.SearchTracksAsync(term);
+        if (r.LoadType == LavalinkLoadResultType.Error) {
+            await common.respond(ctx, $"No tracks were found at specified link.  {((LavalinkException)r.Result).Cause}: {((LavalinkException)r.Result).Message}");
+            return;
+        }
+
         if (r.LoadType != LavalinkLoadResultType.Search) {
-            await common.respond(ctx, "No tracks were found at specified link.");
+            await common.respond(ctx, $"No tracks were found. (this is {r.LoadType}!)");
             return;
         }
 
