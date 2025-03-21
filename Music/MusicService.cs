@@ -4,7 +4,6 @@ using DisCatSharp.Entities;
 using DisCatSharp.Lavalink;
 using DisCatSharp.Lavalink.Entities;
 using DisCatSharp.Lavalink.Enums;
-using DisCatSharp.Lavalink.EventArgs;
 using Soulseek;
 using Spectre.Console;
 using File = Soulseek.File;
@@ -48,11 +47,9 @@ public sealed class MusicService {
         node.WebsocketClosed += async (sender, args) => {
             await Console.Out.WriteLineAsync($"Lavalink websocket closed: (by Discord: {args.ByRemote}), code: {args.CloseCode}\nmessage: {args.CloseMessage}");
         };
-        node.StatsReceived += playbackStarted;
-
-        async Task playbackStarted(LavalinkSession sender, LavalinkStatsReceivedEventArgs e) {
-            await Console.Out.WriteLineAsync($"len/nodes: {e.Statistics.Players}");
-        }
+        node.StatsReceived += async (sender, args) => {
+            await Console.Out.WriteLineAsync($"len/nodes: {args.Statistics.Players}");
+        };
     }
 
 
@@ -89,7 +86,7 @@ public sealed class MusicService {
         foreach (var r in result.Responses) {
                 foreach (var f in r.Files) {
                     results.Add(new SLSKResult(r, f));
-                }
+            }
         }
 
         return results.Take(50).ToList();

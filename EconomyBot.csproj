@@ -55,7 +55,7 @@
     <ItemGroup>
         <PackageReference Include="ConcurrentHashSet" Version="1.3.0"/>
         <PackageReference Include="BooruSharp" Version="4.0.0-beta"/>
-        <PackageReference Include="DetectLanguage" Version="1.0.0-beta"/>
+        <PackageReference Include="DetectLanguage" Version="1.0.0"/>
         <PackageReference Include="FuzzierSharp" Version="3.0.1" />
         <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1" />
         <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.0-preview.1.25080.5" />

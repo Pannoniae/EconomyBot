@@ -125,6 +125,8 @@ public class Program {
         discord.Ready += async (sender, _) => await setup(sender, lavalink, lavalinkConfig);
         //discord.GuildDownloadCompleted += (sender, _) => setupB(sender, lavalink, lavalinkConfig);
         discord.MessageDeleted += messageDeleteHandler;
+        discord.GuildMemberAdded += roleHandler;
+
         discord.GetCommandsNext().UnregisterConverter<TimeSpan>();
         discord.GetCommandsNext().RegisterConverter(new CustomTimeSpanConverter());
         #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -157,6 +159,12 @@ public class Program {
 
         // hold console window
         await Task.Delay(-1);
+    }
+
+    private static async Task roleHandler(DiscordClient sender, GuildMemberAddEventArgs e) {
+        const ulong roleID = 1352463350533197989u;
+        var role = await e.Guild.GetRoleAsync(roleID);
+        await e.Member.GrantRoleAsync(role);
     }
 
     private static async Task messageDeleteHandler(DiscordClient sender, MessageBulkDeleteEventArgs e) {

@@ -69,5 +69,6 @@ logging:
   path: ./logs/
 
   level:
-    root: INFO
-    lavalink: INFO
+    root: DEBUG
+    lavalink: DEBUG
+    com.sedmelluq.discord.lavaplayer.tools.ExceptionTools: DEBUG

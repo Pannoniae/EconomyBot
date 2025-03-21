@@ -62,6 +62,26 @@ public class ChatModule : BaseCommandModule {
         await ctx.RespondAsync($"Deleted {amt} messages!");
     }
 
+    /// <summary>
+    /// ALL users of the server
+    /// </summary>
+    [Command]
+    public async Task role(CommandContext ctx, DiscordRole role) {
+        var members = await ctx.Guild!.GetAllMembersAsync();
+        foreach (var member in members) {
+            await member.GrantRoleAsync(role);
+        }
+        await ctx.RespondAsync($"{members.Count}");
+    }
+
+    [Command]
+    public async Task get(CommandContext ctx, DiscordRole role) {
+        var totalMembers = (await ctx.Guild!.GetAllMembersAsync()).ToList();
+        var members = totalMembers.Where(member => member.Roles.Contains(role)).ToList();
+
+        await ctx.RespondAsync($"{members.Count} / {totalMembers.Count}");
+    }
+
     [Command]
     public async Task test2(CommandContext ctx) {
         await ChatHandler.test2(ctx.Guild!);
