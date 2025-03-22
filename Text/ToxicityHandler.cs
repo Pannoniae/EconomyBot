@@ -13,12 +13,14 @@ public class ToxicityHandler {
     private static readonly HttpClient httpClient = new();
 
     private const int globalCd = 15;
+    private const int personCd = 10;
     private const int categoryCd = 30;
     private const int msgCd = 45;
 
     private DateTime? globalCooldown = new();
     private readonly Dictionary<string, DateTime?> categoryCooldowns = new();
     private readonly Dictionary<string, DateTime?> msgCooldowns = new();
+    private readonly Dictionary<ulong, DateTime?> memberCooldowns = new();
 
     private static readonly Logger logger = Logger.getClassLogger("ToxicityHandler");
 
@@ -32,7 +34,12 @@ public class ToxicityHandler {
         var now = DateTime.Now;
 
         // check global cooldown
-        if (checkGlobalCooldown(now)) {
+        //if (checkGlobalCooldown(now)) {
+        //    return;
+        //}
+
+        // check user cooldown
+        if (user is DiscordMember member && checkPersonCooldown(now, member)) {
             return;
         }
 
@@ -87,7 +94,7 @@ public class ToxicityHandler {
         }
 
         // don't say "cute" to every bloody sexual reference ever
-        if (ActualFuzz.partialFuzz(new[] { "sex", "penis", "vagina", "cunt" }, content) > 90) {
+        if (ActualFuzz.partialFuzz(["sex", "penis", "vagina", "cunt"], content) > 90) {
             values.sexualScore -= 0.25;
         }
 
@@ -114,6 +121,17 @@ public class ToxicityHandler {
         globalCooldown = now;
         return false;
     }
+
+    public bool checkPersonCooldown(DateTime now, DiscordMember member) {
+        var cooldown = memberCooldowns.GetValueOrDefault(member.Id);
+        if (cooldown != null && now - cooldown < TimeSpan.FromSeconds(personCd)) {
+            logger.info($"Hit {member.Id} member cooldown ({now - globalCooldown})");
+            memberCooldowns[member.Id] = now;
+            return true;
+        }
+        memberCooldowns[member.Id] = now;
+        return false;
+    }
     
     public bool checkCategoryCooldown(DateTime now, string category) {
         var cooldown = categoryCooldowns.GetValueOrDefault(category);
@@ -127,6 +145,7 @@ public class ToxicityHandler {
     }
     
     public bool checkMsgCooldown(DateTime now, string msg) {
+        return false; // we don't need this temporarily
         var cooldown = msgCooldowns.GetValueOrDefault(msg);
         if (cooldown != null && now - cooldown < TimeSpan.FromSeconds(msgCd)) {
             logger.info($"Hit {msg} msg cooldown ({now - globalCooldown})");
