@@ -66,6 +66,7 @@ public class ChatModule : BaseCommandModule {
     /// ALL users of the server
     /// </summary>
     [Command]
+    [RequirePermissions(Permissions.Administrator)]
     public async Task role(CommandContext ctx, DiscordRole role) {
         var members = await ctx.Guild!.GetAllMembersAsync();
         foreach (var member in members) {
@@ -83,6 +84,7 @@ public class ChatModule : BaseCommandModule {
     }
 
     [Command]
+    [RequirePermissions(Permissions.ManageMessages)]
     public async Task test2(CommandContext ctx) {
         await ChatHandler.test2(ctx.Guild!);
     }
@@ -106,6 +108,7 @@ public class ChatModule : BaseCommandModule {
     }
 
     [Command("bishop")]
+    [RequirePermissions(Permissions.ManageMessages)]
     public async Task saveBishop(CommandContext ctx) {
         var messages = (await ctx.Channel.GetMessagesAsync(2000))
             .Where(msg => msg.Author.Id == 540265036141297676)
@@ -115,6 +118,7 @@ public class ChatModule : BaseCommandModule {
     }
 
     [Command("postbishop")]
+    [RequirePermissions(Permissions.ManageMessages)]
     public async Task postBishop(CommandContext ctx) {
         var messages =
             await File.ReadAllLinesAsync(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/bishop.txt");

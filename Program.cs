@@ -73,7 +73,8 @@ public class Program {
         var discord = new DiscordClient(new DiscordConfiguration {
             TokenType = TokenType.Bot,
             Token = Constants.token,
-            Intents = DiscordIntents.All
+            Intents = DiscordIntents.All,
+            ReconnectIndefinitely = true
         });
         client = discord;
 

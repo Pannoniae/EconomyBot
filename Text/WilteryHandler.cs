@@ -139,7 +139,7 @@ public class WilteryHandler {
             Method = HttpMethod.Post,
             RequestUri = new Uri(API_URL + "@cf/meta/llama-3-8b-instruct"),
             Headers = {
-                { HttpRequestHeader.Authorization.ToString(), $"Bearer {Constants.apikey_cloudflareAI}" },
+                { nameof(HttpRequestHeader.Authorization), $"Bearer {Constants.apikey_cloudflareAI}" },
             },
             Content = new StringContent(h_json, Encoding.UTF8, "application/json")
         };

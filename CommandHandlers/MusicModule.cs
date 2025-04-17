@@ -566,7 +566,7 @@ public class MusicModule : BaseCommandModule {
     public async Task PauseAsync(CommandContext ctx) {
         await GuildMusic.PauseAsync();
         await common.respond(ctx,
-            $"Playback paused. Use {Formatter.InlineCode($"{ctx.Prefix}resume")} to resume playback.");
+            $"Playback paused. Use {$"{ctx.Prefix}resume".InlineCode()} to resume playback.");
     }
 
     [Command("resume"), Description("Resumes playback."), Aliases("unpause")]
