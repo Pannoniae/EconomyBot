@@ -31,7 +31,7 @@ public class MusicModule : BaseCommandModule {
     public required GuildMusicData GuildMusic { get; set; }
     private readonly MusicCommon common = new();
     private readonly SemaphoreSlim _semaphore = new(1, 1);
-    private const string TEMP_FOLDER = "/snd/music/temp";
+    private const string TEMP_FOLDER = @"D:\music\temp";
 
     private static readonly Logger logger = Logger.getClassLogger("MusicModule");
 
@@ -300,7 +300,7 @@ public class MusicModule : BaseCommandModule {
         await common.respond(ctx, "Stopped jazz.");
     }
 
-    [Command("play"), Description("Plays supplied URL or searches for specified keywords."), Aliases("p"), Priority(0)]
+    [Command("play"), Description("Plays supplied URL or searches for specified keywords."), Aliases("p"), Priority(2)]
     public async Task PlayAsync(CommandContext ctx,
         [Description("URL to play from.")] Uri uri) {
         var trackLoad = await Music.GetTracksAsync(uri);
@@ -334,9 +334,7 @@ public class MusicModule : BaseCommandModule {
         foreach (var track in tracks) {
             GuildMusic.queue.Enqueue(track);
         }
-
-        var chn = getChannel(ctx);
-        await GuildMusic.CreatePlayerAsync(chn!);
+        await startPlayer(ctx);
         await GuildMusic.queue.PlayAsync();
 
         if (trackCount > 1) {
@@ -674,7 +672,7 @@ public class MusicModule : BaseCommandModule {
     [Command("queue"), Description("Displays current playback queue."), Aliases("q")]
     public async Task QueueAsync(CommandContext ctx) {
         var track = GuildMusic.queue.NowPlaying;
-        if (track == null && GuildMusic.queue.Queue.Count == 0 && GuildMusic.queue.autoQueue.Count == 0) {
+        if (track is null && GuildMusic.queue.Queue.Count == 0 && GuildMusic.queue.autoQueue.Count == 0) {
             await common.respond(ctx, "Queue is empty!");
             return;
         }
@@ -686,7 +684,7 @@ public class MusicModule : BaseCommandModule {
         if (queue.Count % 10 == 0) {
             pageCount--;
         }
-        if (!isPlaying || queue.Count == 0) {
+        if (!isPlaying && queue.Count == 0) {
             await common.respond(ctx, "Queue is empty!");
             return;
         }

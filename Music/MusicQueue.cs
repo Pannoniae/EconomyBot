@@ -63,7 +63,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
             return;
         }
 
-        if (NowPlaying == default) {
+        if (NowPlaying == null) {
             await guildMusic.queue.PlayHandlerAsync();
         }
     }
@@ -217,8 +217,8 @@ public class MusicQueue(GuildMusicData guildMusic) {
 
     public async Task PlayHandlerAsync() {
         var nextTrack = Dequeue();
-        if (nextTrack == default) {
-            NowPlaying = default;
+        if (nextTrack == null) {
+            NowPlaying = null;
             return;
         }
 

@@ -97,7 +97,7 @@ public sealed class GuildMusicData {
             rootPath = "/snd/music";
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
-            rootPath = "E:/music";
+            rootPath = @"D:\music";
         }
         else {
             throw new NotSupportedException("OS not supported, specify paths for the music.");
@@ -232,6 +232,12 @@ public sealed class GuildMusicData {
 
         Player = await Node.ConnectAsync(channel, false);
 
+        
+        Player.TrackEnded -= queue.Player_PlaybackFinished;
+        Player.TrackStarted -= queue.Player_PlaybackStarted;
+        Player.TrackException -= Lavalink_TrackExceptionThrown;
+        
+        await Task.Delay(100);
         await SetVolumeAsync(volume);
 
         if (!eq) {
@@ -239,10 +245,6 @@ public sealed class GuildMusicData {
         }
 
         // reset events
-        Player.TrackEnded -= queue.Player_PlaybackFinished;
-        Player.TrackStarted -= queue.Player_PlaybackStarted;
-        Player.TrackException -= Lavalink_TrackExceptionThrown;
-
         Player.TrackEnded += (con, e) => queue.Player_PlaybackFinished(con, e);
         Player.TrackStarted += (sender, e) => queue.Player_PlaybackStarted(sender, e);
         Player.TrackException += Lavalink_TrackExceptionThrown;

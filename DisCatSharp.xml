@@ -20965,7 +20965,7 @@
                 Gets the proxied URL of the unfurled media.
             </summary>
         </member>
-        <member name="P:DisCatSharp.Entities.DiscordUnfurledMedia.MediaType">
+        <member name="P:DisCatSharp.Entities.DiscordUnfurledMedia.ContentType">
             <summary>
                 Gets the media, or MIME, type of the unfurled media.
             </summary>
@@ -30368,6 +30368,91 @@
                 Gets the guild where the integration was updated.
             </summary>
         </member>
+        <member name="T:DisCatSharp.EventArgs.GuildJoinRequestCreateEventArgs">
+            <summary>
+                Represents arguments for <see cref="E:DisCatSharp.DiscordClient.GuildJoinRequestCreated" /> event.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.EventArgs.GuildJoinRequestCreateEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.EventArgs.GuildJoinRequestCreateEventArgs" /> class.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestCreateEventArgs.Request">
+            <summary>
+                Gets the request of the join request that was created.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestCreateEventArgs.Status">
+            <summary>
+                Gets the status of the join request.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestCreateEventArgs.User">
+            <summary>
+                Gets the user that created the join request.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestCreateEventArgs.Guild">
+            <summary>
+                Gets the guild this join request was created for.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.EventArgs.GuildJoinRequestDeleteEventArgs">
+            <summary>
+                Represents arguments for <see cref="E:DisCatSharp.DiscordClient.GuildJoinRequestDeleted" /> event.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.EventArgs.GuildJoinRequestDeleteEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.EventArgs.GuildJoinRequestDeleteEventArgs" /> class.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestDeleteEventArgs.RequestId">
+            <summary>
+                Gets the request ID of the join request that was deleted.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestDeleteEventArgs.User">
+            <summary>
+                Gets the user that deleted the join request.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestDeleteEventArgs.Guild">
+            <summary>
+                Gets the guild this join request was deleted from.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.EventArgs.GuildJoinRequestUpdateEventArgs">
+            <summary>
+                Represents arguments for <see cref="E:DisCatSharp.DiscordClient.GuildJoinRequestUpdated" /> event.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.EventArgs.GuildJoinRequestUpdateEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.EventArgs.GuildJoinRequestUpdateEventArgs" /> class.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestUpdateEventArgs.Request">
+            <summary>
+                Gets the request of the join request that was updated.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestUpdateEventArgs.Status">
+            <summary>
+                Gets the status of the join request.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestUpdateEventArgs.User">
+            <summary>
+                Gets the user who's join request was updated.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestUpdateEventArgs.Guild">
+            <summary>
+                Gets the guild this join request was updated for.
+            </summary>
+        </member>
         <member name="T:DisCatSharp.EventArgs.GuildMemberAddEventArgs">
             <summary>
                 Represents arguments for <see cref="E:DisCatSharp.DiscordClient.GuildMemberAdded" /> event.
@@ -30591,91 +30676,6 @@
         <member name="P:DisCatSharp.EventArgs.GuildMemberUpdateEventArgs.GuildAvatarDecorationDataBefore">
             <summary>
                 Gets the member's guild avatar decoration data before the update.
-            </summary>
-        </member>
-        <member name="T:DisCatSharp.EventArgs.GuildJoinRequestCreateEventArgs">
-            <summary>
-                Represents arguments for <see cref="E:DisCatSharp.DiscordClient.GuildJoinRequestCreated" /> event.
-            </summary>
-        </member>
-        <member name="M:DisCatSharp.EventArgs.GuildJoinRequestCreateEventArgs.#ctor(System.IServiceProvider)">
-            <summary>
-                Initializes a new instance of the <see cref="T:DisCatSharp.EventArgs.GuildJoinRequestCreateEventArgs" /> class.
-            </summary>
-        </member>
-        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestCreateEventArgs.Request">
-            <summary>
-                Gets the request of the join request that was created.
-            </summary>
-        </member>
-        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestCreateEventArgs.Status">
-            <summary>
-                Gets the status of the join request.
-            </summary>
-        </member>
-        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestCreateEventArgs.User">
-            <summary>
-                Gets the user that created the join request.
-            </summary>
-        </member>
-        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestCreateEventArgs.Guild">
-            <summary>
-                Gets the guild this join request was created for.
-            </summary>
-        </member>
-        <member name="T:DisCatSharp.EventArgs.GuildJoinRequestDeleteEventArgs">
-            <summary>
-                Represents arguments for <see cref="E:DisCatSharp.DiscordClient.GuildJoinRequestDeleted" /> event.
-            </summary>
-        </member>
-        <member name="M:DisCatSharp.EventArgs.GuildJoinRequestDeleteEventArgs.#ctor(System.IServiceProvider)">
-            <summary>
-                Initializes a new instance of the <see cref="T:DisCatSharp.EventArgs.GuildJoinRequestDeleteEventArgs" /> class.
-            </summary>
-        </member>
-        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestDeleteEventArgs.RequestId">
-            <summary>
-                Gets the request ID of the join request that was deleted.
-            </summary>
-        </member>
-        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestDeleteEventArgs.User">
-            <summary>
-                Gets the user that deleted the join request.
-            </summary>
-        </member>
-        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestDeleteEventArgs.Guild">
-            <summary>
-                Gets the guild this join request was deleted from.
-            </summary>
-        </member>
-        <member name="T:DisCatSharp.EventArgs.GuildJoinRequestUpdateEventArgs">
-            <summary>
-                Represents arguments for <see cref="E:DisCatSharp.DiscordClient.GuildJoinRequestUpdated" /> event.
-            </summary>
-        </member>
-        <member name="M:DisCatSharp.EventArgs.GuildJoinRequestUpdateEventArgs.#ctor(System.IServiceProvider)">
-            <summary>
-                Initializes a new instance of the <see cref="T:DisCatSharp.EventArgs.GuildJoinRequestUpdateEventArgs" /> class.
-            </summary>
-        </member>
-        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestUpdateEventArgs.Request">
-            <summary>
-                Gets the request of the join request that was updated.
-            </summary>
-        </member>
-        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestUpdateEventArgs.Status">
-            <summary>
-                Gets the status of the join request.
-            </summary>
-        </member>
-        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestUpdateEventArgs.User">
-            <summary>
-                Gets the user who's join request was updated.
-            </summary>
-        </member>
-        <member name="P:DisCatSharp.EventArgs.GuildJoinRequestUpdateEventArgs.Guild">
-            <summary>
-                Gets the guild this join request was updated for.
             </summary>
         </member>
         <member name="T:DisCatSharp.EventArgs.GuildRoleCreateEventArgs">

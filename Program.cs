@@ -360,7 +360,7 @@ public class Program {
     private static async Task setup(DiscordClient client, LavalinkExtension lavalink,
         LavalinkConfiguration lavalinkConfig) {
         // Wait a bit with lavalink init, Lavalink seems to start slower than the bot. Lazy solution is pretty much a sleep
-        //await Task.Delay(5000);
+        await Task.Delay(5000);
         LavalinkNode = await lavalink.ConnectAsync(lavalinkConfig);
         musicService = new MusicService(lavalink, LavalinkNode);
         lavalinkInit = true;
