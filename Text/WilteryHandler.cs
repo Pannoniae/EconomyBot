@@ -36,6 +36,10 @@ public class WilteryHandler {
         messageHandlers.Add(new ExactWordMessageHandler("brah", DiscordEmoji.FromName(client, ":cat2:")));
         messageHandlers.Add(new ExactWordMessageHandler("bra", DiscordEmoji.FromName(client, ":cat2:")));
         messageHandlers.Add(new ExactWordMessageHandler("bruh", DiscordEmoji.FromName(client, ":cat2:")));
+        messageHandlers.Add(new ExactWordMessageHandler("dude", DiscordEmoji.FromName(client, ":zero:")));
+        messageHandlers.Add(new ExactWordMessageHandler("sir", "gracious m'lady"));
+        messageHandlers.Add(new ExactWordMessageHandler("bud", DiscordEmoji.FromName(client, ":deciduous_tree:")));
+        messageHandlers.Add(new ExactWordMessageHandler("buddy", DiscordEmoji.FromName(client, ":deciduous_tree:")));
 
         // stop the stupidity
         // replace every gendered pronoun with neutral ones
