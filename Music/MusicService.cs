@@ -31,6 +31,8 @@ public sealed class MusicService {
         MusicData = new ConcurrentDictionary<ulong, GuildMusicData>();
         client = lavalink.Client;
         node = theNode;
+        
+        slsk?.Dispose();
 
         slsk = new SoulseekClient();
         slsk.ConnectAsync("jazzbot", "jazzbot").GetAwaiter().GetResult();
