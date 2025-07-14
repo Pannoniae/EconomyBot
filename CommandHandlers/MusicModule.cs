@@ -5,15 +5,13 @@ using DisCatSharp;
 using DisCatSharp.CommandsNext;
 using DisCatSharp.CommandsNext.Attributes;
 using DisCatSharp.Entities;
-using DisCatSharp.Enums;
 using DisCatSharp.Interactivity;
 using DisCatSharp.Interactivity.Enums;
-using DisCatSharp.Interactivity.EventHandling;
 using DisCatSharp.Interactivity.Extensions;
 using DisCatSharp.Lavalink.Entities;
 using DisCatSharp.Lavalink.Enums;
-using DisCatSharp.Net;
 using EconomyBot.Logging;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Soulseek;
@@ -24,6 +22,7 @@ using File = System.IO.File;
 namespace EconomyBot;
 
 // TODO implement a CheckBaseAttribute to stop commands from erroring when base prereqs aren't met
+
 
 [ModuleLifespan(ModuleLifespan.Singleton)]
 public class MusicModule : BaseCommandModule {
@@ -332,7 +331,12 @@ public class MusicModule : BaseCommandModule {
 
         var trackCount = tracks.Count;
         foreach (var track in tracks) {
-            GuildMusic.queue.Enqueue(track);
+            if (ctx.Prefix == "!!") {
+                GuildMusic.queue.EnqueueFront(track);
+            }
+            else {
+                GuildMusic.queue.Enqueue(track);
+            }
         }
         await startPlayer(ctx);
         await GuildMusic.queue.PlayAsync();
@@ -368,7 +372,12 @@ public class MusicModule : BaseCommandModule {
             return;
         }
 
-        GuildMusic.queue.Enqueue(track);
+        if (ctx.Prefix == "!!") {
+            GuildMusic.queue.EnqueueFront(track);
+        }
+        else {
+            GuildMusic.queue.Enqueue(track);
+        }
         await startPlayer(ctx);
         await GuildMusic.queue.PlayAsync();
 
@@ -414,7 +423,12 @@ public class MusicModule : BaseCommandModule {
             return;
         }
 
-        GuildMusic.queue.Enqueue(track);
+        if (ctx.Prefix == "!!") {
+            GuildMusic.queue.EnqueueFront(track);
+        }
+        else {
+            GuildMusic.queue.Enqueue(track);
+        }
         await startPlayer(ctx);
         await GuildMusic.queue.PlayAsync();
         await common.modify(ctx, msg, $"Added {track.ToLimitedTrackString()} to the playback queue.");
@@ -447,7 +461,12 @@ public class MusicModule : BaseCommandModule {
             return;
         }
 
-        GuildMusic.queue.Enqueue(track);
+        if (ctx.Prefix == "!!") {
+            GuildMusic.queue.EnqueueFront(track);
+        }
+        else {
+            GuildMusic.queue.Enqueue(track);
+        }
         await startPlayer(ctx);
         await GuildMusic.queue.PlayAsync();
         await common.modify(ctx, msg, $"Added {track.ToLimitedTrackString()} to the playback queue.");
@@ -476,7 +495,12 @@ public class MusicModule : BaseCommandModule {
             return;
         }
 
-        GuildMusic.queue.Enqueue(track);
+        if (ctx.Prefix == "!!") {
+            GuildMusic.queue.EnqueueFront(track);
+        }
+        else {
+            GuildMusic.queue.Enqueue(track);
+        }
         await startPlayer(ctx);
         await GuildMusic.queue.PlayAsync();
 

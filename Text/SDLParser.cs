@@ -39,9 +39,9 @@ public partial class SDLParser {
                 continue;
             }
 
-            var artist = ParseArtistEntry(entry);
+            var (name, artist) = ParseArtistEntry(entry);
             if (artist != null) {
-                artists[artist.name] = artist;
+                artists[name!] = artist;
             }
         }
 
@@ -100,7 +100,7 @@ public partial class SDLParser {
         return entries;
     }
 
-    private Artist? ParseArtistEntry(string entry) {
+    private (string?, Artist?) ParseArtistEntry(string entry) {
         //Console.Out.WriteLine("Artist: " + entry);
         // Remove outer parentheses
         entry = entry.Trim('(', ')').Trim();
@@ -111,7 +111,7 @@ public partial class SDLParser {
         if (parts.Count < 3) // Must have at least id, display name, and full path
         {
             logger.warn("Malformed artist entry: " + entry);
-            return null;
+            return (null, null);
         }
         double volume, weight, historyRepeatPenalty, doubleRepeatPenalty;
         try {
@@ -119,28 +119,28 @@ public partial class SDLParser {
         }
         catch (FormatException) {
             logger.warn("Malformed artist entry: " + entry);
-            return null;
+            return (null, null);
         }
         try {
             weight = parts.Count > 4 ? double.Parse(parts[4]) : 1.0;
         }
         catch (FormatException) {
             logger.warn("Malformed artist entry: " + entry);
-            return null;
+            return (null, null);
         }
         try {
             historyRepeatPenalty = parts.Count > 5 ? double.Parse(parts[5]) : 1.0;
         }
         catch (FormatException) {
             logger.warn("Malformed artist entry: " + entry);
-            return null;
+            return (null, null);
         }
         try {
             doubleRepeatPenalty = parts.Count > 6 ? double.Parse(parts[6]) : 1.0;
         }
         catch (FormatException) {
             logger.warn("Malformed artist entry: " + entry);
-            return null;
+            return (null, null);
         }
         var artist = new Artist(
             parts[1].Trim('"'),
@@ -151,7 +151,7 @@ public partial class SDLParser {
             doubleRepeatPenalty
         );
 
-        return artist;
+        return (parts[0].Trim('"'), artist);
     }
 
     private List<string> SplitQuotedString(string input) {

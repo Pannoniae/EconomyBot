@@ -93,7 +93,7 @@ public class Program {
 
         var lavalink = discord.UseLavalink();
         var commands = discord.UseCommandsNext(new CommandsNextConfiguration {
-            StringPrefixes = ["."],
+            StringPrefixes = [".", "!!"],
         });
         //var ApplicationCommands = discord.UseApplicationCommands(new ApplicationCommandsConfiguration {
         //    ServiceProvider = services

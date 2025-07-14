@@ -76,7 +76,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
             return;
         }
 
-        if (NowPlaying == default) {
+        if (NowPlaying == null) {
             return;
         }
 
@@ -107,12 +107,12 @@ public class MusicQueue(GuildMusicData guildMusic) {
     private void insert(int idx, Track track) {
         // autoplaylist
         if (track.artist != null) {
-            autoQueue.Insert(0, track);
-            history.Insert(0, track);
+            autoQueue.Insert(idx, track);
+            history.Insert(idx, track);
         }
         // manually added
         else {
-            Queue.Insert(0, track);
+            Queue.Insert(idx, track);
         }
     }
 
@@ -135,6 +135,14 @@ public class MusicQueue(GuildMusicData guildMusic) {
     /// <param name="item">Music track to enqueue.</param>
     public void Enqueue(LavalinkTrack item, string? artist = null) {
         play(new Track(item, artist));
+    }
+    
+    /// <summary>
+    /// Enqueues a music track for playback at the front of the queue.
+    /// </summary>
+    /// <param name="item">Music track to enqueue.</param>
+    public void EnqueueFront(LavalinkTrack item, string? artist = null) {
+        insert(0, new Track(item, artist));
     }
 
     /// <summary>
