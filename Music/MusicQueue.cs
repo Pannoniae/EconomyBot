@@ -16,7 +16,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
     /// <summary>
     /// It's like <see cref="NowPlaying"/> but doesn't get cleared when playback stops. Used for implementing repeat.
     /// </summary>
-    public Track? repeatHolder { get; private set; }
+    public Track? repeatHolder { get; set; }
 
     /// <summary>
     /// Gets the current manual music queue.

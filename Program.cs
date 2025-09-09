@@ -40,6 +40,8 @@ public class Program {
     public static bool hasSetup = false;
 
     public static DiscordClient client = null!;
+    
+    private static readonly Dictionary<ulong, PlaybackState> savedPlaybackStates = new();
 
     public const ulong LOG = 838920584879800343;
     public static ulong HALLOFFAME = 1078991955633127474;
@@ -124,6 +126,7 @@ public class Program {
         discord.MessageCreated += messageHandler;
         discord.MessagesBulkDeleted += messageDeleteHandler;
         discord.Ready += async (sender, _) => await setup(sender, lavalink, lavalinkConfig);
+        discord.Resumed += async (sender, _) => await reconnectLavalink(sender, lavalink, lavalinkConfig);
         //discord.GuildDownloadCompleted += (sender, _) => setupB(sender, lavalink, lavalinkConfig);
         discord.MessageDeleted += messageDeleteHandler;
         discord.GuildMemberAdded += roleHandler;
@@ -137,6 +140,7 @@ public class Program {
         };
         discord.SocketErrored += async (sender, e) => {
             logger.error(e.Exception);
+            await saveAllPlaybackStates();
         };
         #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         await discord.ConnectAsync();
@@ -360,8 +364,12 @@ public class Program {
     private static async Task setup(DiscordClient client, LavalinkExtension lavalink,
         LavalinkConfiguration lavalinkConfig) {
         // Wait a bit with lavalink init, Lavalink seems to start slower than the bot. Lazy solution is pretty much a sleep
-        await Task.Delay(5000);
+        //await Task.Delay(5000);
         LavalinkNode = await lavalink.ConnectAsync(lavalinkConfig);
+        
+        // dispose slsk client!!
+        musicService?.slsk?.Dispose();
+        
         musicService = new MusicService(lavalink, LavalinkNode);
         lavalinkInit = true;
         imagesModule = new ImagesModule();
@@ -377,6 +385,165 @@ public class Program {
         _ = setupB(client, lavalink, lavalinkConfig);
 
         logger.info("Setup done!");
+    }
+
+    private static async Task reconnectLavalink(DiscordClient client, LavalinkExtension lavalink,
+        LavalinkConfiguration lavalinkConfig) {
+        if (!lavalinkInit) {
+            logger.info("Lavalink not initialized yet, skipping reconnection attempt");
+            return;
+        }
+
+        try {
+            if (LavalinkNode != null && LavalinkNode.IsConnected) {
+                logger.info("Lavalink is already connected, skipping reconnection");
+                return;
+            }
+
+            logger.info("Attempting to reconnect to Lavalink after gateway session resumed...");
+            
+            LavalinkNode = await lavalink.ConnectAsync(lavalinkConfig);
+            
+            musicService?.slsk?.Dispose();
+            musicService = new MusicService(lavalink, LavalinkNode);
+            
+            logger.info("Successfully reconnected to Lavalink!");
+            
+            await restoreAllPlaybackStates();
+        }
+        catch (Exception ex) {
+            logger.error($"Failed to reconnect to Lavalink: {ex.Message}");
+            logger.error(ex);
+        }
+    }
+    
+    public static async Task lavalinkReconnect() {
+        if (!lavalinkInit || musicService == null) {
+            return;
+        }
+        
+        try {
+            logger.info("Triggering Lavalink reconnection due to socket error...");
+            
+            var lavalinkConfig = new LavalinkConfiguration {
+                Password = "youshallnotpass",
+                RestEndpoint = new ConnectionEndpoint { Hostname = "127.0.0.1", Port = 2333 },
+                SocketEndpoint = new ConnectionEndpoint { Hostname = "127.0.0.1", Port = 2333 }
+            };
+            
+            var lavalink = client.GetLavalink();
+            await reconnectLavalink(client, lavalink, lavalinkConfig);
+        }
+        catch (Exception ex) {
+            logger.error($"Error during triggered Lavalink reconnection: {ex}");
+        }
+    }
+
+    public static async Task saveAllPlaybackStates() {
+        if (!lavalinkInit || musicService == null) {
+            return;
+        }
+
+        try {
+            logger.info("Saving playback states for all guilds...");
+            
+            foreach (var guild in client.Guilds.Values) {
+                var musicData = await musicService.GetOrCreateDataAsync(guild);
+                if (musicData.Player != null && musicData.Player.IsConnected && musicData.queue.NowPlaying != null) {
+                    var state = new PlaybackState {
+                        CurrentTrack = musicData.queue.NowPlaying,
+                        Position = musicData.GetCurrentPosition(),
+                        WasPlaying = musicData.Player.CurrentTrack != null && !musicData.Player.Player.Paused,
+                        WasPaused = musicData.Player.Player.Paused,
+                        VoiceChannelId = musicData.Player.Channel?.Id,
+                        CommandChannelId = musicData.CommandChannel?.Id,
+                        Queue = new List<Track>(musicData.queue.Queue),
+                        AutoQueue = new List<Track>(musicData.queue.autoQueue),
+                        History = new List<Track>(musicData.queue.history),
+                        ArtistQueue = new List<string>(musicData.queue.artistQueue),
+                        RepeatHolder = musicData.queue.repeatHolder,
+                        RepeatQueue = musicData.queue.repeatQueue,
+                        EarrapeMode = musicData.queue.earrapeMode,
+                        Volume = musicData.volume,
+                        EqEnabled = musicData.eq
+                    };
+                    
+                    savedPlaybackStates[guild.Id] = state;
+                    logger.info($"Saved playback state for guild {guild.Name}");
+                }
+            }
+        }
+        catch (Exception ex) {
+            logger.error($"Error saving playback states: {ex}");
+        }
+    }
+    
+    private static async Task restoreAllPlaybackStates() {
+        if (!lavalinkInit || musicService == null) {
+            return;
+        }
+
+        try {
+            logger.info("Restoring playback states for all guilds...");
+            
+            foreach (var (guildId, state) in savedPlaybackStates.ToList()) {
+                try {
+                    var guild = client.Guilds.Values.FirstOrDefault(g => g.Id == guildId);
+                    if (guild == null) continue;
+
+                    var musicData = await musicService.GetOrCreateDataAsync(guild);
+                    
+                    if (state.VoiceChannelId.HasValue && state.CurrentTrack != null) {
+                        var voiceChannel = guild.GetChannel(state.VoiceChannelId.Value);
+                        if (voiceChannel != null) {
+                            await musicData.CreatePlayerAsync(voiceChannel);
+                            
+                            musicData.queue.Queue.Clear();
+                            musicData.queue.Queue.AddRange(state.Queue);
+                            musicData.queue.autoQueue.Clear();
+                            musicData.queue.autoQueue.AddRange(state.AutoQueue);
+                            musicData.queue.history.Clear();
+                            musicData.queue.history.AddRange(state.History);
+                            musicData.queue.artistQueue.Clear();
+                            musicData.queue.artistQueue.AddRange(state.ArtistQueue);
+                            musicData.queue.repeatHolder = state.RepeatHolder;
+                            musicData.queue.repeatQueue = state.RepeatQueue;
+                            musicData.queue.earrapeMode = state.EarrapeMode;
+                            
+                            await musicData.SetVolumeAsync(state.Volume);
+                            
+                            if (state.EqEnabled != musicData.eq) {
+                                musicData.toggleEQ();
+                            }
+                            
+                            if (state.CommandChannelId.HasValue) {
+                                musicData.CommandChannel = guild.GetChannel(state.CommandChannelId.Value);
+                            }
+                            
+                            if (state.WasPlaying && !state.WasPaused) {
+                                await musicData.Player!.PlayAsync(state.CurrentTrack.track);
+                                await musicData.SeekAsync(state.Position, false);
+                                logger.info($"Resumed playback for guild {guild.Name} at {state.Position}");
+                            } else if (state.WasPaused) {
+                                await musicData.Player!.PlayAsync(state.CurrentTrack.track);
+                                await musicData.SeekAsync(state.Position, false);
+                                await musicData.PauseAsync();
+                                logger.info($"Restored paused state for guild {guild.Name} at {state.Position}");
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex) {
+                    logger.error($"Error restoring playback state for guild {guildId}: {ex}");
+                }
+            }
+            
+            savedPlaybackStates.Clear();
+            logger.info("Finished restoring playback states");
+        }
+        catch (Exception ex) {
+            logger.error($"Error during playback state restoration: {ex}");
+        }
     }
 
     private static Task setupB(DiscordClient client, LavalinkExtension lavalink,
@@ -522,4 +689,22 @@ public partial class CustomTimeSpanConverter : IArgumentConverter<TimeSpan> {
         result2 = new TimeSpan(days, hours, minutes, seconds);
         return Task.FromResult(Optional.FromNullable(result2));
     }
+}
+
+public class PlaybackState {
+    public Track? CurrentTrack;
+    public TimeSpan Position;
+    public bool WasPlaying;
+    public bool WasPaused;
+    public ulong? VoiceChannelId;
+    public ulong? CommandChannelId;
+    public List<Track> Queue = new();
+    public List<Track> AutoQueue = new();
+    public List<Track> History = new();
+    public List<string> ArtistQueue = new();
+    public Track? RepeatHolder;
+    public bool RepeatQueue;
+    public bool EarrapeMode;
+    public int Volume = 100;
+    public bool EqEnabled;
 }

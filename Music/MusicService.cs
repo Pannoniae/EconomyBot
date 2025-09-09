@@ -45,6 +45,16 @@ public sealed class MusicService {
 
         node.LavalinkSocketErrored += async (sender, args) => {
             await Console.Out.WriteLineAsync($"Lavalink socket errored: {args.Exception.Message}");
+            
+            _ = Task.Run(async () => {
+                try {
+                    await Program.saveAllPlaybackStates();
+                    await Program.lavalinkReconnect();
+                }
+                catch (Exception ex) {
+                    await Console.Out.WriteLineAsync($"Error handling Lavalink socket error: {ex.Message}");
+                }
+            });
         };
         node.WebsocketClosed += async (sender, args) => {
             await Console.Out.WriteLineAsync($"Lavalink websocket closed: (by Discord: {args.ByRemote}), code: {args.CloseCode}\nmessage: {args.CloseMessage}");
