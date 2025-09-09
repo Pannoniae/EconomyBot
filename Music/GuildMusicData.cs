@@ -38,8 +38,8 @@ public sealed class GuildMusicData {
     /// </summary>
     public DiscordChannel? CommandChannel { get; set; }
 
-    private DiscordGuild Guild { get; }
-    private LavalinkExtension Lavalink { get; }
+    public DiscordGuild Guild { get; }
+    public LavalinkExtension Lavalink { get; }
     public LavalinkGuildPlayer? Player { get; private set; }
 
     public LavalinkSession Node { get; }

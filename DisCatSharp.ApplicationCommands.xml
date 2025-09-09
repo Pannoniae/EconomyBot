@@ -102,7 +102,7 @@
                 A class that handles slash commands for a client.
             </summary>
         </member>
-        <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.Configuration">
+        <member name="P:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.Configuration">
             <summary>
                 Configuration for Discord.
             </summary>
@@ -1926,6 +1926,11 @@
         <member name="P:DisCatSharp.ApplicationCommands.Context.BaseContext.GuildLocale">
             <summary>
                 Gets the guild locale if applicable.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.Context.BaseContext.AttachmentSizeLimit">
+            <summary>
+                Gets the attachment size limit in bytes.
             </summary>
         </member>
         <member name="P:DisCatSharp.ApplicationCommands.Context.BaseContext.AppPermissions">

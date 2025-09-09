@@ -58,6 +58,16 @@ public sealed class MusicService {
         };
         node.WebsocketClosed += async (sender, args) => {
             await Console.Out.WriteLineAsync($"Lavalink websocket closed: (by Discord: {args.ByRemote}), code: {args.CloseCode}\nmessage: {args.CloseMessage}");
+            
+            _ = Task.Run(async () => {
+                try {
+                    await Program.saveAllPlaybackStates();
+                    await Program.lavalinkReconnect();
+                }
+                catch (Exception ex) {
+                    await Console.Out.WriteLineAsync($"Error handling Lavalink socket error: {ex.Message}");
+                }
+            });
         };
         node.StatsReceived += async (sender, args) => {
             await Console.Out.WriteLineAsync($"len/nodes: {args.Statistics.Players}");
@@ -119,6 +129,14 @@ public sealed class MusicService {
     /// <returns></returns>
     public void SaveDataForAsync(DiscordGuild guild) {
         MusicData.TryGetValue(guild.Id, out _);
+    }
+
+    /// <summary>
+    /// Gets existing music data for all active guilds.
+    /// </summary>
+    /// <returns>Collection of existing guild music data.</returns>
+    public IEnumerable<GuildMusicData> GetExistingGuildData() {
+        return MusicData.Values;
     }
 
     /// <summary>

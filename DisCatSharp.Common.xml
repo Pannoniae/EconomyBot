@@ -20,7 +20,7 @@
             ○ Match if at the beginning of the string.<br/>
             ○ Match '#' atomically, optionally.<br/>
             ○ 1st capture group.<br/>
-                ○ Match a character in the set [0-9A-Fa-f] exactly 6 times.<br/>
+                ○ Match a hexadecimal digit exactly 6 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -111,13 +111,13 @@
                         ○ Match the string "playlist".<br/>
             ○ Optional (greedy).<br/>
                 ○ "id" capture group.<br/>
-                    ○ Match a word character (ECMA) greedily at least once.<br/>
+                    ○ Match a word character (ECMA) atomically at least once.<br/>
             ○ 5th capture group.<br/>
                 ○ 6th capture group.<br/>
                     ○ Match a character in the set [&amp;?].<br/>
                 ○ Match the string "list=".<br/>
                 ○ "list" capture group.<br/>
-                    ○ Match a character in the set [-0-9A-Z_a-z\u0130] greedily at least once.<br/>
+                    ○ Match a character in the set [\-0-9A-Z_a-z\u0130] greedily at least once.<br/>
             ○ Optional (greedy).<br/>
                 ○ 7th capture group.<br/>
                     ○ Match the string "&amp;index=".<br/>
@@ -152,7 +152,7 @@
                         ○ Match '&gt;'.<br/>
                     ○ Match a sequence of expressions.<br/>
                         ○ Match the string "&lt;:".<br/>
-                        ○ Match a character in the set [-0-9A-Z_a-z].<br/>
+                        ○ Match a character in the set [\-0-9A-Z_a-z].<br/>
                         ○ Match ':'.<br/>
                         ○ Match a character in the set [0-9] atomically at least once.<br/>
                         ○ Match '&gt;'.<br/>
@@ -237,23 +237,20 @@
                                     ○ Match the string "staging.".<br/>
                         ○ 7th capture group.<br/>
                             ○ Match the string "discord".<br/>
-                            ○ Match with 2 alternative expressions.<br/>
-                                ○ Match an empty string.<br/>
+                            ○ Optional (greedy).<br/>
                                 ○ Match the string "app".<br/>
                         ○ 8th capture group.<br/>
                             ○ Match the string ".co".<br/>
-                            ○ Match with 2 alternative expressions.<br/>
-                                ○ Match 'm'.<br/>
-                                ○ Match an empty string.<br/>
+                            ○ Match 'm' atomically, optionally.<br/>
                         ○ Match the string "/invite".<br/>
             ○ Match '/'.<br/>
             ○ "code" capture group.<br/>
-                ○ Match a character in the set [0-9A-Za-z] greedily any number of times.<br/>
+                ○ Match an ASCII letter or digit greedily any number of times.<br/>
             ○ Optional (greedy).<br/>
                 ○ 9th capture group.<br/>
                     ○ Match the string "?event=".<br/>
                     ○ "event" capture group.<br/>
-                        ○ Match a character in the set [0-9] greedily at least once.<br/>
+                        ○ Match a character in the set [0-9] atomically at least once.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -281,14 +278,11 @@
                         ○ Match the string "staging.".<br/>
             ○ 3rd capture group.<br/>
                 ○ Match the string "discord".<br/>
-                ○ Match with 2 alternative expressions.<br/>
-                    ○ Match an empty string.<br/>
+                ○ Optional (greedy).<br/>
                     ○ Match the string "app".<br/>
             ○ 4th capture group.<br/>
                 ○ Match the string ".co".<br/>
-                ○ Match with 2 alternative expressions.<br/>
-                    ○ Match 'm'.<br/>
-                    ○ Match an empty string.<br/>
+                ○ Match 'm' atomically, optionally.<br/>
             ○ Match the string "/channels/".<br/>
             ○ "guild" capture group.<br/>
                 ○ Match with 2 alternative expressions.<br/>
@@ -574,14 +568,11 @@
                         ○ Match the string "staging.".<br/>
             ○ 3rd capture group.<br/>
                 ○ Match the string "discord".<br/>
-                ○ Match with 2 alternative expressions.<br/>
-                    ○ Match an empty string.<br/>
+                ○ Optional (greedy).<br/>
                     ○ Match the string "app".<br/>
             ○ 4th capture group.<br/>
                 ○ Match the string ".co".<br/>
-                ○ Match with 2 alternative expressions.<br/>
-                    ○ Match 'm'.<br/>
-                    ○ Match an empty string.<br/>
+                ○ Match 'm' atomically, optionally.<br/>
             ○ Match the string "/events/".<br/>
             ○ "guild" capture group.<br/>
                 ○ Match a character in the set [0-9] atomically at least once.<br/>
@@ -601,7 +592,7 @@
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match a character in the set ['-0-9A-Z_a-z\u0130\p{Ll}\p{Lt}] atomically at least 1 and at most 32 times.<br/>
+            ○ Match a character in the set ['\-0-9A-Z_a-z\u0130\p{Ll}\p{Lt}] atomically at least 1 and at most 32 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -627,14 +618,11 @@
                         ○ Match the string "staging.".<br/>
             ○ 2nd capture group.<br/>
                 ○ Match the string "discord".<br/>
-                ○ Match with 2 alternative expressions.<br/>
-                    ○ Match an empty string.<br/>
+                ○ Optional (greedy).<br/>
                     ○ Match the string "app".<br/>
             ○ 3rd capture group.<br/>
                 ○ Match the string ".co".<br/>
-                ○ Match with 2 alternative expressions.<br/>
-                    ○ Match 'm'.<br/>
-                    ○ Match an empty string.<br/>
+                ○ Match 'm' atomically, optionally.<br/>
             ○ Match the string "/api/".<br/>
             ○ Optional (greedy).<br/>
                 ○ Match 'v'.<br/>
@@ -645,7 +633,7 @@
                 ○ Match a character in the set [0-9] atomically at least once.<br/>
             ○ Match '/'.<br/>
             ○ "token" capture group.<br/>
-                ○ Match a character in the set [-0-9A-Z_a-z] atomically at least once.<br/>
+                ○ Match a character in the set [\-0-9A-Z_a-z] atomically at least once.<br/>
             </code>
             </remarks>
         </member>

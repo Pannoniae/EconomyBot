@@ -1,2 +1,1 @@
-Start-Process dotnet EconomyBot.dll
-Start-Process "java" -ArgumentList "-jar Lavalink.jar"
+wt new-tab --title "EconomyBot" dotnet EconomyBot.dll `; new-tab --title "Lavalink" java -jar Lavalink.jar

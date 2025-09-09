@@ -42,6 +42,8 @@ public class Program {
     public static DiscordClient client = null!;
     
     private static readonly Dictionary<ulong, PlaybackState> savedPlaybackStates = new();
+    private static DateTime lastReconnectionAttempt = DateTime.MinValue;
+    private static readonly Lock reconnectionLock = new();
 
     public const ulong LOG = 838920584879800343;
     public static ulong HALLOFFAME = 1078991955633127474;
@@ -126,7 +128,7 @@ public class Program {
         discord.MessageCreated += messageHandler;
         discord.MessagesBulkDeleted += messageDeleteHandler;
         discord.Ready += async (sender, _) => await setup(sender, lavalink, lavalinkConfig);
-        discord.Resumed += async (sender, _) => await reconnectLavalink(sender, lavalink, lavalinkConfig);
+        discord.Resumed += async (_, _) => await lavalinkReconnect();
         //discord.GuildDownloadCompleted += (sender, _) => setupB(sender, lavalink, lavalinkConfig);
         discord.MessageDeleted += messageDeleteHandler;
         discord.GuildMemberAdded += roleHandler;
@@ -320,11 +322,12 @@ public class Program {
         // Ukrainian language promotion handler, don't trigger if it's a quote
         if (e.Channel.Id == UKRAYINSKIJ_KANAL && !e.Message.Content.Contains('"') && e.Message.Content.Length > 10) {
             var results = await languageClient.DetectAsync(e.Message.Content);
-            bool isRussian = results.Any(r => r.language == "ru" && r.confidence > 1 && r.reliable);
+            bool isRussian = results.Any(r => r.language == "ru" && r.score > 1);
             bool isNotUkrainian = results.All(r => r.language != "uk");
             logger.info($"Language analysis:");
             foreach (var result in results) {
-                logger.info($"    {result.language}, {result.confidence}, {result.reliable}");
+                logger.info($"    {result.language}, {result.score}");
+                
             }
 
             if (isRussian && isNotUkrainian) {
@@ -364,8 +367,9 @@ public class Program {
     private static async Task setup(DiscordClient client, LavalinkExtension lavalink,
         LavalinkConfiguration lavalinkConfig) {
         // Wait a bit with lavalink init, Lavalink seems to start slower than the bot. Lazy solution is pretty much a sleep
-        //await Task.Delay(5000);
+        await Task.Delay(2000);
         LavalinkNode = await lavalink.ConnectAsync(lavalinkConfig);
+        
         
         // dispose slsk client!!
         musicService?.slsk?.Dispose();
@@ -386,33 +390,29 @@ public class Program {
 
         logger.info("Setup done!");
     }
-
-    private static async Task reconnectLavalink(DiscordClient client, LavalinkExtension lavalink,
+    
+    private static async Task forceReconnectLavalink(DiscordClient client, LavalinkExtension lavalink,
         LavalinkConfiguration lavalinkConfig) {
         if (!lavalinkInit) {
-            logger.info("Lavalink not initialized yet, skipping reconnection attempt");
+            logger.info("Lavalink not initialized yet, skipping forced reconnection attempt");
             return;
         }
 
         try {
-            if (LavalinkNode != null && LavalinkNode.IsConnected) {
-                logger.info("Lavalink is already connected, skipping reconnection");
-                return;
-            }
-
-            logger.info("Attempting to reconnect to Lavalink after gateway session resumed...");
+            logger.info("Forcing Lavalink reconnection (ignoring current connection state)...");
             
+            // Force create a new connection regardless of current state
             LavalinkNode = await lavalink.ConnectAsync(lavalinkConfig);
             
             musicService?.slsk?.Dispose();
             musicService = new MusicService(lavalink, LavalinkNode);
             
-            logger.info("Successfully reconnected to Lavalink!");
+            logger.info("Successfully force-reconnected to Lavalink!");
             
             await restoreAllPlaybackStates();
         }
         catch (Exception ex) {
-            logger.error($"Failed to reconnect to Lavalink: {ex.Message}");
+            logger.error($"Failed to force-reconnect to Lavalink: {ex.Message}");
             logger.error(ex);
         }
     }
@@ -420,6 +420,15 @@ public class Program {
     public static async Task lavalinkReconnect() {
         if (!lavalinkInit || musicService == null) {
             return;
+        }
+        
+        lock (reconnectionLock) {
+            // ignore if we attempted reconnection in the last 5 seconds (we're still doing it!!)
+            if (DateTime.Now - lastReconnectionAttempt < TimeSpan.FromSeconds(5)) {
+                logger.info("Skipping reconnection attempt - too recent");
+                return;
+            }
+            lastReconnectionAttempt = DateTime.Now;
         }
         
         try {
@@ -432,7 +441,7 @@ public class Program {
             };
             
             var lavalink = client.GetLavalink();
-            await reconnectLavalink(client, lavalink, lavalinkConfig);
+            await forceReconnectLavalink(client, lavalink, lavalinkConfig);
         }
         catch (Exception ex) {
             logger.error($"Error during triggered Lavalink reconnection: {ex}");
@@ -445,11 +454,10 @@ public class Program {
         }
 
         try {
-            logger.info("Saving playback states for all guilds...");
+            logger.info("Saving playback states for guilds with active music...");
             
-            foreach (var guild in client.Guilds.Values) {
-                var musicData = await musicService.GetOrCreateDataAsync(guild);
-                if (musicData.Player != null && musicData.Player.IsConnected && musicData.queue.NowPlaying != null) {
+            foreach (var musicData in musicService.GetExistingGuildData()) {
+                if (musicData.Player is { IsConnected: true } && musicData.queue.NowPlaying != null) {
                     var state = new PlaybackState {
                         CurrentTrack = musicData.queue.NowPlaying,
                         Position = musicData.GetCurrentPosition(),
@@ -468,8 +476,8 @@ public class Program {
                         EqEnabled = musicData.eq
                     };
                     
-                    savedPlaybackStates[guild.Id] = state;
-                    logger.info($"Saved playback state for guild {guild.Name}");
+                    savedPlaybackStates[musicData.Guild.Id] = state;
+                    logger.info($"Saved playback state for guild {musicData.Guild.Name}");
                 }
             }
         }

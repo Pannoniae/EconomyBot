@@ -2827,11 +2827,11 @@
                 Handles the heartbeat loop.
             </summary>
         </member>
-        <member name="M:DisCatSharp.DiscordClient.InternalUpdateStatusAsync(DisCatSharp.Entities.DiscordActivity,System.Nullable{DisCatSharp.Entities.UserStatus},System.Nullable{System.DateTimeOffset})">
+        <member name="M:DisCatSharp.DiscordClient.InternalUpdateStatusAsync(System.Collections.Generic.List{DisCatSharp.Entities.DiscordActivity},System.Nullable{DisCatSharp.Entities.UserStatus},System.Nullable{System.DateTimeOffset})">
             <summary>
                 Updates the status.
             </summary>
-            <param name="activity">The activity.</param>
+            <param name="activities">The activity.</param>
             <param name="userStatus">The optional user status.</param>
             <param name="idleSince">Since when is the client performing the specified activity.</param>
         </member>
@@ -10105,6 +10105,11 @@
                 Gets a mapping of unicode => :name:.
             </summary>
         </member>
+        <member name="P:DisCatSharp.Entities.DiscordEmoji.s_aliasNameToCanonical">
+            <summary>
+                Gets a mapping of :alias_name: => :name:.
+            </summary>
+        </member>
         <member name="T:DisCatSharp.Entities.DiscordUnicodeEmoji">
             <summary>
                 Represents a discord unicode emoji.
@@ -10136,6 +10141,11 @@
         <member name="M:DisCatSharp.Entities.PartialEmoji.#ctor">
             <summary>
                 Creates a new empty <see cref="T:DisCatSharp.Entities.PartialEmoji" />
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Entities.PartialEmoji.IsAnimated">
+            <summary>
+                Sets whether this emoji is animated.
             </summary>
         </member>
         <member name="P:DisCatSharp.Entities.PartialEmoji.Id">
@@ -18274,6 +18284,11 @@
                 Gets the guild locale if applicable.
             </summary>
         </member>
+        <member name="P:DisCatSharp.Entities.DiscordInteraction.AttachmentSizeLimit">
+            <summary>
+                Gets the attachment size limit in bytes.
+            </summary>
+        </member>
         <member name="P:DisCatSharp.Entities.DiscordInteraction.AppPermissions">
             <summary>
                 Gets the applications permissions.
@@ -22575,6 +22590,11 @@
             </summary>
             <param name="other">The other.</param>
         </member>
+        <member name="P:DisCatSharp.Entities.DiscordActivity.Emoji">
+            <summary>
+                Gets or sets the partial emoji.
+            </summary>
+        </member>
         <member name="P:DisCatSharp.Entities.DiscordActivity.Id">
             <summary>
                 Gets or sets the id of user's activity.
@@ -22662,7 +22682,7 @@
                 Gets the emoji of this custom status, if any.
             </summary>
         </member>
-        <member name="M:DisCatSharp.Entities.DiscordCustomStatus.UpdateWith(System.String,DisCatSharp.Entities.DiscordEmoji)">
+        <member name="M:DisCatSharp.Entities.DiscordCustomStatus.UpdateWith(System.String,DisCatSharp.Entities.PartialEmoji)">
             <summary>
                 Updates a discord status.
             </summary>
@@ -23045,6 +23065,11 @@
             </summary>
             <param name="other">The other.</param>
         </member>
+        <member name="P:DisCatSharp.Entities.DiscordPresence.InternalActivities">
+            <summary>
+                Gets the internal activities.
+            </summary>
+        </member>
         <member name="P:DisCatSharp.Entities.DiscordPresence.Discord">
             <summary>
                 Gets the discord client.
@@ -23288,16 +23313,6 @@
                 Represents a Discord user.
             </summary>
         </member>
-        <member name="F:DisCatSharp.Entities.DiscordUser.BannerColorInternal">
-            <summary>
-                Gets the user's banner color integer.
-            </summary>
-        </member>
-        <member name="F:DisCatSharp.Entities.DiscordUser.ThemeColorsInternal">
-            <summary>
-                Gets the user's theme color integers.
-            </summary>
-        </member>
         <member name="M:DisCatSharp.Entities.DiscordUser.#ctor">
             <summary>
                 Initializes a new instance of the <see cref="T:DisCatSharp.Entities.DiscordUser" /> class.
@@ -23308,6 +23323,16 @@
                 Initializes a new instance of the <see cref="T:DisCatSharp.Entities.DiscordUser" /> class.
             </summary>
             <param name="transport">The transport user.</param>
+        </member>
+        <member name="P:DisCatSharp.Entities.DiscordUser.BannerColorInternal">
+            <summary>
+                Gets the user's banner color integer.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Entities.DiscordUser.ThemeColorsInternal">
+            <summary>
+                Gets the user's theme color integers.
+            </summary>
         </member>
         <member name="P:DisCatSharp.Entities.DiscordUser.Username">
             <summary>
@@ -32195,6 +32220,11 @@
                 Gets the user's new game.
             </summary>
         </member>
+        <member name="P:DisCatSharp.EventArgs.PresenceUpdateEventArgs.Activities">
+            <summary>
+                Gets the user's new activitites.
+            </summary>
+        </member>
         <member name="P:DisCatSharp.EventArgs.PresenceUpdateEventArgs.Status">
             <summary>
                 Gets the user's status.
@@ -36520,6 +36550,11 @@
                 Represents data for websocket status update payload.
             </summary>
         </member>
+        <member name="P:DisCatSharp.Net.Abstractions.StatusUpdate.ActivitiesInternal">
+            <summary>
+                Gets the activities.
+            </summary>
+        </member>
         <member name="P:DisCatSharp.Net.Abstractions.StatusUpdate.IdleSince">
             <summary>
                 Gets or sets the unix millisecond timestamp of when the user went idle.
@@ -36540,7 +36575,7 @@
                 Gets the status string of the user.
             </summary>
         </member>
-        <member name="P:DisCatSharp.Net.Abstractions.StatusUpdate.Activity">
+        <member name="P:DisCatSharp.Net.Abstractions.StatusUpdate.Activities">
             <summary>
                 Gets or sets the game the user is playing.
             </summary>
