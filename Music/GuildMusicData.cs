@@ -384,6 +384,7 @@ public sealed class GuildMusicData {
         eq = true;
         logger.info("Enabled EQ");
         Player!.UpdateAsync(action => action.Filters = new LavalinkFilters {
+                Volume = 1f,
                 Equalizers = new List<LavalinkEqualizer> {
                     new((LavalinkFilterBand)0, 0.2f),
                     new((LavalinkFilterBand)1, 0.2f),
@@ -402,7 +403,9 @@ public sealed class GuildMusicData {
                     new((LavalinkFilterBand)14, -0.05f)
                 },
                 // otherwise this errors? idk
-                PluginFilters = new Dictionary<string, IPluginFilter>()
+                PluginFilters = new Dictionary<string, IPluginFilter>() {
+                    ["a"] = null!
+                }
             }
         );
     }
