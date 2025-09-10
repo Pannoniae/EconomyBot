@@ -11,7 +11,7 @@ public class MusicQueue(GuildMusicData guildMusic) {
     /// <summary>
     /// Gets the currently playing item.
     /// </summary>
-    public Track? NowPlaying { get; private set; }
+    public Track? NowPlaying { get; set; }
 
     /// <summary>
     /// It's like <see cref="NowPlaying"/> but doesn't get cleared when playback stops. Used for implementing repeat.

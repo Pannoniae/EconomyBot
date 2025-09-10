@@ -43,7 +43,11 @@ public class Program {
     
     private static readonly Dictionary<ulong, PlaybackState> savedPlaybackStates = new();
     private static DateTime lastReconnectionAttempt = DateTime.MinValue;
+    private static DateTime lastSaveAttempt = DateTime.MinValue;
+    private static DateTime lastRestoreAttempt = DateTime.MinValue;
     private static readonly Lock reconnectionLock = new();
+    private static readonly Lock saveStateLock = new();
+    private static readonly Lock restoreStateLock = new();
 
     public const ulong LOG = 838920584879800343;
     public static ulong HALLOFFAME = 1078991955633127474;
@@ -399,12 +403,40 @@ public class Program {
         }
 
         try {
-            logger.info("Forcing Lavalink reconnection (ignoring current connection state)...");
+            logger.info("Forcing Lavalink reconnection...");
             
-            // Force create a new connection regardless of current state
+            // Properly dispose old connections and data to prevent memory leaks
+            if (LavalinkNode != null) {
+                logger.info("Destroying old Lavalink node...");
+                try {
+                    await LavalinkNode.DestroyAsync();
+                    logger.info("Successfully destroyed old Lavalink node");
+                } catch (Exception disposeEx) {
+                    logger.warn($"Error destroying old Lavalink node: {disposeEx}");
+                }
+            }
+            
+            if (musicService != null) {
+                logger.info("Disposing old MusicService...");
+                musicService.slsk?.Dispose();
+                // Clear all guild data to force garbage collection
+                foreach (var guildData in musicService.GetExistingGuildData()) {
+                    try {
+                        await guildData.DestroyPlayerAsync();
+                    } catch (Exception destroyEx) {
+                        logger.warn($"Error destroying player for {guildData.Guild.Name}: {destroyEx}");
+                    }
+                }
+                musicService = null;
+            }
+            
+            // Force garbage collection to clean up old instances
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+            
+            // Create fresh connection
             LavalinkNode = await lavalink.ConnectAsync(lavalinkConfig);
-            
-            musicService?.slsk?.Dispose();
             musicService = new MusicService(lavalink, LavalinkNode);
             
             logger.info("Successfully force-reconnected to Lavalink!");
@@ -412,7 +444,7 @@ public class Program {
             await restoreAllPlaybackStates();
         }
         catch (Exception ex) {
-            logger.error($"Failed to force-reconnect to Lavalink: {ex.Message}");
+            logger.error($"Failed to force-reconnect to Lavalink: {ex}");
             logger.error(ex);
         }
     }
@@ -453,6 +485,15 @@ public class Program {
             return;
         }
 
+        lock (saveStateLock) {
+            // Debounce: ignore if we attempted save in the last 5 seconds
+            if (DateTime.Now - lastSaveAttempt < TimeSpan.FromSeconds(5)) {
+                logger.info("Skipping save attempt - too recent");
+                return;
+            }
+            lastSaveAttempt = DateTime.Now;
+        }
+
         try {
             logger.info("Saving playback states for guilds with active music...");
             
@@ -478,6 +519,17 @@ public class Program {
                     
                     savedPlaybackStates[musicData.Guild.Id] = state;
                     logger.info($"Saved playback state for guild {musicData.Guild.Name}");
+                    
+                    // Properly disconnect from voice channel to prevent stuck states
+                    try {
+                        if (musicData.Player != null && musicData.Player.IsConnected) {
+                            await musicData.Player.DisconnectAsync();
+                            logger.info($"Disconnected from voice channel in {musicData.Guild.Name}");
+                        }
+                    }
+                    catch (Exception disconnectEx) {
+                        logger.warn($"Failed to disconnect from voice channel in {musicData.Guild.Name}: {disconnectEx}");
+                    }
                 }
             }
         }
@@ -489,6 +541,15 @@ public class Program {
     private static async Task restoreAllPlaybackStates() {
         if (!lavalinkInit || musicService == null) {
             return;
+        }
+
+        lock (restoreStateLock) {
+            // Debounce: ignore if we attempted restore in the last 5 seconds
+            if (DateTime.Now - lastRestoreAttempt < TimeSpan.FromSeconds(5)) {
+                logger.info("Skipping restore attempt - too recent");
+                return;
+            }
+            lastRestoreAttempt = DateTime.Now;
         }
 
         try {
@@ -504,7 +565,23 @@ public class Program {
                     if (state.VoiceChannelId.HasValue && state.CurrentTrack != null) {
                         var voiceChannel = guild.GetChannel(state.VoiceChannelId.Value);
                         if (voiceChannel != null) {
+                            // Ensure we're properly disconnected first
+                            try {
+                                if (musicData.Player != null && musicData.Player.IsConnected) {
+                                    await musicData.Player.DisconnectAsync();
+                                    logger.info($"Disconnected existing player from {guild.Name}");
+                                }
+                            }
+                            catch (Exception disconnectEx) {
+                                logger.warn($"Failed to disconnect existing player in {guild.Name}: {disconnectEx}");
+                            }
+
+                            // Create fresh player connection
                             await musicData.CreatePlayerAsync(voiceChannel);
+                            logger.info($"Reconnected to voice channel in {guild.Name}");
+                            
+                            // Wait a moment for connection to stabilize
+                            await Task.Delay(1000);
                             
                             musicData.queue.Queue.Clear();
                             musicData.queue.Queue.AddRange(state.Queue);
@@ -527,6 +604,9 @@ public class Program {
                             if (state.CommandChannelId.HasValue) {
                                 musicData.CommandChannel = guild.GetChannel(state.CommandChannelId.Value);
                             }
+                            
+                            // Properly restore the current track through the queue system
+                            musicData.queue.NowPlaying = state.CurrentTrack;
                             
                             if (state.WasPlaying && !state.WasPaused) {
                                 await musicData.Player!.PlayAsync(state.CurrentTrack.track);
