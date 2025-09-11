@@ -230,13 +230,19 @@ public class MusicQueue(GuildMusicData guildMusic) {
             return;
         }
 
+        if (guildMusic.Player == null || !guildMusic.Player.IsConnected) {
+            logger.warn("Cannot play track - player is null or disconnected, requeueing track");
+            Queue.Insert(0, nextTrack);
+            return;
+        }
+
         NowPlaying = nextTrack;
         if (earrapeMode) {
             var length = nextTrack.track.Info.Length;
-            await guildMusic.Player!.PlayPartialAsync(nextTrack.track, TimeSpan.Zero, length - TimeSpan.FromSeconds(20));
+            await guildMusic.Player.PlayPartialAsync(nextTrack.track, TimeSpan.Zero, length - TimeSpan.FromSeconds(20));
         }
         else {
-            await guildMusic.Player!.PlayAsync(nextTrack.track);
+            await guildMusic.Player.PlayAsync(nextTrack.track);
         }
     }
 
@@ -328,6 +334,11 @@ public class MusicQueue(GuildMusicData guildMusic) {
     }
 
     public async Task Player_PlaybackFinished(LavalinkGuildPlayer con, LavalinkTrackEndedEventArgs e) {
+        if (guildMusic.Player == null || con != guildMusic.Player) {
+            logger.warn("Ignoring playback finished event from old/invalid player during reconnection");
+            return;
+        }
+
         // requeue if there are items in the queue
         if (repeatQueue && Queue.Count != 0 && repeatHolder != null) {
             Queue.Add(repeatHolder);
@@ -346,6 +357,11 @@ public class MusicQueue(GuildMusicData guildMusic) {
     }
 
     public async Task Player_PlaybackStarted(LavalinkGuildPlayer sender, LavalinkTrackStartedEventArgs e) {
+        if (guildMusic.Player == null || sender != guildMusic.Player) {
+            logger.warn("Ignoring playback started event from old/invalid player during reconnection");
+            return;
+        }
+        
         await sender.SetVolumeAsync(guildMusic.effectiveVolume);
     }
 }

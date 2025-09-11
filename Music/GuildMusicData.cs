@@ -268,6 +268,10 @@ public sealed class GuildMusicData {
         if (Player == null) {
             return;
         }
+        
+        Player.TrackEnded -= queue.Player_PlaybackFinished;
+        Player.TrackStarted -= queue.Player_PlaybackStarted;
+        Player.TrackException -= Lavalink_TrackExceptionThrown;
 
         if (Player.IsConnected) {
             await Player.DisconnectAsync();

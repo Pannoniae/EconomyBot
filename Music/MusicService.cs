@@ -49,7 +49,7 @@ public sealed class MusicService {
             _ = Task.Run(async () => {
                 try {
                     await Program.saveAllPlaybackStates();
-                    await Program.lavalinkReconnect();
+                    Program.markLavalinkReconnectionNeeded();
                 }
                 catch (Exception ex) {
                     await Console.Out.WriteLineAsync($"Error handling Lavalink socket error: {ex.Message}");
@@ -62,10 +62,10 @@ public sealed class MusicService {
             _ = Task.Run(async () => {
                 try {
                     await Program.saveAllPlaybackStates();
-                    await Program.lavalinkReconnect();
+                    Program.markLavalinkReconnectionNeeded();
                 }
                 catch (Exception ex) {
-                    await Console.Out.WriteLineAsync($"Error handling Lavalink socket error: {ex.Message}");
+                    await Console.Out.WriteLineAsync($"Error handling Lavalink websocket close: {ex.Message}");
                 }
             });
         };

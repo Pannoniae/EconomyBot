@@ -48,6 +48,7 @@ public class Program {
     private static readonly Lock reconnectionLock = new();
     private static readonly Lock saveStateLock = new();
     private static readonly Lock restoreStateLock = new();
+    private static bool needsLavalinkReconnection = false;
 
     public const ulong LOG = 838920584879800343;
     public static ulong HALLOFFAME = 1078991955633127474;
@@ -131,8 +132,19 @@ public class Program {
         });
         discord.MessageCreated += messageHandler;
         discord.MessagesBulkDeleted += messageDeleteHandler;
-        discord.Ready += async (sender, _) => await setup(sender, lavalink, lavalinkConfig);
-        discord.Resumed += async (_, _) => await lavalinkReconnect();
+        discord.Ready += async (sender, _) => {
+            await setup(sender, lavalink, lavalinkConfig);
+            if (needsLavalinkReconnection) {
+                needsLavalinkReconnection = false;
+                await lavalinkReconnect();
+            }
+        };
+        discord.Resumed += async (_, _) => {
+            if (needsLavalinkReconnection) {
+                needsLavalinkReconnection = false;
+                await lavalinkReconnect();
+            }
+        };
         //discord.GuildDownloadCompleted += (sender, _) => setupB(sender, lavalink, lavalinkConfig);
         discord.MessageDeleted += messageDeleteHandler;
         discord.GuildMemberAdded += roleHandler;
@@ -405,17 +417,6 @@ public class Program {
         try {
             logger.info("Forcing Lavalink reconnection...");
             
-            // Properly dispose old connections and data to prevent memory leaks
-            if (LavalinkNode != null) {
-                logger.info("Destroying old Lavalink node...");
-                try {
-                    await LavalinkNode.DestroyAsync();
-                    logger.info("Successfully destroyed old Lavalink node");
-                } catch (Exception disposeEx) {
-                    logger.warn($"Error destroying old Lavalink node: {disposeEx}");
-                }
-            }
-            
             if (musicService != null) {
                 logger.info("Disposing old MusicService...");
                 musicService.slsk?.Dispose();
@@ -428,6 +429,17 @@ public class Program {
                     }
                 }
                 musicService = null;
+            }
+            
+            // Properly dispose old connections and data to prevent memory leaks
+            if (LavalinkNode != null) {
+                logger.info("Destroying old Lavalink node...");
+                try {
+                    await LavalinkNode.DestroyAsync();
+                    logger.info("Successfully destroyed old Lavalink node");
+                } catch (Exception disposeEx) {
+                    logger.warn($"Error destroying old Lavalink node: {disposeEx}");
+                }
             }
             
             // Force garbage collection to clean up old instances
@@ -447,6 +459,11 @@ public class Program {
             logger.error($"Failed to force-reconnect to Lavalink: {ex}");
             logger.error(ex);
         }
+    }
+    
+    public static void markLavalinkReconnectionNeeded() {
+        needsLavalinkReconnection = true;
+        logger.info("Marked Lavalink reconnection as needed - will reconnect at end of Ready/Resumed event");
     }
     
     public static async Task lavalinkReconnect() {
@@ -608,15 +625,19 @@ public class Program {
                             // Properly restore the current track through the queue system
                             musicData.queue.NowPlaying = state.CurrentTrack;
                             
-                            if (state.WasPlaying && !state.WasPaused) {
-                                await musicData.Player!.PlayAsync(state.CurrentTrack.track);
-                                await musicData.SeekAsync(state.Position, false);
-                                logger.info($"Resumed playback for guild {guild.Name} at {state.Position}");
-                            } else if (state.WasPaused) {
-                                await musicData.Player!.PlayAsync(state.CurrentTrack.track);
-                                await musicData.SeekAsync(state.Position, false);
-                                await musicData.PauseAsync();
-                                logger.info($"Restored paused state for guild {guild.Name} at {state.Position}");
+                            if (musicData.Player != null && musicData.Player.IsConnected) {
+                                if (state.WasPlaying && !state.WasPaused) {
+                                    await musicData.Player.PlayAsync(state.CurrentTrack.track);
+                                    await musicData.SeekAsync(state.Position, false);
+                                    logger.info($"Resumed playback for guild {guild.Name} at {state.Position}");
+                                } else if (state.WasPaused) {
+                                    await musicData.Player.PlayAsync(state.CurrentTrack.track);
+                                    await musicData.SeekAsync(state.Position, false);
+                                    await musicData.PauseAsync();
+                                    logger.info($"Restored paused state for guild {guild.Name} at {state.Position}");
+                                }
+                            } else {
+                                logger.warn($"Cannot restore playback for guild {guild.Name} - player is null or disconnected");
                             }
                         }
                     }
