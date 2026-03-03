@@ -8,6 +8,7 @@ using DisCatSharp.ApplicationCommands.Attributes;
 using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.ApplicationCommands.Enums;
 using DisCatSharp.Enums;
+using DisCatSharp.Interactivity.Entities;
 using DisCatSharp.Interactivity.EventHandling;
 
 namespace EconomyBot;

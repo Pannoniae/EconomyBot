@@ -1022,6 +1022,16 @@
                 The session id for the voice connection.
             </summary>
         </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkVoiceState.ChannelId">
+            <summary>
+                The channel id for the voice connection.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Entities.LavalinkVoiceState.ChannelIdString">
+            <summary>
+            	The channel id for the voice connection as a string, used for serialization.
+            </summary>
+        </member>
         <member name="T:DisCatSharp.Lavalink.Entities.LyricsLine">
             <summary>
                 Represents a lyric line.
@@ -2740,27 +2750,38 @@
                 Represents a custom json (de-)serializer.
             </summary>
         </member>
-        <member name="F:DisCatSharp.Lavalink.LavalinkJson.s_setting">
+        <member name="F:DisCatSharp.Lavalink.LavalinkJson.s_settings">
             <summary>
-                The <see cref="T:Newtonsoft.Json.JsonSerializerSettings" /> with an <see cref="T:Newtonsoft.Json.Serialization.IContractResolver" />
-                for <see cref="T:DisCatSharp.Entities.Optional" /> types.
+            	Gets the serializer settings.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkJson.s_serializer">
+            <summary>
+                Gets the serializer.
             </summary>
         </member>
         <member name="M:DisCatSharp.Lavalink.LavalinkJson.DeserializeObject``1(System.String)">
             <summary>
-                Deserializes the JSON to the specified .NET type using <see cref="F:DisCatSharp.Lavalink.LavalinkJson.s_setting" />.
+                Deserializes the JSON to the specified .NET type using <see cref="F:DisCatSharp.Lavalink.LavalinkJson.s_serializer" />.
             </summary>
             <typeparam name="T">The type of the object to deserialize to.</typeparam>
             <param name="value">The object to deserialize.</param>
             <returns>The deserialized object from the JSON string.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkJson.SerializeObject(System.Object,Newtonsoft.Json.Formatting)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkJson.SerializeObject(System.Object)">
             <summary>
-                Serializes the specified object to a JSON string using formatting and <see cref="F:DisCatSharp.Lavalink.LavalinkJson.s_setting" />.
+                Serializes the specified object to a JSON string using formatting and <see cref="F:DisCatSharp.Lavalink.LavalinkJson.s_serializer" />.
             </summary>
             <param name="value">The object to serialize.</param>
-            <param name="formatting">Indicates how the output should be formatted. Defaults to <see cref="F:Newtonsoft.Json.Formatting.Indented" />.</param>
             <returns>A JSON string representation of the object.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkJson.SerializeObjectInternal(System.Object,System.Type,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+                Serializes the object.
+            </summary>
+            <param name="value">The value.</param>
+            <param name="type">The type.</param>
+            <param name="jsonSerializer">The json serializer.</param>
         </member>
         <member name="T:DisCatSharp.Lavalink.LavalinkQueue`1">
             <summary>

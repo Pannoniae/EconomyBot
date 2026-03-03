@@ -552,9 +552,27 @@
             <param name="checkMode">Role checking mode.</param>
             <param name="roleNames">Names of the role to be verified by this check.</param>
         </member>
+        <member name="M:DisCatSharp.CommandsNext.Attributes.RequireRolesAttribute.#ctor(DisCatSharp.CommandsNext.Attributes.RoleCheckMode,System.UInt64[])">
+            <summary>
+                Defines that usage of this command is restricted to members with specified role. Note that it's much preferred to
+                restrict access using <see cref="T:DisCatSharp.CommandsNext.Attributes.RequirePermissionsAttribute" />.
+            </summary>
+            <param name="checkMode">Role checking mode.</param>
+            <param name="roleIds">Ids of the role to be verified by this check.</param>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.RequireRolesAttribute.UsesRoleIds">
+            <summary>
+            	Gets whether role ids are used.
+            </summary>
+        </member>
         <member name="P:DisCatSharp.CommandsNext.Attributes.RequireRolesAttribute.RoleNames">
             <summary>
                 Gets the name of the role required to execute this command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.Attributes.RequireRolesAttribute.RoleIds">
+            <summary>
+                Gets the ids of the role required to execute this command.
             </summary>
         </member>
         <member name="P:DisCatSharp.CommandsNext.Attributes.RequireRolesAttribute.CheckMode">
@@ -2359,6 +2377,12 @@
             <summary>
                 Gets the command that is being executed.
             </summary>
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandContext.FullCommandName">
+            <inheritdoc />
+        </member>
+        <member name="P:DisCatSharp.CommandsNext.CommandContext.CommandName">
+            <inheritdoc />
         </member>
         <member name="P:DisCatSharp.CommandsNext.CommandContext.Overload">
             <summary>

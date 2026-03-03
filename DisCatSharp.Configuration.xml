@@ -39,6 +39,25 @@
             <param name="config">Instance of config</param>
             <param name="section">Section which contains values for <paramref name="config" /></param>
         </member>
+        <member name="M:DisCatSharp.Configuration.ConfigurationExtensions.TryCreateWebProxy(DisCatSharp.Configuration.Models.ConfigSection,System.String,System.String)">
+            <summary>
+                Attempts to create a <see cref="T:System.Net.IWebProxy" /> from a user-specified value or sub-section.
+            </summary>
+            <param name="section">Configuration section being hydrated.</param>
+            <param name="propertyName">Property name pointing to the proxy object.</param>
+            <param name="value">Proxy value provided via configuration.</param>
+            <returns>Instance of <see cref="T:System.Net.IWebProxy" /> when parsable; otherwise, <see langword="null" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Configuration.ConfigurationExtensions.TryCreateProxyFromString(System.String,System.String,System.String)">
+            <summary>
+                Tries to create a proxy from string values, supporting host, port and bypass-on-local.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Configuration.ConfigurationExtensions.TryHydrateComplexType(DisCatSharp.Configuration.Models.ConfigSection,System.String,System.Type,System.String)">
+            <summary>
+                Attempts to hydrate a complex type using JSON value or a nested configuration section.
+            </summary>
+        </member>
         <member name="M:DisCatSharp.Configuration.ConfigurationExtensions.ExtractConfig(DisCatSharp.Configuration.Models.ConfigSection,System.Func{System.Object})">
             <summary>
                 Instantiate an entity using <paramref name="factory" /> then walk through the specified <paramref name="section" />
@@ -100,22 +119,22 @@
             <returns>Hydrated instance of <typeparamref name="TConfig" /> which contains the user-defined values (if any).</returns>
         </member>
         <member name="M:DisCatSharp.Configuration.ConfigurationExtensions.HasSection(Microsoft.Extensions.Configuration.IConfiguration,System.String[])">
-            <summary>
-                Determines if <paramref name="config" /> contains a particular section/object (not value)
-            </summary>
-            <remarks>
-                <code>
-            {
-               "Discord": {  // this is a section/object
+             <summary>
+                 Determines if <paramref name="config" /> contains a particular section/object (not value)
+             </summary>
+             <remarks>
+                 <code>
+             {
+                "Discord": {  // this is a section/object
             
-               },
-               "Value": "something" // this is not a section/object
-            }
-            </code>
-            </remarks>
-            <param name="config"></param>
-            <param name="values"></param>
-            <returns>True if section exists, otherwise false</returns>
+                },
+                "Value": "something" // this is not a section/object
+             }
+             </code>
+             </remarks>
+             <param name="config"></param>
+             <param name="values"></param>
+             <returns>True if section exists, otherwise false</returns>
         </member>
         <member name="M:DisCatSharp.Configuration.ConfigurationExtensions.BuildClient(Microsoft.Extensions.Configuration.IConfiguration,System.IServiceProvider,System.String)">
             <summary>

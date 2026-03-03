@@ -6,6 +6,7 @@ using DisCatSharp.CommandsNext;
 using DisCatSharp.CommandsNext.Attributes;
 using DisCatSharp.Entities;
 using DisCatSharp.Interactivity;
+using DisCatSharp.Interactivity.Entities;
 using DisCatSharp.Interactivity.Enums;
 using DisCatSharp.Interactivity.Extensions;
 using DisCatSharp.Lavalink.Entities;

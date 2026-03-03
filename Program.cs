@@ -56,6 +56,8 @@ public class Program {
     public const ulong POLISH_CHANNEL = 1156695554462597120;
     public const ulong ZOO = 1149817703922675823;
     public const ulong HUNGARY_CHANNEL = 1154903997510062181;
+    public const ulong MY_GUILD = 838843082110664756;
+    public const ulong BUG_REPORT_CATEGORY = 1472268871791808790;
 
 
     // shut up compiler
@@ -218,13 +220,15 @@ public class Program {
                         logger.warn(exception);
                         throw;
                     }
-                    catch (Exception) {
+                    catch (Exception e) {
                         await channel.SendMessageAsync("Penis happened!");
+                        // log the fucking error
+                        await channel.SendMessageAsync(e.ToString());
                     }
 
                     var file = new FileStream(path, FileMode.Open);
                     await (await client.GetGuildAsync(838843082110664756)!).GetChannel(LOG)!
-                        .SendMessageAsync(new DiscordMessageBuilder().WithFile(file));
+                        .SendMessageAsync(new DiscordMessageBuilder().AddFile(file));
                 }
             });
         }
@@ -258,8 +262,8 @@ public class Program {
             await e.Guild.BanMemberAsync(m, 6);
         }
 
-        // @everyone protection
-        if (e.Message.Content.Contains("@everyone") || e.Message.Content.Contains("@here")) {
+        // @everyone protection (only on our server)
+        if (e.Guild?.Id == MY_GUILD && (e.Message.Content.Contains("@everyone") || e.Message.Content.Contains("@here"))) {
             await e.Message.RespondAsync("This server - and the world in general - would be better without your existence " + DiscordEmoji.FromName(client, ":pleading_face:"));
         }
 
@@ -272,8 +276,37 @@ public class Program {
             return;
         }
 
-        // Funny replacement handling
-        // todo
+        // Bug report reminder for new forum posts in the bug report category
+        {
+            var ch = e.Channel;
+            bool inBugCategory = false;
+            while (ch != null) {
+                if (ch.Id == BUG_REPORT_CATEGORY) {
+                    inBugCategory = true;
+                    break;
+                }
+                // resolve through guild cache if possible
+                ch = ch.Parent?.Id is { } pid && e.Guild?.Channels.TryGetValue(pid, out var cached) == true
+                    ? cached
+                    : ch.Parent;
+            }
+            if (inBugCategory) {
+                var hasAttachment = e.Message.Attachments.Count > 0;
+                var hasLogLink = e.Message.Content.Contains("pastebin", StringComparison.OrdinalIgnoreCase) ||
+                                 e.Message.Content.Contains("paste.ee", StringComparison.OrdinalIgnoreCase) ||
+                                 e.Message.Content.Contains("hastebin", StringComparison.OrdinalIgnoreCase) ||
+                                 e.Message.Content.Contains("gist.github", StringComparison.OrdinalIgnoreCase);
+                if (!hasAttachment && !hasLogLink) {
+                    await e.Message.RespondAsync(
+                        "I'm not a mind-reader: can you please provide a crashlog (found in /reports), the system.log.txt and a detailed explanation of the crash's occurrence?");
+                }
+            }
+        }
+
+        // Only run funny replies/replacements on our server
+        if (e.Guild?.Id != MY_GUILD) return;
+
+        // conquest
 
         var lizardry = new List<string> {
             "ą",
