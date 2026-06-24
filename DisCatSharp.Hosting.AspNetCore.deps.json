@@ -1,0 +1,254 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v11.0/win-x64",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v11.0": {},
+    ".NETCoreApp,Version=v11.0/win-x64": {
+      "DisCatSharp.Hosting.AspNetCore/10.7.1": {
+        "dependencies": {
+          "BouncyCastle.Cryptography": "2.6.2",
+          "DisCatSharp.Attributes": "2026.3.26",
+          "DisCatSharp.Hosting": "10.7.1"
+        },
+        "runtime": {
+          "DisCatSharp.Hosting.AspNetCore.dll": {}
+        }
+      },
+      "BouncyCastle.Cryptography/2.6.2": {
+        "runtime": {
+          "lib/net6.0/BouncyCastle.Cryptography.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.6.2.46322",
+            "localPath": "BouncyCastle.Cryptography.dll"
+          }
+        }
+      },
+      "DisCatSharp.Attributes/2026.3.26": {
+        "runtime": {
+          "lib/netstandard2.0/DisCatSharp.Attributes.dll": {
+            "assemblyVersion": "2026.3.26.0",
+            "fileVersion": "2026.3.26.0",
+            "localPath": "DisCatSharp.Attributes.dll"
+          }
+        }
+      },
+      "Microsoft.Bcl.HashCode/6.0.0": {
+        "runtime": {
+          "lib/net6.0/Microsoft.Bcl.HashCode.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.24.56208",
+            "localPath": "Microsoft.Bcl.HashCode.dll"
+          }
+        }
+      },
+      "Microsoft.Maui.Graphics/10.0.60": {
+        "runtime": {
+          "lib/net10.0/Microsoft.Maui.Graphics.dll": {
+            "assemblyVersion": "10.0.0.0",
+            "fileVersion": "10.0.6026.22707",
+            "localPath": "Microsoft.Maui.Graphics.dll"
+          }
+        }
+      },
+      "Microsoft.Maui.Graphics.Skia/10.0.60": {
+        "dependencies": {
+          "Microsoft.Maui.Graphics": "10.0.60",
+          "SkiaSharp": "3.116.1"
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.Maui.Graphics.Skia.dll": {
+            "assemblyVersion": "10.0.0.0",
+            "fileVersion": "10.0.6026.22707",
+            "localPath": "Microsoft.Maui.Graphics.Skia.dll"
+          }
+        }
+      },
+      "Nager.PublicSuffix/3.8.0": {
+        "runtime": {
+          "lib/net10.0/Nager.PublicSuffix.dll": {
+            "assemblyVersion": "3.8.0.0",
+            "fileVersion": "3.8.0.0",
+            "localPath": "Nager.PublicSuffix.dll"
+          }
+        }
+      },
+      "Newtonsoft.Json/13.0.4": {
+        "runtime": {
+          "lib/net6.0/Newtonsoft.Json.dll": {
+            "assemblyVersion": "13.0.0.0",
+            "fileVersion": "13.0.4.30916",
+            "localPath": "Newtonsoft.Json.dll"
+          }
+        }
+      },
+      "SkiaSharp/3.116.1": {
+        "dependencies": {
+          "SkiaSharp.NativeAssets.Win32": "3.116.1"
+        },
+        "runtime": {
+          "lib/net8.0/SkiaSharp.dll": {
+            "assemblyVersion": "3.116.0.0",
+            "fileVersion": "3.116.1.0",
+            "localPath": "SkiaSharp.dll"
+          }
+        }
+      },
+      "SkiaSharp.NativeAssets.Win32/3.116.1": {
+        "native": {
+          "runtimes/win-x64/native/libSkiaSharp.dll": {
+            "fileVersion": "0.0.0.0",
+            "localPath": "libSkiaSharp.dll"
+          }
+        }
+      },
+      "DisCatSharp/10.7.1": {
+        "dependencies": {
+          "DisCatSharp.Attributes": "2026.3.26",
+          "DisCatSharp.Common": "10.7.1",
+          "Microsoft.Bcl.HashCode": "6.0.0",
+          "Nager.PublicSuffix": "3.8.0",
+          "Newtonsoft.Json": "13.0.4"
+        },
+        "runtime": {
+          "DisCatSharp.dll": {
+            "assemblyVersion": "10.7.1.0",
+            "fileVersion": "10.7.1.0"
+          }
+        }
+      },
+      "DisCatSharp.Common/10.7.1": {
+        "dependencies": {
+          "DisCatSharp.Attributes": "2026.3.26",
+          "Microsoft.Maui.Graphics": "10.0.60",
+          "Microsoft.Maui.Graphics.Skia": "10.0.60",
+          "Newtonsoft.Json": "13.0.4"
+        },
+        "runtime": {
+          "DisCatSharp.Common.dll": {
+            "assemblyVersion": "10.7.1.0",
+            "fileVersion": "10.7.1.0"
+          }
+        }
+      },
+      "DisCatSharp.Configuration/10.7.1": {
+        "dependencies": {
+          "DisCatSharp": "10.7.1",
+          "DisCatSharp.Attributes": "2026.3.26",
+          "Newtonsoft.Json": "13.0.4"
+        },
+        "runtime": {
+          "DisCatSharp.Configuration.dll": {
+            "assemblyVersion": "10.7.1.0",
+            "fileVersion": "10.7.1.0"
+          }
+        }
+      },
+      "DisCatSharp.Hosting/10.7.1": {
+        "dependencies": {
+          "DisCatSharp": "10.7.1",
+          "DisCatSharp.Attributes": "2026.3.26",
+          "DisCatSharp.Configuration": "10.7.1"
+        },
+        "runtime": {
+          "DisCatSharp.Hosting.dll": {
+            "assemblyVersion": "10.7.1.0",
+            "fileVersion": "10.7.1.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "DisCatSharp.Hosting.AspNetCore/10.7.1": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "BouncyCastle.Cryptography/2.6.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-7oWOcvnntmMKNzDLsdxAYqApt+AjpRpP2CShjMfIa3umZ42UQMvH0tl1qAliYPNYO6vTdcGMqnRrCPmsfzTI1w==",
+      "path": "bouncycastle.cryptography/2.6.2",
+      "hashPath": "bouncycastle.cryptography.2.6.2.nupkg.sha512"
+    },
+    "DisCatSharp.Attributes/2026.3.26": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-CxZBh40/zR8cMizgC3K/tCLjCdD7cnh/+7XA8KG//n4e+CbW3DpLjzyxJ6NMznBvBEw7XjfqhmXIZ/M/kOBXXA==",
+      "path": "discatsharp.attributes/2026.3.26",
+      "hashPath": "discatsharp.attributes.2026.3.26.nupkg.sha512"
+    },
+    "Microsoft.Bcl.HashCode/6.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-GI4jcoi6eC9ZhNOQylIBaWOQjyGaR8T6N3tC1u8p3EXfndLCVNNWa+Zp+ocjvvS3kNBN09Zma2HXL0ezO0dRfw==",
+      "path": "microsoft.bcl.hashcode/6.0.0",
+      "hashPath": "microsoft.bcl.hashcode.6.0.0.nupkg.sha512"
+    },
+    "Microsoft.Maui.Graphics/10.0.60": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-4SEY3I1sU/r3PD9B0fYXLL0ttqDibxl1kscWIKkqAmLi6fha0dFL7XMRL3P2mjwkCQQcKLB46iE+ZuI3F/1SHA==",
+      "path": "microsoft.maui.graphics/10.0.60",
+      "hashPath": "microsoft.maui.graphics.10.0.60.nupkg.sha512"
+    },
+    "Microsoft.Maui.Graphics.Skia/10.0.60": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-cNE40LboEeWKdJ/ki1zmVVy+JgtT1nM9CbsR+VtmQtVfXTEwQ/oMFhasTJgABb52X0yxIDeTlpsL5BVk32xobQ==",
+      "path": "microsoft.maui.graphics.skia/10.0.60",
+      "hashPath": "microsoft.maui.graphics.skia.10.0.60.nupkg.sha512"
+    },
+    "Nager.PublicSuffix/3.8.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-xdRuauud5WRKkGuytdnBShDY21YZjj/JuK8GfenFXznlWAWoR1wI0v0dK6FbpU5l3XvxGaTYzao1i8FL+IIOnw==",
+      "path": "nager.publicsuffix/3.8.0",
+      "hashPath": "nager.publicsuffix.3.8.0.nupkg.sha512"
+    },
+    "Newtonsoft.Json/13.0.4": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-pdgNNMai3zv51W5aq268sujXUyx7SNdE2bj1wZcWjAQrKMFZV260lbqYop1d2GM67JI1huLRwxo9ZqnfF/lC6A==",
+      "path": "newtonsoft.json/13.0.4",
+      "hashPath": "newtonsoft.json.13.0.4.nupkg.sha512"
+    },
+    "SkiaSharp/3.116.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-DNDwbRjP+aMo27dV2h/uHCVTcWubWWxHnPLiePNyl24f4Pv43mQ8AQQeseOrKR+J3AOCEs6t0sUjo0aa3j3RWQ==",
+      "path": "skiasharp/3.116.1",
+      "hashPath": "skiasharp.3.116.1.nupkg.sha512"
+    },
+    "SkiaSharp.NativeAssets.Win32/3.116.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-dRQ75MCI8oz6zAs2Y1w6pq6ARs4MhdNG+gf3doOxOxdnueDXffQLGQIxON54GDoxc0WjKOoHMKBR4DhaduwwQw==",
+      "path": "skiasharp.nativeassets.win32/3.116.1",
+      "hashPath": "skiasharp.nativeassets.win32.3.116.1.nupkg.sha512"
+    },
+    "DisCatSharp/10.7.1": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "DisCatSharp.Common/10.7.1": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "DisCatSharp.Configuration/10.7.1": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "DisCatSharp.Hosting/10.7.1": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

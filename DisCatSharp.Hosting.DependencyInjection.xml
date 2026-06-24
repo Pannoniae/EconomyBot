@@ -4,6 +4,79 @@
         <name>DisCatSharp.Hosting.DependencyInjection</name>
     </assembly>
     <members>
+        <member name="T:DisCatSharp.Hosting.DependencyInjection.HostBuilderExtensions">
+            <summary>
+                Provides host builder extensions for registering DisCatSharp hosted services.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.DependencyInjection.HostBuilderExtensions.AddDiscordHostedService``1(Microsoft.Extensions.Hosting.IHostApplicationBuilder)">
+            <summary>
+                Adds your bot as a background service to the host application builder.
+            </summary>
+            <typeparam name="TService">The hosted Discord service implementation.</typeparam>
+            <param name="builder">The host application builder to update.</param>
+            <returns>The <paramref name="builder" /> for chaining purposes.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.DependencyInjection.HostBuilderExtensions.AddDiscordHostedShardService``1(Microsoft.Extensions.Hosting.IHostApplicationBuilder)">
+            <summary>
+                Adds your bot as a sharded background service to the host application builder.
+            </summary>
+            <typeparam name="TService">The hosted Discord shard service implementation.</typeparam>
+            <param name="builder">The host application builder to update.</param>
+            <returns>The <paramref name="builder" /> for chaining purposes.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.DependencyInjection.HostBuilderExtensions.AddDiscordHostedService``2(Microsoft.Extensions.Hosting.IHostApplicationBuilder)">
+            <summary>
+                Adds a Discord background service that can also be resolved via <typeparamref name="TInterface" /> to the host application builder.
+            </summary>
+            <typeparam name="TInterface">The service contract exposed from dependency injection.</typeparam>
+            <typeparam name="TService">The hosted Discord service implementation.</typeparam>
+            <param name="builder">The host application builder to update.</param>
+            <returns>The <paramref name="builder" /> for chaining purposes.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.DependencyInjection.HostBuilderExtensions.AddDiscordHostedShardService``2(Microsoft.Extensions.Hosting.IHostApplicationBuilder)">
+            <summary>
+                Adds a sharded Discord background service that can also be resolved via <typeparamref name="TInterface" /> to the host application builder.
+            </summary>
+            <typeparam name="TInterface">The service contract exposed from dependency injection.</typeparam>
+            <typeparam name="TService">The hosted Discord shard service implementation.</typeparam>
+            <param name="builder">The host application builder to update.</param>
+            <returns>The <paramref name="builder" /> for chaining purposes.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.DependencyInjection.HostBuilderExtensions.AddDiscordHostedService``1(Microsoft.Extensions.Hosting.IHostBuilder)">
+            <summary>
+                Adds your bot as a background service to the host builder.
+            </summary>
+            <typeparam name="TService">The hosted Discord service implementation.</typeparam>
+            <param name="builder">The host builder to update.</param>
+            <returns>The <paramref name="builder" /> for chaining purposes.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.DependencyInjection.HostBuilderExtensions.AddDiscordHostedShardService``1(Microsoft.Extensions.Hosting.IHostBuilder)">
+            <summary>
+                Adds your bot as a sharded background service to the host builder.
+            </summary>
+            <typeparam name="TService">The hosted Discord shard service implementation.</typeparam>
+            <param name="builder">The host builder to update.</param>
+            <returns>The <paramref name="builder" /> for chaining purposes.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.DependencyInjection.HostBuilderExtensions.AddDiscordHostedService``2(Microsoft.Extensions.Hosting.IHostBuilder)">
+            <summary>
+                Adds a Discord background service that can also be resolved via <typeparamref name="TInterface" /> to the host builder.
+            </summary>
+            <typeparam name="TInterface">The service contract exposed from dependency injection.</typeparam>
+            <typeparam name="TService">The hosted Discord service implementation.</typeparam>
+            <param name="builder">The host builder to update.</param>
+            <returns>The <paramref name="builder" /> for chaining purposes.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.DependencyInjection.HostBuilderExtensions.AddDiscordHostedShardService``2(Microsoft.Extensions.Hosting.IHostBuilder)">
+            <summary>
+                Adds a sharded Discord background service that can also be resolved via <typeparamref name="TInterface" /> to the host builder.
+            </summary>
+            <typeparam name="TInterface">The service contract exposed from dependency injection.</typeparam>
+            <typeparam name="TService">The hosted Discord shard service implementation.</typeparam>
+            <param name="builder">The host builder to update.</param>
+            <returns>The <paramref name="builder" /> for chaining purposes.</returns>
+        </member>
         <member name="T:DisCatSharp.Hosting.DependencyInjection.ServiceCollectionExtensions">
             <summary>
                 The service collection extensions.

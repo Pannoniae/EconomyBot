@@ -26,6 +26,11 @@
             </summary>
             <param name="ex">The exception/reason for not starting</param>
         </member>
+        <member name="P:DisCatSharp.Hosting.BaseHostedService.HostDiagnosticsSink">
+            <summary>
+                Gets the diagnostics sink from the underlying client, if available.
+            </summary>
+        </member>
         <member name="M:DisCatSharp.Hosting.BaseHostedService.ConnectAsync">
             <summary>
                 Connect your client(s) to Discord
@@ -171,6 +176,9 @@
             <param name="serviceProvider">The service provider.</param>
             <param name="applicationLifetime">The application lifetime.</param>
             <param name="configBotSection">The config bot section.</param>
+        </member>
+        <member name="P:DisCatSharp.Hosting.DiscordShardedHostedService.HostDiagnosticsSink">
+            <inheritdoc />
         </member>
         <member name="T:DisCatSharp.Hosting.IDiscordHostedService">
             <summary>

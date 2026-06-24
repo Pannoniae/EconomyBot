@@ -28,7 +28,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.CommonRegEx.RgbColorStringRegex">
             <remarks>
             Pattern:<br/>
-            <code>^(\\d{1,3})\\s*?,\\s*?(\\d{1,3}),\\s*?(\\d{1,3})$</code><br/>
+            <code>^(\d{1,3})\s*?,\s*?(\d{1,3}),\s*?(\d{1,3})$</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -52,7 +52,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.CommonRegEx.TimeSpanRegex">
             <remarks>
             Pattern:<br/>
-            <code>^(?&lt;days&gt;\\d+d\\s*)?(?&lt;hours&gt;\\d{1,2}h\\s*)?(?&lt;minutes&gt;\\d{1,2}m\\s*)?(?&lt;seconds&gt;\\d{1,2}s\\s*)?$</code><br/>
+            <code>^(?&lt;days&gt;\d+d\s*)?(?&lt;hours&gt;\d{1,2}h\s*)?(?&lt;minutes&gt;\d{1,2}m\s*)?(?&lt;seconds&gt;\d{1,2}s\s*)?$</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -85,7 +85,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.CommonRegEx.AdvancedYoutubeRegex">
             <remarks>
             Pattern:<br/>
-            <code>http(s)?:\\/\\/(www\\.)?youtu(\\.be|be\\.com)\\/(watch\\?v=|playlist)?(?&lt;id&gt;\\w{1,})?((\\?|\\&amp;)list=(?&lt;list&gt;[\\w-_]{1,}))(&amp;index=(?&lt;index&gt;\\d{1,}))?</code><br/>
+            <code>http(s)?:\/\/(www\.)?youtu(\.be|be\.com)\/(watch\?v=|playlist)?(?&lt;id&gt;\w{1,})?((\?|\&amp;)list=(?&lt;list&gt;[\w-_]{1,}))(&amp;index=(?&lt;index&gt;\d{1,}))?</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -129,7 +129,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.CommonRegEx.MdStripRegex">
             <remarks>
             Pattern:<br/>
-            <code>([`\\*_~\\[\\]\\(\\)"\\|]|&lt;@\\!?\\d+&gt;|&lt;#\\d+&gt;|&lt;@\\&amp;\\d+&gt;|&lt;:[a-zA-Z0-9_\\-]:\\d+&gt;|#{1,3} |&gt; |&gt;&gt;&gt; |\\* )</code><br/>
+            <code>([`\*_~\[\]\(\)"\|]|&lt;@\!?\d+&gt;|&lt;#\d+&gt;|&lt;@\&amp;\d+&gt;|&lt;:[a-zA-Z0-9_\-]:\d+&gt;|#{1,3} |&gt; |&gt;&gt;&gt; |\* )</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -168,7 +168,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.CommonRegEx.MdSanitizeRegex">
             <remarks>
             Pattern:<br/>
-            <code>([`\\*_~&lt;&gt;\\[\\]\\(\\)"@\\!\\&amp;#:\\|])</code><br/>
+            <code>([`\*_~&lt;&gt;\[\]\(\)"@\!\&amp;#:\|])</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -200,7 +200,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.DiscordRegEx.InviteRegex">
             <remarks>
             Pattern:<br/>
-            <code>^((https?:\\/\\/)?(www\\.)?discord\\.gg(\\/.*)*|(https?:\\/\\/)?(www\\.|canary\\.|ptb\\.|staging\\.)?(discord|discordapp)(\\.com|\\.co)\\/invite)\\/(?&lt;code&gt;[a-zA-Z0-9]*)(\\?event=(?&lt;event&gt;\\d+))?$</code><br/>
+            <code>^((https?:\/\/)?(www\.)?discord\.gg(\/.*)*|(https?:\/\/)?(www\.|canary\.|ptb\.|staging\.)?(discord|discordapp)(\.com|\.co)\/invite)\/(?&lt;code&gt;[a-zA-Z0-9]*)(\?event=(?&lt;event&gt;\d+))?$</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -258,7 +258,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.DiscordRegEx.MessageLinkRegex">
             <remarks>
             Pattern:<br/>
-            <code>^(https?:\\/\\/)?(www\\.|canary\\.|ptb\\.|staging\\.)?(discord|discordapp)(\\.com|\\.co)\\/channels\\/(?&lt;guild&gt;(?:\\d+|@me))\\/(?&lt;channel&gt;\\d+)\\/(?&lt;message&gt;\\d+)\\/?</code><br/>
+            <code>^(https?:\/\/)?(www\.|canary\.|ptb\.|staging\.)?(discord|discordapp)(\.com|\.co)\/channels\/(?&lt;guild&gt;(?:\d+|@me))\/(?&lt;channel&gt;\d+)\/(?&lt;message&gt;\d+)\/?</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -301,7 +301,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.DiscordRegEx.EmojiRegex">
             <remarks>
             Pattern:<br/>
-            <code>^&lt;(?&lt;animated&gt;a)?:(?&lt;name&gt;[a-zA-Z0-9_]+?):(?&lt;id&gt;\\d+?)&gt;$</code><br/>
+            <code>^&lt;(?&lt;animated&gt;a)?:(?&lt;name&gt;[a-zA-Z0-9_]+?):(?&lt;id&gt;\d+?)&gt;$</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -325,7 +325,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.DiscordRegEx.AnimatedEmojiRegex">
             <remarks>
             Pattern:<br/>
-            <code>^&lt;(?&lt;animated&gt;a):(?&lt;name&gt;\\w{2,32}):(?&lt;id&gt;\\d{17,20})&gt;$</code><br/>
+            <code>^&lt;(?&lt;animated&gt;a):(?&lt;name&gt;\w{2,32}):(?&lt;id&gt;\d{17,20})&gt;$</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -348,7 +348,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.DiscordRegEx.StaticEmojiRegex">
             <remarks>
             Pattern:<br/>
-            <code>^&lt;:(?&lt;name&gt;\\w{2,32}):(?&lt;id&gt;\\d{17,20})&gt;$</code><br/>
+            <code>^&lt;:(?&lt;name&gt;\w{2,32}):(?&lt;id&gt;\d{17,20})&gt;$</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -368,7 +368,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.DiscordRegEx.TimestampRegex">
             <remarks>
             Pattern:<br/>
-            <code>^&lt;t:(?&lt;timestamp&gt;-?\\d{1,13})(:(?&lt;style&gt;[tTdDfFR]))?&gt;$</code><br/>
+            <code>^&lt;t:(?&lt;timestamp&gt;-?\d{1,13})(:(?&lt;style&gt;[tTdDfFR]))?&gt;$</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -391,7 +391,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.DiscordRegEx.DefaultStyledTimestampRegex">
             <remarks>
             Pattern:<br/>
-            <code>^&lt;t:(?&lt;timestamp&gt;-?\\d{1,13})$</code><br/>
+            <code>^&lt;t:(?&lt;timestamp&gt;-?\d{1,13})$</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -408,7 +408,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.DiscordRegEx.StyledTimestampRegex">
             <remarks>
             Pattern:<br/>
-            <code>^&lt;t:(?&lt;timestamp&gt;-?\\d{1,13}):(?&lt;style&gt;[tTdDfFR])&gt;$</code><br/>
+            <code>^&lt;t:(?&lt;timestamp&gt;-?\d{1,13}):(?&lt;style&gt;[tTdDfFR])&gt;$</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -429,7 +429,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.DiscordRegEx.RoleRegex">
             <remarks>
             Pattern:<br/>
-            <code>^&lt;@&amp;(?&lt;id&gt;\\d+)&gt;$</code><br/>
+            <code>^&lt;@&amp;(?&lt;id&gt;\d+)&gt;$</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -446,7 +446,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.DiscordRegEx.ChannelRegex">
             <remarks>
             Pattern:<br/>
-            <code>^&lt;#(?&lt;id&gt;\\d+)&gt;$</code><br/>
+            <code>^&lt;#(?&lt;id&gt;\d+)&gt;$</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -463,7 +463,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.DiscordRegEx.UserRegex">
             <remarks>
             Pattern:<br/>
-            <code>^&lt;@\\!?(?&lt;id&gt;\\d+?)&gt;$</code><br/>
+            <code>^&lt;@\!?(?&lt;id&gt;\d+?)&gt;$</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -481,7 +481,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.DiscordRegEx.IdRegex">
             <remarks>
             Pattern:<br/>
-            <code>^(?&lt;id&gt;\\d{17,20})$</code><br/>
+            <code>^(?&lt;id&gt;\d{17,20})$</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -496,7 +496,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.DiscordRegEx.UserWithNicknameRegex">
             <remarks>
             Pattern:<br/>
-            <code>^&lt;@\\!(?&lt;id&gt;\\d{17,20})&gt;$</code><br/>
+            <code>^&lt;@\!(?&lt;id&gt;\d{17,20})&gt;$</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -513,7 +513,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.DiscordRegEx.UserWithOptionalNicknameRegex">
             <remarks>
             Pattern:<br/>
-            <code>^&lt;@\\!?(?&lt;id&gt;\\d{17,20})&gt;$</code><br/>
+            <code>^&lt;@\!?(?&lt;id&gt;\d{17,20})&gt;$</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -531,7 +531,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.DiscordRegEx.UserWithoutNicknameRegex">
             <remarks>
             Pattern:<br/>
-            <code>^&lt;@(?&lt;id&gt;\\d{17,20})&gt;$</code><br/>
+            <code>^&lt;@(?&lt;id&gt;\d{17,20})&gt;$</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -548,7 +548,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.DiscordRegEx.EventRegex">
             <remarks>
             Pattern:<br/>
-            <code>^(https?:\\/\\/)?(www\\.|canary\\.|ptb\\.|staging\\.)?(discord|discordapp)(\\.com|\\.co)\\/events\\/(?&lt;guild&gt;\\d+)\\/(?&lt;event&gt;\\d+)$</code><br/>
+            <code>^(https?:\/\/)?(www\.|canary\.|ptb\.|staging\.)?(discord|discordapp)(\.com|\.co)\/events\/(?&lt;guild&gt;\d+)\/(?&lt;event&gt;\d+)$</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -586,7 +586,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.DiscordRegEx.ApplicationCommandNameRegex">
             <remarks>
             Pattern:<br/>
-            <code>^[\\p{Ll}\\p{Lt}\\w_'-]{1,32}$</code><br/>
+            <code>^[\p{Ll}\p{Lt}\w_'-]{1,32}$</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -600,7 +600,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.DiscordRegEx.WebhookRegex">
             <remarks>
             Pattern:<br/>
-            <code>(?:https?:\\/\\/)?(www\\.|canary\\.|ptb\\.|staging\\.)?(discord|discordapp)(\\.com|\\.co)\\/api\\/(?:v\\d\\/)?webhooks\\/(?&lt;id&gt;\\d+)\\/(?&lt;token&gt;[A-Za-z0-9_\\-]+)</code><br/>
+            <code>(?:https?:\/\/)?(www\.|canary\.|ptb\.|staging\.)?(discord|discordapp)(\.com|\.co)\/api\/(?:v\d\/)?webhooks\/(?&lt;id&gt;\d+)\/(?&lt;token&gt;[A-Za-z0-9_\-]+)</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -640,7 +640,7 @@
         <member name="M:DisCatSharp.Common.RegularExpressions.DiscordRegEx.SoundRegex">
             <remarks>
             Pattern:<br/>
-            <code>^&lt;sound:(?&lt;guild_id&gt;\\\\d+):(?&lt;sound_id&gt;\\\\d+)&gt;$</code><br/>
+            <code>^&lt;sound:(?&lt;guild_id&gt;\\d+):(?&lt;sound_id&gt;\\d+)&gt;$</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled | RegexOptions.ECMAScript</code><br/>
             Explanation:<br/>
@@ -2230,6 +2230,11 @@
                 Gets or sets the event handlers.
             </summary>
         </member>
+        <member name="P:DisCatSharp.Common.Utilities.AsyncEvent`2.HasHandlers">
+            <summary>
+                Gets whether any handlers are currently registered for this event.
+            </summary>
+        </member>
         <member name="P:DisCatSharp.Common.Utilities.AsyncEvent`2.MaximumExecutionTime">
             <summary>
                 Gets the maximum allotted execution time for all handlers. Any event which causes the handler to time out
@@ -3090,8 +3095,7 @@
         </member>
         <member name="T:DisCatSharp.AsyncManualResetEvent">
             <summary>
-                Implements an async version of a <see cref="T:System.Threading.ManualResetEvent" />
-                This class does currently not support Timeouts or the use of CancellationTokens
+                Implements an async version of a <see cref="T:System.Threading.ManualResetEvent" />.
             </summary>
         </member>
         <member name="F:DisCatSharp.AsyncManualResetEvent._tsc">
@@ -3119,6 +3123,12 @@
             <summary>
                 Waits the async waiter.
             </summary>
+        </member>
+        <member name="M:DisCatSharp.AsyncManualResetEvent.WaitAsync(System.Threading.CancellationToken)">
+            <summary>
+                Waits the async waiter with cancellation support.
+            </summary>
+            <param name="ct">The cancellation token to observe.</param>
         </member>
         <member name="M:DisCatSharp.AsyncManualResetEvent.SetAsync">
             <summary>

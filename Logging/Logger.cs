@@ -67,7 +67,7 @@ public class Logger {
         }
 
         var time = DateTime.Now;
-        AnsiConsole.MarkupLine($"[{colour ?? "default"}]{time} {GetLogLevelMarkup(logLevel)} {name}: {msg.EscapeMarkup()}[/]");
+        AnsiConsole.MarkupLine($"[{colour ?? "default"}]{time} {GetLogLevelMarkup(logLevel)} {name}: {AnsiMarkup.Escape(msg)}[/]");
     }
 
     private void log<T>(LogLevel logLevel, string? colour, T msg) {
@@ -76,7 +76,7 @@ public class Logger {
         }
         
         var time = DateTime.Now;
-        AnsiConsole.MarkupLine($"[{colour ?? "default"}]{time} {GetLogLevelMarkup(logLevel)} {name}: {msg?.ToString().EscapeMarkup()}[/]");
+        AnsiConsole.MarkupLine($"[{colour ?? "default"}]{time} {GetLogLevelMarkup(logLevel)} {name}: {AnsiMarkup.Escape(msg?.ToString())}[/]");
     }
 
 

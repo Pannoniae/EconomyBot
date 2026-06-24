@@ -89,7 +89,7 @@ public class WilteryHandler {
                 ThreadName = channel.Name,
                 AvatarUrl = new Optional<string>(avatarURL),
                 Username = new Optional<string>(username)
-            }.AddEmbeds(message.Embeds));
+            }.AddEmbeds(message.Embeds ?? []));
             return;
         }
 
@@ -97,7 +97,7 @@ public class WilteryHandler {
             Content = message.Content,
             AvatarUrl = new Optional<string>(avatarURL),
             Username = new Optional<string>(username)
-        }.AddEmbeds(message.Embeds));
+        }.AddEmbeds(message.Embeds ?? []));
     }
 
     public async Task handleMessage(DiscordClient client, DiscordMessage message) {

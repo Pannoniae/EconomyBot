@@ -4,6 +4,140 @@
         <name>DisCatSharp.Lavalink</name>
     </assembly>
     <members>
+        <member name="T:DisCatSharp.Lavalink.Bridge.LavalinkBridgeClient">
+            <summary>
+                WebSocket client for the Lavalink transport bridge.
+                Connects to a patched Lavalink server's bridge endpoint and demultiplexes
+                Opus frames per guild.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Lavalink.Bridge.LavalinkBridgeClient.ControlMessageReceived">
+            <summary>
+                Fired when a control message is received from the bridge.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Bridge.LavalinkBridgeClient.#ctor(DisCatSharp.Lavalink.Bridge.LavalinkBridgeConfiguration,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+                Creates a new instance of <see cref="T:DisCatSharp.Lavalink.Bridge.LavalinkBridgeClient" />.
+            </summary>
+            <param name="config">The bridge configuration.</param>
+            <param name="logger">The logger instance.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Bridge.LavalinkBridgeClient.ConnectAsync(System.Threading.CancellationToken)">
+            <summary>
+                Connects to the bridge WebSocket endpoint and starts receiving frames.
+            </summary>
+            <param name="cancellationToken">Token to cancel the connection attempt.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Bridge.LavalinkBridgeClient.GetGuildOpusSource(System.UInt64)">
+            <summary>
+                Gets or creates an <see cref="T:DisCatSharp.Voice.Interfaces.IExternalOpusSource" /> for the specified guild.
+            </summary>
+            <param name="guildId">The guild snowflake ID.</param>
+            <returns>An <see cref="T:DisCatSharp.Voice.Interfaces.IExternalOpusSource" /> that yields Opus frames for the guild.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Bridge.LavalinkBridgeClient.DetachGuild(System.UInt64)">
+            <summary>
+                Removes the guild channel, stopping frame delivery for that guild.
+            </summary>
+            <param name="guildId">The guild snowflake ID.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Bridge.LavalinkBridgeClient.ReceiveLoopAsync(System.Threading.CancellationToken)">
+            <summary>
+                Main receive loop that reads frames from the bridge WebSocket.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Bridge.LavalinkBridgeClient.ProcessBinaryFrame(System.ReadOnlySpan{System.Byte})">
+            <summary>
+                Parses a binary frame containing an Opus audio packet.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Bridge.LavalinkBridgeClient.ProcessTextFrame(System.ReadOnlySpan{System.Byte})">
+            <summary>
+                Parses a JSON text frame containing a control message.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Bridge.LavalinkBridgeClient.ReconnectAsync(System.Threading.CancellationToken)">
+            <summary>
+                Attempts to reconnect to the bridge WebSocket with exponential backoff.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Bridge.LavalinkBridgeClient.DisposeAsync">
+            <inheritdoc />
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Bridge.LavalinkBridgeClient.GuildOpusSource">
+            <summary>
+                Per-guild <see cref="T:DisCatSharp.Voice.Interfaces.IExternalOpusSource" /> implementation that reads from a channel.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Bridge.LavalinkBridgeClient.GuildOpusSource.#ctor(System.Threading.Channels.ChannelReader{DisCatSharp.Voice.Entities.ExternalOpusFrame})">
+            <summary>
+                Per-guild <see cref="T:DisCatSharp.Voice.Interfaces.IExternalOpusSource" /> implementation that reads from a channel.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Bridge.LavalinkBridgeClient.GuildOpusSource.ReadFramesAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:DisCatSharp.Lavalink.Bridge.LavalinkBridgeConfiguration">
+            <summary>
+                Configuration for the optional Lavalink transport bridge.
+            </summary>
+            <remarks>
+                When enabled, Lavalink produces Opus frames and exports them over a WebSocket bridge
+                to DisCatSharp.Voice, which handles Discord voice transport (RTP, DAVE E2EE, AEAD, UDP).
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Bridge.LavalinkBridgeConfiguration.#ctor">
+            <summary>
+                Creates a new instance of <see cref="T:DisCatSharp.Lavalink.Bridge.LavalinkBridgeConfiguration" />.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Bridge.LavalinkBridgeConfiguration.#ctor(DisCatSharp.Lavalink.Bridge.LavalinkBridgeConfiguration)">
+            <summary>
+                Creates a new instance of <see cref="T:DisCatSharp.Lavalink.Bridge.LavalinkBridgeConfiguration" />, copying the properties of another configuration.
+            </summary>
+            <param name="other">Configuration the properties of which are to be copied.</param>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Bridge.LavalinkBridgeConfiguration.EnableExternalVoiceBridge">
+            <summary>
+                <para>Enables the external voice bridge mode.</para>
+                <para>When enabled, DisCatSharp.Lavalink connects to the Lavalink bridge WebSocket
+                and routes Opus frames through DisCatSharp.Voice instead of Lavalink's built-in Koe transport.</para>
+                <para>Defaults to false.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Bridge.LavalinkBridgeConfiguration.BridgeEndpoint">
+            <summary>
+                <para>The WebSocket endpoint for the Lavalink bridge.</para>
+                <para>Example: <c>ws://localhost:2335/bridge/v1</c></para>
+                <para>Required when <see cref="P:DisCatSharp.Lavalink.Bridge.LavalinkBridgeConfiguration.EnableExternalVoiceBridge" /> is true.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Bridge.LavalinkBridgeConfiguration.BridgeAuthToken">
+            <summary>
+                <para>The authentication token for the bridge WebSocket connection.</para>
+                <para>Sent as <c>Authorization: Bearer {token}</c> header.</para>
+                <para>Required when <see cref="P:DisCatSharp.Lavalink.Bridge.LavalinkBridgeConfiguration.EnableExternalVoiceBridge" /> is true.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Bridge.LavalinkBridgeConfiguration.ReconnectDelay">
+            <summary>
+                <para>Delay between bridge reconnection attempts.</para>
+                <para>Defaults to 5 seconds.</para>
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.Bridge.LavalinkBridgeConfiguration.MaxReconnectAttempts">
+            <summary>
+                <para>Maximum number of reconnection attempts before giving up.</para>
+                <para>Set to -1 for unlimited retries. Defaults to 10.</para>
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.Bridge.LavalinkBridgeConfiguration.Validate">
+            <summary>
+                Validates this configuration for use.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">Thrown when required properties are missing.</exception>
+        </member>
         <member name="T:DisCatSharp.Lavalink.Entities.DefaultQueueEntry">
             <summary>
                 Represents a default queue entry.
@@ -926,8 +1060,8 @@
         <member name="T:DisCatSharp.Lavalink.Entities.LavalinkTrackLoadingResult">
             <summary>
                 Represents a loading result when looking up tracks with
-                <see cref="M:DisCatSharp.Lavalink.LavalinkSession.LoadTracksAsync(DisCatSharp.Lavalink.Enums.LavalinkSearchType,System.String)" /> or
-                <see cref="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.LoadTracksAsync(System.String)" />.
+                <see cref="M:DisCatSharp.Lavalink.LavalinkSession.LoadTracksAsync(DisCatSharp.Lavalink.Enums.LavalinkSearchType,System.String,System.Threading.CancellationToken)" /> or
+                <see cref="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.LoadTracksAsync(System.String,System.Threading.CancellationToken)" />.
             </summary>
         </member>
         <member name="P:DisCatSharp.Lavalink.Entities.LavalinkTrackLoadingResult.LoadType">
@@ -1980,11 +2114,6 @@
                 Gets the error message.
             </summary>
         </member>
-        <member name="P:DisCatSharp.Lavalink.Exceptions.LavalinkRestException.Message">
-            <summary>
-                Gets the exception message.
-            </summary>
-        </member>
         <member name="P:DisCatSharp.Lavalink.Exceptions.LavalinkRestException.Path">
             <summary>
                 Gets the path where the exception was thrown.
@@ -2039,12 +2168,14 @@
             <param name="client">The shard client to retrieve <see cref="T:DisCatSharp.Lavalink.LavalinkExtension" /> instances from.</param>
             <returns>A dictionary containing <see cref="T:DisCatSharp.Lavalink.LavalinkExtension" /> instances for each shard.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.ExtensionMethods.ConnectAsync(DisCatSharp.Entities.DiscordChannel,DisCatSharp.Lavalink.LavalinkSession)">
+        <member name="M:DisCatSharp.Lavalink.ExtensionMethods.ConnectAsync(DisCatSharp.Entities.DiscordChannel,DisCatSharp.Lavalink.LavalinkSession,System.Boolean,System.Boolean)">
             <summary>
                 Connects to this voice channel using Lavalink.
             </summary>
             <param name="channel">Channel to connect to.</param>
             <param name="session">Lavalink session to connect through.</param>
+            <param name="deafened">Whether to join the channel deafened.</param>
+            <param name="muted">Whether to join the channel muted.</param>
             <returns>If successful, the Lavalink client.</returns>
         </member>
         <member name="T:DisCatSharp.Lavalink.LavalinkConfiguration">
@@ -2164,6 +2295,14 @@
                 <para>Min <c>0</c>, max <c>1000</c>.</para>
             </summary>
         </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkConfiguration.Bridge">
+            <summary>
+                <para>Optional bridge configuration for external voice transport mode.</para>
+                <para>When set and enabled, Lavalink Opus frames are routed through DisCatSharp.Voice
+                for full DAVE E2EE and AEAD transport encryption support.</para>
+                <para>Defaults to <see langword="null" /> (bridge disabled).</para>
+            </summary>
+        </member>
         <member name="T:DisCatSharp.Lavalink.LavalinkExtension">
             <summary>
                 Represents the lavalink extension.
@@ -2221,11 +2360,12 @@
             <param name="client">DO NOT USE THIS MANUALLY.</param>
             <exception cref="T:System.InvalidOperationException">Thrown when a developer tries to manually initialize it.</exception>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkExtension.ConnectAsync(DisCatSharp.Lavalink.LavalinkConfiguration)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkExtension.ConnectAsync(DisCatSharp.Lavalink.LavalinkConfiguration,System.Threading.CancellationToken)">
             <summary>
                 Connect to a Lavalink session.
             </summary>
             <param name="config">Lavalink client configuration.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The established Lavalink connection.</returns>
         </member>
         <member name="M:DisCatSharp.Lavalink.LavalinkExtension.GetSession(DisCatSharp.Net.ConnectionEndpoint)">
@@ -2468,163 +2608,196 @@
             <param name="args">The event args.</param>
             <returns></returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.DecodeTracksAsync(System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.DecodeTracksAsync(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)">
             <summary>
                 Decodes encoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />s.
                 <para>Might not work with pre 4.0 tracks.</para>
             </summary>
             <param name="tracks">The tracks to decode.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>A <see cref="T:System.Collections.Generic.List`1" /> of decoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />s.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.DecodeTrackAsync(System.String)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.DecodeTrackAsync(System.String,System.Threading.CancellationToken)">
             <summary>
                 Decodes an encoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />.
                 <para>Might not work with some pre 4.0 tracks.</para>
             </summary>
             <param name="track">The track to decode.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The decoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.LoadTracksAsync(System.String)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.LoadTracksAsync(System.String,System.Threading.CancellationToken)">
             <summary>
                 Loads tracks by <paramref name="identifier" />.
                 Returns a dynamic object you have to parse with (Type)Result.
             </summary>
             <param name="identifier">The identifier to load.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>A track loading result.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.LoadTracksAsync(DisCatSharp.Lavalink.Enums.LavalinkSearchType,System.String)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.LoadTracksAsync(DisCatSharp.Lavalink.Enums.LavalinkSearchType,System.String,System.Threading.CancellationToken)">
             <summary>
                 Loads tracks by <paramref name="identifier" />.
                 Returns a dynamic object you have to parse with (Type)Result.
             </summary>
             <param name="searchType">The search type to use. Some types need additional setup.</param>
             <param name="identifier">The identifier to load.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>A track loading result.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.GetLyricsAsync(System.Boolean)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.GetLyricsAsync(System.Boolean,System.Threading.CancellationToken)">
             <summary>
                 Gets the lyrics for the currently playing track.
             </summary>
             <param name="skipTrackSource">Whether to skip the current track source and fetch from highest priority source.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkLyricsResult" /> or <see langword="null" />.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.UpdateAsync(System.Action{DisCatSharp.Lavalink.Models.LavalinkPlayerUpdateModel})">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.UpdateAsync(System.Action{DisCatSharp.Lavalink.Models.LavalinkPlayerUpdateModel},System.Threading.CancellationToken)">
             <summary>
                 Updates the <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkPlayer" />.
             </summary>
             <param name="action">The action to perform on the player.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The updated guild player.</returns>
             <exception cref="T:System.InvalidOperationException">Thrown when both <c>EncodedTrack</c> and <c>Identifier</c> are set.</exception>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayPartialAsync(System.String,System.TimeSpan,System.TimeSpan)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayPartialAsync(System.String,System.TimeSpan,System.TimeSpan,System.Threading.CancellationToken)">
             <summary>
                 Plays a song partially by its identifier with a start and end-time.
             </summary>
             <param name="identifier">The identifier to play.</param>
             <param name="startTime">The start time.</param>
             <param name="endTime">The end time.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The updated guild player.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayPartialAsync(DisCatSharp.Lavalink.Entities.LavalinkTrack,System.TimeSpan,System.TimeSpan)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayPartialAsync(DisCatSharp.Lavalink.Entities.LavalinkTrack,System.TimeSpan,System.TimeSpan,System.Threading.CancellationToken)">
             <summary>
                 Plays a track partially with a start and end-time.
             </summary>
             <param name="track">The track to play.</param>
             <param name="startTime">The start time.</param>
             <param name="endTime">The end time.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The updated guild player.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayPartialEncodedAsync(System.String,System.TimeSpan,System.TimeSpan)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayPartialEncodedAsync(System.String,System.TimeSpan,System.TimeSpan,System.Threading.CancellationToken)">
             <summary>
                 Plays a song by its encoded track string with a start and end-time.
             </summary>
             <param name="encodedTrack">The encoded track to play.</param>
             <param name="startTime">The start time.</param>
             <param name="endTime">The end time.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The updated guild player.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayAsync(System.String)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayAsync(System.String,System.Threading.CancellationToken)">
             <summary>
                 Plays a song by its identifier.
             </summary>
             <param name="identifier">The identifier to play.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The updated guild player.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayAsync(DisCatSharp.Lavalink.Entities.LavalinkTrack)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayAsync(DisCatSharp.Lavalink.Entities.LavalinkTrack,System.Threading.CancellationToken)">
             <summary>
                 Plays a track.
             </summary>
             <param name="track">The track to play.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The updated guild player.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayEncodedAsync(System.String)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayEncodedAsync(System.String,System.Threading.CancellationToken)">
             <summary>
                 Plays a song by its encoded track string.
             </summary>
             <param name="encodedTrack">The encoded track to play.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The updated guild player.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.SeekAsync(System.Int32)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.SeekAsync(System.Int32,System.Threading.CancellationToken)">
             <summary>
                 Seeks the player to the position in <paramref name="seconds" />.
             </summary>
             <param name="seconds">The seconds to seek to.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The updated guild player.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.SeekAsync(System.TimeSpan)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.SeekAsync(System.TimeSpan,System.Threading.CancellationToken)">
             <summary>
                 Seeks the player to the position.
             </summary>
             <param name="position">The position to seek to.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The updated guild player.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.SetVolumeAsync(System.Int32)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.SetVolumeAsync(System.Int32,System.Threading.CancellationToken)">
             <summary>
                 Modifies the volume of the player.
             </summary>
             <param name="volume">The volume of the player, range <c>0</c>-<c>1000</c>, in percentage.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The updated guild player.</returns>
             <exception cref="T:System.ArgumentException">Thrown when the <paramref name="volume" /> is out of range.</exception>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PauseAsync">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PauseAsync(System.Threading.CancellationToken)">
             <summary>
                 Pauses the player.
             </summary>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The updated guild player.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.ResumeAsync">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.ResumeAsync(System.Threading.CancellationToken)">
             <summary>
                 Resumes the player.
             </summary>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The updated guild player.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.StopAsync">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.StopAsync(System.Threading.CancellationToken)">
             <summary>
                 Stops the player.
             </summary>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The updated guild player.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.SkipAsync">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.SkipAsync(System.Threading.CancellationToken)">
             <summary>
                 Skips the current track.
             </summary>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The updated guild player.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayDirectUrlAsync(System.String)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.PlayDirectUrlAsync(System.String,System.Threading.CancellationToken)">
             <summary>
                 Directly plays a song by url.
             </summary>
             <param name="url">The url to play.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns></returns>
             <exception cref="T:System.NotSupportedException">Thrown when the <paramref name="url" /> is a pure youtube playlist.</exception>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.SwitchChannelAsync(DisCatSharp.Entities.DiscordChannel,System.Boolean)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.SwitchChannelAsync(DisCatSharp.Entities.DiscordChannel,System.Boolean,System.Threading.CancellationToken)">
             <summary>
                 Switches the player to a new channel.
             </summary>
             <param name="channel">The new channel to switch to.</param>
             <param name="deafened">Whether to join deafened.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <exception cref="T:System.ArgumentException">Thrown when the target channel is not of the base type voice.</exception>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.SetDeafenedAsync(System.Boolean)">
+            <summary>
+                Updates the bot's self-deafen state without switching channels.
+            </summary>
+            <param name="deafened">Whether the bot should be deafened.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.SetMutedAsync(System.Boolean)">
+            <summary>
+                Updates the bot's self-mute state without switching channels.
+            </summary>
+            <param name="muted">Whether the bot should be muted.</param>
         </member>
         <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.UpdatePlayerState(DisCatSharp.Lavalink.Entities.LavalinkPlayerState)">
             <summary>
@@ -2638,10 +2811,11 @@
             </summary>
             <param name="voiceState">The voice state to update with.</param>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.DisconnectAsync">
+        <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.DisconnectAsync(System.Threading.CancellationToken)">
             <summary>
                 Disconnect the guild player from the channel.
             </summary>
+            <param name="cancellationToken">The cancellation token.</param>
         </member>
         <member name="M:DisCatSharp.Lavalink.LavalinkGuildPlayer.DisconnectVoiceAsync">
             <summary>
@@ -2941,7 +3115,7 @@
             <param name="routeParams">The route params.</param>
             <returns>The generated route.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.DoRequestAsync(System.Net.Http.HttpMethod,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.DoRequestAsync(System.Net.Http.HttpMethod,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.String,System.Threading.CancellationToken)">
             <summary>
                 Executes a rest request.
             </summary>
@@ -2949,57 +3123,65 @@
             <param name="path">The path.</param>
             <param name="headers">The headers.</param>
             <param name="payload">The payload.</param>
+            <param name="cancellationToken">The cancellation token.</param>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetVersionAsync">
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetVersionAsync(System.Threading.CancellationToken)">
             <summary>
                 Requests Lavalink server version.
             </summary>
             <returns>The version <see cref="T:System.String" />.</returns>
+            <param name="cancellationToken">The cancellation token.</param>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetInfoAsync">
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetInfoAsync(System.Threading.CancellationToken)">
             <summary>
                 Requests Lavalink server information.
             </summary>
             <returns>A <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkInfo" /> object.</returns>
+            <param name="cancellationToken">The cancellation token.</param>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetStatsAsync">
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetStatsAsync(System.Threading.CancellationToken)">
             <summary>
                 Requests Lavalink server statistics.
             </summary>
             <returns>A <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkStats" /> object.</returns>
+            <param name="cancellationToken">The cancellation token.</param>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.UpdateSessionAsync(System.String,DisCatSharp.Lavalink.Entities.LavalinkSessionConfiguration)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.UpdateSessionAsync(System.String,DisCatSharp.Lavalink.Entities.LavalinkSessionConfiguration,System.Threading.CancellationToken)">
             <summary>
                 Updates a session with the resuming state and timeout.
             </summary>
             <param name="sessionId">The session id.</param>
             <param name="config">The session config.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The updated <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkSessionConfiguration" />.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetPlayersAsync(System.String)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetPlayersAsync(System.String,System.Threading.CancellationToken)">
             <summary>
                 Returns a list of players for the given session id.
             </summary>
             <param name="sessionId">The session id.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>A <see cref="T:System.Collections.Generic.IReadOnlyList`1" /> of <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkPlayer" />s.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.CreatePlayerAsync(System.String,System.UInt64,System.Int32)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.CreatePlayerAsync(System.String,System.UInt64,System.Int32,System.Threading.CancellationToken)">
             <summary>
                 Creates a player.
             </summary>
             <param name="sessionId">The session id.</param>
             <param name="guildId">The guild id this player should be created for.</param>
             <param name="defaultVolume">The default volume level which should be used.</param>
+            <param name="cancellationToken">The cancellation token.</param>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetPlayerAsync(System.String,System.UInt64)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetPlayerAsync(System.String,System.UInt64,System.Threading.CancellationToken)">
             <summary>
                 Returns the player for a guild for the given session id.
             </summary>
             <param name="sessionId">The session id.</param>
             <param name="guildId">The guild id this player should be created/updated for.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkPlayer" /> for <paramref name="guildId" />.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.UpdatePlayerAsync(System.String,System.UInt64,System.Boolean,DisCatSharp.Entities.Optional{System.String},DisCatSharp.Entities.Optional{System.String},DisCatSharp.Entities.Optional{System.Int32},DisCatSharp.Entities.Optional{System.Nullable{System.Int32}},DisCatSharp.Entities.Optional{System.Int32},DisCatSharp.Entities.Optional{System.Boolean},DisCatSharp.Entities.Optional{DisCatSharp.Lavalink.Entities.Filters.LavalinkFilters},DisCatSharp.Entities.Optional{System.Object})">
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.UpdatePlayerAsync(System.String,System.UInt64,System.Boolean,DisCatSharp.Entities.Optional{System.String},DisCatSharp.Entities.Optional{System.String},DisCatSharp.Entities.Optional{System.Int32},DisCatSharp.Entities.Optional{System.Nullable{System.Int32}},DisCatSharp.Entities.Optional{System.Int32},DisCatSharp.Entities.Optional{System.Boolean},DisCatSharp.Entities.Optional{DisCatSharp.Lavalink.Entities.Filters.LavalinkFilters},DisCatSharp.Entities.Optional{System.Object},System.Threading.CancellationToken)">
             <summary>
                 Updates or creates the player for a guild if it doesn't already exist for the given session id.
             </summary>
@@ -3014,36 +3196,40 @@
             <param name="paused">Whether to pause the track.</param>
             <param name="filters">The filters.</param>
             <param name="userData">The user data.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The updated <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkPlayer" /> object.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.UpdatePlayerVoiceStateAsync(System.String,System.UInt64,DisCatSharp.Lavalink.Entities.LavalinkVoiceState)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.UpdatePlayerVoiceStateAsync(System.String,System.UInt64,DisCatSharp.Lavalink.Entities.LavalinkVoiceState,System.Threading.CancellationToken)">
             <summary>
                 Updates the players voice state.
             </summary>
             <param name="sessionId">The session id.</param>
             <param name="guildId">The guild id this player voice state should be updated for.</param>
             <param name="state">The state to update with.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns></returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.DestroyPlayerAsync(System.String,System.UInt64)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.DestroyPlayerAsync(System.String,System.UInt64,System.Threading.CancellationToken)">
             <summary>
                 Destroys the player for a guild for the given session id
             </summary>
             <param name="sessionId">The session id.</param>
             <param name="guildId">The guild id this player should be created/updated for.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns></returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.LoadTracksAsync(System.String)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.LoadTracksAsync(System.String,System.Threading.CancellationToken)">
             <summary>
-                Resolves audio tracks for use with the <see cref="M:DisCatSharp.Lavalink.LavalinkRestClient.UpdatePlayerAsync(System.String,System.UInt64,System.Boolean,DisCatSharp.Entities.Optional{System.String},DisCatSharp.Entities.Optional{System.String},DisCatSharp.Entities.Optional{System.Int32},DisCatSharp.Entities.Optional{System.Nullable{System.Int32}},DisCatSharp.Entities.Optional{System.Int32},DisCatSharp.Entities.Optional{System.Boolean},DisCatSharp.Entities.Optional{DisCatSharp.Lavalink.Entities.Filters.LavalinkFilters},DisCatSharp.Entities.Optional{System.Object})" /> method.
+                Resolves audio tracks for use with the <see cref="M:DisCatSharp.Lavalink.LavalinkRestClient.UpdatePlayerAsync(System.String,System.UInt64,System.Boolean,DisCatSharp.Entities.Optional{System.String},DisCatSharp.Entities.Optional{System.String},DisCatSharp.Entities.Optional{System.Int32},DisCatSharp.Entities.Optional{System.Nullable{System.Int32}},DisCatSharp.Entities.Optional{System.Int32},DisCatSharp.Entities.Optional{System.Boolean},DisCatSharp.Entities.Optional{DisCatSharp.Lavalink.Entities.Filters.LavalinkFilters},DisCatSharp.Entities.Optional{System.Object},System.Threading.CancellationToken)" /> method.
             </summary>
             <param name="identifier">The identifier to resolve tracks with.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>
                 A <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrackLoadingResult" /> where <see cref="P:DisCatSharp.Lavalink.Entities.LavalinkTrackLoadingResult.Result" /> is dynamic
                 based on <see cref="P:DisCatSharp.Lavalink.Entities.LavalinkTrackLoadingResult.LoadType" />.
             </returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetLyricsAsync(System.String,System.Boolean,System.String,System.Nullable{System.UInt64})">
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetLyricsAsync(System.String,System.Boolean,System.String,System.Nullable{System.UInt64},System.Threading.CancellationToken)">
             <summary>
                 Gets the lyrics for a track.
             </summary>
@@ -3051,29 +3237,33 @@
             <param name="skipTrackSource">Whether to skip the current track source and fetch from highest priority source.</param>
             <param name="sessionId">The optional session id a player is associated with.</param>
             <param name="guildId">The optional guild id a player is associated with.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkLyricsResult" /> or <see langword="null" />.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetLyricsForCurrentTrackAsync(System.String,System.UInt64,System.Boolean)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.GetLyricsForCurrentTrackAsync(System.String,System.UInt64,System.Boolean,System.Threading.CancellationToken)">
             <summary>
                 Gets the lyrics for a currently playing track.
             </summary>
             <param name="sessionId">The session id a player is associated with.</param>
             <param name="guildId">The guild id a player is associated with.</param>
             <param name="skipTrackSource">Whether to skip the current track source and fetch from highest priority source.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkLyricsResult" /> or <see langword="null" />.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.DecodeTrackAsync(System.String)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.DecodeTrackAsync(System.String,System.Threading.CancellationToken)">
             <summary>
                 Decode a single track into its info, where <paramref name="base64Track" /> is the encoded base64 data.
             </summary>
             <param name="base64Track">The encoded track <see cref="T:System.String" />.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The decoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.DecodeTracksAsync(System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:DisCatSharp.Lavalink.LavalinkRestClient.DecodeTracksAsync(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)">
             <summary>
                 Decodes multiple tracks into their info.
             </summary>
             <param name="base64Tracks"><see cref="T:System.Collections.Generic.List`1" /> of encoded track <see cref="T:System.String" />s.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>A <see cref="T:System.Collections.Generic.IReadOnlyList`1" /> of decoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />s.</returns>
         </member>
         <member name="T:DisCatSharp.Lavalink.SessionDisconnectedEventHandler">
@@ -3133,6 +3323,11 @@
                 Gets the voice state updates.
             </summary>
         </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkSession._pendingVoiceStates">
+            <summary>
+                Stores partially received Discord voice-state data until both the state and server halves are available.
+            </summary>
+        </member>
         <member name="F:DisCatSharp.Lavalink.LavalinkSession._websocketClosed">
             <summary>
                 Triggers when the Lavalink websocket is closed.
@@ -3167,6 +3362,49 @@
             <summary>
                 Gets the internal dictionary of connected players for each guild.
             </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkSession._bridgeClient">
+            <summary>
+                The bridge client for external voice transport, if bridge mode is enabled.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Lavalink.LavalinkSession._bridgeVoiceConnections">
+            <summary>
+                Tracks active <see cref="T:DisCatSharp.Voice.VoiceConnection" /> instances per guild when in bridge mode.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Lavalink.LavalinkSession.IsBridgeMode">
+            <summary>
+                Whether this session uses bridge mode for voice transport.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetBridgeVoiceConnection(System.UInt64)">
+            <summary>
+                Gets the bridge-mode <see cref="T:DisCatSharp.Voice.VoiceConnection" /> for the specified guild, if one is active.
+            </summary>
+            <param name="guildId">The guild snowflake.</param>
+            <returns>The <see cref="T:DisCatSharp.Voice.VoiceConnection" /> when bridge mode is active and the guild is connected; otherwise <see langword="null" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetBridgeOpusSource(System.UInt64)">
+            <summary>
+                Gets the bridge-mode <see cref="T:DisCatSharp.Voice.Interfaces.IExternalOpusSource" /> for the specified guild, if available.
+                Use this to feed a <see cref="T:DisCatSharp.Voice.Entities.VoiceOutputController" /> via
+                <see cref="M:DisCatSharp.Voice.Entities.VoiceOutputController.SetMusicSourceAsync(DisCatSharp.Voice.Interfaces.IExternalOpusSource,System.Threading.CancellationToken)" />.
+            </summary>
+            <param name="guildId">The guild snowflake.</param>
+            <returns>The <see cref="T:DisCatSharp.Voice.Interfaces.IExternalOpusSource" /> when bridge mode is active and the guild has an attached source; otherwise <see langword="null" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.RebindBridgeOpusSource(System.UInt64,DisCatSharp.Voice.Interfaces.IExternalOpusSource,System.Threading.CancellationToken)">
+            <summary>
+                Rebinds the voice connection for the specified guild to a new Opus source.
+                Typically used to insert a <see cref="T:DisCatSharp.Voice.Entities.VoiceOutputController" />
+                between the bridge source and the voice connection.
+                The previous binding is cancelled before the new one starts.
+            </summary>
+            <param name="guildId">The guild snowflake.</param>
+            <param name="newSource">The new Opus source to bind (e.g. a <see cref="T:DisCatSharp.Voice.Entities.VoiceOutputController" />).</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns><see langword="true" /> if the rebind succeeded; <see langword="false" /> if no voice connection exists for this guild.</returns>
         </member>
         <member name="M:DisCatSharp.Lavalink.LavalinkSession.#ctor(DisCatSharp.DiscordClient,DisCatSharp.Lavalink.LavalinkExtension,DisCatSharp.Lavalink.LavalinkConfiguration)">
             <summary>
@@ -3266,33 +3504,38 @@
                 Fires when a <see cref="T:DisCatSharp.Lavalink.LavalinkSession" /> disconnected.
             </summary>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetLavalinkInfoAsync">
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetLavalinkInfoAsync(System.Threading.CancellationToken)">
             <summary>
                 Gets the lavalink server information.
             </summary>
             <returns>A <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkInfo" /> object.</returns>
+            <param name="cancellationToken">The cancellation token.</param>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetLavalinkVersionAsync">
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetLavalinkVersionAsync(System.Threading.CancellationToken)">
             <summary>
                 Gets the lavalink server version
             </summary>
             <returns>The version <see langword="string" />.</returns>
+            <param name="cancellationToken">The cancellation token.</param>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetLavalinkStatsAsync">
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetLavalinkStatsAsync(System.Threading.CancellationToken)">
             <summary>
                 Gets the lavalink server statistics.
             </summary>
             <returns>A <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkStats" /> object.</returns>
+            <param name="cancellationToken">The cancellation token.</param>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkSession.DestroyAsync">
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.DestroyAsync(System.Threading.CancellationToken)">
             <summary>
                 Destroys the current session, disconnecting all players.
             </summary>
+            <param name="cancellationToken">The cancellation token.</param>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkSession.DestroyGuildPlayersAsync">
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.DestroyGuildPlayersAsync(System.Threading.CancellationToken)">
             <summary>
                 Destroys all players.
             </summary>
+            <param name="cancellationToken">The cancellation token.</param>
         </member>
         <member name="M:DisCatSharp.Lavalink.LavalinkSession.LavalinkGuildPlayerDestroyed(DisCatSharp.Lavalink.LavalinkSession,DisCatSharp.Lavalink.EventArgs.GuildPlayerDestroyedEventArgs)">
             <summary>
@@ -3301,20 +3544,46 @@
             <param name="sender">The lavalink session.</param>
             <param name="args">The guild player destroyed event args containing the destroyed <see cref="T:DisCatSharp.Lavalink.LavalinkGuildPlayer" />.</param>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkSession.ConnectAsync(DisCatSharp.Entities.DiscordChannel,System.Boolean)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.ConnectAsync(DisCatSharp.Entities.DiscordChannel,System.Boolean,System.Boolean,System.Threading.CancellationToken)">
             <summary>
                 Connects to a <see cref="T:DisCatSharp.Entities.DiscordChannel" />.
             </summary>
             <param name="channel">The channel to join.</param>
             <param name="deafened">Whether to join the channel deafened.</param>
+            <param name="muted">Whether to join the channel muted.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The created <see cref="T:DisCatSharp.Lavalink.LavalinkGuildPlayer" />.</returns>
             <exception cref="T:System.ArgumentException"></exception>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkSession.ConfigureAsync(DisCatSharp.Lavalink.Entities.LavalinkSessionConfiguration)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.ConnectBridgeAsync(DisCatSharp.Entities.DiscordChannel,System.Boolean,System.Boolean,System.Threading.CancellationToken)">
+            <summary>
+                Connects to a voice channel using bridge mode.
+                In bridge mode, DisCatSharp.Voice handles Discord voice transport (RTP, DAVE E2EE, AEAD, UDP)
+                and receives Opus frames from Lavalink via the bridge WebSocket.
+            </summary>
+            <param name="channel">The channel to join.</param>
+            <param name="deafened">Whether to join the channel deafened.</param>
+            <param name="muted">Whether to join the channel muted.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>The created <see cref="T:DisCatSharp.Lavalink.LavalinkGuildPlayer" />.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.EnsureBridgeClientConnectedAsync(DisCatSharp.Lavalink.Bridge.LavalinkBridgeConfiguration,System.Threading.CancellationToken)">
+            <summary>
+                Ensures the bridge client is connected, creating it if necessary.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.DisconnectBridgeGuildAsync(System.UInt64)">
+            <summary>
+                Disconnects a guild's bridge voice connection and detaches the bridge Opus source.
+            </summary>
+            <param name="guildId">The guild ID to disconnect.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.ConfigureAsync(DisCatSharp.Lavalink.Entities.LavalinkSessionConfiguration,System.Threading.CancellationToken)">
             <summary>
                 Configures the current lavalink session.
             </summary>
             <param name="config">The config update to set.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The updated session.</returns>
         </member>
         <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetGuildPlayer(DisCatSharp.Entities.DiscordGuild)">
@@ -3330,69 +3599,77 @@
             </summary>
             <returns>The found players or <see langword="null" />.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetPlayerAsync(DisCatSharp.Entities.DiscordGuild)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetPlayerAsync(DisCatSharp.Entities.DiscordGuild,System.Threading.CancellationToken)">
             <summary>
                 Gets the lavalink player attached to <paramref name="guild" />.
                 <para>Use <see cref="M:DisCatSharp.Lavalink.LavalinkSession.GetGuildPlayer(DisCatSharp.Entities.DiscordGuild)" /> if you want to interact with the actual player.</para>
             </summary>
             <param name="guild">The guild to get the player for.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The found player or <see langword="null" />.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetPlayersAsync">
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetPlayersAsync(System.Threading.CancellationToken)">
             <summary>
                 Gets all lavalink players.
                 <para>Use <see cref="M:DisCatSharp.Lavalink.LavalinkSession.GetGuildPlayersAsync" /> if you want to interact with the actual players.</para>
             </summary>
             <returns>The found players or <see langword="null" />.</returns>
+            <param name="cancellationToken">The cancellation token.</param>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkSession.DecodeTracksAsync(System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.DecodeTracksAsync(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)">
             <summary>
                 Decodes encoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />s.
                 <para>Might not work with pre 3.0 tracks.</para>
             </summary>
             <param name="tracks">The tracks to decode.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>A <see cref="T:System.Collections.Generic.List`1" /> of decoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />s.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkSession.DecodeTrackAsync(System.String)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.DecodeTrackAsync(System.String,System.Threading.CancellationToken)">
             <summary>
                 Decodes an encoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />.
                 <para>Might not work with pre 3.0 tracks.</para>
             </summary>
             <param name="track">The track to decode.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The decoded <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkTrack" />.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkSession.LoadTracksAsync(System.String)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.LoadTracksAsync(System.String,System.Threading.CancellationToken)">
             <summary>
                 Loads tracks by <paramref name="identifier" />.
                 Returns a dynamic object you have to parse with (Type)Result.
             </summary>
             <param name="identifier">The identifier to load.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>A track loading result.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetLyricsAsync(DisCatSharp.Lavalink.Entities.LavalinkTrack,System.Boolean)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetLyricsAsync(DisCatSharp.Lavalink.Entities.LavalinkTrack,System.Boolean,System.Threading.CancellationToken)">
             <summary>
                 Gets the lyrics for a track.
             </summary>
             <param name="track">The track to fetch the lyrics for.</param>
             <param name="skipTrackSource">Whether to skip the current track source and fetch from highest priority source.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkLyricsResult" /> or <see langword="null" />.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetLyricsForCurrentTrackAsync(System.String,System.UInt64,System.Boolean)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.GetLyricsForCurrentTrackAsync(System.String,System.UInt64,System.Boolean,System.Threading.CancellationToken)">
             <summary>
                 Gets the lyrics for a currently playing track.
             </summary>
             <param name="sessionId">The session id a player is associated with.</param>
             <param name="guildId">The guild id a player is associated with.</param>
             <param name="skipTrackSource">Whether to skip the current track source and fetch from highest priority source.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>The <see cref="T:DisCatSharp.Lavalink.Entities.LavalinkLyricsResult" /> or <see langword="null" />.</returns>
         </member>
-        <member name="M:DisCatSharp.Lavalink.LavalinkSession.LoadTracksAsync(DisCatSharp.Lavalink.Enums.LavalinkSearchType,System.String)">
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.LoadTracksAsync(DisCatSharp.Lavalink.Enums.LavalinkSearchType,System.String,System.Threading.CancellationToken)">
             <summary>
                 Loads tracks by <paramref name="identifier" />.
                 Returns a dynamic object you have to parse with (Type)Result.
             </summary>
             <param name="searchType">The search type to use. Some types need additional setup.</param>
             <param name="identifier">The identifier to load.</param>
+            <param name="cancellationToken">The cancellation token.</param>
             <returns>A track loading result.</returns>
         </member>
         <member name="M:DisCatSharp.Lavalink.LavalinkSession.EstablishConnectionAsync">
@@ -3442,6 +3719,29 @@
             </summary>
             <param name="client">The websocket client.</param>
             <param name="args">The event args.</param>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.MergePendingVoiceState(System.UInt64,System.Action{DisCatSharp.Lavalink.Entities.LavalinkVoiceState})">
+            <summary>
+                Merges newly received Discord voice-state data into the per-guild pending state cache.
+            </summary>
+            <param name="guildId">The guild id whose pending voice state is being updated.</param>
+            <param name="updateAction">The mutation that applies the newly received event data.</param>
+            <returns>The merged voice state snapshot.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.TryApplyVoiceStateUpdateAsync(DisCatSharp.Lavalink.LavalinkGuildPlayer,DisCatSharp.Lavalink.Entities.LavalinkVoiceState)">
+            <summary>
+                Applies a merged voice-state update to Lavalink only when all required fields are available.
+            </summary>
+            <param name="guildPlayer">The guild player whose voice state is being refreshed.</param>
+            <param name="state">The merged voice-state snapshot.</param>
+            <returns>A task representing the asynchronous update operation.</returns>
+        </member>
+        <member name="M:DisCatSharp.Lavalink.LavalinkSession.IsVoiceStateComplete(DisCatSharp.Lavalink.Entities.LavalinkVoiceState)">
+            <summary>
+                Determines whether a merged Discord voice-state snapshot contains the full set of values Lavalink requires.
+            </summary>
+            <param name="state">The voice-state snapshot to validate.</param>
+            <returns><see langword="true" /> when the snapshot is complete; otherwise <see langword="false" />.</returns>
         </member>
         <member name="T:DisCatSharp.Lavalink.Models.LavalinkPlayerUpdateModel">
             <summary>

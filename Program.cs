@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Net;
 using System.Reflection;
 using System.Text;
@@ -187,6 +187,9 @@ public class Program {
     }
 
     private static async Task roleHandler(DiscordClient sender, GuildMemberAddEventArgs e) {
+        if (e.Guild.Id != MY_GUILD) {
+            return;
+        }
         const ulong roleID = 1352463350533197989u;
         var role = await e.Guild.GetRoleAsync(roleID);
         await e.Member.GrantRoleAsync(role);
@@ -239,8 +242,8 @@ public class Program {
                 await Task.Delay(3000); // stupid discord doesnt update logs immediately
                 var logs = await server.GetAuditLogsAsync(10, actionType: AuditLogActionType.MessageDelete);
                 var deleter = logs.FirstOrDefault(log =>
-                        log is DiscordAuditLogMessageEntry entry && entry.Target.Id == message.Id)?
-                    .UserResponsible?.Username ?? "unknown";
+                        log is DiscordMessageAuditLogEntry entry && entry.TargetMessageId == message.Id)?
+                    .Actor?.Username ?? "unknown";
                 await server.GetChannel(LOG)!
                     .SendMessageAsync($"{message.Content} deleted by {deleter}");
             });
@@ -273,6 +276,19 @@ public class Program {
 
         // Don't reply to webhooks with embeds. The bot might have sent them
         if (e.Message.WebhookMessage && e.Message.Embeds.Count > 0) {
+            return;
+        }
+
+        // Wolfy wanted "/s" to everything he posts. NOW HE GOT IT
+        // but keep it separate from the wiltery shit so the rest of the stupid jokes don't leak into the wild
+        const ulong sarcasmVictim = 1279919118925041705;
+        if (false && e.Author.Id == sarcasmVictim && !e.Message.WebhookMessage
+            && e.Message.Content is { Length: > 0 } wolfyMsg
+            && !wolfyMsg.StartsWith('.') && !wolfyMsg.StartsWith('/')
+            && e.Message.Embeds.Count == 0 && e.Message.Attachments.Count == 0
+            && !wolfyMsg.Contains("@everyone") && !wolfyMsg.Contains("@here")
+            && !wolfyMsg.TrimEnd().EndsWith("/s", StringComparison.Ordinal)) {
+            await wiltery.editMessage(e.Message, wolfyMsg, $"{wolfyMsg} /s");
             return;
         }
 

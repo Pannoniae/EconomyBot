@@ -1,0 +1,24 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v11.0/win-x64",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v11.0": {},
+    ".NETCoreApp,Version=v11.0/win-x64": {
+      "DisCatSharp.Voice.Natives/10.7.1": {
+        "runtime": {
+          "DisCatSharp.Voice.Natives.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "DisCatSharp.Voice.Natives/10.7.1": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

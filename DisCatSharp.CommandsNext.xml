@@ -2414,40 +2414,45 @@
                 Gets or sets the service scope context.
             </summary>
         </member>
-        <member name="M:DisCatSharp.CommandsNext.CommandContext.RespondAsync(System.String)">
+        <member name="M:DisCatSharp.CommandsNext.CommandContext.RespondAsync(System.String,System.Threading.CancellationToken)">
             <summary>
                 Quickly respond to the message that triggered the command.
             </summary>
             <param name="content">Message to respond with.</param>
+            <param name="cancellationToken">A cancellation token to cancel the operation.</param>
             <returns></returns>
         </member>
-        <member name="M:DisCatSharp.CommandsNext.CommandContext.RespondAsync(DisCatSharp.Entities.DiscordEmbed)">
+        <member name="M:DisCatSharp.CommandsNext.CommandContext.RespondAsync(DisCatSharp.Entities.DiscordEmbed,System.Threading.CancellationToken)">
             <summary>
                 Quickly respond to the message that triggered the command.
             </summary>
             <param name="embed">Embed to attach.</param>
+            <param name="cancellationToken">A cancellation token to cancel the operation.</param>
             <returns></returns>
         </member>
-        <member name="M:DisCatSharp.CommandsNext.CommandContext.RespondAsync(System.String,DisCatSharp.Entities.DiscordEmbed)">
+        <member name="M:DisCatSharp.CommandsNext.CommandContext.RespondAsync(System.String,DisCatSharp.Entities.DiscordEmbed,System.Threading.CancellationToken)">
             <summary>
                 Quickly respond to the message that triggered the command.
             </summary>
             <param name="content">Message to respond with.</param>
             <param name="embed">Embed to attach.</param>
+            <param name="cancellationToken">A cancellation token to cancel the operation.</param>
             <returns></returns>
         </member>
-        <member name="M:DisCatSharp.CommandsNext.CommandContext.RespondAsync(DisCatSharp.Entities.DiscordMessageBuilder)">
+        <member name="M:DisCatSharp.CommandsNext.CommandContext.RespondAsync(DisCatSharp.Entities.DiscordMessageBuilder,System.Threading.CancellationToken)">
             <summary>
                 Quickly respond to the message that triggered the command.
             </summary>
             <param name="builder">The Discord Message builder.</param>
+            <param name="cancellationToken">A cancellation token to cancel the operation.</param>
             <returns></returns>
         </member>
-        <member name="M:DisCatSharp.CommandsNext.CommandContext.RespondAsync(System.Action{DisCatSharp.Entities.DiscordMessageBuilder})">
+        <member name="M:DisCatSharp.CommandsNext.CommandContext.RespondAsync(System.Action{DisCatSharp.Entities.DiscordMessageBuilder},System.Threading.CancellationToken)">
             <summary>
                 Quickly respond to the message that triggered the command.
             </summary>
             <param name="action">The Discord Message builder.</param>
+            <param name="cancellationToken">A cancellation token to cancel the operation.</param>
             <returns></returns>
         </member>
         <member name="M:DisCatSharp.CommandsNext.CommandContext.TriggerTypingAsync">

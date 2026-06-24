@@ -43,12 +43,13 @@
                 Represents experimental extension methods for DisCatSharp.
             </summary>
         </member>
-        <member name="M:DisCatSharp.Experimental.DisCatSharpExtensions.GetUsernameAsync(DisCatSharp.DiscordClient,System.UInt64)">
+        <member name="M:DisCatSharp.Experimental.DisCatSharpExtensions.GetUsernameAsync(DisCatSharp.DiscordClient,System.UInt64,System.Threading.CancellationToken)">
             <summary>
             This is a test method to test the functionality of DisCatSharp.Experimental and the DisCatSharp.Analyzer.
             </summary>
             <param name="client">The discord client.</param>
             <param name="id">The id of the user to get the username of.</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
             <returns>The username of the user with the given id.</returns>
         </member>
         <member name="T:DisCatSharp.Experimental.DiscordApiClientHook">
@@ -67,24 +68,74 @@
                 Gets the api client.
             </summary>
         </member>
-        <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.SearchGuildMessagesAsync(System.UInt64,DisCatSharp.Experimental.Entities.DiscordGuildMessageSearchParams)">
+        <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.SearchGuildMessagesAsync(System.UInt64,DisCatSharp.Experimental.Entities.DiscordGuildMessageSearchParams,System.Threading.CancellationToken)">
             <summary>
                Searches the guild messages asynchronously based on the provided search parameters.
             </summary>
             <param name="guildId">The ID of the guild.</param>
             <param name="searchParams">The search parameters.</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
             <exception cref="T:DisCatSharp.Exceptions.ValidationException">Thrown if the user gave an invalid input.</exception>
             <exception cref="T:DisCatSharp.Exceptions.NotIndexedException">Thrown if the elastisearch endpoint has not finished indexing yet.</exception>
             <exception cref="T:DisCatSharp.Exceptions.BadRequestException">Thrown when an invalid parameter was provided.</exception>
             <exception cref="T:DisCatSharp.Exceptions.ServerErrorException">Thrown when Discord is unable to process the request.</exception>
             <returns>A list of messages that match the search criteria.</returns>
         </member>
-        <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.SearchGuildMembersAsync(System.UInt64,DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchParams)">
+        <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.BuildGuildMessageSearchQueryString(DisCatSharp.Experimental.Entities.DiscordGuildMessageSearchParams)">
+            <summary>
+                Builds the query string for the guild message search endpoint.
+            </summary>
+            <param name="searchParams">The search parameters.</param>
+            <returns>The encoded query string, including the leading <c>?</c> when needed.</returns>
+        </member>
+        <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.AppendQueryParam``1(System.Text.StringBuilder,System.String,``0)">
+            <summary>
+                Appends a single query parameter when it has a value.
+            </summary>
+            <param name="query">The query string builder.</param>
+            <param name="name">The name of the query parameter.</param>
+            <param name="value">The value of the query parameter. If null, the parameter will not be appended.</param>
+            <typeparam name="T">The type of the value.</typeparam>
+        </member>
+        <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.AppendQueryParams``1(System.Text.StringBuilder,System.String,System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+                Appends repeated query parameters for a multi-value filter.
+            </summary>
+            <param name="query">The query string builder.</param>
+            <param name="name">The name of the query parameter.</param>
+            <param name="values">The values to append. If null, no parameters will be appended.</param>
+            <typeparam name="T">The type of the values.</typeparam>
+        </member>
+        <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.AppendRawQueryParam(System.Text.StringBuilder,System.String,System.String)">
+            <summary>
+                Appends an already serialized query parameter value.
+            </summary>
+            <param name="query">The query string builder.</param>
+            <param name="name">The name of the query parameter.</param>
+            <param name="value">The raw value of the query parameter, which will be URL-encoded as-is.</param>
+        </member>
+        <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.SerializeQueryValue``1(``0)">
+            <summary>
+                Serializes a query value to the wire format Discord expects.
+            </summary>
+            <param name="value">The value to serialize.</param>
+            <typeparam name="T">The type of the value.</typeparam>
+            <returns>The serialized value.</returns>
+        </member>
+        <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.GetEnumMemberValue(System.Enum)">
+            <summary>
+                Gets the <see cref="P:System.Runtime.Serialization.EnumMemberAttribute.Value" /> for an enum value, if present.
+            </summary>
+            <param name="value">The enum value.</param>
+            <returns>The value specified in the <see cref="T:System.Runtime.Serialization.EnumMemberAttribute" />, or the enum's name if the attribute is not present.</returns>
+        </member>
+        <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.SearchGuildMembersAsync(System.UInt64,DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchParams,System.Threading.CancellationToken)">
             <summary>
                 Searches the guild members asynchronously based on the provided search parameters.
             </summary>
             <param name="guildId">The ID of the guild.</param>
             <param name="searchParams">The search parameters.</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
             <exception cref="T:DisCatSharp.Exceptions.ValidationException">Thrown if the user gave an invalid input.</exception>
             <exception cref="T:DisCatSharp.Exceptions.NotIndexedException">Thrown if the elastisearch endpoint has not finished indexing yet.</exception>
             <exception cref="T:DisCatSharp.Exceptions.UnauthorizedException">
@@ -95,12 +146,13 @@
             <exception cref="T:DisCatSharp.Exceptions.ServerErrorException">Thrown when Discord is unable to process the request.</exception>
             <returns>A list of supplemental guild members that match the search criteria.</returns>
         </member>
-        <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.RequestFileUploadAsync(System.UInt64,DisCatSharp.Experimental.Entities.GcpAttachment)">
+        <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.RequestFileUploadAsync(System.UInt64,DisCatSharp.Experimental.Entities.GcpAttachment,System.Threading.CancellationToken)">
             <summary>
                Requests a file upload to GCP.
             </summary>
             <param name="channelId">The ID of the channel.</param>
             <param name="attachment">The attachment information.</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
             <returns>The GCP attachment response.</returns>
         </member>
         <member name="M:DisCatSharp.Experimental.DiscordApiClientHook.UploadGcpFile(DisCatSharp.Experimental.Entities.GcpAttachmentUploadInformation,System.IO.Stream)">
@@ -115,7 +167,7 @@
                 Adds methods to <see cref="T:DisCatSharp.Entities.DiscordChannel" />
             </summary>
         </member>
-        <member name="M:DisCatSharp.Experimental.Entities.DiscordChannelMethodHooks.UploadFileAsync(DisCatSharp.Entities.DiscordChannel,System.String,System.IO.Stream,System.String)">
+        <member name="M:DisCatSharp.Experimental.Entities.DiscordChannelMethodHooks.UploadFileAsync(DisCatSharp.Entities.DiscordChannel,System.String,System.IO.Stream,System.String,System.Threading.CancellationToken)">
             <summary>
                 Uploads a file to the channel for later use in a <see cref="T:DisCatSharp.Entities.DiscordMessageBuilder" />.
             </summary>
@@ -123,6 +175,7 @@
             <param name="name">The name of the file to upload.</param>
             <param name="stream">The stream of the file to upload.</param>
             <param name="description">The description of the file to upload.</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
             <returns>The upload information.</returns>
         </member>
         <member name="T:DisCatSharp.Experimental.Entities.GcpAttachment">
@@ -468,12 +521,17 @@
             Gets or sets the list of channel IDs to filter by.
             </summary>
         </member>
+        <member name="P:DisCatSharp.Experimental.Entities.DiscordGuildMessageSearchParams.RepliedToMessageId">
+            <summary>
+            Gets or sets the list of guild IDs to filter by.
+            </summary>
+        </member>
         <member name="T:DisCatSharp.Experimental.Entities.DiscordGuildMethodsHook">
             <summary>
                 Adds methods to <see cref="T:DisCatSharp.Entities.DiscordGuild" />.
             </summary>
         </member>
-        <member name="M:DisCatSharp.Experimental.Entities.DiscordGuildMethodsHook.SearchMembersAsync(DisCatSharp.Entities.DiscordGuild,DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchParams)">
+        <member name="M:DisCatSharp.Experimental.Entities.DiscordGuildMethodsHook.SearchMembersAsync(DisCatSharp.Entities.DiscordGuild,DisCatSharp.Experimental.Entities.DiscordGuildMemberSearchParams,System.Threading.CancellationToken)">
             <summary>
                 Searches the guild for members through elasticsearch.
                 If the guild isn't indexed yet, it'll return a 202 accepted response, we're gonna throw at this point.
@@ -482,6 +540,7 @@
             </summary>
             <param name="guild">The guild.</param>
             <param name="searchParams">The guild member search params</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
             <exception cref="T:DisCatSharp.Exceptions.ValidationException">Thrown if the user gave an invalid input.</exception>
             <exception cref="T:DisCatSharp.Exceptions.NotIndexedException">Thrown if the elasticsearch endpoint has not finished indexing yet.</exception>
             <exception cref="T:DisCatSharp.Exceptions.UnauthorizedException">
@@ -491,7 +550,7 @@
             <exception cref="T:DisCatSharp.Exceptions.BadRequestException">Thrown when an invalid parameter was provided.</exception>
             <exception cref="T:DisCatSharp.Exceptions.ServerErrorException">Thrown when Discord is unable to process the request.</exception>
         </member>
-        <member name="M:DisCatSharp.Experimental.Entities.DiscordGuildMethodsHook.SearchMessagesAsync(DisCatSharp.Entities.DiscordGuild,DisCatSharp.Experimental.Entities.DiscordGuildMessageSearchParams)">
+        <member name="M:DisCatSharp.Experimental.Entities.DiscordGuildMethodsHook.SearchMessagesAsync(DisCatSharp.Entities.DiscordGuild,DisCatSharp.Experimental.Entities.DiscordGuildMessageSearchParams,System.Threading.CancellationToken)">
             <summary>
                 Searches the guild for messages through elasticsearch.
                 If the guild isn't indexed yet, it'll return a 202 accepted response, we're gonna throw at this point.
@@ -500,6 +559,7 @@
             </summary>
             <param name="guild">The guild.</param>
             <param name="searchParams">The guild messages search params</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
             <exception cref="T:DisCatSharp.Exceptions.ValidationException">Thrown if the user gave an invalid input.</exception>
             <exception cref="T:DisCatSharp.Exceptions.NotIndexedException">Thrown if the elasticsearch endpoint has not finished indexing yet.</exception>
             <exception cref="T:DisCatSharp.Exceptions.UnauthorizedException">
@@ -684,7 +744,7 @@
         </member>
         <member name="P:DisCatSharp.Experimental.Entities.DiscordSearchGuildMessagesResponse.Messages">
             <summary>
-            Gets the list of messages found in the search.
+            Gets the nested list of messages found in the search.
             </summary>
         </member>
         <member name="P:DisCatSharp.Experimental.Entities.DiscordSearchGuildMessagesResponse.DoingDeepHistoricalIndex">
@@ -704,7 +764,7 @@
         </member>
         <member name="P:DisCatSharp.Experimental.Entities.DiscordSearchGuildMessagesResponse.Members">
             <summary>
-            Gets the list of members found in the search.
+            Gets the list of thread members found in the search.
             </summary>
         </member>
         <member name="P:DisCatSharp.Experimental.Entities.DiscordSearchGuildMessagesResponse.DocumentsIndexed">

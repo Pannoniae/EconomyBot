@@ -107,6 +107,11 @@
                 Configuration for Discord.
             </summary>
         </member>
+        <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.s_collectionLock">
+            <summary>
+                Lock object for synchronizing access to shared static collections.
+            </summary>
+        </member>
         <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.s_registeredCommands">
             <summary>
                 Sets a list of registered commands. The key is the guild id (null if global).
@@ -151,6 +156,11 @@
                 Fires the context menu executed event.
             </summary>
         </member>
+        <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension._contextMenuChecksFailed">
+            <summary>
+                Fires the context menu checks failed event.
+            </summary>
+        </member>
         <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension._globalApplicationCommandsRegistered">
             <summary>
                 Fires the global application command registered event.
@@ -169,6 +179,11 @@
         <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension._slashExecuted">
             <summary>
                 Fires the slash command executed event.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension._slashChecksFailed">
+            <summary>
+                Fires the slash command checks failed event.
             </summary>
         </member>
         <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension._updateList">
@@ -312,6 +327,12 @@
                 Gets whether the finish event was fired.
             </summary>
         </member>
+        <member name="F:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension._userEntryPointCommand">
+            <summary>
+                Gets the user-provided entry point command configuration.
+                Set via <see cref="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.RegisterEntryPointCommand(System.String,System.Collections.Generic.List{DisCatSharp.Enums.InteractionContextType},System.Collections.Generic.List{DisCatSharp.Enums.ApplicationCommandIntegrationTypes},System.Nullable{DisCatSharp.Enums.ApplicationCommandHandlerType},System.Nullable{DisCatSharp.Enums.Permissions},DisCatSharp.Entities.DiscordApplicationCommandLocalization,DisCatSharp.Entities.DiscordApplicationCommandLocalization)"/>.
+            </summary>
+        </member>
         <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.Setup(DisCatSharp.DiscordClient)">
             <summary>
                 Runs setup.
@@ -350,17 +371,19 @@
                 DO NOT USE IF YOU DON'T KNOW WHAT IT DOES.
             </summary>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.CleanGuildCommandsAsync">
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.CleanGuildCommandsAsync(System.Threading.CancellationToken)">
             <summary>
                 Cleans all guild application commands.
                 <note type="caution">You normally don't need to execute it.</note>
             </summary>
+            <param name="cancellationToken">A token to cancel the request.</param>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.CleanGlobalCommandsAsync">
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.CleanGlobalCommandsAsync(System.Threading.CancellationToken)">
             <summary>
                 Cleans all global application commands.
                 <note type="caution">You normally don't need to execute it.</note>
             </summary>
+            <param name="cancellationToken">A token to cancel the request.</param>
         </member>
         <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.RegisterGuildCommands(System.Reflection.Assembly,System.UInt64)">
             <summary>
@@ -407,6 +430,20 @@
             <param name="type">The <see cref="T:System.Type" /> of the command class to register.</param>
             <param name="translationSetup">A callback to setup translations with.</param>
         </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.RegisterEntryPointCommand(System.String,System.Collections.Generic.List{DisCatSharp.Enums.InteractionContextType},System.Collections.Generic.List{DisCatSharp.Enums.ApplicationCommandIntegrationTypes},System.Nullable{DisCatSharp.Enums.ApplicationCommandHandlerType},System.Nullable{DisCatSharp.Enums.Permissions},DisCatSharp.Entities.DiscordApplicationCommandLocalization,DisCatSharp.Entities.DiscordApplicationCommandLocalization)">
+            <summary>
+                Registers a custom entry point command for the application's activity.
+                <para>Only one entry point command can exist per application. The name is always "launch" as required by Discord.</para>
+                <para>Use this to configure the description, allowed contexts, integration types, and handler type of the entry point command.</para>
+            </summary>
+            <param name="description">The description of the entry point command. When <see langword="null"/>, defaults to "Launch an activity".</param>
+            <param name="allowedContexts">Where the entry point command can be used. When <see langword="null"/>, Discord's defaults are kept.</param>
+            <param name="integrationTypes">The allowed integration types. When <see langword="null"/>, Discord's defaults are kept.</param>
+            <param name="handlerType">The handler type. When <see langword="null"/>, falls back to <see cref="P:DisCatSharp.DiscordConfiguration.ActivityHandlerType"/>.</param>
+            <param name="defaultMemberPermissions">The default member permissions. When <see langword="null"/>, no restrictions are applied.</param>
+            <param name="nameLocalizations">The localizations of the command name.</param>
+            <param name="descriptionLocalizations">The localizations of the command description.</param>
+        </member>
         <member name="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ApplicationCommandsModuleReady">
             <summary>
                 Fired when the application commands module is ready.
@@ -427,17 +464,19 @@
                 Fired when the global commands are registered.
             </summary>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.UpdateAsync">
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.UpdateAsync(System.Threading.CancellationToken)">
             <summary>
                 Used for RegisterCommands and the <see cref="E:DisCatSharp.DiscordClient.Ready" /> event.
             </summary>
+            <param name="cancellationToken">A token to cancel the request.</param>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.RegisterCommands(System.Collections.Generic.List{DisCatSharp.ApplicationCommands.ApplicationCommandsModuleConfiguration},System.Nullable{System.UInt64})">
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.RegisterCommands(System.Collections.Generic.List{DisCatSharp.ApplicationCommands.ApplicationCommandsModuleConfiguration},System.Nullable{System.UInt64},System.Threading.CancellationToken)">
             <summary>
                 Method for registering commands for a target from modules.
             </summary>
             <param name="types">The types.</param>
             <param name="guildId">The optional guild id.</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
         </member>
         <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.CheckRegistrationStartup(System.Collections.Generic.List{DisCatSharp.ApplicationCommands.Entities.CommandTranslator},System.Collections.Generic.List{DisCatSharp.ApplicationCommands.Entities.GroupTranslator},System.Nullable{System.UInt64})">
             <summary>
@@ -497,25 +536,28 @@
             <param name="method">The method info.</param>
             <param name="options">The options.</param>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.RunPreexecutionChecksAsync(System.Reflection.MemberInfo,DisCatSharp.ApplicationCommands.Context.BaseContext)">
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.InvokeChecksFailedAsync(DisCatSharp.ApplicationCommands.Context.BaseContext,System.Collections.Generic.IReadOnlyList{DisCatSharp.ApplicationCommands.Attributes.ApplicationCommandCheckBaseAttribute})">
             <summary>
                 Runs the pre-execution checks.
             </summary>
-            <param name="method">The method info.</param>
             <param name="context">The base context.</param>
+            <param name="failedChecks">The checks that failed for the current context.</param>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GetChoiceAttributesFromProvider(System.Collections.Generic.List{DisCatSharp.ApplicationCommands.Attributes.ChoiceProviderAttribute},System.Nullable{System.UInt64})">
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GetChoiceAttributesFromProvider(System.Collections.Generic.List{DisCatSharp.ApplicationCommands.Attributes.ChoiceProviderAttribute},System.Nullable{System.UInt64},DisCatSharp.Enums.ApplicationCommandOptionType,System.Type)">
             <summary>
                 Gets the choice attributes from choice provider.
             </summary>
             <param name="customAttributes">The custom attributes.</param>
-            <param name="guildId">The optional guild id</param>
+            <param name="guildId">The optional guild id.</param>
+            <param name="optionType">The application command option type the choices are being generated for.</param>
+            <param name="numericTargetType">The numeric target type to preserve for integer and number choices.</param>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GetChoiceAttributesFromEnumParameter(System.Type)">
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GetChoiceAttributesFromEnumParameter(System.Type,DisCatSharp.Enums.ApplicationCommandOptionType)">
             <summary>
                 Gets the choice attributes from enum parameter.
             </summary>
             <param name="enumParam">The enum parameter.</param>
+            <param name="optionType">The application command option type the enum choices should use.</param>
         </member>
         <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GetParameterType(System.Type)">
             <summary>
@@ -523,11 +565,13 @@
             </summary>
             <param name="type">The type.</param>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GetChoiceAttributesFromParameter(System.Collections.Generic.List{DisCatSharp.ApplicationCommands.Attributes.ChoiceAttribute})">
+        <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.GetChoiceAttributesFromParameter(System.Collections.Generic.List{DisCatSharp.ApplicationCommands.Attributes.ChoiceAttribute},DisCatSharp.Enums.ApplicationCommandOptionType,System.Type)">
             <summary>
                 Gets the choice attributes from parameter.
             </summary>
             <param name="choiceAttributes">The choice attributes.</param>
+            <param name="optionType">The application command option type the choices should use.</param>
+            <param name="numericTargetType">The numeric target type to preserve for integer and number choices.</param>
         </member>
         <member name="M:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ParseParametersAsync(System.Collections.Generic.IEnumerable{System.Reflection.ParameterInfo},System.String,System.Nullable{System.UInt64})">
             <summary>
@@ -547,6 +591,11 @@
                 Fires when the execution of a slash command is successful.
             </summary>
         </member>
+        <member name="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.SlashCommandChecksFailed">
+            <summary>
+                Fires when slash command execution is aborted because one or more pre-execution checks failed.
+            </summary>
+        </member>
         <member name="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ContextMenuErrored">
             <summary>
                 Fires when the execution of a context menu fails.
@@ -555,6 +604,11 @@
         <member name="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ContextMenuExecuted">
             <summary>
                 Fire when the execution of a context menu is successful.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ContextMenuChecksFailed">
+            <summary>
+                Fires when context menu execution is aborted because one or more pre-execution checks failed.
             </summary>
         </member>
         <member name="T:DisCatSharp.ApplicationCommands.ApplicationCommandsModuleConfiguration">
@@ -1299,9 +1353,16 @@
                 Implementation of <see cref="T:DisCatSharp.ApplicationCommands.Attributes.IChoiceProvider" /> with access to service collection.
             </summary>
         </member>
+        <member name="F:DisCatSharp.ApplicationCommands.Attributes.ChoiceProvider._services">
+            <summary>
+                The backing field for <see cref="P:DisCatSharp.ApplicationCommands.Attributes.ChoiceProvider.Services"/>.
+            </summary>
+        </member>
         <member name="P:DisCatSharp.ApplicationCommands.Attributes.ChoiceProvider.Services">
             <summary>
-                Sets the service provider.
+                Gets or sets the service provider. This property is injected by the framework
+                during command registration and will be available when <see cref="M:DisCatSharp.ApplicationCommands.Attributes.ChoiceProvider.Provider" /> is called.
+                <para>Throws <see cref="T:System.InvalidOperationException"/> if accessed before the framework has injected it.</para>
             </summary>
         </member>
         <member name="P:DisCatSharp.ApplicationCommands.Attributes.ChoiceProvider.GuildId">
@@ -1720,13 +1781,23 @@
             <param name="client">The discord client.</param>
             <param name="localizationEnabled">Whether localization is enabled.</param>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.Checks.ApplicationCommandEqualityChecks.DeepEqualOptions(System.Collections.Generic.IReadOnlyList{DisCatSharp.Entities.DiscordApplicationCommandOption},System.Collections.Generic.IReadOnlyList{DisCatSharp.Entities.DiscordApplicationCommandOption},System.Boolean)">
+        <member name="M:DisCatSharp.ApplicationCommands.Checks.ApplicationCommandEqualityChecks.DeepEqualOptions(System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommandOption},System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommandOption},System.Boolean)">
             <summary>
                 Checks deeply whether <see cref="T:DisCatSharp.Entities.DiscordApplicationCommandOption" />s are the same.
             </summary>
             <param name="sourceOptions">Source options.</param>
             <param name="targetOptions">Options to check against.</param>
             <param name="localizationEnabled">Whether localization is enabled.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.Checks.ApplicationCommandEqualityChecks.AreChoiceValuesEqual(System.Object,System.Object)">
+            <summary>
+                Compares two choice values for equality, normalizing numeric types so that
+                <c>42</c> (int), <c>42L</c> (long), and <c>42.0</c> (double) are considered equal
+                when they represent the same logical value.
+            </summary>
+            <param name="a">The first value.</param>
+            <param name="b">The second value.</param>
+            <returns>Whether the two values are considered equal.</returns>
         </member>
         <member name="T:DisCatSharp.ApplicationCommands.Context.ApplicationCommandsTranslationContext">
             <summary>
@@ -1956,7 +2027,7 @@
                 Used internally for proper disposal of scoped services.
             </summary>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.CreateResponseAsync(DisCatSharp.Enums.InteractionResponseType,DisCatSharp.Entities.DiscordInteractionResponseBuilder,DisCatSharp.Enums.Core.ModifyMode)">
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.CreateResponseAsync(DisCatSharp.Enums.InteractionResponseType,DisCatSharp.Entities.DiscordInteractionResponseBuilder,DisCatSharp.Enums.Core.ModifyMode,System.Threading.CancellationToken)">
             <summary>
                 Creates a response to this interaction.
                 <para>
@@ -1969,18 +2040,20 @@
             <param name="type">The type of the response.</param>
             <param name="builder">The data to be sent, if any.</param>
             <param name="modifyMode">The modify mode. Only useful for <see cref="F:DisCatSharp.Enums.InteractionResponseType.UpdateMessage"/>.</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
             <returns>
                 The created <see cref="T:DisCatSharp.Entities.DiscordMessage" />, or <see langword="null" /> if <paramref name="type" /> creates no
                 content.
             </returns>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.CreateModalResponseAsync(DisCatSharp.Entities.DiscordInteractionModalBuilder)">
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.CreateModalResponseAsync(DisCatSharp.Entities.DiscordInteractionModalBuilder,System.Threading.CancellationToken)">
             <summary>
                 Creates a modal response to this interaction.
             </summary>
             <param name="builder">The data to send.</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.CreateInteractionIframeResponseAsync(System.String,System.String,DisCatSharp.Enums.IframeModalSize,System.String)">
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.CreateInteractionIframeResponseAsync(System.String,System.String,DisCatSharp.Enums.IframeModalSize,System.String,System.Threading.CancellationToken)">
             <summary>
                 Creates an iframe response to this interaction.
             </summary>
@@ -1988,76 +2061,87 @@
             <param name="title">The title of the iframe.</param>
             <param name="modalSize">The size of the iframe.</param>
             <param name="iFramePath">The path of the iframe.</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.EditResponseAsync(DisCatSharp.Entities.DiscordWebhookBuilder,DisCatSharp.Enums.Core.ModifyMode)">
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.EditResponseAsync(DisCatSharp.Entities.DiscordWebhookBuilder,DisCatSharp.Enums.Core.ModifyMode,System.Threading.CancellationToken)">
             <summary>
                 Edits the interaction response.
             </summary>
             <param name="builder">The data to edit the response with.</param>
             <param name="modifyMode">The modify mode.</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
             <returns></returns>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.EditResponseAsync(System.String)">
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.EditResponseAsync(System.String,System.Threading.CancellationToken)">
             <summary>
                 Edits the interaction response.
             </summary>
             <param name="content">The content to edit the response with.</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
             <returns></returns>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.DeleteResponseAsync">
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.DeleteResponseAsync(System.Threading.CancellationToken)">
             <summary>
                 Deletes the interaction response.
             </summary>
+            <param name="cancellationToken">A token to cancel the request.</param>
             <returns></returns>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.FollowUpAsync(DisCatSharp.Entities.DiscordFollowupMessageBuilder)">
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.FollowUpAsync(DisCatSharp.Entities.DiscordFollowupMessageBuilder,System.Threading.CancellationToken)">
             <summary>
                 Creates a follow up message to the interaction.
             </summary>
             <param name="builder">The message to be sent, in the form of a webhook.</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
             <returns>The created message.</returns>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.FollowUpAsync(System.String)">
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.FollowUpAsync(System.String,System.Threading.CancellationToken)">
             <summary>
                 Creates a follow up message to the interaction.
             </summary>
             <param name="content">The content of the message to be sent.</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
             <returns>The created message.</returns>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.EditFollowupAsync(System.UInt64,DisCatSharp.Entities.DiscordWebhookBuilder,DisCatSharp.Enums.Core.ModifyMode)">
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.EditFollowupAsync(System.UInt64,DisCatSharp.Entities.DiscordWebhookBuilder,DisCatSharp.Enums.Core.ModifyMode,System.Threading.CancellationToken)">
             <summary>
                 Edits a followup message.
             </summary>
             <param name="followupMessageId">The id of the followup message to edit.</param>
             <param name="builder">The webhook builder.</param>
             <param name="modifyMode">The modify mode.</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
             <returns>The created message.</returns>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.EditFollowupAsync(System.UInt64,System.String)">
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.EditFollowupAsync(System.UInt64,System.String,System.Threading.CancellationToken)">
             <summary>
                 Edits a followup message.
             </summary>
             <param name="followupMessageId">The id of the followup message to edit.</param>
             <param name="content">The content of the webhook.</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
             <returns>The created message.</returns>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.DeleteFollowupAsync(System.UInt64)">
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.DeleteFollowupAsync(System.UInt64,System.Threading.CancellationToken)">
             <summary>
                 Deletes a followup message.
             </summary>
             <param name="followupMessageId">The id of the followup message to delete.</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
             <returns></returns>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.GetFollowupMessageAsync(System.UInt64)">
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.GetFollowupMessageAsync(System.UInt64,System.Threading.CancellationToken)">
             <summary>
                 Gets the followup message.
             </summary>
             <param name="followupMessageId">The followup message id.</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.GetOriginalResponseAsync">
+        <member name="M:DisCatSharp.ApplicationCommands.Context.BaseContext.GetOriginalResponseAsync(System.Threading.CancellationToken)">
             <summary>
                 Gets the original interaction response.
             </summary>
+            <param name="cancellationToken">A token to cancel the request.</param>
             <returns>The original interaction response.</returns>
         </member>
         <member name="T:DisCatSharp.ApplicationCommands.Context.ContextMenuContext">
@@ -2113,6 +2197,18 @@
         <member name="P:DisCatSharp.ApplicationCommands.Context.InteractionContext.ResolvedAttachments">
             <summary>
                 Gets the attachments in the command parameters, if applicable.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.ApplicationCommands.EmptyServiceProvider">
+            <summary>
+                Provides a shared, singleton empty <see cref="T:System.IServiceProvider" /> instance
+                to avoid allocating a new <see cref="T:Microsoft.Extensions.DependencyInjection.ServiceCollection" /> and
+                <see cref="T:Microsoft.Extensions.DependencyInjection.ServiceProvider" /> on every context or configuration creation.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.ApplicationCommands.EmptyServiceProvider.Instance">
+            <summary>
+                A shared empty service provider singleton.
             </summary>
         </member>
         <member name="T:DisCatSharp.ApplicationCommands.Entities.ChoiceTranslator">
@@ -2386,6 +2482,27 @@
                 Whether this module should be initiated at startup.
             </summary>
         </member>
+        <member name="T:DisCatSharp.ApplicationCommands.EventArgs.ContextMenuChecksFailedEventArgs">
+            <summary>
+                Represents arguments for a <see cref="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ContextMenuChecksFailed" /> event.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.EventArgs.ContextMenuChecksFailedEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.ApplicationCommands.EventArgs.ContextMenuChecksFailedEventArgs" /> class.
+            </summary>
+            <param name="provider">The provider.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.EventArgs.ContextMenuChecksFailedEventArgs.Context">
+            <summary>
+                The context of the command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.EventArgs.ContextMenuChecksFailedEventArgs.FailedChecks">
+            <summary>
+                The checks that failed.
+            </summary>
+        </member>
         <member name="T:DisCatSharp.ApplicationCommands.EventArgs.ContextMenuErrorEventArgs">
             <summary>
                 Represents arguments for a <see cref="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.ContextMenuErrored" />
@@ -2508,6 +2625,27 @@
                 Gets all registered guild commands.
             </summary>
         </member>
+        <member name="T:DisCatSharp.ApplicationCommands.EventArgs.SlashCommandChecksFailedEventArgs">
+            <summary>
+                Represents arguments for a <see cref="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.SlashCommandChecksFailed" /> event.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.EventArgs.SlashCommandChecksFailedEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.ApplicationCommands.EventArgs.SlashCommandChecksFailedEventArgs" /> class.
+            </summary>
+            <param name="provider">The provider.</param>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.EventArgs.SlashCommandChecksFailedEventArgs.Context">
+            <summary>
+                The context of the command.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.ApplicationCommands.EventArgs.SlashCommandChecksFailedEventArgs.FailedChecks">
+            <summary>
+                The checks that failed.
+            </summary>
+        </member>
         <member name="T:DisCatSharp.ApplicationCommands.EventArgs.SlashCommandErrorEventArgs">
             <summary>
                 Represents arguments for a <see cref="E:DisCatSharp.ApplicationCommands.ApplicationCommandsExtension.SlashCommandErrored" /> event
@@ -2573,6 +2711,7 @@
         <member name="M:DisCatSharp.ApplicationCommands.ExtensionMethods.UseApplicationCommands(DisCatSharp.DiscordClient,DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration)">
             <summary>
                 Enables application commands on this <see cref="T:DisCatSharp.DiscordClient" />.
+                Registration is started from the gateway ready lifecycle and is not triggered by HTTP ingress alone.
             </summary>
             <param name="client">Client to enable application commands for.</param>
             <param name="config">Configuration to use.</param>
@@ -2625,6 +2764,21 @@
             <param name="type">The <see cref="T:System.Type" /> of the command class to register.</param>
             <param name="guildId">The guild id to register it on.</param>
             <param name="translationSetup">A callback to setup translations with.</param>
+        </member>
+        <member name="M:DisCatSharp.ApplicationCommands.ExtensionMethods.RegisterEntryPointCommand(System.Collections.Generic.IReadOnlyDictionary{System.Int32,DisCatSharp.ApplicationCommands.ApplicationCommandsExtension},System.String,System.Collections.Generic.List{DisCatSharp.Enums.InteractionContextType},System.Collections.Generic.List{DisCatSharp.Enums.ApplicationCommandIntegrationTypes},System.Nullable{DisCatSharp.Enums.ApplicationCommandHandlerType},System.Nullable{DisCatSharp.Enums.Permissions},DisCatSharp.Entities.DiscordApplicationCommandLocalization,DisCatSharp.Entities.DiscordApplicationCommandLocalization)">
+            <summary>
+                Registers an entry point command across all shards.
+                <para>Only one entry point command can exist per application. The name is always "launch" as required by Discord.</para>
+                <para>Use this to configure the description, allowed contexts, integration types, and handler type of the entry point command.</para>
+            </summary>
+            <param name="extensions">Sharding extensions.</param>
+            <param name="description">The description of the entry point command.</param>
+            <param name="allowedContexts">Where the entry point command can be used.</param>
+            <param name="integrationTypes">The allowed integration types.</param>
+            <param name="handlerType">The handler type. When <see langword="null"/>, falls back to <see cref="P:DisCatSharp.DiscordConfiguration.ActivityHandlerType"/>.</param>
+            <param name="defaultMemberPermissions">The default member permissions.</param>
+            <param name="nameLocalizations">The localizations of the command name.</param>
+            <param name="descriptionLocalizations">The localizations of the command description.</param>
         </member>
         <member name="M:DisCatSharp.ApplicationCommands.ExtensionMethods.UseApplicationCommandsAsync(DisCatSharp.DiscordShardedClient,DisCatSharp.ApplicationCommands.ApplicationCommandsConfiguration)">
             <summary>
@@ -2684,22 +2838,24 @@
                 Represents a <see cref="T:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker" />.
             </summary>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker.RegisterGlobalCommandsAsync(DisCatSharp.DiscordClient,System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommand},DisCatSharp.Entities.DiscordApplicationCommand)">
+        <member name="M:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker.RegisterGlobalCommandsAsync(DisCatSharp.DiscordClient,System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommand},DisCatSharp.Entities.DiscordApplicationCommand,System.Threading.CancellationToken)">
             <summary>
                 Registers the global commands.
             </summary>
             <param name="client">The discord client.</param>
             <param name="commands">The command list.</param>
             <param name="entryPointCommand">The entry point command.</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
             <returns>A list of registered commands.</returns>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker.RegisterGuildCommandsAsync(DisCatSharp.DiscordClient,System.UInt64,System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommand})">
+        <member name="M:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker.RegisterGuildCommandsAsync(DisCatSharp.DiscordClient,System.UInt64,System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommand},System.Threading.CancellationToken)">
             <summary>
                 Registers the guild commands.
             </summary>
             <param name="client">The discord client.</param>
             <param name="guildId">The target guild id.</param>
             <param name="commands">The command list.</param>
+            <param name="cancellationToken">A token to cancel the request.</param>
             <returns>A list of registered commands.</returns>
         </member>
         <member name="M:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker.BuildGuildDeleteList(DisCatSharp.DiscordClient,System.UInt64,System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommand})">
@@ -2729,22 +2885,20 @@
             <param name="updateList">The command list.</param>
             <returns>A dictionary of command id and command.</returns>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker.BuildGlobalDeleteList(DisCatSharp.DiscordClient,System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommand},DisCatSharp.Entities.DiscordApplicationCommand)">
+        <member name="M:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker.BuildGlobalDeleteList(DisCatSharp.DiscordClient,System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommand})">
             <summary>
                 Builds a list of global command ids to be deleted on discords backend.
             </summary>
             <param name="client">The discord client.</param>
             <param name="updateList">The command list.</param>
-            <param name="entryPointCommand">The entry point command.</param>
             <returns>A list of command ids.</returns>
         </member>
-        <member name="M:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker.BuildGlobalCreateList(DisCatSharp.DiscordClient,System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommand},DisCatSharp.Entities.DiscordApplicationCommand)">
+        <member name="M:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker.BuildGlobalCreateList(DisCatSharp.DiscordClient,System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommand})">
             <summary>
                 Builds a list of global commands to be created on discords backend.
             </summary>
             <param name="client">The discord client.</param>
             <param name="updateList">The command list.</param>
-            <param name="entryPointCommand">The entry point command.</param>
             <returns>A list of commands.</returns>
         </member>
         <member name="M:DisCatSharp.ApplicationCommands.Workers.RegistrationWorker.BuildGlobalOverwriteList(DisCatSharp.DiscordClient,System.Collections.Generic.List{DisCatSharp.Entities.DiscordApplicationCommand})">

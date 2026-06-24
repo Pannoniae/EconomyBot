@@ -1,0 +1,3044 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DisCatSharp.Hosting.AspNetCore</name>
+    </assembly>
+    <members>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Deployment.DiscordIngressProxyHelpers">
+            <summary>
+                Generates starter reverse-proxy configuration snippets for the DisCatSharp ASP.NET Core ingress surface.
+            </summary>
+            <remarks>
+                The generated snippets intentionally preserve the package's default routing behavior by forwarding the
+                entire ingress surface and the <c>X-Forwarded-Prefix</c> header expected by the URL helpers.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Deployment.DiscordIngressProxyHelpers.CreateNginxConfig(System.Uri,System.Uri,DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions)">
+            <summary>
+                Creates an NGINX configuration snippet that forwards the public ingress surface to the ASP.NET Core app.
+            </summary>
+            <param name="publicBaseUrl">The externally visible base URL.</param>
+            <param name="upstreamBaseUrl">The base URL where the ASP.NET Core app listens internally.</param>
+            <param name="options">Optional ingress route options. Defaults to package defaults.</param>
+            <returns>An NGINX location snippet.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Deployment.DiscordIngressProxyHelpers.CreateApacheConfig(System.Uri,System.Uri,DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions)">
+            <summary>
+                Creates an Apache httpd configuration snippet that forwards the public ingress surface to the ASP.NET Core app.
+            </summary>
+            <param name="publicBaseUrl">The externally visible base URL.</param>
+            <param name="upstreamBaseUrl">The base URL where the ASP.NET Core app listens internally.</param>
+            <param name="options">Optional ingress route options. Defaults to package defaults.</param>
+            <returns>An Apache reverse-proxy snippet.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Deployment.DiscordIngressProxyHelpers.CreateDockerNginxConfig(System.Uri,System.String,System.Int32,DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions)">
+            <summary>
+                Creates an NGINX configuration snippet tailored for a Docker network where the ASP.NET Core app is addressed by service name.
+            </summary>
+            <param name="publicBaseUrl">The externally visible base URL.</param>
+            <param name="upstreamServiceName">The Docker service name for the ASP.NET Core container.</param>
+            <param name="upstreamPort">The ASP.NET Core container port.</param>
+            <param name="options">Optional ingress route options. Defaults to package defaults.</param>
+            <returns>An NGINX location snippet.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Deployment.DiscordIngressProxyHelpers.CreateTraefikDockerLabels(System.Uri,System.String,System.Int32,DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions,System.Uri)">
+            <summary>
+                Creates Traefik Docker labels that route the public ingress surface to the ASP.NET Core container.
+            </summary>
+            <param name="publicBaseUrl">The externally visible base URL.</param>
+            <param name="routerName">The Traefik router and service name prefix.</param>
+            <param name="containerPort">The container port exposed by the ASP.NET Core app.</param>
+            <param name="options">Optional ingress route options. Defaults to package defaults.</param>
+            <param name="upstreamBaseUrl">
+                Optional upstream base URL used to compute path rewrites. Defaults to <c>http://internal/</c>.
+            </param>
+            <returns>The Traefik labels keyed by label name.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Deployment.DiscordIngressProxyHelpers.CreateDockerCaddyConfig(System.Uri,System.String,System.Int32,DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions,System.Uri)">
+            <summary>
+                Creates a Caddy configuration snippet tailored for a Docker network where the ASP.NET Core app is addressed by service name.
+            </summary>
+            <param name="publicBaseUrl">The externally visible base URL.</param>
+            <param name="upstreamServiceName">The Docker service name for the ASP.NET Core container.</param>
+            <param name="upstreamPort">The ASP.NET Core container port.</param>
+            <param name="options">Optional ingress route options. Defaults to package defaults.</param>
+            <param name="upstreamBaseUrl">
+                Optional upstream base URL used to compute path rewrites. Defaults to <c>http://internal/</c>.
+            </param>
+            <returns>A Caddyfile snippet.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions">
+            <summary>
+                Configures the public ASP.NET Core route surface for DisCatSharp web ingress.
+            </summary>
+            <remarks>
+                These options control only the ASP.NET Core-facing route layout. The default shape is
+                <c>/discord/oauth/callback</c>, <c>/discord/interactions</c>, and <c>/discord/webhooks/*</c>.
+            </remarks>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.DefaultRoutePrefix">
+            <summary>
+                The default route prefix used for DisCatSharp ingress endpoints.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.DefaultOAuthPath">
+            <summary>
+                The default route segment for OAuth-related ingress endpoints.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.DefaultOAuthCallbackPath">
+            <summary>
+                The default route segment for the OAuth callback endpoint.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.DefaultInteractionsPath">
+            <summary>
+                The default route segment for the interactions endpoint.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.DefaultWebhooksPath">
+            <summary>
+                The default route segment for webhook-related ingress endpoints.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.DefaultWebhookEventsPath">
+            <summary>
+                The default route segment for webhook event endpoints.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.DefaultIncomingWebhooksPath">
+            <summary>
+                The default route segment for incoming webhook endpoints.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.RoutePrefix">
+            <summary>
+                Gets or sets the root route prefix used by <see cref="M:DisCatSharp.Hosting.AspNetCore.EndpointRouteBuilderExtensions.MapDisCatSharpIngress(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder)" />.
+            </summary>
+            <remarks>
+                Specify <c>/</c> or an empty value to map the ingress surface at the application root.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.OAuthPath">
+            <summary>
+                Gets or sets the route segment used for OAuth-related endpoints.
+            </summary>
+            <remarks>
+                The value is treated as a relative segment beneath <see cref="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.RoutePrefix" /> and is trimmed of surrounding slashes.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.OAuthCallbackPath">
+            <summary>
+                Gets or sets the route segment used for the OAuth callback endpoint.
+            </summary>
+            <remarks>
+                This segment is appended beneath <see cref="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.OAuthPath" />.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.InteractionsPath">
+            <summary>
+                Gets or sets the route segment used for the Discord interactions endpoint.
+            </summary>
+            <remarks>
+                This segment is appended directly beneath <see cref="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.RoutePrefix" />.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.WebhooksPath">
+            <summary>
+                Gets or sets the route segment used for webhook-related endpoints.
+            </summary>
+            <remarks>
+                This segment is the shared parent for both <see cref="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.WebhookEventsPath" /> and <see cref="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.IncomingWebhooksPath" />.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.WebhookEventsPath">
+            <summary>
+                Gets or sets the route segment used for webhook event endpoints.
+            </summary>
+            <remarks>
+                This segment is appended beneath <see cref="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.WebhooksPath" />.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.IncomingWebhooksPath">
+            <summary>
+                Gets or sets the route segment used for incoming webhook endpoints.
+            </summary>
+            <remarks>
+                This segment is appended beneath <see cref="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.WebhooksPath" />.
+            </remarks>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostOptions">
+            <summary>
+                Configures the optional self-hosted ASP.NET Core ingress mode for DisCatSharp.
+            </summary>
+            <remarks>
+                These settings are used only when <see cref="M:DisCatSharp.Hosting.AspNetCore.ServiceCollectionExtensions.AddDisCatSharpAspNetCoreSelfHost(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostOptions},System.Action{DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions},System.Action{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions})" />
+                or the corresponding host builder extensions are used.
+            </remarks>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostOptions.DefaultListenAddress">
+            <summary>
+                The default listen address used by the internal ASP.NET Core app.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostOptions.DefaultListenPort">
+            <summary>
+                The default listen port used by the internal ASP.NET Core app.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostOptions.DefaultScheme">
+            <summary>
+                The default URI scheme used to build the internal listen address.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostOptions.ListenAddress">
+            <summary>
+                Gets or sets the address or host name that the internal ASP.NET Core app should bind to.
+            </summary>
+            <remarks>
+                This value controls only the private listener. Publish a different public origin with <see cref="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostOptions.BaseUrl" /> when running
+                behind a reverse proxy or tunnel.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostOptions.ListenPort">
+            <summary>
+                Gets or sets the port that the internal ASP.NET Core app should bind to.
+                Specify <c>0</c> to request an ephemeral port from the operating system.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostOptions.Scheme">
+            <summary>
+                Gets or sets the URI scheme used to build the internal listen address.
+            </summary>
+            <remarks>
+                This affects the private listener URL only. HTTPS termination can still happen upstream when <see cref="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostOptions.BaseUrl" /> points to
+                an external TLS endpoint.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostOptions.BaseUrl">
+            <summary>
+                Gets or sets the externally visible base URL advertised by the self-hosted ingress surface.
+                When not set, the runtime falls back to the bound listen address.
+            </summary>
+            <remarks>
+                Set this when the self-hosted app runs behind a reverse proxy or tunnel that exposes a different public origin.
+            </remarks>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostRuntime">
+            <summary>
+                Exposes the active runtime addresses for the optional self-hosted ASP.NET Core ingress mode.
+            </summary>
+            <remarks>
+                The runtime remains empty until the self-hosted ASP.NET Core app starts and is reset when it stops.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostRuntime.ListenBaseUrl">
+            <summary>
+                Gets the bound listen base URL for the internal ASP.NET Core app when it is running.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostRuntime.PublicBaseUrl">
+            <summary>
+                Gets the externally visible base URL for the self-hosted ingress surface when it is running.
+            </summary>
+            <remarks>
+                This reflects <see cref="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostOptions.BaseUrl" /> when configured; otherwise it mirrors
+                <see cref="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostRuntime.ListenBaseUrl" />.
+            </remarks>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostService">
+            <summary>
+                Hosts the optional private ASP.NET Core application used by self-host mode.
+            </summary>
+            <remarks>
+                The service creates a lightweight internal <see cref="T:Microsoft.AspNetCore.Builder.WebApplication" />, copies the ingress registrations from the primary
+                dependency injection container, and maps the standard DisCatSharp ingress endpoints into that isolated app.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostService.#ctor(System.IServiceProvider,Microsoft.Extensions.Options.IOptions{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostOptions},DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostRuntime,Microsoft.Extensions.Logging.ILogger{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostService})">
+            <summary>
+                Hosts the optional private ASP.NET Core application used by self-host mode.
+            </summary>
+            <remarks>
+                The service creates a lightweight internal <see cref="T:Microsoft.AspNetCore.Builder.WebApplication" />, copies the ingress registrations from the primary
+                dependency injection container, and maps the standard DisCatSharp ingress endpoints into that isolated app.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostService.StartAsync(System.Threading.CancellationToken)">
+            <summary>
+                Starts the internal ASP.NET Core application when it is not already running.
+            </summary>
+            <param name="cancellationToken">A token used to cancel startup.</param>
+            <returns>A task that completes when startup has finished.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostService.StopAsync(System.Threading.CancellationToken)">
+            <summary>
+                Stops the internal ASP.NET Core application when it is running.
+            </summary>
+            <param name="cancellationToken">A token used to cancel shutdown.</param>
+            <returns>A task that completes when shutdown has finished.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostService.DisposeAsync">
+            <summary>
+                Disposes the internal ASP.NET Core application when self-host mode created one.
+            </summary>
+            <returns>A task that completes when disposal has finished.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostService.RegisterBridgedServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+                Copies the ingress dependencies from the parent container into the private self-host container.
+            </summary>
+            <remarks>
+                This bridge keeps the self-hosted HTTP surface aligned with the application's existing handlers, validators, options, and
+                runtime singletons instead of constructing a second independent ingress graph.
+            </remarks>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.EndpointRouteBuilderExtensions">
+            <summary>
+                Provides ASP.NET Core endpoint mapping extensions for the DisCatSharp web ingress surface.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.EndpointRouteBuilderExtensions.MapDisCatSharpIngress(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder)">
+            <summary>
+                Maps the default DisCatSharp ingress surface under the configured route prefix.
+            </summary>
+            <remarks>
+                <para>
+                    This convenience method preserves the package's default route composition by mapping the OAuth, interactions, and
+                    webhook surfaces beneath <see cref="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.RoutePrefix" />.
+                </para>
+                <para>
+                    The resulting endpoints retain stable names from <see cref="T:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressEndpointNames" /> and attach
+                    <see cref="T:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressEndpointMetadata" /> so deployment tooling can inspect the logical ingress surface after route
+                    groups have been composed.
+                </para>
+            </remarks>
+            <param name="endpoints">The endpoint route builder to update.</param>
+            <returns>The configured ingress route group.</returns>
+            <example>
+                <code language="csharp"><![CDATA[
+            var app = builder.Build();
+            app.MapDisCatSharpIngress();
+            ]]></code>
+            </example>
+            <exception cref="T:System.ArgumentNullException"><paramref name="endpoints" /> is <see langword="null" />.</exception>
+            <exception cref="T:System.InvalidOperationException">
+                DisCatSharp ASP.NET Core ingress services have not been registered on the application's service provider.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.EndpointRouteBuilderExtensions.MapDiscordOAuthIngress(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder)">
+            <summary>
+                Maps the DisCatSharp OAuth ingress callback endpoint.
+            </summary>
+            <remarks>
+                The callback route remains relative to the current route group so callers can nest the ingress
+                surface under their own prefixes without changing the default OAuth path semantics. The callback request is normalized into
+                <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackRequest" /> before it is handed to <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.IDiscordOAuthCallbackHandler" />.
+            </remarks>
+            <param name="endpoints">The endpoint route builder to update.</param>
+            <returns>The configured OAuth route group.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="endpoints" /> is <see langword="null" />.</exception>
+            <exception cref="T:System.InvalidOperationException">
+                DisCatSharp ASP.NET Core ingress services have not been registered on the application's service provider.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.EndpointRouteBuilderExtensions.MapDiscordInteractionIngress(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder)">
+            <summary>
+                Maps the DisCatSharp interactions ingress endpoint.
+            </summary>
+            <remarks>
+                The mapped endpoint keeps its stable name and metadata even when composed under a custom route group. Request signatures are
+                validated before the JSON payload is parsed and the registered <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.IDiscordInteractionIngressHandler" /> instances are
+                invoked.
+            </remarks>
+            <param name="endpoints">The endpoint route builder to update.</param>
+            <returns>The configured interactions route group.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="endpoints" /> is <see langword="null" />.</exception>
+            <exception cref="T:System.InvalidOperationException">
+                DisCatSharp ASP.NET Core ingress services have not been registered on the application's service provider.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.EndpointRouteBuilderExtensions.MapDiscordWebhookIngress(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder)">
+            <summary>
+                Maps the DisCatSharp webhook ingress endpoints.
+            </summary>
+            <remarks>
+                This maps both webhook event delivery and incoming webhook callbacks under the configured webhook root. Signed webhook events
+                are acknowledged before their async event handlers complete, while generic incoming webhook handlers run inline and return the
+                first response produced by the registered pipeline.
+            </remarks>
+            <param name="endpoints">The endpoint route builder to update.</param>
+            <returns>The configured webhooks route group.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="endpoints" /> is <see langword="null" />.</exception>
+            <exception cref="T:System.InvalidOperationException">
+                DisCatSharp ASP.NET Core ingress services have not been registered on the application's service provider.
+            </exception>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.UnknownWebhookEventArgs">
+            <summary>
+                Represents arguments for <see cref="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.UnknownWebhookEventReceived" />.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookApplicationAuthorizedEventArgs">
+            <summary>
+                Represents arguments for <see cref="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.ApplicationAuthorized" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookApplicationAuthorizedEventArgs.Authorization">
+            <summary>
+                Gets the typed authorization payload.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookApplicationDeauthorizedEventArgs">
+            <summary>
+                Represents arguments for <see cref="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.ApplicationDeauthorized" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookApplicationDeauthorizedEventArgs.Deauthorization">
+            <summary>
+                Gets the typed deauthorization payload.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookEntitlementCreateEventArgs">
+            <summary>
+                Represents arguments for <see cref="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.EntitlementCreated" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookEntitlementCreateEventArgs.Entitlement">
+            <summary>
+                Gets the entitlement payload.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookEntitlementDeleteEventArgs">
+            <summary>
+                Represents arguments for <see cref="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.EntitlementDeleted" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookEntitlementDeleteEventArgs.Entitlement">
+            <summary>
+                Gets the entitlement payload.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookEntitlementUpdateEventArgs">
+            <summary>
+                Represents arguments for <see cref="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.EntitlementUpdated" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookEntitlementUpdateEventArgs.Entitlement">
+            <summary>
+                Gets the entitlement payload.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.DiscordWebhookEventArgs">
+            <summary>
+                Common base for all Discord webhook events raised by <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher" />.
+            </summary>
+            <remarks>
+                Derived event arguments expose both the original transport-neutral ingress request and the parsed webhook event envelope alongside the typed Discord payload.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.DiscordWebhookEventArgs.#ctor(System.IServiceProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.DiscordWebhookEventArgs" /> class.
+            </summary>
+            <param name="provider">The provider.</param>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.DiscordWebhookEventArgs.Request">
+            <summary>
+                Gets the transport-neutral ingress request.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.DiscordWebhookEventArgs.Envelope">
+            <summary>
+                Gets the parsed Discord webhook event envelope.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookGameDirectMessageCreateEventArgs">
+            <summary>
+                Represents arguments for <see cref="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.GameDirectMessageCreated" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookGameDirectMessageCreateEventArgs.Message">
+            <summary>
+                Gets the typed game direct message payload.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookGameDirectMessageDeleteEventArgs">
+            <summary>
+                Represents arguments for <see cref="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.GameDirectMessageDeleted" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookGameDirectMessageDeleteEventArgs.Message">
+            <summary>
+                Gets the typed game direct message payload.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookGameDirectMessageUpdateEventArgs">
+            <summary>
+                Represents arguments for <see cref="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.GameDirectMessageUpdated" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookGameDirectMessageUpdateEventArgs.Message">
+            <summary>
+                Gets the typed game direct message payload.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookLobbyMessageCreateEventArgs">
+            <summary>
+                Represents arguments for <see cref="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.LobbyMessageCreated" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookLobbyMessageCreateEventArgs.Message">
+            <summary>
+                Gets the typed lobby message payload.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookLobbyMessageDeleteEventArgs">
+            <summary>
+                Represents arguments for <see cref="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.LobbyMessageDeleted" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookLobbyMessageDeleteEventArgs.Message">
+            <summary>
+                Gets the typed lobby message delete payload.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookLobbyMessageUpdateEventArgs">
+            <summary>
+                Represents arguments for <see cref="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.LobbyMessageUpdated" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.EventArgs.Webhook.WebhookLobbyMessageUpdateEventArgs.Message">
+            <summary>
+                Gets the typed lobby message payload.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.HostBuilderExtensions">
+            <summary>
+                Provides host builder extensions for registering DisCatSharp ASP.NET Core ingress services.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.HostBuilderExtensions.AddDisCatSharpAspNetCore(Microsoft.Extensions.Hosting.IHostApplicationBuilder,System.Action{DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions},System.Action{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions},System.Action{DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthIngressOptions})">
+            <summary>
+                Registers the DisCatSharp ASP.NET Core ingress services on a host application builder.
+            </summary>
+            <remarks>
+                This is a convenience wrapper over <see cref="M:DisCatSharp.Hosting.AspNetCore.ServiceCollectionExtensions.AddDisCatSharpAspNetCore(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions},System.Action{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions},System.Action{DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthIngressOptions})" /> for applications that
+                configure services through <see cref="T:Microsoft.Extensions.Hosting.IHostApplicationBuilder" />.
+            </remarks>
+            <param name="builder">The host application builder to update.</param>
+            <param name="configure">Optional configuration callback for the ingress subsystem.</param>
+            <param name="configureAspNetCore">Optional configuration callback for ASP.NET Core endpoint conventions.</param>
+            <param name="configureOAuth">Optional configuration callback for the OAuth callback flow.</param>
+            <returns>The <paramref name="builder" /> for chaining purposes.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="builder" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.HostBuilderExtensions.AddDisCatSharpAspNetCoreSelfHost(Microsoft.Extensions.Hosting.IHostApplicationBuilder,System.Action{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostOptions},System.Action{DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions},System.Action{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions})">
+            <summary>
+                Registers the optional self-hosted DisCatSharp ASP.NET Core ingress services on a host application builder.
+            </summary>
+            <remarks>
+                This wraps <see cref="M:DisCatSharp.Hosting.AspNetCore.ServiceCollectionExtensions.AddDisCatSharpAspNetCoreSelfHost(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostOptions},System.Action{DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions},System.Action{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions})" /> and is intended for worker-style hosts
+                that do not already manage an ASP.NET Core application.
+            </remarks>
+            <param name="builder">The host application builder to update.</param>
+            <param name="configureSelfHost">Optional configuration callback for the internal ASP.NET Core host.</param>
+            <param name="configure">Optional configuration callback for the ingress subsystem.</param>
+            <param name="configureAspNetCore">Optional configuration callback for ASP.NET Core endpoint conventions.</param>
+            <returns>The <paramref name="builder" /> for chaining purposes.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="builder" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.HostBuilderExtensions.AddDisCatSharpAspNetCore(Microsoft.Extensions.Hosting.IHostBuilder,System.Action{DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions},System.Action{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions},System.Action{DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthIngressOptions})">
+            <summary>
+                Registers the DisCatSharp ASP.NET Core ingress services on a host builder.
+            </summary>
+            <remarks>
+                This is the <see cref="T:Microsoft.Extensions.Hosting.IHostBuilder" /> counterpart to <see cref="M:DisCatSharp.Hosting.AspNetCore.HostBuilderExtensions.AddDisCatSharpAspNetCore(Microsoft.Extensions.Hosting.IHostApplicationBuilder,System.Action{DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions},System.Action{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions},System.Action{DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthIngressOptions})" />.
+            </remarks>
+            <param name="builder">The host builder to update.</param>
+            <param name="configure">Optional configuration callback for the ingress subsystem.</param>
+            <param name="configureAspNetCore">Optional configuration callback for ASP.NET Core endpoint conventions.</param>
+            <param name="configureOAuth">Optional configuration callback for the OAuth callback flow.</param>
+            <returns>The <paramref name="builder" /> for chaining purposes.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="builder" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.HostBuilderExtensions.AddDisCatSharpAspNetCoreSelfHost(Microsoft.Extensions.Hosting.IHostBuilder,System.Action{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostOptions},System.Action{DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions},System.Action{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions})">
+            <summary>
+                Registers the optional self-hosted DisCatSharp ASP.NET Core ingress services on a host builder.
+            </summary>
+            <remarks>
+                This is the <see cref="T:Microsoft.Extensions.Hosting.IHostBuilder" /> counterpart to
+                <see cref="M:DisCatSharp.Hosting.AspNetCore.HostBuilderExtensions.AddDisCatSharpAspNetCoreSelfHost(Microsoft.Extensions.Hosting.IHostApplicationBuilder,System.Action{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostOptions},System.Action{DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions},System.Action{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions})" />.
+            </remarks>
+            <param name="builder">The host builder to update.</param>
+            <param name="configureSelfHost">Optional configuration callback for the internal ASP.NET Core host.</param>
+            <param name="configure">Optional configuration callback for the ingress subsystem.</param>
+            <param name="configureAspNetCore">Optional configuration callback for ASP.NET Core endpoint conventions.</param>
+            <returns>The <paramref name="builder" /> for chaining purposes.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="builder" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordAspNetCoreIngressRequestExtensions">
+            <summary>
+                Adapts ASP.NET Core <see cref="T:Microsoft.AspNetCore.Http.HttpRequest" /> instances into transport-neutral ingress requests.
+            </summary>
+            <remarks>
+                The adapter rewinds buffered request bodies before reading them and restores the original stream position afterwards so other
+                ASP.NET Core components can still inspect the body later in the pipeline.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordAspNetCoreIngressRequestExtensions.ToDiscordIngressRequestAsync(Microsoft.AspNetCore.Http.HttpRequest,DisCatSharp.Hosting.AspNetCore.Ingress.IDiscordIngressBodyReader,System.Threading.CancellationToken)">
+            <summary>
+                Converts an ASP.NET Core request into a transport-neutral ingress request.
+            </summary>
+            <param name="request">The ASP.NET Core request to adapt.</param>
+            <param name="bodyReader">The body reader responsible for enforcing ingress size limits.</param>
+            <param name="cancellationToken">A token used to cancel the operation.</param>
+            <returns>The adapted ingress request.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordAspNetCoreIngressResponseExtensions">
+            <summary>
+                Adapts transport-neutral ingress responses back into ASP.NET Core results.
+            </summary>
+            <remarks>
+                This adapter is the final step for the endpoint handlers after the transport-neutral ingress services finish processing a
+                request.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordAspNetCoreIngressResponseExtensions.ToAspNetCoreResult(DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressResponse)">
+            <summary>
+                Converts the supplied ingress response into an ASP.NET Core result.
+            </summary>
+            <param name="response">The transport-neutral response to adapt.</param>
+            <returns>The ASP.NET Core result.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordAspNetCoreIngressResponseExtensions.DiscordAspNetCoreIngressResult.ExecuteAsync(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+                Writes the adapted response into the current ASP.NET Core HTTP response.
+            </summary>
+            <param name="httpContext">The current HTTP context.</param>
+            <returns>A task that completes when the response has been written.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressBodyReader">
+            <summary>
+                Default implementation that buffers an ingress request body for downstream processing.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressBodyReader.#ctor(Microsoft.Extensions.Options.IOptions{DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions})">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressBodyReader" /> class.
+            </summary>
+            <param name="options">The ingress options.</param>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressBodyReader.ReadAsync(System.IO.Stream,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressBodyTooLargeException">
+            <summary>
+                Represents a failure caused by an ingress request body exceeding the configured maximum size.
+            </summary>
+            <remarks>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressBodyTooLargeException" /> class.
+            </remarks>
+            <param name="maxAllowedBytes">The configured maximum request body size, in bytes.</param>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressBodyTooLargeException.#ctor(System.Int32)">
+            <summary>
+                Represents a failure caused by an ingress request body exceeding the configured maximum size.
+            </summary>
+            <remarks>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressBodyTooLargeException" /> class.
+            </remarks>
+            <param name="maxAllowedBytes">The configured maximum request body size, in bytes.</param>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressBodyTooLargeException.MaxAllowedBytes">
+            <summary>
+                Gets the configured maximum request body size, in bytes.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressHeaderNames">
+            <summary>
+                Contains the HTTP header names used by Discord signed ingress requests.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressHeaderNames.SignatureEd25519">
+            <summary>
+                The Discord Ed25519 signature header.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressHeaderNames.SignatureTimestamp">
+            <summary>
+                The Discord signature timestamp header.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPayload">
+            <summary>
+                Represents a raw ingress payload that can be reused across transport implementations.
+            </summary>
+            <remarks>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPayload" /> class.
+            </remarks>
+            <param name="bytes">The raw payload bytes.</param>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPayload.#ctor(System.ReadOnlyMemory{System.Byte})">
+            <summary>
+                Represents a raw ingress payload that can be reused across transport implementations.
+            </summary>
+            <remarks>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPayload" /> class.
+            </remarks>
+            <param name="bytes">The raw payload bytes.</param>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPayload.Empty">
+            <summary>
+                Gets a reusable empty payload instance.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPayload.Bytes">
+            <summary>
+                Gets the raw payload bytes.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPayload.Length">
+            <summary>
+                Gets the payload length in bytes.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPayload.IsEmpty">
+            <summary>
+                Gets a value indicating whether the payload is empty.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPayload.FromString(System.String,System.Text.Encoding)">
+            <summary>
+                Creates a payload from text content.
+            </summary>
+            <param name="content">The text content to encode.</param>
+            <param name="encoding">The encoding to use. UTF-8 is used when omitted.</param>
+            <returns>A payload containing the encoded bytes.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPayload.GetString(System.Text.Encoding)">
+            <summary>
+                Decodes the payload into a string.
+            </summary>
+            <param name="encoding">The encoding to use. UTF-8 is used when omitted.</param>
+            <returns>The decoded text representation of the payload.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPendingState">
+            <summary>
+                Represents a pending ingress state entry, such as an OAuth request awaiting a callback.
+            </summary>
+            <remarks>
+                The stored <see cref="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPendingState.RequestUri" /> and <see cref="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPendingState.Flow" /> values are used by the default OAuth callback handler to validate
+                that the callback matches the original authorization request.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPendingState.Key">
+            <summary>
+                Gets or sets the stable key used to locate the pending state entry.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPendingState.Flow">
+            <summary>
+                Gets or sets the logical flow name associated with this state entry.
+            </summary>
+            <remarks>
+                Use distinct flow names when multiple callback-driven features share the same pending-state store.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPendingState.RequestUri">
+            <summary>
+                Gets or sets the originating request URI when one is available.
+            </summary>
+            <remarks>
+                For OAuth flows this is typically the original Discord authorization URL so redirect URI, scope, and integration type can be
+                recovered during callback processing.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPendingState.CreatedAt">
+            <summary>
+                Gets or sets when the pending state was created.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPendingState.ExpiresAt">
+            <summary>
+                Gets or sets when the pending state expires.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPendingState.Properties">
+            <summary>
+                Gets or sets additional flow-specific properties associated with the entry.
+            </summary>
+            <remarks>
+                These values are not interpreted by the default store and are preserved for custom callback handlers.
+            </remarks>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest">
+            <summary>
+                Represents a transport-neutral ingress request that future handlers can operate on.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest.#ctor(System.String,System.Uri,System.Collections.Generic.IReadOnlyDictionary{System.String,Microsoft.Extensions.Primitives.StringValues},DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPayload)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest" /> class.
+            </summary>
+            <param name="method">The request method.</param>
+            <param name="requestUri">The request URI when one is available.</param>
+            <param name="headers">The request headers.</param>
+            <param name="body">The raw request body.</param>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest.Method">
+            <summary>
+                Gets the request method.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest.RequestUri">
+            <summary>
+                Gets the request URI when one is available.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest.Headers">
+            <summary>
+                Gets the request headers.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest.Body">
+            <summary>
+                Gets the raw request body.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest.TryGetHeader(System.String,Microsoft.Extensions.Primitives.StringValues@)">
+            <summary>
+                Attempts to resolve a request header by name.
+            </summary>
+            <param name="name">The header name to resolve.</param>
+            <param name="value">The resolved header value.</param>
+            <returns><see langword="true" /> when the header exists.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest.GetHeaderValue(System.String)">
+            <summary>
+                Gets the first value for a request header when present.
+            </summary>
+            <param name="name">The header name to resolve.</param>
+            <returns>The first header value, or <see langword="null" /> when the header does not exist.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest.TryGetSingleHeaderValue(System.String,System.String@)">
+            <summary>
+                Attempts to resolve a single header value by name.
+            </summary>
+            <param name="name">The header name to resolve.</param>
+            <param name="value">The single header value when one is present.</param>
+            <returns><see langword="true" /> when exactly one header value exists.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressResponse">
+            <summary>
+                Represents a transport-neutral ingress response for future endpoint handlers.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressResponse.#ctor(System.Int32,DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPayload,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,Microsoft.Extensions.Primitives.StringValues})">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressResponse" /> class.
+            </summary>
+            <param name="statusCode">The HTTP status code to return.</param>
+            <param name="body">The response body.</param>
+            <param name="contentType">The response content type.</param>
+            <param name="headers">Additional response headers.</param>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressResponse.StatusCode">
+            <summary>
+                Gets the HTTP status code to return.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressResponse.Body">
+            <summary>
+                Gets the response body.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressResponse.ContentType">
+            <summary>
+                Gets the response content type.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressResponse.Headers">
+            <summary>
+                Gets any additional response headers.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressResponse.Empty(System.Int32)">
+            <summary>
+                Creates a response without a body.
+            </summary>
+            <param name="statusCode">The HTTP status code to return.</param>
+            <returns>A response without a body.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressResponse.NoContent">
+            <summary>
+                Creates a <c>204 No Content</c> response.
+            </summary>
+            <returns>A response without a body.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressResponse.Acknowledge">
+            <summary>
+                Creates the standard Discord acknowledgment response.
+            </summary>
+            <returns>A response without a body.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressResponse.Text(System.Int32,System.String,System.String)">
+            <summary>
+                Creates a text response.
+            </summary>
+            <param name="statusCode">The HTTP status code to return.</param>
+            <param name="content">The response text.</param>
+            <param name="contentType">The content type to emit.</param>
+            <returns>A text response.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressResponse.Json(System.Int32,System.String)">
+            <summary>
+                Creates a JSON response.
+            </summary>
+            <param name="statusCode">The HTTP status code to return.</param>
+            <param name="json">The JSON payload.</param>
+            <returns>A JSON response.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions">
+            <summary>
+                Configures transport-agnostic Discord web ingress services.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions.DefaultMaxRequestBodySize">
+            <summary>
+                The default maximum request body size in bytes.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions.ApplicationVerifyKey">
+            <summary>
+                Gets or sets the hex-encoded Discord application verify key used for signed ingress validation.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions.MaxRequestBodySize">
+            <summary>
+                Gets or sets the maximum allowed size of a raw ingress request body in bytes.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions.PendingStateLifetime">
+            <summary>
+                Gets or sets the default lifetime applied to pending ingress state entries.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions.PendingStateCleanupInterval">
+            <summary>
+                Gets or sets how often the default in-memory pending state store prunes expired entries.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.IDiscordIngressBodyReader">
+            <summary>
+                Reads raw request bodies for Discord ingress handlers.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.IDiscordIngressBodyReader.ReadAsync(System.IO.Stream,System.Threading.CancellationToken)">
+            <summary>
+                Reads the full raw request body into an ingress payload.
+            </summary>
+            <param name="body">The body stream to read.</param>
+            <param name="cancellationToken">A token used to cancel the read operation.</param>
+            <returns>The fully buffered payload.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.IDiscordIngressPendingStateStore">
+            <summary>
+                Stores pending ingress state needed by callback-driven flows such as OAuth.
+            </summary>
+            <remarks>
+                Implementations are responsible for preserving one-time callback state between the outbound authorization redirect and the
+                inbound callback request. <see cref="M:DisCatSharp.Hosting.AspNetCore.Ingress.IDiscordIngressPendingStateStore.ConsumeAsync(System.String,System.Threading.CancellationToken)" /> should remove entries atomically so state cannot
+                be replayed.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.IDiscordIngressPendingStateStore.StoreAsync(DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPendingState,System.Threading.CancellationToken)">
+            <summary>
+                Stores or replaces a pending state entry.
+            </summary>
+            <remarks>
+                Replacing an existing key is allowed so callers can refresh the expiry window for a logical flow.
+            </remarks>
+            <param name="state">The state entry to persist.</param>
+            <param name="cancellationToken">A token used to cancel the operation.</param>
+            <returns>A completed task once the state has been stored.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.IDiscordIngressPendingStateStore.GetAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+                Resolves an existing pending state entry without removing it.
+            </summary>
+            <remarks>
+                Use this for diagnostics or preview flows that must not consume the state yet.
+            </remarks>
+            <param name="key">The pending state key.</param>
+            <param name="cancellationToken">A token used to cancel the operation.</param>
+            <returns>The pending state entry, or <see langword="null" /> when none is available.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.IDiscordIngressPendingStateStore.ConsumeAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+                Resolves and removes an existing pending state entry.
+            </summary>
+            <remarks>
+                OAuth callback handling uses this operation so the same state cannot be accepted twice.
+            </remarks>
+            <param name="key">The pending state key.</param>
+            <param name="cancellationToken">A token used to cancel the operation.</param>
+            <returns>The removed pending state entry, or <see langword="null" /> when none is available.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.IDiscordIngressPendingStateStore.RemoveAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+                Removes a pending state entry when present.
+            </summary>
+            <param name="key">The pending state key.</param>
+            <param name="cancellationToken">A token used to cancel the operation.</param>
+            <returns><see langword="true" /> when an entry was removed.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.DiscordIncomingWebhookContext">
+            <summary>
+                Represents an incoming webhook request received through the ASP.NET Core ingress surface.
+            </summary>
+            <remarks>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.DiscordIncomingWebhookContext" /> class.
+            </remarks>
+            <param name="request">The transport-neutral ingress request.</param>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.DiscordIncomingWebhookContext.#ctor(DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest)">
+            <summary>
+                Represents an incoming webhook request received through the ASP.NET Core ingress surface.
+            </summary>
+            <remarks>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.DiscordIncomingWebhookContext" /> class.
+            </remarks>
+            <param name="request">The transport-neutral ingress request.</param>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.DiscordIncomingWebhookContext.Request">
+            <summary>
+                Gets the transport-neutral ingress request.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.DiscordIncomingWebhookContext.Method">
+            <summary>
+                Gets the incoming HTTP method.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.DiscordIncomingWebhookContext.RequestUri">
+            <summary>
+                Gets the request URI when available.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.DiscordIncomingWebhookContext.Headers">
+            <summary>
+                Gets the incoming request headers.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.DiscordIncomingWebhookContext.Body">
+            <summary>
+                Gets the raw request body.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.DiscordIncomingWebhookContext.TryGetHeader(System.String,Microsoft.Extensions.Primitives.StringValues@)">
+            <summary>
+                Attempts to resolve a request header by name.
+            </summary>
+            <param name="name">The header name to resolve.</param>
+            <param name="value">The resolved header value.</param>
+            <returns><see langword="true" /> when the header exists.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.DiscordIncomingWebhookContext.GetHeaderValue(System.String)">
+            <summary>
+                Gets the first value for a request header when present.
+            </summary>
+            <param name="name">The header name to resolve.</param>
+            <returns>The first header value, or <see langword="null" /> when the header does not exist.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.DiscordIncomingWebhookContext.TryGetSingleHeaderValue(System.String,System.String@)">
+            <summary>
+                Attempts to resolve a single header value by name.
+            </summary>
+            <param name="name">The header name to resolve.</param>
+            <param name="value">The single header value when one is present.</param>
+            <returns><see langword="true" /> when exactly one header value exists.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.DiscordIncomingWebhookEndpointHandler">
+            <summary>
+                ASP.NET Core endpoint adapter for generic incoming webhooks.
+            </summary>
+            <remarks>
+                This bridge applies the shared request body reader and response adapter around the transport-neutral incoming webhook pipeline.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.DiscordIncomingWebhookEndpointHandler.#ctor(DisCatSharp.Hosting.AspNetCore.Ingress.IDiscordIngressBodyReader,DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.DiscordIncomingWebhookIngressService)">
+            <summary>
+                ASP.NET Core endpoint adapter for generic incoming webhooks.
+            </summary>
+            <remarks>
+                This bridge applies the shared request body reader and response adapter around the transport-neutral incoming webhook pipeline.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.DiscordIncomingWebhookEndpointHandler.HandleAsync(Microsoft.AspNetCore.Http.HttpRequest,System.Threading.CancellationToken)">
+            <summary>
+                Handles an ASP.NET Core incoming webhook request.
+            </summary>
+            <param name="request">The incoming ASP.NET Core request.</param>
+            <param name="cancellationToken">A token used to cancel the operation.</param>
+            <returns>The adapted ASP.NET Core result.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.DiscordIncomingWebhookIngressService">
+            <summary>
+                Runs the transport-neutral incoming webhook ingress pipeline.
+            </summary>
+            <remarks>
+                Registered handlers are invoked in registration order until one returns a response. When no handler accepts the request, the
+                pipeline returns <c>501 Not Implemented</c>.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.DiscordIncomingWebhookIngressService.HandleAsync(DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest,System.Threading.CancellationToken)">
+            <summary>
+                Processes an incoming webhook request.
+            </summary>
+            <param name="request">The ingress request to process.</param>
+            <param name="cancellationToken">A token used to cancel the operation.</param>
+            <returns>The response chosen by the webhook pipeline.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.IDiscordIncomingWebhookHandler">
+            <summary>
+                Handles generic incoming webhooks received over the DisCatSharp ASP.NET Core ingress surface.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.IDiscordIncomingWebhookHandler.HandleAsync(DisCatSharp.Hosting.AspNetCore.Ingress.IncomingWebhooks.DiscordIncomingWebhookContext,System.Threading.CancellationToken)">
+            <summary>
+                Attempts to handle an incoming webhook request.
+            </summary>
+            <param name="context">The incoming webhook context.</param>
+            <param name="cancellationToken">A token to cancel the operation.</param>
+            <returns>
+                A transport-neutral ingress response when the request was handled, or <see langword="null" /> to allow other
+                registered handlers to try.
+            </returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.InMemoryDiscordIngressPendingStateStore">
+            <summary>
+                Default in-memory implementation for pending ingress state.
+            </summary>
+            <remarks>
+                This implementation is process-local and is best suited to single-node hosting scenarios. Replace it with a distributed store
+                when callback state must survive app restarts or be shared across multiple instances.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.InMemoryDiscordIngressPendingStateStore.#ctor(Microsoft.Extensions.Options.IOptions{DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions},System.TimeProvider)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.InMemoryDiscordIngressPendingStateStore" /> class.
+            </summary>
+            <param name="options">The ingress options.</param>
+            <param name="timeProvider">The time provider used for expiration checks.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="options" /> or <paramref name="timeProvider" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.InMemoryDiscordIngressPendingStateStore.StoreAsync(DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPendingState,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.InMemoryDiscordIngressPendingStateStore.GetAsync(System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.InMemoryDiscordIngressPendingStateStore.ConsumeAsync(System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.InMemoryDiscordIngressPendingStateStore.RemoveAsync(System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionEndpointHandler">
+            <summary>
+                ASP.NET Core endpoint adapter for the interaction ingress pipeline.
+            </summary>
+            <remarks>
+                This bridge converts the raw <see cref="T:Microsoft.AspNetCore.Http.HttpRequest" /> into <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest" />, executes the transport-neutral
+                pipeline, and converts the result back into an ASP.NET Core response.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionEndpointHandler.#ctor(DisCatSharp.Hosting.AspNetCore.Ingress.IDiscordIngressBodyReader,DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressService)">
+            <summary>
+                ASP.NET Core endpoint adapter for the interaction ingress pipeline.
+            </summary>
+            <remarks>
+                This bridge converts the raw <see cref="T:Microsoft.AspNetCore.Http.HttpRequest" /> into <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest" />, executes the transport-neutral
+                pipeline, and converts the result back into an ASP.NET Core response.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionEndpointHandler.HandleAsync(Microsoft.AspNetCore.Http.HttpRequest,System.Threading.CancellationToken)">
+            <summary>
+                Handles an ASP.NET Core interaction request.
+            </summary>
+            <param name="request">The incoming ASP.NET Core request.</param>
+            <param name="cancellationToken">A token used to cancel the operation.</param>
+            <returns>The adapted ASP.NET Core result.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressContext">
+            <summary>
+                Provides the transport-neutral context for a Discord interaction delivered over HTTP ingress.
+            </summary>
+            <remarks>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressContext" /> class.
+            </remarks>
+            <param name="request">The validated ingress request.</param>
+            <param name="interaction">The parsed interaction envelope.</param>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressContext.#ctor(DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest,DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressEnvelope)">
+            <summary>
+                Provides the transport-neutral context for a Discord interaction delivered over HTTP ingress.
+            </summary>
+            <remarks>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressContext" /> class.
+            </remarks>
+            <param name="request">The validated ingress request.</param>
+            <param name="interaction">The parsed interaction envelope.</param>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressContext.Request">
+            <summary>
+                Gets the original ingress request, including the preserved raw request body used for signature verification.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressContext.Interaction">
+            <summary>
+                Gets the parsed interaction envelope.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressEnvelope">
+            <summary>
+                Represents the parsed top-level Discord interaction payload received over HTTP ingress.
+            </summary>
+            <remarks>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressEnvelope" /> class.
+            </remarks>
+            <param name="type">The interaction type.</param>
+            <param name="payload">The parsed interaction payload.</param>
+            <param name="interactionId">The interaction identifier when present.</param>
+            <param name="applicationId">The application identifier when present.</param>
+            <param name="token">The interaction continuation token when present.</param>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressEnvelope.#ctor(DisCatSharp.Enums.InteractionType,Newtonsoft.Json.Linq.JObject,System.Nullable{System.UInt64},System.Nullable{System.UInt64},System.String)">
+            <summary>
+                Represents the parsed top-level Discord interaction payload received over HTTP ingress.
+            </summary>
+            <remarks>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressEnvelope" /> class.
+            </remarks>
+            <param name="type">The interaction type.</param>
+            <param name="payload">The parsed interaction payload.</param>
+            <param name="interactionId">The interaction identifier when present.</param>
+            <param name="applicationId">The application identifier when present.</param>
+            <param name="token">The interaction continuation token when present.</param>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressEnvelope.Type">
+            <summary>
+                Gets the interaction type.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressEnvelope.Payload">
+            <summary>
+                Gets the raw parsed JSON payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressEnvelope.InteractionId">
+            <summary>
+                Gets the interaction identifier when available.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressEnvelope.ApplicationId">
+            <summary>
+                Gets the application identifier when available.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressEnvelope.Token">
+            <summary>
+                Gets the interaction token when available.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressEnvelope.IsPing">
+            <summary>
+                Gets a value indicating whether this payload is a Discord ping challenge.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressResponse">
+            <summary>
+                Represents an inline HTTP response to a Discord interaction.
+            </summary>
+            <remarks>
+                Discord requires the initial response to be returned within roughly three seconds. Use one of the deferred
+                response helpers when additional work is required, then finish the interaction through the outbound follow-up
+                webhook APIs before the interaction token expires after fifteen minutes.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressResponse.Type">
+            <summary>
+                Gets the Discord interaction callback type returned by this response.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressResponse.Pong">
+            <summary>
+                Creates the required <c>PONG</c> response for an interaction ping.
+            </summary>
+            <returns>The inline pong response.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressResponse.FromCallback(DisCatSharp.Enums.InteractionResponseType,DisCatSharp.Entities.DiscordInteractionResponseBuilder)">
+            <summary>
+                Creates an inline interaction callback response.
+            </summary>
+            <param name="type">The callback type to send.</param>
+            <param name="builder">The response builder for callback data, when required.</param>
+            <returns>The inline interaction callback response.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressResponse.ChannelMessageWithSource(DisCatSharp.Entities.DiscordInteractionResponseBuilder)">
+            <summary>
+                Creates an inline message response for an incoming Discord interaction.
+            </summary>
+            <param name="builder">The message response builder.</param>
+            <returns>The inline message response.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressResponse.DeferredChannelMessageWithSource(System.Boolean)">
+            <summary>
+                Creates a deferred message response for an incoming Discord interaction.
+            </summary>
+            <param name="ephemeral">Whether the deferred response should be ephemeral.</param>
+            <returns>The deferred message response.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressService">
+            <summary>
+                Runs the transport-neutral interaction ingress pipeline.
+            </summary>
+            <remarks>
+                The pipeline validates the request signature, parses the interaction envelope, short-circuits ping requests, and then invokes
+                registered <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.IDiscordInteractionIngressHandler" /> instances in registration order until one handles the interaction.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressService.HandleAsync(DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest,System.Threading.CancellationToken)">
+            <summary>
+                Processes an interaction ingress request.
+            </summary>
+            <param name="request">The ingress request to process.</param>
+            <param name="cancellationToken">A token used to cancel the operation.</param>
+            <returns>The interaction ingress result.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.IDiscordInteractionIngressHandler">
+            <summary>
+                Handles Discord interactions received over incoming HTTP.
+            </summary>
+            <remarks>
+                Discord expects the initial response to arrive within roughly three seconds. Return a deferred response when the
+                interaction requires more work, then complete follow-up work with the interaction token through the standard
+                outbound interaction webhook APIs within fifteen minutes.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.IDiscordInteractionIngressHandler.HandleAsync(DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.DiscordInteractionIngressContext,System.Threading.CancellationToken)">
+            <summary>
+                Attempts to handle an incoming Discord interaction.
+            </summary>
+            <param name="context">The interaction ingress context.</param>
+            <param name="cancellationToken">A token to cancel the operation.</param>
+            <returns>
+                A transport-neutral interaction response when the interaction was handled, or <see langword="null" /> to allow
+                other registered handlers to try.
+            </returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackHandler">
+            <summary>
+                Default <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.IDiscordOAuthCallbackHandler" /> implementation for the ASP.NET Core ingress package.
+            </summary>
+            <remarks>
+                The handler consumes the pending state entry exactly once, validates that the callback still matches the original authorization
+                request, and only then performs the Discord token exchange.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackHandler.#ctor(Microsoft.Extensions.Options.IOptions{DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthIngressOptions},DisCatSharp.Hosting.AspNetCore.Ingress.IDiscordIngressPendingStateStore,DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.IDiscordOAuthTokenExchangeService)">
+            <summary>
+                Default <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.IDiscordOAuthCallbackHandler" /> implementation for the ASP.NET Core ingress package.
+            </summary>
+            <remarks>
+                The handler consumes the pending state entry exactly once, validates that the callback still matches the original authorization
+                request, and only then performs the Discord token exchange.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackHandler.HandleAsync(DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackRequest,System.Threading.CancellationToken)">
+            <summary>
+                Validates and processes an incoming OAuth callback request.
+            </summary>
+            <param name="request">The callback request to process.</param>
+            <param name="cancellationToken">A token used to cancel the operation.</param>
+            <returns>The callback processing result.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="request" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackRequest">
+            <summary>
+                Represents a Discord OAuth authorization-code callback request.
+            </summary>
+            <remarks>
+                Query parameter names are stored with case-insensitive lookup semantics so ASP.NET Core and synthetic test requests behave the
+                same way.
+            </remarks>
+            <param name="code">The authorization code received from Discord.</param>
+            <param name="state">The callback state received from Discord.</param>
+            <param name="error">The OAuth error returned by Discord, when available.</param>
+            <param name="errorDescription">The OAuth error description returned by Discord, when available.</param>
+            <param name="callbackUri">The absolute callback URI, when one is available.</param>
+            <param name="queryParameters">The callback query parameters.</param>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackRequest.#ctor(System.String,System.String,System.String,System.String,System.Uri,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String})">
+            <summary>
+                Represents a Discord OAuth authorization-code callback request.
+            </summary>
+            <remarks>
+                Query parameter names are stored with case-insensitive lookup semantics so ASP.NET Core and synthetic test requests behave the
+                same way.
+            </remarks>
+            <param name="code">The authorization code received from Discord.</param>
+            <param name="state">The callback state received from Discord.</param>
+            <param name="error">The OAuth error returned by Discord, when available.</param>
+            <param name="errorDescription">The OAuth error description returned by Discord, when available.</param>
+            <param name="callbackUri">The absolute callback URI, when one is available.</param>
+            <param name="queryParameters">The callback query parameters.</param>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackRequest.Code">
+            <summary>
+                Gets the authorization code received from Discord.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackRequest.State">
+            <summary>
+                Gets the callback state received from Discord.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackRequest.Error">
+            <summary>
+                Gets the OAuth error returned by Discord, when available.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackRequest.ErrorDescription">
+            <summary>
+                Gets the OAuth error description returned by Discord, when available.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackRequest.CallbackUri">
+            <summary>
+                Gets the absolute callback URI, when available.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackRequest.QueryParameters">
+            <summary>
+                Gets the callback query parameters.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackRequest.TryGetQueryValue(System.String,System.String@)">
+            <summary>
+                Attempts to resolve a callback query parameter.
+            </summary>
+            <param name="name">The query parameter name.</param>
+            <param name="value">The resolved value.</param>
+            <returns><see langword="true" /> when the parameter exists.</returns>
+            <exception cref="T:System.ArgumentException"><paramref name="name" /> is empty.</exception>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult">
+            <summary>
+                Represents the outcome of processing a Discord OAuth authorization-code callback.
+            </summary>
+            <remarks>
+                Instances preserve normalized callback metadata that higher-level features such as linked roles and incoming webhooks can use
+                without re-parsing the original authorization or callback URLs.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.Status">
+            <summary>
+                Gets the callback processing status.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.IsSuccess">
+            <summary>
+                Gets a value indicating whether the callback completed successfully.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.State">
+            <summary>
+                Gets the callback state received from Discord.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.Code">
+            <summary>
+                Gets the authorization code received from Discord.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.Detail">
+            <summary>
+                Gets the human-readable callback detail for non-success outcomes.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.PendingState">
+            <summary>
+                Gets the consumed pending state entry, when one was available.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.RedirectUri">
+            <summary>
+                Gets the redirect URI used for the OAuth code exchange.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.CallbackUri">
+            <summary>
+                Gets the callback URI that was received by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.AccessToken">
+            <summary>
+                Gets the exchanged access token when the callback completed successfully.
+            </summary>
+            <remarks>
+                This property is available only in-process. The default callback response factory does not serialize raw token values back to
+                the browser.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.OAuthError">
+            <summary>
+                Gets the OAuth error returned by Discord, when available.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.OAuthErrorDescription">
+            <summary>
+                Gets the OAuth error description returned by Discord, when available.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.Exception">
+            <summary>
+                Gets the underlying exception, when one was captured.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.AuthorizationParameters">
+            <summary>
+                Gets the normalized authorization request parameters derived from the stored pending request URI.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.CallbackParameters">
+            <summary>
+                Gets the normalized callback query parameters received by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.TokenAdditionalProperties">
+            <summary>
+                Gets any additional token response properties preserved from the Discord OAuth token payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.RequestedScope">
+            <summary>
+                Gets the originally requested OAuth scope, when it was captured.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.GrantedScope">
+            <summary>
+                Gets the scope granted by the exchanged Discord access token, when available.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.IntegrationType">
+            <summary>
+                Gets the Discord integration type associated with the callback, when available.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.HasIncomingWebhookPayload">
+            <summary>
+                Gets a value indicating whether the token response preserved an incoming webhook payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.IncomingWebhookPayload">
+            <summary>
+                Gets the preserved incoming webhook payload from the token response, when available.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.Success(System.String,System.String,DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPendingState,System.Uri,System.Uri,DisCatSharp.Entities.OAuth2.DiscordAccessToken,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.Collections.Generic.IReadOnlyDictionary{System.String,System.Object})">
+            <summary>
+                Creates a successful callback result.
+            </summary>
+            <remarks>
+                Use this when the state, redirect validation, and token exchange all completed successfully.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.InvalidRequest(System.String,System.String,System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.Uri)">
+            <summary>
+                Creates an invalid-request callback result.
+            </summary>
+            <remarks>
+                This status is typically used when the callback is malformed or Discord returned an OAuth error query string.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.InvalidState(System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.Uri)">
+            <summary>
+                Creates an invalid-state callback result.
+            </summary>
+            <remarks>
+                This status indicates the callback could not be matched to a pending state entry.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.SecurityFailure(System.String,System.String,DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPendingState,System.Uri,System.Uri,System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.Exception)">
+            <summary>
+                Creates a security-failure callback result.
+            </summary>
+            <remarks>
+                This status is used when the callback was received but failed additional security checks such as flow or redirect URI
+                validation.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.ConfigurationFailure(System.String,System.String,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.Uri)">
+            <summary>
+                Creates a configuration-failure callback result.
+            </summary>
+            <remarks>
+                This status is used when the callback endpoint is reachable but the OAuth client credentials or redirect URI are incomplete.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult.ExchangeFailure(System.String,System.String,DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPendingState,System.Uri,System.Uri,System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.Exception)">
+            <summary>
+                Creates a code-exchange failure callback result.
+            </summary>
+            <remarks>
+                This status indicates the callback passed validation but the downstream call to Discord's token endpoint failed.
+            </remarks>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackStatus">
+            <summary>
+                Describes the outcome of processing a Discord OAuth callback.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackStatus.Success">
+            <summary>
+                The callback completed successfully and the authorization code was exchanged.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackStatus.InvalidRequest">
+            <summary>
+                The callback request was malformed or Discord returned an OAuth error response.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackStatus.InvalidState">
+            <summary>
+                The callback state could not be matched to a pending authorization request.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackStatus.SecurityFailure">
+            <summary>
+                The callback failed an additional security validation step.
+            </summary>
+            <remarks>
+                Examples include mismatched flow names, mismatched stored state, or a redirect URI that no longer matches the configured
+                callback URI.
+            </remarks>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackStatus.ConfigurationFailure">
+            <summary>
+                The callback could not be processed because the OAuth ingress flow is not configured.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackStatus.ExchangeFailure">
+            <summary>
+                The authorization code exchange failed after the callback had been validated.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthIngressOptions">
+            <summary>
+                Configures the Discord OAuth callback flow exposed by the ASP.NET Core ingress package.
+            </summary>
+            <remarks>
+                <see cref="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthIngressOptions.ClientId" />, <see cref="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthIngressOptions.ClientSecret" />, and <see cref="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthIngressOptions.RedirectUri" /> must be configured together before the
+                default callback handler can exchange authorization codes.
+            </remarks>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthIngressOptions.DefaultPendingStateFlow">
+            <summary>
+                The default logical flow name used when storing pending OAuth state.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthIngressOptions.ClientId">
+            <summary>
+                Gets or sets the Discord application client identifier used for token exchange.
+            </summary>
+            <remarks>
+                Leave this at <c>0</c> only when the OAuth callback endpoint is intentionally disabled.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthIngressOptions.ClientSecret">
+            <summary>
+                Gets or sets the Discord application client secret used for token exchange.
+            </summary>
+            <remarks>
+                This value is consumed only by <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.IDiscordOAuthTokenExchangeService" /> implementations and should be sourced from a
+                secure configuration provider.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthIngressOptions.RedirectUri">
+            <summary>
+                Gets or sets the redirect URI that Discord should use for the authorization-code callback.
+            </summary>
+            <remarks>
+                The default callback handler compares this URI against the stored authorization request to prevent redirect swapping.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthIngressOptions.PendingStateFlow">
+            <summary>
+                Gets or sets the expected logical flow name for pending OAuth state entries.
+            </summary>
+            <remarks>
+                This value must match <see cref="P:DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPendingState.Flow" /> for states generated by the corresponding authorization
+                flow.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthIngressOptions.IsConfigured">
+            <summary>
+                Gets a value indicating whether the OAuth callback flow has enough configuration to exchange codes.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.IDiscordOAuthCallbackHandler">
+            <summary>
+                Processes Discord OAuth authorization-code callbacks.
+            </summary>
+            <remarks>
+                The default implementation consumes the pending state entry, validates the callback against the original authorization request,
+                and then delegates the code exchange to <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.IDiscordOAuthTokenExchangeService" />.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.IDiscordOAuthCallbackHandler.HandleAsync(DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackRequest,System.Threading.CancellationToken)">
+            <summary>
+                Processes the specified callback request.
+            </summary>
+            <param name="request">The callback request to process.</param>
+            <param name="cancellationToken">A token used to cancel the operation.</param>
+            <returns>The callback processing result.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="request" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.IDiscordOAuthCallbackResponseFactory">
+            <summary>
+                Shapes Discord OAuth callback results into transport-neutral ingress responses.
+            </summary>
+            <remarks>
+                The default implementation emits cache-busting headers and deliberately excludes raw access and refresh tokens from the response
+                payload.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.IDiscordOAuthCallbackResponseFactory.CreateResponse(DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult)">
+            <summary>
+                Creates the ingress response for the specified callback result.
+            </summary>
+            <param name="result">The callback result to shape.</param>
+            <returns>The ingress response to emit.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.IDiscordOAuthTokenExchangeService">
+            <summary>
+                Exchanges Discord OAuth authorization codes for access tokens.
+            </summary>
+            <remarks>
+                Implementations should assume the callback has already passed state and redirect validation and focus exclusively on the token
+                exchange with Discord.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.IDiscordOAuthTokenExchangeService.ExchangeAccessTokenAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+                Exchanges the specified authorization code for a Discord access token.
+            </summary>
+            <param name="code">The authorization code to exchange.</param>
+            <param name="cancellationToken">A token used to cancel the operation.</param>
+            <returns>The exchanged Discord access token.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordEd25519IngressSignatureValidator">
+            <summary>
+                Validates Discord ingress requests signed with the application's Ed25519 verify key.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordEd25519IngressSignatureValidator.#ctor(Microsoft.Extensions.Options.IOptions{DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions},Microsoft.Extensions.Logging.ILogger{DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordEd25519IngressSignatureValidator})">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordEd25519IngressSignatureValidator" /> class.
+            </summary>
+            <param name="options">The ingress options.</param>
+            <param name="logger">The diagnostic logger.</param>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordEd25519IngressSignatureValidator.ValidateAsync(DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationResult">
+            <summary>
+                Represents the outcome of an ingress signature validation attempt.
+            </summary>
+            <remarks>
+                <see cref="F:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationStatus.NotValidated" /> indicates that no registered validator claimed the request.
+                This is distinct from <see cref="F:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationStatus.Invalid" />, which indicates a validator did claim the
+                request and rejected it.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationResult.Status">
+            <summary>
+                Gets the validation outcome.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationResult.ValidatorName">
+            <summary>
+                Gets the validator name that produced the result when one is available.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationResult.FailureReason">
+            <summary>
+                Gets a human-readable failure reason when validation failed.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationResult.NotValidated(System.String)">
+            <summary>
+                Creates a result that indicates no validator evaluated the request.
+            </summary>
+            <param name="validatorName">The validator name, when applicable.</param>
+            <returns>A not-validated result.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationResult.Valid(System.String)">
+            <summary>
+                Creates a successful validation result.
+            </summary>
+            <param name="validatorName">The validator that accepted the request.</param>
+            <returns>A successful validation result.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationResult.Invalid(System.String,System.String)">
+            <summary>
+                Creates a failed validation result.
+            </summary>
+            <param name="validatorName">The validator that rejected the request.</param>
+            <param name="failureReason">The reason that validation failed.</param>
+            <returns>A failed validation result.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationService">
+            <summary>
+                Aggregates the registered ingress signature validators.
+            </summary>
+            <remarks>
+                This aggregator is intentionally order-sensitive so applications can prepend custom validators ahead of the built-in Discord
+                Ed25519 validator.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationService.#ctor(System.Collections.Generic.IEnumerable{DisCatSharp.Hosting.AspNetCore.Ingress.Security.IDiscordIngressSignatureValidator})">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationService" /> class.
+            </summary>
+            <param name="validators">The signature validators to aggregate.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="validators" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationService.ValidateAsync(DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationStatus">
+            <summary>
+                Describes the outcome of a signature validation attempt.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationStatus.NotValidated">
+            <summary>
+                No validator was able to evaluate the request.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationStatus.Valid">
+            <summary>
+                The request signature was valid.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationStatus.Invalid">
+            <summary>
+                The request signature was invalid.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.Security.IDiscordIngressSignatureValidationService">
+            <summary>
+                Coordinates transport-agnostic ingress signature validation.
+            </summary>
+            <remarks>
+                The default implementation walks the registered <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.Security.IDiscordIngressSignatureValidator" /> instances in registration
+                order, returns immediately on the first valid result, otherwise preserves the first invalid result, and falls back to
+                <see cref="F:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationStatus.NotValidated" /> when no validator applied.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.Security.IDiscordIngressSignatureValidationService.ValidateAsync(DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest,System.Threading.CancellationToken)">
+            <summary>
+                Validates the supplied ingress request against the registered signature validators.
+            </summary>
+            <param name="request">The request to validate.</param>
+            <param name="cancellationToken">A token used to cancel the operation.</param>
+            <returns>The aggregated validation outcome.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.Security.IDiscordIngressSignatureValidator">
+            <summary>
+                Validates an ingress request signature for a specific provider or scheme.
+            </summary>
+            <remarks>
+                Return <see cref="M:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationResult.NotValidated(System.String)" /> when the validator does not apply to the
+                current request. Reserve <see cref="M:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationResult.Invalid(System.String,System.String)" /> for requests that should
+                have matched but failed validation.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.Security.IDiscordIngressSignatureValidator.ValidateAsync(DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest,System.Threading.CancellationToken)">
+            <summary>
+                Validates the supplied ingress request.
+            </summary>
+            <param name="request">The request to validate.</param>
+            <param name="cancellationToken">A token used to cancel the operation.</param>
+            <returns>The validation outcome.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookApplicationAuthorizedEventData">
+            <summary>
+                Represents the payload for <see cref="F:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventNames.ApplicationAuthorized" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookApplicationAuthorizedEventData.IntegrationType">
+            <summary>
+                Gets the authorization installation context when Discord provided it.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookApplicationAuthorizedEventData.User">
+            <summary>
+                Gets the user that authorized the application.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookApplicationAuthorizedEventData.Scopes">
+            <summary>
+                Gets the scopes granted during authorization.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookApplicationAuthorizedEventData.Guild">
+            <summary>
+                Gets the guild the application was authorized for when the install target was a guild.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookApplicationDeauthorizedEventData">
+            <summary>
+                Represents the payload for <see cref="F:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventNames.ApplicationDeauthorized" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookApplicationDeauthorizedEventData.User">
+            <summary>
+                Gets the user that deauthorized the application.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookAuthorizedGuild">
+            <summary>
+                Represents the guild context included with application authorization webhook events.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookAuthorizedGuild.Id">
+            <summary>
+                Gets the guild identifier.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookAuthorizedGuild.Name">
+            <summary>
+                Gets the guild name.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookAuthorizedGuild.IconHash">
+            <summary>
+                Gets the guild icon hash.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher">
+            <summary>
+                Dispatches typed Discord webhook events raised by the ASP.NET Core ingress pipeline.
+            </summary>
+            <remarks>
+                <para>
+                    The dispatcher stays alongside the webhook envelope, registry, and typed DTOs so the signed webhook feature surface can be
+                    discovered from one feature area.
+                </para>
+                <para>
+                    Event dispatch is intentionally fire-and-forget. The HTTP webhook endpoint acknowledges the signed request before async event
+                    handlers complete, and each registered handler is subject to a one-second timeout enforced by the underlying
+                    <see cref="T:DisCatSharp.Common.Utilities.AsyncEvent`2" /> infrastructure.
+                </para>
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.#ctor(System.IServiceProvider,Microsoft.Extensions.Logging.ILogger{DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher})">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher" /> class.
+            </summary>
+            <param name="provider">The root service provider.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.ApplicationAuthorized">
+            <summary>
+                Fired when Discord sends an <c>APPLICATION_AUTHORIZED</c> webhook event.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.ApplicationDeauthorized">
+            <summary>
+                Fired when Discord sends an <c>APPLICATION_DEAUTHORIZED</c> webhook event.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.EntitlementCreated">
+            <summary>
+                Fired when Discord sends an <c>ENTITLEMENT_CREATE</c> webhook event.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.EntitlementUpdated">
+            <summary>
+                Fired when Discord sends an <c>ENTITLEMENT_UPDATE</c> webhook event.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.EntitlementDeleted">
+            <summary>
+                Fired when Discord sends an <c>ENTITLEMENT_DELETE</c> webhook event.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.LobbyMessageCreated">
+            <summary>
+                Fired when Discord sends a <c>LOBBY_MESSAGE_CREATE</c> webhook event.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.LobbyMessageUpdated">
+            <summary>
+                Fired when Discord sends a <c>LOBBY_MESSAGE_UPDATE</c> webhook event.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.LobbyMessageDeleted">
+            <summary>
+                Fired when Discord sends a <c>LOBBY_MESSAGE_DELETE</c> webhook event.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.GameDirectMessageCreated">
+            <summary>
+                Fired when Discord sends a <c>GAME_DIRECT_MESSAGE_CREATE</c> webhook event.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.GameDirectMessageUpdated">
+            <summary>
+                Fired when Discord sends a <c>GAME_DIRECT_MESSAGE_UPDATE</c> webhook event.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.GameDirectMessageDeleted">
+            <summary>
+                Fired when Discord sends a <c>GAME_DIRECT_MESSAGE_DELETE</c> webhook event.
+            </summary>
+        </member>
+        <member name="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.UnknownWebhookEventReceived">
+            <summary>
+                Fired when Discord delivers a signed webhook event that does not yet have a typed event surface.
+            </summary>
+            <remarks>
+                Subscribe to this event to handle newer webhook event types before the package ships a typed payload model for them.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.HasHandlers">
+            <summary>
+                Gets a value indicating whether any webhook event handlers are currently registered.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEndpointHandler">
+            <summary>
+                ASP.NET Core endpoint adapter for signed webhook events.
+            </summary>
+            <remarks>
+                This bridge applies the shared request body reader and converts transport-neutral webhook results back into ASP.NET Core
+                responses.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEndpointHandler.#ctor(DisCatSharp.Hosting.AspNetCore.Ingress.IDiscordIngressBodyReader,DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventIngressService)">
+            <summary>
+                ASP.NET Core endpoint adapter for signed webhook events.
+            </summary>
+            <remarks>
+                This bridge applies the shared request body reader and converts transport-neutral webhook results back into ASP.NET Core
+                responses.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEndpointHandler.HandleAsync(Microsoft.AspNetCore.Http.HttpRequest,System.Threading.CancellationToken)">
+            <summary>
+                Handles an ASP.NET Core signed webhook request.
+            </summary>
+            <param name="request">The incoming ASP.NET Core request.</param>
+            <param name="cancellationToken">A token used to cancel the operation.</param>
+            <returns>The adapted ASP.NET Core result.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope">
+            <summary>
+                Represents a parsed inbound Discord webhook event envelope.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.#ctor(System.Int32,DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPayload,System.Text.Json.JsonElement,System.Nullable{System.Int32},System.String,System.String,System.String,System.Nullable{System.Text.Json.JsonElement},System.Nullable{System.Text.Json.JsonElement})">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope" /> class.
+            </summary>
+            <param name="type">The envelope type discriminator.</param>
+            <param name="payload">The raw payload bytes.</param>
+            <param name="root">The parsed JSON root element.</param>
+            <param name="version">The webhook envelope version when present.</param>
+            <param name="applicationId">The application identifier when present.</param>
+            <param name="eventType">The event type when present.</param>
+            <param name="timestampRaw">The event timestamp when present.</param>
+            <param name="eventBody">The raw nested event object when present.</param>
+            <param name="data">The raw nested event data object when present.</param>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.Type">
+            <summary>
+                Gets the webhook envelope type discriminator.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.IsPing">
+            <summary>
+                Gets a value indicating whether the envelope represents a Discord webhook ping.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.IsEvent">
+            <summary>
+                Gets a value indicating whether the envelope represents a Discord webhook event.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.Payload">
+            <summary>
+                Gets the raw request payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.Root">
+            <summary>
+                Gets the parsed JSON root object.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.Version">
+            <summary>
+                Gets the webhook envelope version when present on the payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.ApplicationId">
+            <summary>
+                Gets the application identifier when present on the payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.EventType">
+            <summary>
+                Gets the event type when present on the payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.Event">
+            <summary>
+                Gets the raw nested event object when present on the payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.HasEvent">
+            <summary>
+                Gets a value indicating whether the payload included a nested event object.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.TimestampRaw">
+            <summary>
+                Gets the raw event timestamp when present on the payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.Timestamp">
+            <summary>
+                Gets the parsed event timestamp when present on the payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.Data">
+            <summary>
+                Gets the raw nested event data object when present on the payload.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.HasData">
+            <summary>
+                Gets a value indicating whether the payload included nested event data.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.SuggestedDataModelType">
+            <summary>
+                Gets the recommended CLR model for the current <see cref="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.EventType" />, when known.
+            </summary>
+            <remarks>
+                This value comes from <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventModelRegistry" /> and is intended for tooling and diagnostics; unknown
+                event types may still carry valid payloads.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.TryGetProperty(System.String,System.Text.Json.JsonElement@)">
+            <summary>
+                Attempts to resolve a top-level property from the envelope.
+            </summary>
+            <param name="name">The property name to resolve.</param>
+            <param name="value">The resolved JSON value.</param>
+            <returns><see langword="true" /> when the property exists.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.TryGetEventProperty(System.String,System.Text.Json.JsonElement@)">
+            <summary>
+                Attempts to resolve a property from the nested event object.
+            </summary>
+            <param name="name">The property name to resolve.</param>
+            <param name="value">The resolved JSON value.</param>
+            <returns><see langword="true" /> when the property exists on the nested event object.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.TryGetDataProperty(System.String,System.Text.Json.JsonElement@)">
+            <summary>
+                Attempts to resolve a property from the nested event data object.
+            </summary>
+            <param name="name">The property name to resolve.</param>
+            <param name="value">The resolved JSON value.</param>
+            <returns><see langword="true" /> when the property exists on the nested event data object.</returns>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.DeserializeData``1">
+            <summary>
+                Deserializes the nested event data into a typed model.
+            </summary>
+            <typeparam name="T">The payload model type.</typeparam>
+            <returns>The deserialized payload model.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when the envelope does not contain nested event data.</exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.TryDeserializeData``1(``0@)">
+            <summary>
+                Attempts to deserialize the nested event data into a typed model.
+            </summary>
+            <typeparam name="T">The payload model type.</typeparam>
+            <param name="data">The deserialized payload model when successful.</param>
+            <returns><see langword="true" /> when the payload was deserialized successfully.</returns>
+            <remarks>
+                This method swallows JSON deserialization failures so callers can fall back to
+                <see cref="E:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher.UnknownWebhookEventReceived" /> or other raw-payload handling paths.
+            </remarks>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelopeParser">
+            <summary>
+                Parses signed Discord webhook JSON payloads into transport-neutral webhook envelopes.
+            </summary>
+            <remarks>
+                The parser preserves raw JSON elements for later typed deserialization while validating the minimal envelope contract required
+                by the dispatcher.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelopeParser.Parse(DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressPayload)">
+            <summary>
+                Parses a signed webhook payload.
+            </summary>
+            <param name="payload">The raw ingress payload.</param>
+            <returns>The parse result.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventIngressService">
+            <summary>
+                Runs the signed webhook event ingress pipeline.
+            </summary>
+            <remarks>
+                The pipeline validates request signatures, parses the webhook envelope, returns the HTTP acknowledgment immediately, and then
+                schedules async dispatch through <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher" />.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventIngressService.#ctor(DisCatSharp.Hosting.AspNetCore.Ingress.Security.IDiscordIngressSignatureValidationService,DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher,Microsoft.Extensions.Logging.ILogger{DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventIngressService})">
+            <summary>
+                Runs the signed webhook event ingress pipeline.
+            </summary>
+            <remarks>
+                The pipeline validates request signatures, parses the webhook envelope, returns the HTTP acknowledgment immediately, and then
+                schedules async dispatch through <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventDispatcher" />.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventIngressService.HandleAsync(DisCatSharp.Hosting.AspNetCore.Ingress.DiscordIngressRequest,System.Threading.CancellationToken)">
+            <summary>
+                Processes a signed webhook event request.
+            </summary>
+            <param name="request">The ingress request to process.</param>
+            <param name="cancellationToken">A token used to cancel the operation.</param>
+            <returns>The webhook ingress result.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventModelRegistry">
+            <summary>
+                Resolves the typed payload model associated with a documented Discord webhook event type.
+            </summary>
+            <remarks>
+                This registry is used by contributor-facing tooling and by <see cref="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventEnvelope.SuggestedDataModelType" /> to
+                connect raw event names to the package's typed webhook DTOs.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventModelRegistry.GetPayloadType(System.String)">
+            <summary>
+                Gets the recommended payload model type for a webhook event.
+            </summary>
+            <param name="eventType">The Discord webhook event type name.</param>
+            <returns>The payload model type when one is known; otherwise <see langword="null" />.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventNames">
+            <summary>
+                Contains documented Discord webhook event type names.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventNames.ApplicationAuthorized">
+            <summary>
+                Sent when an app was authorized by a user.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventNames.ApplicationDeauthorized">
+            <summary>
+                Sent when an app was deauthorized by a user.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventNames.EntitlementCreate">
+            <summary>
+                Sent when an entitlement was created.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventNames.EntitlementUpdate">
+            <summary>
+                Sent when an entitlement was updated.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventNames.EntitlementDelete">
+            <summary>
+                Sent when an entitlement was deleted.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventNames.QuestUserEnrollment">
+            <summary>
+                Sent when a user is enrolled into a quest.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventNames.LobbyMessageCreate">
+            <summary>
+                Sent when a lobby message is created.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventNames.LobbyMessageUpdate">
+            <summary>
+                Sent when a lobby message is updated.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventNames.LobbyMessageDelete">
+            <summary>
+                Sent when a lobby message is deleted.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventNames.GameDirectMessageCreate">
+            <summary>
+                Sent when a Social SDK game direct message is created.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventNames.GameDirectMessageUpdate">
+            <summary>
+                Sent when a Social SDK game direct message is updated.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventNames.GameDirectMessageDelete">
+            <summary>
+                Sent when a Social SDK game direct message is deleted.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventTypes">
+            <summary>
+                Contains known Discord webhook event envelope type constants.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventTypes.Ping">
+            <summary>
+                The Discord webhook ping envelope type.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventTypes.Event">
+            <summary>
+                The Discord webhook event envelope type.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookGameDirectMessageEventData">
+            <summary>
+                Represents the payload for Social SDK game direct message webhook events.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookGameDirectMessageEventData.RecipientId">
+            <summary>
+                Gets the other direct message participant identifier when Discord provided it.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookLobbyMessageDeleteEventData">
+            <summary>
+                Represents the payload for <see cref="F:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookEventNames.LobbyMessageDelete" />.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookLobbyMessageDeleteEventData.Id">
+            <summary>
+                Gets the deleted message identifier.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookLobbyMessageDeleteEventData.LobbyId">
+            <summary>
+                Gets the lobby identifier where the message was deleted.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookLobbyMessageEventData">
+            <summary>
+                Represents the payload for lobby message create and update webhook events.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookLobbyMessageEventData.Metadata">
+            <summary>
+                Gets the lobby-scoped metadata dictionary when present.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialChannel">
+            <summary>
+                Represents the Social SDK channel context embedded in webhook message payloads.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialChannel.Id">
+            <summary>
+                Gets the channel identifier.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialChannel.Type">
+            <summary>
+                Gets the channel type.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialChannel.Name">
+            <summary>
+                Gets the channel name when Discord provided it.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialChannel.Recipients">
+            <summary>
+                Gets the channel recipients when Discord provided them.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialMessageEventData">
+            <summary>
+                Represents common Social SDK webhook message fields shared by lobby and game direct message events.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialMessageEventData.Id">
+            <summary>
+                Gets the message identifier.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialMessageEventData.Type">
+            <summary>
+                Gets the Discord message type when present.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialMessageEventData.Content">
+            <summary>
+                Gets the message content when present.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialMessageEventData.LobbyId">
+            <summary>
+                Gets the lobby identifier for lobby or linked-channel message contexts.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialMessageEventData.ChannelId">
+            <summary>
+                Gets the channel identifier when present.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialMessageEventData.Author">
+            <summary>
+                Gets the message author when present.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialMessageEventData.TimestampRaw">
+            <summary>
+                Gets the message timestamp as received from Discord.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialMessageEventData.Timestamp">
+            <summary>
+                Gets the parsed message timestamp when present.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialMessageEventData.EditedTimestampRaw">
+            <summary>
+                Gets the message edit timestamp as received from Discord.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialMessageEventData.EditedTimestamp">
+            <summary>
+                Gets the parsed message edit timestamp when present.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialMessageEventData.Flags">
+            <summary>
+                Gets the message metadata flags when present.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialMessageEventData.ApplicationId">
+            <summary>
+                Gets the application identifier when present.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialMessageEventData.Channel">
+            <summary>
+                Gets the Social SDK channel context when present.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialMessageEventData.Activity">
+            <summary>
+                Gets the message activity payload when present.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialMessageEventData.Application">
+            <summary>
+                Gets the embedded message application when present.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialMessageEventData.Attachments">
+            <summary>
+                Gets the message attachments when present.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Ingress.WebhookEvents.DiscordWebhookSocialMessageEventData.Components">
+            <summary>
+                Gets the message components when present.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.LinkedRoles.DiscordLinkedRolesOptions">
+            <summary>
+                Configures linked-roles support built on top of the ASP.NET Core ingress package.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.LinkedRoles.DiscordLinkedRolesOptions.DefaultVerificationPath">
+            <summary>
+                The default application-relative verification path used for the linked-roles verification URL.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.LinkedRoles.DiscordLinkedRolesOptions.VerificationPath">
+            <summary>
+                Gets or sets the application-relative verification path exposed to Discord in the developer portal.
+            </summary>
+            <remarks>
+                The path is combined directly with the application's public base URL. It does not inherit
+                <see cref="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.RoutePrefix" />, which lets linked-role verification live outside the signed ingress
+                surface when desired.
+            </remarks>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.LinkedRoles.DiscordLinkedRolesService">
+            <summary>
+                Provides helper methods for linked-roles verification URLs, metadata synchronization, and OAuth role-connection updates.
+            </summary>
+            <remarks>
+                This helper keeps the ASP.NET Core ingress route configuration, Discord application metadata, and OAuth callback results aligned for linked-roles flows.
+            </remarks>
+            <param name="aspNetCoreOptions">The ingress route options.</param>
+            <param name="linkedRolesOptions">The linked-roles helper options.</param>
+            <param name="serviceProvider">The service provider.</param>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.LinkedRoles.DiscordLinkedRolesService.#ctor(Microsoft.Extensions.Options.IOptions{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions},Microsoft.Extensions.Options.IOptions{DisCatSharp.Hosting.AspNetCore.LinkedRoles.DiscordLinkedRolesOptions},System.IServiceProvider)">
+            <summary>
+                Provides helper methods for linked-roles verification URLs, metadata synchronization, and OAuth role-connection updates.
+            </summary>
+            <remarks>
+                This helper keeps the ASP.NET Core ingress route configuration, Discord application metadata, and OAuth callback results aligned for linked-roles flows.
+            </remarks>
+            <param name="aspNetCoreOptions">The ingress route options.</param>
+            <param name="linkedRolesOptions">The linked-roles helper options.</param>
+            <param name="serviceProvider">The service provider.</param>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.LinkedRoles.DiscordLinkedRolesService.GetVerificationUrl(System.Uri)">
+            <summary>
+                Computes the public linked-roles verification URL for the supplied application base URL.
+            </summary>
+            <remarks>
+                The returned URL follows <see cref="P:DisCatSharp.Hosting.AspNetCore.LinkedRoles.DiscordLinkedRolesOptions.VerificationPath" /> semantics and therefore remains independent
+                from the signed ingress route prefix.
+            </remarks>
+            <param name="publicBaseUrl">The externally visible application base URL.</param>
+            <returns>The public linked-roles verification URL.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="publicBaseUrl" /> is <see langword="null" />.</exception>
+            <exception cref="T:System.InvalidOperationException">Linked-roles support did not produce a verification URL.</exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.LinkedRoles.DiscordLinkedRolesService.UpdateVerificationUrlAsync(DisCatSharp.BaseDiscordClient,System.Uri,System.Threading.CancellationToken)">
+            <summary>
+                Updates the current Discord application's linked-roles verification URL to the computed public URL.
+            </summary>
+            <remarks>
+                Use this after deployment changes so the developer portal stays aligned with the URL published by
+                <see cref="M:DisCatSharp.Hosting.AspNetCore.LinkedRoles.DiscordLinkedRolesService.GetVerificationUrl(System.Uri)" />.
+            </remarks>
+            <param name="client">The Discord client used to update the application.</param>
+            <param name="publicBaseUrl">The externally visible application base URL.</param>
+            <param name="cancellationToken">A token to cancel the operation.</param>
+            <returns>The updated Discord application.</returns>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="client" /> or <paramref name="publicBaseUrl" /> is <see langword="null" />.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.LinkedRoles.DiscordLinkedRolesService.HasRoleConnectionsWriteScope(DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult)">
+            <summary>
+                Gets a value indicating whether a callback result contains the required <c>role_connections.write</c> scope.
+            </summary>
+            <remarks>
+                Linked-role connection updates require a successful OAuth callback that granted <c>role_connections.write</c>.
+            </remarks>
+            <param name="callbackResult">The callback result to inspect.</param>
+            <returns><see langword="true" /> when the granted scope contains <c>role_connections.write</c>.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="callbackResult" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.LinkedRoles.DiscordLinkedRolesService.GetMetadataAsync(System.Threading.CancellationToken)">
+            <summary>
+                Resolves the linked-roles metadata records from the registered provider.
+            </summary>
+            <remarks>
+                Discord currently supports at most five metadata records, each with a unique key. These constraints are validated before the
+                records are returned.
+            </remarks>
+            <param name="cancellationToken">A token to cancel the operation.</param>
+            <returns>The resolved metadata records.</returns>
+            <exception cref="T:System.InvalidOperationException">
+                No provider is registered, more than five records were returned, or duplicate metadata keys were produced.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.LinkedRoles.DiscordLinkedRolesService.SynchronizeMetadataAsync(DisCatSharp.DiscordClient,System.Threading.CancellationToken)">
+            <summary>
+                Synchronizes the registered linked-roles metadata with Discord when the local schema differs from the remote application state.
+            </summary>
+            <remarks>
+                The synchronization check is order-sensitive because Discord preserves the metadata array order exposed in the developer
+                portal.
+            </remarks>
+            <param name="client">The Discord client used to manage application metadata.</param>
+            <param name="cancellationToken">A token to cancel the operation.</param>
+            <returns>The active metadata records after synchronization.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="client" /> is <see langword="null" />.</exception>
+            <exception cref="T:System.InvalidOperationException">
+                The registered metadata provider is missing or returned invalid metadata.
+            </exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.LinkedRoles.DiscordLinkedRolesService.PublishRoleConnectionAsync(DisCatSharp.DiscordOAuth2Client,DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthCallbackResult,System.String,System.String,DisCatSharp.Entities.OAuth2.ApplicationRoleConnectionMetadata,System.Threading.CancellationToken)">
+            <summary>
+                Publishes a linked-roles connection update using the access token captured by a successful OAuth callback.
+            </summary>
+            <remarks>
+                This helper is intended for the final step of the OAuth callback flow after the callback result has been validated and the
+                access token has been confirmed to include <c>role_connections.write</c>.
+            </remarks>
+            <param name="oauthClient">The OAuth2 client used to publish the role connection.</param>
+            <param name="callbackResult">The completed OAuth callback result.</param>
+            <param name="platformName">The external platform name to show in Discord.</param>
+            <param name="platformUsername">The external platform username to show in Discord.</param>
+            <param name="metadata">The role-connection metadata to publish.</param>
+            <param name="cancellationToken">A token to cancel the operation.</param>
+            <returns>The updated application role connection.</returns>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="oauthClient" />, <paramref name="callbackResult" />, or <paramref name="metadata" /> is <see langword="null" />.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+                <paramref name="platformName" /> or <paramref name="platformUsername" /> is empty.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+                The callback did not succeed or the granted token does not include <c>role_connections.write</c>.
+            </exception>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.LinkedRoles.IDiscordLinkedRolesMetadataProvider">
+            <summary>
+                Supplies linked-roles metadata records for synchronization with the Discord application.
+            </summary>
+            <remarks>
+                Return records in the exact order you want them published. Discord currently supports at most five records and each key must be
+                unique.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.LinkedRoles.IDiscordLinkedRolesMetadataProvider.GetMetadataAsync(System.Threading.CancellationToken)">
+            <summary>
+                Resolves the desired linked-roles metadata records.
+            </summary>
+            <param name="cancellationToken">A token to cancel the operation.</param>
+            <returns>The metadata records that should be registered with Discord.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressEndpointMetadata">
+            <summary>
+                Describes a mapped DisCatSharp ingress endpoint.
+            </summary>
+            <remarks>
+                Instances of this type are attached as endpoint metadata so applications can inspect the logical
+                DisCatSharp ingress surface without relying on route templates or display names.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressEndpointMetadata.#ctor(System.String,System.String,System.String)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressEndpointMetadata" /> class.
+            </summary>
+            <param name="module">The logical ingress module that owns the endpoint.</param>
+            <param name="endpointName">The stable endpoint name.</param>
+            <param name="relativePath">The relative route path inside the ingress surface.</param>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressEndpointMetadata.Module">
+            <summary>
+                Gets the logical ingress module that owns the endpoint.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressEndpointMetadata.EndpointName">
+            <summary>
+                Gets the stable endpoint name.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressEndpointMetadata.RelativePath">
+            <summary>
+                Gets the route path relative to the ingress root.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressEndpointNames">
+            <summary>
+                Contains the stable endpoint names used by the DisCatSharp ASP.NET Core ingress surface.
+            </summary>
+            <remarks>
+                These names are intentionally stable so callers can look up mapped endpoints or attach conventions
+                without depending on the configured route segments.
+            </remarks>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressEndpointNames.OAuthCallback">
+            <summary>
+                The OAuth callback endpoint name.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressEndpointNames.Interactions">
+            <summary>
+                The interactions endpoint name.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressEndpointNames.WebhookEvents">
+            <summary>
+                The webhook events endpoint name.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressEndpointNames.IncomingWebhooks">
+            <summary>
+                The incoming webhooks endpoint name.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressPublicUrls">
+            <summary>
+                Represents the externally visible ASP.NET Core ingress URLs exposed by DisCatSharp.
+            </summary>
+            <remarks>
+                This helper resolves the package's public route surface from a base URL and the configured
+                ASP.NET Core ingress options so deployment and validation code can share the same path logic.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressPublicUrls.#ctor(System.Uri,System.String,System.Uri,System.Uri,System.Uri,System.Uri,System.Uri,System.Uri)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressPublicUrls" /> class.
+            </summary>
+            <param name="baseUrl">The base URL used to build the ingress surface.</param>
+            <param name="ingressRootPath">The normalized ingress root path.</param>
+            <param name="ingressRootUrl">The absolute ingress root URL.</param>
+            <param name="oauthCallbackUrl">The OAuth callback URL.</param>
+            <param name="interactionsUrl">The interactions URL.</param>
+            <param name="webhookEventsUrl">The webhook events URL.</param>
+            <param name="incomingWebhooksUrl">The incoming webhooks URL.</param>
+            <param name="roleConnectionsVerificationUrl">The linked-roles verification URL when configured.</param>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressPublicUrls.BaseUrl">
+            <summary>
+                Gets the base URL used to build the ingress surface.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressPublicUrls.IngressRootPath">
+            <summary>
+                Gets the normalized public ingress root path.
+            </summary>
+            <remarks>
+                The computed path preserves the path component from <see cref="P:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressPublicUrls.BaseUrl" /> and then appends the normalized
+                <see cref="P:DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions.RoutePrefix" />.
+            </remarks>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressPublicUrls.IngressRootUrl">
+            <summary>
+                Gets the public ingress root URL.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressPublicUrls.OAuthCallbackUrl">
+            <summary>
+                Gets the public OAuth callback URL.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressPublicUrls.InteractionsUrl">
+            <summary>
+                Gets the public interactions URL.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressPublicUrls.WebhookEventsUrl">
+            <summary>
+                Gets the public webhook events URL.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressPublicUrls.IncomingWebhooksUrl">
+            <summary>
+                Gets the public incoming webhooks URL.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressPublicUrls.RoleConnectionsVerificationUrl">
+            <summary>
+                Gets the public linked-roles verification URL when linked-roles support is configured.
+            </summary>
+            <remarks>
+                Unlike the ingress endpoints, the linked-roles verification URL is composed directly from the application's public base URL
+                and <see cref="P:DisCatSharp.Hosting.AspNetCore.LinkedRoles.DiscordLinkedRolesOptions.VerificationPath" /> without adding the ingress route prefix.
+            </remarks>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressPublicUrls.Create(System.Uri,DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions,DisCatSharp.Hosting.AspNetCore.LinkedRoles.DiscordLinkedRolesOptions)">
+            <summary>
+                Creates a public URL snapshot from the supplied base URL and ingress options.
+            </summary>
+            <remarks>
+                <para>
+                    The supplied <paramref name="baseUrl" /> may already contain a path base such as <c>https://example.com/base</c>; the
+                    ingress route prefix and endpoint segments are appended beneath that existing path.
+                </para>
+                <para>
+                    Linked-roles verification URLs deliberately remain outside the ingress route prefix so they can be published independently
+                    from the signed interactions and webhook endpoints.
+                </para>
+            </remarks>
+            <param name="baseUrl">The externally visible base URL for the ASP.NET Core app.</param>
+            <param name="options">The ingress route options. Defaults to the package defaults when omitted.</param>
+            <param name="linkedRolesOptions">The optional linked-roles route options.</param>
+            <returns>The resolved public ingress URLs.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="baseUrl" /> is <see langword="null" />.</exception>
+            <exception cref="T:System.ArgumentException">
+                <paramref name="baseUrl" /> is not absolute, contains a query or fragment component, or one of the configured route segments
+                is empty after normalization.
+            </exception>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.ServiceCollectionExtensions">
+            <summary>
+                Provides ASP.NET Core service registration extensions for DisCatSharp.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.ServiceCollectionExtensions.AddDisCatSharpAspNetCore(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions},System.Action{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions},System.Action{DisCatSharp.Hosting.AspNetCore.Ingress.OAuth.DiscordOAuthIngressOptions})">
+            <summary>
+                Registers the baseline ASP.NET Core service dependencies used by the DisCatSharp web ingress scaffold.
+            </summary>
+            <remarks>
+                <para>
+                    This scaffold wires the transport-neutral ingress pipeline, including request body reading, pending-state storage,
+                    signature validation aggregation, webhook dispatch, OAuth callback processing, and the ASP.NET Core endpoint handlers
+                    consumed by <see cref="T:DisCatSharp.Hosting.AspNetCore.EndpointRouteBuilderExtensions" />.
+                </para>
+                <para>
+                    It does not register application-command execution on its own. Register one or more
+                    <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.Interactions.IDiscordInteractionIngressHandler" /> implementations to bridge incoming interactions into your bot's
+                    command pipeline.
+                </para>
+            </remarks>
+            <param name="services">The service collection to update.</param>
+            <param name="configure">Optional configuration callback for the ingress subsystem.</param>
+            <param name="configureAspNetCore">Optional configuration callback for ASP.NET Core endpoint conventions.</param>
+            <param name="configureOAuth">Optional configuration callback for the OAuth callback flow.</param>
+            <returns>The service collection for chaining purposes.</returns>
+            <example>
+                <code language="csharp"><![CDATA[
+            builder.Services
+                .AddDisCatSharpAspNetCore(
+                    configure: options => options.ApplicationVerifyKey = "<discord-verify-key>",
+                    configureOAuth: options => options.RedirectUri = "https://bot.example.com/discord/oauth/callback")
+                .AddDiscordInteractionIngressHandler<MyInteractionHandler>();
+            ]]></code>
+            </example>
+            <exception cref="T:System.ArgumentNullException"><paramref name="services" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.ServiceCollectionExtensions.AddDisCatSharpAspNetCoreSelfHost(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreSelfHostOptions},System.Action{DisCatSharp.Hosting.AspNetCore.Ingress.DiscordWebIngressOptions},System.Action{DisCatSharp.Hosting.AspNetCore.DiscordAspNetCoreIngressOptions})">
+            <summary>
+                Registers the optional self-hosted ASP.NET Core ingress infrastructure for applications that do not already own an ASP.NET Core app.
+            </summary>
+            <remarks>
+                This mode spins up a private <see cref="T:Microsoft.AspNetCore.Builder.WebApplication" /> behind the hosting abstraction and
+                bridges the ingress services from the primary dependency injection container into that internal app. Use it when you need the
+                HTTP ingress surface but do not otherwise host ASP.NET Core yourself.
+            </remarks>
+            <param name="services">The service collection to update.</param>
+            <param name="configureSelfHost">Optional configuration callback for the internal ASP.NET Core host.</param>
+            <param name="configure">Optional configuration callback for the ingress subsystem.</param>
+            <param name="configureAspNetCore">Optional configuration callback for ASP.NET Core endpoint conventions.</param>
+            <returns>The service collection for chaining purposes.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="services" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.ServiceCollectionExtensions.AddDiscordIngressSignatureValidator``1(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+                Registers a transport-agnostic ingress signature validator.
+            </summary>
+            <remarks>
+                Validators are aggregated by <see cref="T:DisCatSharp.Hosting.AspNetCore.Ingress.Security.IDiscordIngressSignatureValidationService" /> in registration order. Return
+                <see cref="M:DisCatSharp.Hosting.AspNetCore.Ingress.Security.DiscordIngressSignatureValidationResult.NotValidated(System.String)" /> when a validator does not apply to the current
+                request so later validators can still participate.
+            </remarks>
+            <typeparam name="TValidator">The validator implementation to add.</typeparam>
+            <param name="services">The service collection to update.</param>
+            <returns>The service collection for chaining purposes.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="services" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.ServiceCollectionExtensions.AddDiscordInteractionIngressHandler``1(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+                Registers a Discord HTTP interactions ingress handler.
+            </summary>
+            <remarks>
+                Handlers run in registration order until one returns a non-<see langword="null" /> response. This enables layered pipelines
+                where specialized handlers can opt out and allow later handlers to try.
+            </remarks>
+            <typeparam name="THandler">The handler implementation to add.</typeparam>
+            <param name="services">The service collection to update.</param>
+            <returns>The service collection for chaining purposes.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="services" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.ServiceCollectionExtensions.AddDiscordIncomingWebhookHandler``1(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+                Registers a generic incoming webhook ingress handler.
+            </summary>
+            <remarks>
+                Handlers run in registration order until one returns a non-<see langword="null" /> response.
+            </remarks>
+            <typeparam name="THandler">The handler implementation to add.</typeparam>
+            <param name="services">The service collection to update.</param>
+            <returns>The service collection for chaining purposes.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="services" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.ServiceCollectionExtensions.AddDiscordLinkedRolesSupport(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{DisCatSharp.Hosting.AspNetCore.LinkedRoles.DiscordLinkedRolesOptions})">
+            <summary>
+                Registers linked-roles helpers for verification URL generation, metadata synchronization, and OAuth role connection updates.
+            </summary>
+            <remarks>
+                Register a metadata provider with <see cref="M:DisCatSharp.Hosting.AspNetCore.ServiceCollectionExtensions.AddDiscordLinkedRolesMetadataProvider``1(Microsoft.Extensions.DependencyInjection.IServiceCollection)" /> when
+                you want to synchronize linked-role metadata definitions with Discord.
+            </remarks>
+            <param name="services">The service collection to update.</param>
+            <param name="configure">Optional configuration callback for linked-roles support.</param>
+            <returns>The service collection for chaining purposes.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="services" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.ServiceCollectionExtensions.AddDiscordLinkedRolesMetadataProvider``1(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+                Registers the metadata provider used by <see cref="T:DisCatSharp.Hosting.AspNetCore.LinkedRoles.DiscordLinkedRolesService" /> when synchronizing linked-roles metadata.
+            </summary>
+            <remarks>
+                Only a single provider is consumed at runtime. Register a composite implementation if metadata comes from multiple sources.
+            </remarks>
+            <typeparam name="TProvider">The metadata provider implementation to add.</typeparam>
+            <param name="services">The service collection to update.</param>
+            <returns>The service collection for chaining purposes.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="services" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressConfigurationValidator">
+            <summary>
+                Validates local ingress options against computed public URLs and optional Discord application metadata.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressConfigurationValidator.Validate(DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationContext)">
+            <summary>
+                Validates a local ASP.NET Core ingress configuration snapshot without performing network I/O.
+            </summary>
+            <param name="context">The configuration snapshot to validate.</param>
+            <returns>A report containing computed public URLs and any discovered issues.</returns>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationContext">
+            <summary>
+                Describes the local ingress configuration snapshot and optional Discord state used during validation.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationContext.PublicBaseUrl">
+            <summary>
+                Gets or sets the externally visible base URL for the ASP.NET Core app.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationContext.ExpectedRoleConnectionsVerificationUrl">
+            <summary>
+                Gets or sets the expected public role-connections verification URL when the app exposes one outside the package.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationContext.AspNetCoreOptions">
+            <summary>
+                Gets or sets the local ASP.NET Core ingress route options.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationContext.WebOptions">
+            <summary>
+                Gets or sets the local transport-agnostic ingress options.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationContext.OAuthOptions">
+            <summary>
+                Gets or sets the local OAuth callback flow options.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationContext.LinkedRolesOptions">
+            <summary>
+                Gets or sets the local linked-roles helper options.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationContext.Application">
+            <summary>
+                Gets or sets the current Discord application snapshot from the developer portal or API.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationContext.OAuthClient">
+            <summary>
+                Gets or sets the active OAuth2 client used by the host application.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationIssue">
+            <summary>
+                Represents a single ingress configuration validation finding.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationIssue.#ctor(System.String,DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationSeverity,System.String)">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationIssue" /> class.
+            </summary>
+            <param name="code">A stable code for the finding.</param>
+            <param name="severity">The issue severity.</param>
+            <param name="message">The human-readable issue message.</param>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationIssue.Code">
+            <summary>
+                Gets the stable issue code.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationIssue.Severity">
+            <summary>
+                Gets the issue severity.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationIssue.Message">
+            <summary>
+                Gets the human-readable issue message.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationReport">
+            <summary>
+                Contains the computed ingress URLs and validation findings for a configuration snapshot.
+            </summary>
+        </member>
+        <member name="M:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationReport.#ctor(DisCatSharp.Hosting.AspNetCore.Routing.DiscordIngressPublicUrls,System.Collections.Generic.IEnumerable{DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationIssue})">
+            <summary>
+                Initializes a new instance of the <see cref="T:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationReport" /> class.
+            </summary>
+            <param name="publicUrls">The computed public URLs, if the public base URL could be resolved.</param>
+            <param name="issues">The collected validation issues.</param>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationReport.PublicUrls">
+            <summary>
+                Gets the computed public URLs, if available.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationReport.Issues">
+            <summary>
+                Gets the collected validation issues.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationReport.IsValid">
+            <summary>
+                Gets a value indicating whether the configuration has no errors.
+            </summary>
+        </member>
+        <member name="P:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationReport.HasWarnings">
+            <summary>
+                Gets a value indicating whether the configuration produced any warnings.
+            </summary>
+        </member>
+        <member name="T:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationSeverity">
+            <summary>
+                Represents the severity of an ingress configuration validation issue.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationSeverity.Info">
+            <summary>
+                Informational finding.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationSeverity.Warning">
+            <summary>
+                Warning that should be reviewed before going live.
+            </summary>
+        </member>
+        <member name="F:DisCatSharp.Hosting.AspNetCore.Validation.DiscordIngressValidationSeverity.Error">
+            <summary>
+                Error that is likely to break the ingress flow.
+            </summary>
+        </member>
+    </members>
+</doc>

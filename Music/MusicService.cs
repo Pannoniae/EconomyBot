@@ -34,7 +34,7 @@ public sealed class MusicService {
         
         slsk?.Dispose();
 
-        slsk = new SoulseekClient();
+        slsk = new SoulseekClient(690);
         slsk.ConnectAsync("jazzbot", "jazzbot").GetAwaiter().GetResult();
         slsk.ExcludedSearchPhrasesReceived += (sender, args) => {
             AnsiConsole.WriteLine("Excluded search phrases: ");
