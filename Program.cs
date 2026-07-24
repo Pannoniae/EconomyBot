@@ -197,55 +197,76 @@ public class Program {
 
     private static async Task messageDeleteHandler(DiscordClient sender, MessageBulkDeleteEventArgs e) {
         foreach (var message in e.Messages) {
-            await actualMessageDeleteHandler(e.Channel, message);
+            try {
+                await actualMessageDeleteHandler(e.Channel, message);
+            }
+            catch (Exception ex) {
+                logger.error(ex);
+            }
         }
     }
 
+    private static readonly HttpClient attachmentClient = new();
+
     private static async Task actualMessageDeleteHandler(DiscordChannel channel, DiscordMessage message) {
-        if (message.Attachments.Count != 0 && message.Channel.Id != LOG) {
+        // don't react to deletions in the log channel itself.
+        // NOTE: use the channel from the event args, message.Channel is null for uncached messages!
+        if (channel.Id == LOG) {
+            return;
+        }
+
+        if (message.Attachments is { Count: > 0 }) {
             // long wait so wrap it in task.run
             _ = Task.Run(async () => {
                 var guid = Guid.NewGuid();
-                using var httpClient = new HttpClient();
                 foreach (var a in message.Attachments) {
-                    var path = "";
                     try {
-                        path = Directory.GetCurrentDirectory() + a.Filename;
+                        var path = Directory.GetCurrentDirectory() + a.Filename;
                         var ext = Path.GetExtension(path);
                         path += guid + ext;
                         //slap the correct extension on it
-                        using var response = await httpClient.GetAsync(a.Url.ToString());
+                        using var response = await attachmentClient.GetAsync(a.Url.ToString());
+                        if (response.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.Forbidden) {
+                            // CDN link already dead (ban autodelete / purge), nothing to salvage here (coh2 sounds)
+                            logger.warn($"Attachment {a.Filename} of message {message.Id} is already gone from the CDN ({(int)response.StatusCode})");
+                            continue;
+                        }
                         response.EnsureSuccessStatusCode();
-                        await using var fs = new FileStream(path, FileMode.Create);
-                        await response.Content.CopyToAsync(fs);
-                    }
-                    catch (WebException exception) {
-                        logger.warn(exception);
-                        throw;
+                        await using (var fs = new FileStream(path, FileMode.Create)) {
+                            await response.Content.CopyToAsync(fs);
+                        }
+
+                        await using var file = new FileStream(path, FileMode.Open);
+                        await (await client.GetGuildAsync(MY_GUILD)).GetChannel(LOG)!
+                            .SendMessageAsync(new DiscordMessageBuilder().AddFile(file));
                     }
                     catch (Exception e) {
+                        logger.error(e);
                         await channel.SendMessageAsync("Penis happened!");
-                        // log the fucking error
-                        await channel.SendMessageAsync(e.ToString());
+                        // log the fucking error (truncated, discord caps messages at 2000 chars)
+                        var report = e.ToString();
+                        await channel.SendMessageAsync(report.Length <= 2000 ? report : report[..2000]);
                     }
-
-                    var file = new FileStream(path, FileMode.Open);
-                    await (await client.GetGuildAsync(838843082110664756)!).GetChannel(LOG)!
-                        .SendMessageAsync(new DiscordMessageBuilder().AddFile(file));
                 }
             });
         }
 
-        if (message.Author == client.CurrentUser && message.Channel.Id != LOG) {
-            var server = await client.GetGuildAsync(838843082110664756);
+        if (message.Author == client.CurrentUser) {
             _ = Task.Run(async () => {
-                await Task.Delay(3000); // stupid discord doesnt update logs immediately
-                var logs = await server.GetAuditLogsAsync(10, actionType: AuditLogActionType.MessageDelete);
-                var deleter = logs.FirstOrDefault(log =>
-                        log is DiscordMessageAuditLogEntry entry && entry.TargetMessageId == message.Id)?
-                    .Actor?.Username ?? "unknown";
-                await server.GetChannel(LOG)!
-                    .SendMessageAsync($"{message.Content} deleted by {deleter}");
+                try {
+                    await Task.Delay(3000); // stupid discord doesnt update logs immediately
+                    var server = await client.GetGuildAsync(MY_GUILD);
+                    var logs = await server.GetAuditLogsAsync(10, actionType: AuditLogActionType.MessageDelete);
+                    var deleter = logs.FirstOrDefault(log =>
+                            log is DiscordMessageAuditLogEntry entry && entry.TargetMessageId == message.Id)?
+                        .Actor?.Username ?? "unknown";
+                    var content = string.IsNullOrEmpty(message.Content) ? "<no content>" : message.Content;
+                    await server.GetChannel(LOG)!
+                        .SendMessageAsync($"{content} deleted by {deleter}");
+                }
+                catch (Exception e) {
+                    logger.error(e);
+                }
             });
         }
     }
