@@ -35,8 +35,9 @@ whenever the bot restarts.
 
 ### Server members
 
-- **Join log.** If a server's administrators turn it on, the bot posts a message to a channel of their choice when
-  someone joins, showing the username, user ID, avatar, account creation date and the server's member count.
+- **Join/leave log.** If a server's administrators turn it on, the bot posts a message to a channel of their choice
+  when someone joins or leaves, showing the username, user ID, avatar, the server's member count, and the account
+  creation date (on joining) or the date they joined (on leaving).
 - **Join role.** If a server's administrators turn it on, new members are given a role of their choice.
 - **Role commands.** Administrators can count how many members have a role or give a role to all members. The
   member list is fetched for that command and then discarded.
@@ -49,8 +50,10 @@ The bot sees which voice channel a member is in so that music commands only work
 
 On the machine the bot runs on:
 
-- **Server configuration:** server ID, the channel IDs chosen for the join log, deletion log and ticket
+- **Server configuration:** server ID, the channel IDs chosen for the join/leave log, deletion log and ticket
   transcripts, the ticket category ID, the join role and staff role IDs, and a counter for numbering tickets.
+
+This file is encrypted at rest.
 
 Nothing else. No usernames, messages, attachments or member lists are saved outside Discord. The bot's console
 output is not kept. Unexpected errors are reported to a private channel on the operator's own Discord server; those
@@ -68,7 +71,7 @@ Data is not shared with anyone else.
 ## Retention and deletion
 
 - Server configuration is kept until an administrator changes it or it is removed on request.
-- Transcripts, join log messages and deletion log messages are ordinary Discord messages in the server they belong
+- Transcripts, join/leave log messages and deletion log messages are ordinary Discord messages in the server they belong
   to. The administrators of that server control them and can delete them at any time.
 
 To have a server's configuration removed, or to ask what the bot holds about you, use the contact above.
