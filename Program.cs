@@ -170,14 +170,8 @@ public class Program {
         while (await timer.WaitForNextTickAsync()) {
             try {
                 MemoryUtils.cleanGC();
-                foreach (var file in Directory.GetParent(Directory.GetCurrentDirectory())!.EnumerateFiles()) {
-                    file.Delete();
-                }
-
-                logger.info("Pruned cached images.");
             }
             catch (Exception e) {
-                // file is in use, ignore
                 AnsiConsole.WriteException(e);
             }
         }
@@ -186,13 +180,88 @@ public class Program {
         await Task.Delay(-1);
     }
 
+    private static bool isExpected(Exception e) => e switch {
+        NotFoundException => true, // the thing is gone (10008 unknown message, 10007 unknown member, ...)
+        UnauthorizedException => true, // not allowed to touch it
+        ServerErrorException => true, // discord being discord
+        RateLimitException => true,
+        RequestSizeException => true, // attachment too fat to re-upload
+        RestQueueFullException or RestQueueTimeoutException or RestCircuitBrokenException => true, // we're flooding
+        HttpRequestException or TaskCanceledException => true, // network/CDN
+        _ => false
+    };
+
+    /// One-liner for the log. The full stack trace of "message was already deleted" helps nobody.
+    private static string describe(Exception e) => e switch {
+        NotFoundException x => $"404 {x.JsonMessage ?? x.Message}",
+        UnauthorizedException x => $"403 {x.JsonMessage ?? x.Message}",
+        BadRequestException x => $"400 {x.JsonMessage ?? x.Message}",
+        ServerErrorException x => $"5xx {x.JsonMessage ?? x.Message}",
+        _ => $"{e.GetType().Name}: {e.Message}"
+    };
+
+    /// Fire a Discord call which is allowed to fail because the target went away. Returns whether it landed.
+    /// Use this for anything reacting to a message/member we don't control - by the time we get there, a spambot
+    /// has usually been banned and its messages purged.
+    private static async Task<bool> tryDiscord(string what, Func<Task> action) {
+        try {
+            await action();
+            return true;
+        }
+        catch (Exception e) when (isExpected(e)) {
+            logger.warn($"{what}: {describe(e)}");
+            return false;
+        }
+        catch (Exception e) {
+            await reportError(what, e);
+            return false;
+        }
+    }
+
+    /// The log channel, or null if we can't reach it (mid-reconnect, kicked, whatever).
+    private static async Task<DiscordChannel?> getLogChannel() {
+        try {
+            return (await client.GetGuildAsync(MY_GUILD)).GetChannel(LOG);
+        }
+        catch (Exception e) {
+            logger.warn($"Log channel unreachable: {describe(e)}");
+            return null;
+        }
+    }
+
+    private static async Task reportError(string what, Exception e) {
+        logger.error($"{what}:");
+        logger.error(e);
+        try {
+            var log = await getLogChannel();
+            if (log == null) {
+                return;
+            }
+
+            // discord caps messages at 2000 chars
+            var report = $"Penis happened! ({what})\n```{e}```";
+            await log.SendMessageAsync(report.Length <= 2000 ? report : report[..1997] + "```");
+        }
+        catch (Exception inner) {
+            // if we can't even report the error, give up rather than recurse into another failing send
+            logger.error($"Couldn't report the above: {describe(inner)}");
+        }
+    }
+
     private static async Task roleHandler(DiscordClient sender, GuildMemberAddEventArgs e) {
         if (e.Guild.Id != MY_GUILD) {
             return;
         }
+        if (e.Member is not { } member) {
+            return;
+        }
+
         const ulong roleID = 1352463350533197989u;
-        var role = await e.Guild.GetRoleAsync(roleID);
-        await e.Member.GrantRoleAsync(role);
+        // spambots get banned within seconds of joining, so both of these routinely 404
+        await tryDiscord($"granting the join role to {member.Id}", async () => {
+            var role = await e.Guild.GetRoleAsync(roleID);
+            await member.GrantRoleAsync(role);
+        });
     }
 
     private static async Task messageDeleteHandler(DiscordClient sender, MessageBulkDeleteEventArgs e) {
@@ -200,13 +269,25 @@ public class Program {
             try {
                 await actualMessageDeleteHandler(e.Channel, message);
             }
+            catch (Exception ex) when (isExpected(ex)) {
+                logger.warn($"Handling the bulk deletion of {message.Id}: {describe(ex)}");
+            }
             catch (Exception ex) {
-                logger.error(ex);
+                await reportError($"handling the bulk deletion of {message.Id}", ex);
             }
         }
     }
 
-    private static readonly HttpClient attachmentClient = new();
+    private static readonly HttpClient attachmentClient = new() {
+        // backstop in case the CDN lies about (or omits) Content-Length; we check that too
+        MaxResponseContentBufferSize = MAX_ARCHIVE_SIZE,
+        Timeout = TimeSpan.FromSeconds(60)
+    };
+
+    private const long MAX_ARCHIVE_SIZE = 8 * 1024 * 1024;
+
+    /// discord takes at most 10 attachments per message
+    private const int FILES_PER_MESSAGE = 10;
 
     private static async Task actualMessageDeleteHandler(DiscordChannel channel, DiscordMessage message) {
         // don't react to deletions in the log channel itself.
@@ -217,41 +298,10 @@ public class Program {
 
         if (message.Attachments is { Count: > 0 }) {
             // long wait so wrap it in task.run
-            _ = Task.Run(async () => {
-                var guid = Guid.NewGuid();
-                foreach (var a in message.Attachments) {
-                    try {
-                        var path = Directory.GetCurrentDirectory() + a.Filename;
-                        var ext = Path.GetExtension(path);
-                        path += guid + ext;
-                        //slap the correct extension on it
-                        using var response = await attachmentClient.GetAsync(a.Url.ToString());
-                        if (response.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.Forbidden) {
-                            // CDN link already dead (ban autodelete / purge), nothing to salvage here (coh2 sounds)
-                            logger.warn($"Attachment {a.Filename} of message {message.Id} is already gone from the CDN ({(int)response.StatusCode})");
-                            continue;
-                        }
-                        response.EnsureSuccessStatusCode();
-                        await using (var fs = new FileStream(path, FileMode.Create)) {
-                            await response.Content.CopyToAsync(fs);
-                        }
-
-                        await using var file = new FileStream(path, FileMode.Open);
-                        await (await client.GetGuildAsync(MY_GUILD)).GetChannel(LOG)!
-                            .SendMessageAsync(new DiscordMessageBuilder().AddFile(file));
-                    }
-                    catch (Exception e) {
-                        logger.error(e);
-                        await channel.SendMessageAsync("Penis happened!");
-                        // log the fucking error (truncated, discord caps messages at 2000 chars)
-                        var report = e.ToString();
-                        await channel.SendMessageAsync(report.Length <= 2000 ? report : report[..2000]);
-                    }
-                }
-            });
+            _ = Task.Run(() => archiveAttachments(message));
         }
 
-        if (message.Author == client.CurrentUser) {
+        if (message.Author?.Id == client.CurrentUser.Id) {
             _ = Task.Run(async () => {
                 try {
                     await Task.Delay(3000); // stupid discord doesnt update logs immediately
@@ -261,34 +311,152 @@ public class Program {
                             log is DiscordMessageAuditLogEntry entry && entry.TargetMessageId == message.Id)?
                         .Actor?.Username ?? "unknown";
                     var content = string.IsNullOrEmpty(message.Content) ? "<no content>" : message.Content;
-                    await server.GetChannel(LOG)!
-                        .SendMessageAsync($"{content} deleted by {deleter}");
+                    var log = server.GetChannel(LOG);
+                    if (log != null) {
+                        await log.SendMessageAsync($"{content} deleted by {deleter}");
+                    }
+                }
+                catch (Exception e) when (isExpected(e)) {
+                    // audit log unreadable / message vanished, nothing to report
+                    logger.warn($"Couldn't work out who deleted {message.Id}: {describe(e)}");
                 }
                 catch (Exception e) {
-                    logger.error(e);
+                    await reportError($"reporting the deletion of {message.Id}", e);
                 }
             });
         }
     }
 
+    /// Re-upload a deleted message's attachments to the log channel.
+    /// NOTE: don't round-trip through disk. The response is buffered in memory anyway, so writing it out and reopening
+    /// it only ever bought us file locks and name collisions.
+    private static async Task archiveAttachments(DiscordMessage message) {
+        var files = new Dictionary<string, Stream>();
+        try {
+            foreach (var a in message.Attachments) {
+                var data = await fetchAttachment(a, message.Id);
+                if (data == null) {
+                    continue;
+                }
+
+                // a spambot posting image.jpg five times in one message is very much a thing
+                var name = string.IsNullOrEmpty(a.Filename) ? "attachment" : a.Filename;
+                if (files.ContainsKey(name)) {
+                    name = $"{Path.GetFileNameWithoutExtension(name)}-{a.Id}{Path.GetExtension(name)}";
+                }
+
+                files[name] = data;
+            }
+
+            if (files.Count == 0) {
+                return;
+            }
+
+            var log = await getLogChannel();
+            if (log == null) {
+                return;
+            }
+
+            // batch them: one REST call per batch instead of one per file, so a ten-image dump doesn't ratelimit us
+            foreach (var batch in batchBySize(files)) {
+                await tryDiscord($"archiving attachments of {message.Id}",
+                    () => log.SendMessageAsync(new DiscordMessageBuilder().AddFiles(batch)));
+            }
+        }
+        catch (Exception e) {
+            await reportError($"archiving attachments of {message.Id}", e);
+        }
+        finally {
+            foreach (var s in files.Values) {
+                await s.DisposeAsync();
+            }
+        }
+    }
+
+    /// Pack files into messages bounded by both count and total size, so we never hand discord a payload it rejects.
+    private static IEnumerable<Dictionary<string, Stream>> batchBySize(Dictionary<string, Stream> files) {
+        var batch = new Dictionary<string, Stream>();
+        long size = 0;
+        foreach (var (name, stream) in files) {
+            if (batch.Count > 0 && (batch.Count >= FILES_PER_MESSAGE || size + stream.Length > MAX_ARCHIVE_SIZE)) {
+                yield return batch;
+                batch = new Dictionary<string, Stream>();
+                size = 0;
+            }
+
+            batch[name] = stream;
+            size += stream.Length;
+        }
+
+        if (batch.Count > 0) {
+            yield return batch;
+        }
+    }
+
+    /// Pull an attachment off the CDN. Returns null if it's gone, too big, or the CDN told us to get lost.
+    private static async Task<Stream?> fetchAttachment(DiscordAttachment a, ulong messageId) {
+        try {
+            using var response = await attachmentClient.GetAsync(a.Url.ToString());
+            if (!response.IsSuccessStatusCode) {
+                // CDN link already dead (ban autodelete / purge), nothing to salvage here (coh2 sounds)
+                logger.warn(
+                    $"Attachment {a.Filename} of message {messageId} is unavailable ({(int)response.StatusCode})");
+                return null;
+            }
+
+            var size = response.Content.Headers.ContentLength;
+            if (size > MAX_ARCHIVE_SIZE) {
+                logger.warn($"Attachment {a.Filename} of message {messageId} is {size} bytes, too big to re-upload");
+                return null;
+            }
+
+            return new MemoryStream(await response.Content.ReadAsByteArrayAsync(), false);
+        }
+        catch (Exception e) when (isExpected(e)) {
+            logger.warn($"Couldn't fetch attachment {a.Filename} of message {messageId}: {describe(e)}");
+            return null;
+        }
+    }
+
     private static async Task messageDeleteHandler(DiscordClient sender, MessageDeleteEventArgs e) {
-        await actualMessageDeleteHandler(e.Channel, e.Message);
+        try {
+            await actualMessageDeleteHandler(e.Channel, e.Message);
+        }
+        catch (Exception ex) {
+            await reportError($"handling the deletion of {e.Message?.Id}", ex);
+        }
     }
 
     private static async Task messageHandler(DiscordClient client, MessageCreateEventArgs e) {
+        try {
+            await actualMessageHandler(client, e);
+        }
+        catch (Exception ex) when (isExpected(ex)) {
+            logger.warn($"Handling message {e.Message?.Id}: {describe(ex)}");
+        }
+        catch (Exception ex) {
+            await reportError($"handling message {e.Message?.Id}", ex);
+        }
+    }
+
+    private static async Task actualMessageHandler(DiscordClient client, MessageCreateEventArgs e) {
         if (!hasSetup) {
             return;
         }
 
         // gore protection
-        if (e.Author is DiscordMember m && (e.Message.Content.Contains("Screenshot_20230901_160903") ||
-            e.Message.Attachments.Any(f => f.Url.ToString()!.Contains("Screenshot_20230901_160903")))) {
-            await e.Guild.BanMemberAsync(m, 6);
+        if (e.Author is DiscordMember m && e.Guild is { } goreGuild &&
+            (e.Message.Content.Contains("Screenshot_20230901_160903") ||
+             e.Message.Attachments.Any(f => f.Url.ToString()!.Contains("Screenshot_20230901_160903")))) {
+            // if the ban lands, the message is gone with it - don't carry on poking at it
+            if (await tryDiscord($"banning {m.Id} for gore", () => goreGuild.BanMemberAsync(m, 6))) {
+                return;
+            }
         }
 
         // @everyone protection (only on our server)
         if (e.Guild?.Id == MY_GUILD && (e.Message.Content.Contains("@everyone") || e.Message.Content.Contains("@here"))) {
-            await e.Message.RespondAsync("This server - and the world in general - would be better without your existence " + DiscordEmoji.FromName(client, ":pleading_face:"));
+            await tryDiscord("replying to an @everyone", () => e.Message.RespondAsync("This server - and the world in general - would be better without your existence " + DiscordEmoji.FromName(client, ":pleading_face:")));
         }
 
         if (client.CurrentUser.Id == e.Author.Id) {
@@ -334,8 +502,8 @@ public class Program {
                                  e.Message.Content.Contains("hastebin", StringComparison.OrdinalIgnoreCase) ||
                                  e.Message.Content.Contains("gist.github", StringComparison.OrdinalIgnoreCase);
                 if (!hasAttachment && !hasLogLink) {
-                    await e.Message.RespondAsync(
-                        "I'm not a mind-reader: can you please provide a crashlog (found in /reports), the system.log.txt and a detailed explanation of the crash's occurrence?");
+                    await tryDiscord("nagging about a crashlog", () => e.Message.RespondAsync(
+                        "I'm not a mind-reader: can you please provide a crashlog (found in /reports), the system.log.txt and a detailed explanation of the crash's occurrence?"));
                 }
             }
         }
@@ -371,7 +539,8 @@ public class Program {
         if ((e.Channel.Id != POLISH_CHANNEL && e.Channel.Id != ZOO && e.Channel.Id != HUNGARY_CHANNEL) && lizardry.Any(
                 word =>
                     e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase))) {
-            await e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":lizard:"));
+            await tryDiscord("reacting with a lizard",
+                () => e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":lizard:")));
         }
 
         var cute = new List<string> {
@@ -383,41 +552,51 @@ public class Program {
         // Hoholness
 
         var hohol = "hohol";
-        if (e.Message.Content.Contains(hohol, StringComparison.OrdinalIgnoreCase)) {
-            await ((DiscordMember)e.Author).TimeoutAsync(DateTimeOffset.Now + TimeSpan.FromHours(1), "russian simp");
+        // NOTE: the author isn't necessarily a member (webhooks, users who already left), so no hard cast
+        if (e.Message.Content.Contains(hohol, StringComparison.OrdinalIgnoreCase) && e.Author is DiscordMember hoholer) {
+            await tryDiscord($"timing out {hoholer.Id}",
+                () => hoholer.TimeoutAsync(DateTimeOffset.Now + TimeSpan.FromHours(1), "russian simp"));
         }
 
         // Lizardry
         if (cute.Any(word =>
                 e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase))) {
-            await e.Message.RespondAsync("You are a meanie >.<");
+            await tryDiscord("calling someone a meanie", () => e.Message.RespondAsync("You are a meanie >.<"));
         }
 
         // Spam detection
 
         // base64 decode
         var word = new string(Encoding.UTF8.GetString(Convert.FromBase64String("bWZiem9iZQ==")).Select(c => char.IsLetter(c) ? (char)(c + (char.ToLower(c) < 'n' ? 13 : -13)) : c).ToArray());
-        if (e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase)) {
-            await e.Message.DeleteAsync();
-        }
         var word1 = new string(Encoding.UTF8.GetString(Convert.FromBase64String("Y2V2Zm1hbG54")).Select(c => char.IsLetter(c) ? (char)(c + (char.ToLower(c) < 'n' ? 13 : -13)) : c).ToArray());
-        if (e.Message.Content.Contains(word1, StringComparison.OrdinalIgnoreCase)) {
-            await e.Message.DeleteAsync();
+        if (e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase) ||
+            e.Message.Content.Contains(word1, StringComparison.OrdinalIgnoreCase)) {
+            // routinely 404s: automod or a ban wave usually got there first
+            await tryDiscord($"deleting spam message {e.Message.Id}", () => e.Message.DeleteAsync());
+            // it's spam and it's gone - everything below would just be poking at a dead message
+            return;
         }
 
         // Ukrainian language promotion handler, don't trigger if it's a quote
         if (e.Channel.Id == UKRAYINSKIJ_KANAL && !e.Message.Content.Contains('"') && e.Message.Content.Length > 10) {
-            var results = await languageClient.DetectAsync(e.Message.Content);
-            bool isRussian = results.Any(r => r.language == "ru" && r.score > 1);
-            bool isNotUkrainian = results.All(r => r.language != "uk");
-            logger.info($"Language analysis:");
-            foreach (var result in results) {
-                logger.info($"    {result.language}, {result.score}");
-                
-            }
+            // third-party API, it falls over on its own schedule and that's not our problem
+            try {
+                var results = await languageClient.DetectAsync(e.Message.Content);
+                bool isRussian = results.Any(r => r.language == "ru" && r.score > 1);
+                bool isNotUkrainian = results.All(r => r.language != "uk");
+                logger.info($"Language analysis:");
+                foreach (var result in results) {
+                    logger.info($"    {result.language}, {result.score}");
 
-            if (isRussian && isNotUkrainian) {
-                await e.Message.RespondAsync("москальська свиня");
+                }
+
+                if (isRussian && isNotUkrainian) {
+                    await tryDiscord("calling someone a москаль",
+                        () => e.Message.RespondAsync("москальська свиня"));
+                }
+            }
+            catch (Exception ex) {
+                logger.warn($"Language detection failed: {describe(ex)}");
             }
         }
 
@@ -429,7 +608,8 @@ public class Program {
         }
 
         if (e.Author.Id == 947229156448538634) {
-            await e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":pinkpill:"));
+            await tryDiscord("reacting with a pinkpill",
+                () => e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":pinkpill:")));
         }
 
         var meowList = new List<string> {
