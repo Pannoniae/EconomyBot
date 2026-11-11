@@ -49,12 +49,6 @@ public class MusicModuleSlash : ApplicationCommandsModule {
     [SlashCommand("live", "Live music! :3")]
     public Task live(InteractionContext ctx) => music(ctx, m => m.live());
 
-    [SlashCommand("analyse", "Analyses the frequency of artists.")]
-    public Task analyse(InteractionContext ctx) => music(ctx, m => m.analyse());
-
-    [SlashCommand("rl", "Reloads music data.")]
-    public Task reload(InteractionContext ctx) => music(ctx, m => m.reload());
-
     [SlashCommand("stopjazz", "Stops jazz.")]
     public Task stopJazz(InteractionContext ctx) => music(ctx, m => m.stopJazz());
 
@@ -68,20 +62,6 @@ public class MusicModuleSlash : ApplicationCommandsModule {
                 ? m.play(uri)
                 : m.play(query), front: front);
 
-    [SlashCommand("soulseek", "Searches Soulseek and plays what you pick.")]
-    public Task soulseek(InteractionContext ctx,
-        [Option("query", "What to search for.")]
-        string query,
-        [Option("front", FRONT)] bool front = false) => music(ctx, m => m.soulseek(query), front: front);
-
-    [SlashCommand("soulseekuser", "Searches one Soulseek user's files and plays what you pick.")]
-    public Task soulseekUser(InteractionContext ctx,
-        [Option("user", "The user to search.")]
-        string user,
-        [Option("query", "What to search for.")]
-        string query,
-        [Option("front", FRONT)] bool front = false) => music(ctx, m => m.soulseekUser(user, query), front: front);
-
     [SlashCommand("artist", "Plays tracks from an artist.")]
     public Task artist(InteractionContext ctx, [Option("artist", "Who to play.")] string artist) =>
         music(ctx, m => m.artist(artist));
@@ -94,9 +74,6 @@ public class MusicModuleSlash : ApplicationCommandsModule {
 
     [SlashCommand("repeat", "Toggles repeat of the queue.")]
     public Task repeat(InteractionContext ctx) => music(ctx, m => m.repeat());
-
-    [SlashCommand("earrape", "Toggles annoying users.")]
-    public Task earrape(InteractionContext ctx) => music(ctx, m => m.earrape());
 
     [SlashCommand("clear", "Clears the queue.")]
     public Task clear(InteractionContext ctx) => music(ctx, m => m.clear());

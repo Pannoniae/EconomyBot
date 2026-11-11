@@ -74,32 +74,4 @@ public class ChatModuleSlash : ApplicationCommandsModule {
     public Task roll(InteractionContext ctx,
         [Option("sides", "How many sides the die has."), MinimumValue(1)]
         long sides = 6) => Run.slash(ctx, c => ChatCommands.roll(c, (int)Math.Min(sides, int.MaxValue - 1)));
-
-    [SlashCommand("webhook", "Says something through the channel's webhook.")]
-    public Task webhook(InteractionContext ctx, [Option("message", "What to say.")] string message) =>
-        Run.slash(ctx, c => ChatCommands.webhook(c, message), true);
-
-    [SlashCommand("user", "Says something through the channel's webhook, as you.")]
-    public Task userWebhook(InteractionContext ctx, [Option("message", "What to say.")] string message) =>
-        Run.slash(ctx, c => ChatCommands.userWebhook(c, message), true);
-
-    [SlashCommand("squish", "Squish someone!")]
-    public Task squish(InteractionContext ctx, [Option("member", "Who gets squished.")] DiscordUser member) =>
-        Run.slash(ctx, async c => {
-            if (member is not DiscordMember m) {
-                await c.respond("They aren't on this server.");
-                return;
-            }
-
-            await ChatCommands.squish(c, m);
-        }, true);
-
-    [SlashCommand("0x", "0x appreciation.")]
-    public Task love0x(InteractionContext ctx) => Run.slash(ctx, ChatCommands.love0x);
-
-    [SlashCommand("panno", "Panno appreciation.")]
-    public Task lovepanno(InteractionContext ctx) => Run.slash(ctx, ChatCommands.lovepanno);
-
-    [SlashCommand("gc", "Clears the bot's memory.")]
-    public Task gc(InteractionContext ctx) => Run.slash(ctx, ChatCommands.gc, true);
 }

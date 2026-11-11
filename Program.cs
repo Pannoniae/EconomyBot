@@ -115,6 +115,7 @@ public class Program {
             slashCommands.RegisterGlobalCommands<ChatModuleSlash>();
             slashCommands.RegisterGlobalCommands<MusicModuleSlash>();
             slashCommands.RegisterGlobalCommands<ImagesModuleSlash>();
+            slashCommands.RegisterGuildCommands<HomeModuleSlash>(MY_GUILD);
             commands.CommandErrored += errorHandler;
             commands.RegisterCommands<ChatModule>();
             commands.RegisterCommands<MusicModule>();
