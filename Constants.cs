@@ -17,7 +17,6 @@ public static class Constants {
     public static string? redditappid;
     public static string? redditrefreshtoken;
     public static string? redditappsecret;
-    public static string? apikey;
     public static string? spotifytoken;
     public static string? spotifytoken2;
 
@@ -35,11 +34,6 @@ public static class Constants {
         token = json["token"]?.Value<string>();
         if (token is null) {
             logger.warn("Discord API token not found.");
-        }
-        // youtube search
-        apikey = json["google"]?.Value<string>();
-        if (apikey is null) {
-            logger.warn("Google API key not found.");
         }
         (spotifytoken, spotifytoken2) = (json["spotify1"]?.Value<string>(), json["spotify2"]?.Value<string>());
         if (spotifytoken is null || spotifytoken2 is null) {

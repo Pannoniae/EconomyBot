@@ -35,6 +35,25 @@ public class ChatModuleSlash : ApplicationCommandsModule {
         c => off ? ChatCommands.joinLogOff(c) :
             channel is null ? ChatCommands.joinLogShow(c) : ChatCommands.joinLogSet(c, channel), true);
 
+    [SlashCommand("deletelog", "Shows or sets where deleted attachments and purged messages get logged.",
+        (long)Permissions.ManageGuild)]
+    public Task deleteLog(InteractionContext ctx,
+        [Option("channel", "Channel to log deletions in."), ChannelTypes(ChannelType.Text, ChannelType.News)]
+        DiscordChannel? channel = null,
+        [Option("off", "Turn the deletion log off.")]
+        bool off = false) => Run.slash(ctx,
+        c => off ? ChatCommands.deleteLogOff(c) :
+            channel is null ? ChatCommands.deleteLogShow(c) : ChatCommands.deleteLogSet(c, channel), true);
+
+    [SlashCommand("joinrole", "Shows or sets the role new members get.", (long)Permissions.ManageGuild)]
+    public Task joinRole(InteractionContext ctx,
+        [Option("role", "Role to give to new members.")]
+        DiscordRole? role = null,
+        [Option("off", "Stop giving new members a role.")]
+        bool off = false) => Run.slash(ctx,
+        c => off ? ChatCommands.joinRoleOff(c) :
+            role is null ? ChatCommands.joinRoleShow(c) : ChatCommands.joinRoleSet(c, role), true);
+
     [SlashCommand("ticketsetup", "Sets up ticketing for this server.", (long)Permissions.ManageGuild)]
     public Task ticketSetup(InteractionContext ctx,
         [Option("category", "Category the ticket channels get created in."), ChannelTypes(ChannelType.Category)]

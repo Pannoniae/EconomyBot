@@ -244,15 +244,16 @@ public class Program {
         }
     }
 
+    /// Give new members the server's join role, if it has one configured (.joinrole).
     private static async Task roleHandler(DiscordClient sender, GuildMemberAddEventArgs e) {
-        if (e.Guild.Id != MY_GUILD) {
-            return;
-        }
         if (e.Member is not { } member) {
             return;
         }
 
-        const ulong roleID = 1352463350533197989u;
+        if (GuildSettingsStore.read(e.Guild.Id, s => s.joinRole) is not { } roleID) {
+            return;
+        }
+
         // spambots get banned within seconds of joining, so both of these routinely 404
         await tryDiscord($"granting the join role to {member.Id}", async () => {
             var role = await e.Guild.GetRoleAsync(roleID);
@@ -313,31 +314,38 @@ public class Program {
     internal const int FILES_PER_MESSAGE = 10;
 
     private static async Task actualMessageDeleteHandler(DiscordChannel channel, DiscordMessage message) {
+        // only for servers which asked for a deletion log (.deletelog), and it stays inside that server
+        if (channel.Guild is not { } server ||
+            GuildSettingsStore.read(server.Id, s => s.deleteLogChannel) is not { } logId) {
+            return;
+        }
+
         // don't react to deletions in the log channel itself.
         // NOTE: use the channel from the event args, message.Channel is null for uncached messages!
-        if (channel.Id == LOG) {
+        if (channel.Id == logId) {
+            return;
+        }
+
+        if (server.GetChannel(logId) is not { } log) {
+            logger.warn($"Deletion log channel {logId} of {server.Id} is gone, not logging the deletion of {message.Id}");
             return;
         }
 
         if (message.Attachments is { Count: > 0 }) {
             // long wait so wrap it in task.run
-            _ = Task.Run(() => archiveAttachments(message));
+            _ = Task.Run(() => archiveAttachments(message, log));
         }
 
         if (message.Author?.Id == client.CurrentUser.Id) {
             _ = Task.Run(async () => {
                 try {
                     await Task.Delay(3000); // stupid discord doesnt update logs immediately
-                    var server = await client.GetGuildAsync(MY_GUILD);
                     var logs = await server.GetAuditLogsAsync(10, actionType: AuditLogActionType.MessageDelete);
                     var deleter = logs.FirstOrDefault(log =>
                             log is DiscordMessageAuditLogEntry entry && entry.TargetMessageId == message.Id)?
                         .Actor?.Username ?? "unknown";
                     var content = string.IsNullOrEmpty(message.Content) ? "<no content>" : message.Content;
-                    var log = server.GetChannel(LOG);
-                    if (log != null) {
-                        await log.SendMessageAsync($"{content} deleted by {deleter}");
-                    }
+                    await log.SendMessageAsync($"{content} deleted by {deleter}");
                 }
                 catch (Exception e) when (isExpected(e)) {
                     // audit log unreadable / message vanished, nothing to report
@@ -350,10 +358,10 @@ public class Program {
         }
     }
 
-    /// Re-upload a deleted message's attachments to the log channel.
+    /// Re-upload a deleted message's attachments to its server's deletion log.
     /// NOTE: don't round-trip through disk. The response is buffered in memory anyway, so writing it out and reopening
     /// it only ever bought us file locks and name collisions.
-    private static async Task archiveAttachments(DiscordMessage message) {
+    private static async Task archiveAttachments(DiscordMessage message, DiscordChannel log) {
         var files = new Dictionary<string, Stream>();
         try {
             foreach (var a in message.Attachments) {
@@ -372,11 +380,6 @@ public class Program {
             }
 
             if (files.Count == 0) {
-                return;
-            }
-
-            var log = await getLogChannel();
-            if (log == null) {
                 return;
             }
 

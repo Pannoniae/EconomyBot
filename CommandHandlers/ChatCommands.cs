@@ -32,9 +32,9 @@ public static class ChatCommands {
             messages = await c.channel.GetMessagesAsync(amt);
         }
 
-        // NOTE: the log channel is ours, so other servers' purges don't get copied anywhere
-        if (c.guild.Id == Program.MY_GUILD && c.channel.Id != Program.LOG &&
-            c.guild.GetChannel(Program.LOG) is { } log) {
+        // purged messages go to this server's own deletion log, if it has one
+        if (GuildSettingsStore.read(c.guild.Id, s => s.deleteLogChannel) is { } logId && c.channel.Id != logId &&
+            c.guild.GetChannel(logId) is { } log) {
             var message = string.Join("\n",
                 messages.Select(m => $"{m.Timestamp} {m.Author.Username}#{m.Author.Discriminator}: {m.Content}")
                     .Reverse());
@@ -110,6 +110,88 @@ public static class ChatCommands {
         var current = GuildSettingsStore.read(c.guild.Id, s => s.joinLogChannel);
         var state = current is { } id ? $"Join log currently goes to <#{id}>." : "Join log is off.";
         await c.respond($"{state} Usage: `{c.prefix}joinlog #channel` to set it, `off` to turn it off.");
+    }
+
+    /// <summary>
+    /// Sets the channel deleted attachments and purged messages get reposted to.
+    /// </summary>
+    public static async Task deleteLogSet(Cmd c, DiscordChannel channel) {
+        if (!await c.require(Permissions.ManageGuild)) {
+            return;
+        }
+
+        if (channel.GuildId != c.guild.Id || channel.Type is not (ChannelType.Text or ChannelType.News)) {
+            await c.respond("That has to be a text channel on this server.");
+            return;
+        }
+
+        const Permissions needed = Permissions.AccessChannels | Permissions.SendMessages | Permissions.AttachFiles;
+        if (!channel.PermissionsFor(c.guild.CurrentMember!).HasPermission(needed)) {
+            await c.respond($"I can't post files in {channel.Mention}, fix my permissions there first.");
+            return;
+        }
+
+        GuildSettingsStore.update(c.guild.Id, s => s.deleteLogChannel = channel.Id);
+        await c.respond($"Deletion log set to {channel.Mention}. Keep that channel moderator-only.");
+    }
+
+    public static async Task deleteLogOff(Cmd c) {
+        if (!await c.require(Permissions.ManageGuild)) {
+            return;
+        }
+
+        GuildSettingsStore.update(c.guild.Id, s => s.deleteLogChannel = null);
+        await c.respond("Deletion log turned off.");
+    }
+
+    public static async Task deleteLogShow(Cmd c) {
+        if (!await c.require(Permissions.ManageGuild)) {
+            return;
+        }
+
+        var current = GuildSettingsStore.read(c.guild.Id, s => s.deleteLogChannel);
+        var state = current is { } id ? $"Deletion log currently goes to <#{id}>." : "Deletion log is off.";
+        await c.respond($"{state} Usage: `{c.prefix}deletelog #channel` to set it, `off` to turn it off.");
+    }
+
+    /// <summary>
+    /// Sets the role every new member gets.
+    /// </summary>
+    public static async Task joinRoleSet(Cmd c, DiscordRole role) {
+        if (!await c.require(Permissions.ManageGuild)) {
+            return;
+        }
+
+        // discord only lets us hand out roles below our own highest one
+        var me = c.guild.CurrentMember!;
+        if (!me.Permissions.HasPermission(Permissions.ManageRoles) || role.Position >= me.Hierarchy) {
+            await c.respond($"I can't give out {role.Name}: I need Manage Roles and a role above it.");
+            return;
+        }
+
+        GuildSettingsStore.update(c.guild.Id, s => s.joinRole = role.Id);
+        await c.respond($"New members now get {role.Name}.");
+    }
+
+    public static async Task joinRoleOff(Cmd c) {
+        if (!await c.require(Permissions.ManageGuild)) {
+            return;
+        }
+
+        GuildSettingsStore.update(c.guild.Id, s => s.joinRole = null);
+        await c.respond("Join role turned off.");
+    }
+
+    public static async Task joinRoleShow(Cmd c) {
+        if (!await c.require(Permissions.ManageGuild)) {
+            return;
+        }
+
+        var current = GuildSettingsStore.read(c.guild.Id, s => s.joinRole);
+        var state = current is { } id && c.guild.GetRole(id) is { } role
+            ? $"New members currently get {role.Name}."
+            : "There is no join role.";
+        await c.respond($"{state} Usage: `{c.prefix}joinrole @role` to set it, `off` to turn it off.");
     }
 
     /// <summary>

@@ -29,6 +29,26 @@ public class ChatModule : BaseCommandModule {
             ? ChatCommands.joinLogOff(c)
             : ChatCommands.joinLogShow(c));
 
+    [Command("deletelog"), Priority(1)]
+    public Task deleteLog(CommandContext ctx, DiscordChannel channel) =>
+        Run.prefix(ctx, c => ChatCommands.deleteLogSet(c, channel));
+
+    [Command("deletelog")]
+    public Task deleteLog(CommandContext ctx, [RemainingText] string? arg = null) => Run.prefix(ctx,
+        c => string.Equals(arg?.Trim(), "off", StringComparison.OrdinalIgnoreCase)
+            ? ChatCommands.deleteLogOff(c)
+            : ChatCommands.deleteLogShow(c));
+
+    [Command("joinrole"), Priority(1)]
+    public Task joinRole(CommandContext ctx, DiscordRole role) =>
+        Run.prefix(ctx, c => ChatCommands.joinRoleSet(c, role));
+
+    [Command("joinrole")]
+    public Task joinRole(CommandContext ctx, [RemainingText] string? arg = null) => Run.prefix(ctx,
+        c => string.Equals(arg?.Trim(), "off", StringComparison.OrdinalIgnoreCase)
+            ? ChatCommands.joinRoleOff(c)
+            : ChatCommands.joinRoleShow(c));
+
     /// <summary>
     /// The category has to be given by ID, there's no way to mention one.
     /// </summary>

@@ -8,6 +8,12 @@ public class GuildSettings {
     /// Channel the "User joined" embeds go to, null if the join log is off.
     public ulong? joinLogChannel;
 
+    /// Role every new member gets, null if there isn't one.
+    public ulong? joinRole;
+
+    /// Channel deleted messages' attachments (and purged messages) get reposted to, null if the deletion log is off.
+    public ulong? deleteLogChannel;
+
     /// Ticketing setup, null if the server hasn't run .ticketsetup.
     public TicketConfig? tickets;
 
@@ -32,19 +38,24 @@ public static class GuildSettingsStore {
 
     public static void load() {
         lock (sync) {
-            if (!File.Exists(FILE)) {
-                return;
+            if (File.Exists(FILE)) {
+                try {
+                    settings = JsonConvert.DeserializeObject<Dictionary<ulong, GuildSettings>>(File.ReadAllText(FILE)) ?? new();
+                    logger.info($"Loaded settings for {settings.Count} servers.");
+                }
+                catch (Exception e) {
+                    // don't let the next save flatten a file somebody might want to fix by hand
+                    var broken = $"{FILE}.broken";
+                    File.Move(FILE, broken, true);
+                    logger.error($"{FILE} is unreadable, moved it to {broken} and starting empty: {e.Message}");
+                }
             }
 
-            try {
-                settings = JsonConvert.DeserializeObject<Dictionary<ulong, GuildSettings>>(File.ReadAllText(FILE)) ?? new();
-                logger.info($"Loaded settings for {settings.Count} servers.");
-            }
-            catch (Exception e) {
-                // don't let the next save flatten a file somebody might want to fix by hand
-                var broken = $"{FILE}.broken";
-                File.Move(FILE, broken, true);
-                logger.error($"{FILE} is unreadable, moved it to {broken} and starting empty: {e.Message}");
+            if (!settings.ContainsKey(Program.MY_GUILD)) {
+                settings[Program.MY_GUILD] = new GuildSettings {
+                    deleteLogChannel = Program.LOG,
+                    joinRole = 1352463350533197989
+                };
             }
         }
     }
