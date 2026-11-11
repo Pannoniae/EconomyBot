@@ -25,9 +25,8 @@ The bot reads messages in servers it is in for these purposes:
 - **Ticket transcripts.** When a ticket is closed, the bot reads the messages in that ticket channel once and posts
   them as a text file, together with the ticket's attachments, to the transcript channel the server's administrators
   chose. The transcript stays on Discord, in that server.
-- **Deletion log.** If a server's administrators turn it on, when a message is deleted the bot reposts its
-  attachments to the log channel they chose, and messages removed in bulk with the purge command are copied there
-  as text. This is on Discord, in the same server.
+- **Deletion log.** If a server's administrators turn it on, when a message is deleted the bot reposts its text
+  and attachments to the log channel they chose. This is on Discord, in the same server.
 - **Spam and abuse filters.** Messages are checked against a short list of known spam and abuse patterns. Matching
   messages are removed, and in the worst case the poster is banned.
 

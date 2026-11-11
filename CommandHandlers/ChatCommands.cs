@@ -8,11 +8,6 @@ namespace EconomyBot;
 public static class ChatCommands {
     public const ulong ZEROX = 1091089609234059316;
 
-    private static IEnumerable<string> ChunksUpTo(string str, int maxChunkSize) {
-        for (int i = 0; i < str.Length; i += maxChunkSize)
-            yield return str.Substring(i, Math.Min(maxChunkSize, str.Length - i));
-    }
-
     /// <summary>
     /// It got abused, so it's manage messages-only.
     /// </summary>
@@ -32,15 +27,14 @@ public static class ChatCommands {
             messages = await c.channel.GetMessagesAsync(amt);
         }
 
-        // purged messages go to this server's own deletion log, if it has one
-        if (GuildSettingsStore.read(c.guild.Id, s => s.deleteLogChannel) is { } logId && c.channel.Id != logId &&
-            c.guild.GetChannel(logId) is { } log) {
-            var message = string.Join("\n",
-                messages.Select(m => $"{m.Timestamp} {m.Author.Username}#{m.Author.Discriminator}: {m.Content}")
-                    .Reverse());
-            foreach (var msg in ChunksUpTo(message, 1984)) {
-                await log.SendMessageAsync(msg);
+        // purged messages go to this server's own deletion log, if it has one. We log them here, with the contents
+        // we just fetched, because the deletion events only know what happened to be in the cache
+        if (Program.deleteLogFor(c.channel) is { } log) {
+            foreach (var m in messages) {
+                Program.purged[m.Id] = 0;
             }
+
+            await Program.logDeletedText(log, c.channel, messages, true);
         }
 
         await c.channel.DeleteMessagesAsync(messages);

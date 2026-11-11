@@ -288,10 +288,87 @@ public class Program {
         await tryDiscord($"logging the join of {member.Id}", () => channel.SendMessageAsync(embed.Build()));
     }
 
+    /// Where deletions in this channel get logged, or null if its server has no deletion log (.deletelog) or this
+    /// channel is the log itself. The log always lives in the same server as the deleted message.
+    /// NOTE: use the channel from the event args, message.Channel is null for uncached messages!
+    internal static DiscordChannel? deleteLogFor(DiscordChannel channel) {
+        if (channel.Guild is not { } server ||
+            GuildSettingsStore.read(server.Id, s => s.deleteLogChannel) is not { } logId || channel.Id == logId) {
+            return null;
+        }
+
+        if (server.GetChannel(logId) is not { } log) {
+            logger.warn($"Deletion log channel {logId} of {server.Id} is gone, not logging deletions in {channel.Id}");
+            return null;
+        }
+
+        return log;
+    }
+
+    /// Messages .purge is deleting right now. The command logs those itself, with contents it fetched fresh, so the
+    /// deletion events for them must not log the text a second time.
+    internal static readonly System.Collections.Concurrent.ConcurrentDictionary<ulong, byte> purged = new();
+
+    /// discord caps an embed description at 4096 chars
+    private const int EMBED_LIMIT = 4000;
+
+    /// Post what the deleted messages said to the deletion log. Goes into embeds, so nothing in the text can ping.
+    /// Messages we know nothing about (deleted before we ever saw them, so not in the cache) are skipped.
+    internal static async Task logDeletedText(DiscordChannel log, DiscordChannel source,
+        IEnumerable<DiscordMessage> messages, bool includeOwn = false) {
+        var self = client.CurrentUser.Id;
+        var entries = messages
+            .Where(m => m.Author is not null && (includeOwn || m.Author.Id != self) &&
+                        (!string.IsNullOrEmpty(m.Content) || m.Attachments is { Count: > 0 }))
+            .OrderBy(m => m.Id)
+            .Select(m => {
+                var text = string.IsNullOrEmpty(m.Content) ? "*no text*" : m.Content;
+                var files = m.Attachments is { Count: > 0 } a ? $"\n*{a.Count} attachment(s)*" : "";
+                var entry =
+                    $"**{m.Author.Username}** (`{m.Author.Id}`) <t:{m.Timestamp.ToUnixTimeSeconds()}:f>\n{text}{files}";
+                return entry.Length <= EMBED_LIMIT - 200 ? entry : entry[..(EMBED_LIMIT - 203)] + "...";
+            })
+            .ToList();
+        if (entries.Count == 0) {
+            return;
+        }
+
+        var title = entries.Count == 1 ? "Message deleted" : $"{entries.Count} messages deleted";
+        var page = new StringBuilder($"In {source.Mention}");
+
+        async Task flush() {
+            await log.SendMessageAsync(new DiscordEmbedBuilder()
+                .WithTitle(title)
+                .WithColor(DiscordColor.Red)
+                .WithDescription(page.ToString())
+                .WithTimestamp(DateTimeOffset.UtcNow)
+                .Build());
+            page.Clear();
+        }
+
+        foreach (var entry in entries) {
+            if (page.Length + entry.Length + 2 > EMBED_LIMIT) {
+                await flush();
+            }
+
+            page.Append(page.Length == 0 ? "" : "\n\n").Append(entry);
+        }
+
+        await flush();
+    }
+
     private static async Task messageDeleteHandler(DiscordClient sender, MessageBulkDeleteEventArgs e) {
+        if (deleteLogFor(e.Channel) is not { } log) {
+            return;
+        }
+
+        // one entry for the whole lot, not a message per message
+        var unlogged = e.Messages.Where(m => !purged.TryRemove(m.Id, out _)).ToList();
+        await tryDiscord($"logging a bulk deletion in {e.Channel.Id}", () => logDeletedText(log, e.Channel, unlogged));
+
         foreach (var message in e.Messages) {
             try {
-                await actualMessageDeleteHandler(e.Channel, message);
+                actualMessageDeleteHandler(message, log);
             }
             catch (Exception ex) when (isExpected(ex)) {
                 logger.warn($"Handling the bulk deletion of {message.Id}: {describe(ex)}");
@@ -313,23 +390,10 @@ public class Program {
     /// discord takes at most 10 attachments per message
     internal const int FILES_PER_MESSAGE = 10;
 
-    private static async Task actualMessageDeleteHandler(DiscordChannel channel, DiscordMessage message) {
-        // only for servers which asked for a deletion log (.deletelog), and it stays inside that server
-        if (channel.Guild is not { } server ||
-            GuildSettingsStore.read(server.Id, s => s.deleteLogChannel) is not { } logId) {
-            return;
-        }
-
-        // don't react to deletions in the log channel itself.
-        // NOTE: use the channel from the event args, message.Channel is null for uncached messages!
-        if (channel.Id == logId) {
-            return;
-        }
-
-        if (server.GetChannel(logId) is not { } log) {
-            logger.warn($"Deletion log channel {logId} of {server.Id} is gone, not logging the deletion of {message.Id}");
-            return;
-        }
+    /// The slow parts of logging one deleted message: re-uploading its attachments, and for our own messages
+    /// finding out who deleted them. Both run in the background.
+    private static void actualMessageDeleteHandler(DiscordMessage message, DiscordChannel log) {
+        var server = log.Guild!;
 
         if (message.Attachments is { Count: > 0 }) {
             // long wait so wrap it in task.run
@@ -341,8 +405,8 @@ public class Program {
                 try {
                     await Task.Delay(3000); // stupid discord doesnt update logs immediately
                     var logs = await server.GetAuditLogsAsync(10, actionType: AuditLogActionType.MessageDelete);
-                    var deleter = logs.FirstOrDefault(log =>
-                            log is DiscordMessageAuditLogEntry entry && entry.TargetMessageId == message.Id)?
+                    var deleter = logs.FirstOrDefault(l =>
+                            l is DiscordMessageAuditLogEntry entry && entry.TargetMessageId == message.Id)?
                         .Actor?.Username ?? "unknown";
                     var content = string.IsNullOrEmpty(message.Content) ? "<no content>" : message.Content;
                     await log.SendMessageAsync($"{content} deleted by {deleter}");
@@ -446,7 +510,18 @@ public class Program {
 
     private static async Task messageDeleteHandler(DiscordClient sender, MessageDeleteEventArgs e) {
         try {
-            await actualMessageDeleteHandler(e.Channel, e.Message);
+            if (deleteLogFor(e.Channel) is not { } log) {
+                return;
+            }
+
+            if (!purged.TryRemove(e.Message.Id, out _)) {
+                await logDeletedText(log, e.Channel, [e.Message]);
+            }
+
+            actualMessageDeleteHandler(e.Message, log);
+        }
+        catch (Exception ex) when (isExpected(ex)) {
+            logger.warn($"Handling the deletion of {e.Message?.Id}: {describe(ex)}");
         }
         catch (Exception ex) {
             await reportError($"handling the deletion of {e.Message?.Id}", ex);
