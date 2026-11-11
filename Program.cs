@@ -3,7 +3,6 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using DetectLanguage;
 using DisCatSharp;
 using DisCatSharp.ApplicationCommands;
 using DisCatSharp.CommandsNext;
@@ -29,10 +28,7 @@ public class Program {
     public static LavalinkSession LavalinkNode = null!;
     public static MusicService musicService = null!;
     public static ImagesModule imagesModule = null!;
-    public static ToxicityHandler toxicity = null!;
     public static WilteryHandler wiltery = null!;
-
-    public static DetectLanguageClient languageClient = null!;
 
     public static DiscordEmoji cube = null!;
 
@@ -52,10 +48,6 @@ public class Program {
 
     public const ulong LOG = 838920584879800343;
     public static ulong HALLOFFAME = 1078991955633127474;
-    public const ulong UKRAYINSKIJ_KANAL = 1153439320435335278;
-    public const ulong POLISH_CHANNEL = 1156695554462597120;
-    public const ulong ZOO = 1149817703922675823;
-    public const ulong HUNGARY_CHANNEL = 1154903997510062181;
     public const ulong MY_GUILD = 838843082110664756;
     public const ulong BUG_REPORT_CATEGORY = 1472268871791808790;
 
@@ -80,11 +72,14 @@ public class Program {
         Logger.setLogLevel(LogLevel.INFO);
 
         Constants.init();
+        GuildSettingsStore.load();
 
         var discord = new DiscordClient(new DiscordConfiguration {
             TokenType = TokenType.Bot,
             Token = Constants.token,
-            Intents = DiscordIntents.All,
+            // the two privileged ones we need: members (join role, GetAllMembersAsync) and message content
+            // (prefix commands, deletion log, spam filters). No presences.
+            Intents = DiscordIntents.AllUnprivileged | DiscordIntents.GuildMembers | DiscordIntents.MessageContent,
             ReconnectIndefinitely = true
         });
         client = discord;
@@ -106,13 +101,12 @@ public class Program {
         var commands = discord.UseCommandsNext(new CommandsNextConfiguration {
             StringPrefixes = [".", "!!"],
         });
-        //var ApplicationCommands = discord.UseApplicationCommands(new ApplicationCommandsConfiguration {
-        //    ServiceProvider = services
-        //});
+        var slashCommands = discord.UseApplicationCommands();
         try {
-            //ApplicationCommands.RegisterCommands<ChatModuleSlash>();
-            //ApplicationCommands.RegisterGlobalCommands<MusicModuleSlash>();
-            //ApplicationCommands.RegisterGlobalCommands<ImagesModuleSlash>();
+            // every text command has a slash twin and the other way around, see Cmd.cs
+            slashCommands.RegisterGlobalCommands<ChatModuleSlash>();
+            slashCommands.RegisterGlobalCommands<MusicModuleSlash>();
+            slashCommands.RegisterGlobalCommands<ImagesModuleSlash>();
             commands.CommandErrored += errorHandler;
             commands.RegisterCommands<ChatModule>();
             commands.RegisterCommands<MusicModule>();
@@ -150,6 +144,8 @@ public class Program {
         //discord.GuildDownloadCompleted += (sender, _) => setupB(sender, lavalink, lavalinkConfig);
         discord.MessageDeleted += messageDeleteHandler;
         discord.GuildMemberAdded += roleHandler;
+        discord.GuildMemberAdded += joinLogHandler;
+        discord.ComponentInteractionCreated += Tickets.onComponent;
 
         discord.GetCommandsNext().UnregisterConverter<TimeSpan>();
         discord.GetCommandsNext().RegisterConverter(new CustomTimeSpanConverter());
@@ -180,7 +176,7 @@ public class Program {
         await Task.Delay(-1);
     }
 
-    private static bool isExpected(Exception e) => e switch {
+    internal static bool isExpected(Exception e) => e switch {
         NotFoundException => true, // the thing is gone (10008 unknown message, 10007 unknown member, ...)
         UnauthorizedException => true, // not allowed to touch it
         ServerErrorException => true, // discord being discord
@@ -192,7 +188,7 @@ public class Program {
     };
 
     /// One-liner for the log. The full stack trace of "message was already deleted" helps nobody.
-    private static string describe(Exception e) => e switch {
+    internal static string describe(Exception e) => e switch {
         NotFoundException x => $"404 {x.JsonMessage ?? x.Message}",
         UnauthorizedException x => $"403 {x.JsonMessage ?? x.Message}",
         BadRequestException x => $"400 {x.JsonMessage ?? x.Message}",
@@ -203,7 +199,7 @@ public class Program {
     /// Fire a Discord call which is allowed to fail because the target went away. Returns whether it landed.
     /// Use this for anything reacting to a message/member we don't control - by the time we get there, a spambot
     /// has usually been banned and its messages purged.
-    private static async Task<bool> tryDiscord(string what, Func<Task> action) {
+    internal static async Task<bool> tryDiscord(string what, Func<Task> action) {
         try {
             await action();
             return true;
@@ -229,7 +225,7 @@ public class Program {
         }
     }
 
-    private static async Task reportError(string what, Exception e) {
+    internal static async Task reportError(string what, Exception e) {
         logger.error($"{what}:");
         logger.error(e);
         try {
@@ -264,6 +260,33 @@ public class Program {
         });
     }
 
+    /// Post a "User joined" embed to the server's join log, if it has one configured (.joinlog).
+    private static async Task joinLogHandler(DiscordClient sender, GuildMemberAddEventArgs e) {
+        if (e.Member is not { } member) {
+            return;
+        }
+
+        if (GuildSettingsStore.read(e.Guild.Id, s => s.joinLogChannel) is not { } channelId) {
+            return;
+        }
+
+        if (e.Guild.GetChannel(channelId) is not { } channel) {
+            logger.warn($"Join log channel {channelId} of {e.Guild.Id} is gone, not logging the join of {member.Id}");
+            return;
+        }
+
+        var created = member.CreationTimestamp.ToUnixTimeSeconds();
+        var embed = new DiscordEmbedBuilder()
+            .WithTitle("\U0001F6AA User joined")
+            .WithColor(DiscordColor.Green)
+            .WithDescription($"**User:** `{member.Username} ({member.Id})`\n**User count:** `{e.Guild.MemberCount}`")
+            .AddField(new DiscordEmbedField("Account created", $"<t:{created}:f> (<t:{created}:R>)"))
+            .WithThumbnail(member.AvatarUrl)
+            .WithTimestamp(DateTimeOffset.UtcNow);
+
+        await tryDiscord($"logging the join of {member.Id}", () => channel.SendMessageAsync(embed.Build()));
+    }
+
     private static async Task messageDeleteHandler(DiscordClient sender, MessageBulkDeleteEventArgs e) {
         foreach (var message in e.Messages) {
             try {
@@ -284,10 +307,10 @@ public class Program {
         Timeout = TimeSpan.FromSeconds(60)
     };
 
-    private const long MAX_ARCHIVE_SIZE = 8 * 1024 * 1024;
+    internal const long MAX_ARCHIVE_SIZE = 8 * 1024 * 1024;
 
     /// discord takes at most 10 attachments per message
-    private const int FILES_PER_MESSAGE = 10;
+    internal const int FILES_PER_MESSAGE = 10;
 
     private static async Task actualMessageDeleteHandler(DiscordChannel channel, DiscordMessage message) {
         // don't react to deletions in the log channel itself.
@@ -394,7 +417,7 @@ public class Program {
     }
 
     /// Pull an attachment off the CDN. Returns null if it's gone, too big, or the CDN told us to get lost.
-    private static async Task<Stream?> fetchAttachment(DiscordAttachment a, ulong messageId) {
+    internal static async Task<Stream?> fetchAttachment(DiscordAttachment a, ulong messageId) {
         try {
             using var response = await attachmentClient.GetAsync(a.Url.ToString());
             if (!response.IsSuccessStatusCode) {
@@ -454,30 +477,12 @@ public class Program {
             }
         }
 
-        // @everyone protection (only on our server)
-        if (e.Guild?.Id == MY_GUILD && (e.Message.Content.Contains("@everyone") || e.Message.Content.Contains("@here"))) {
-            await tryDiscord("replying to an @everyone", () => e.Message.RespondAsync("This server - and the world in general - would be better without your existence " + DiscordEmoji.FromName(client, ":pleading_face:")));
-        }
-
         if (client.CurrentUser.Id == e.Author.Id) {
             return;
         }
 
         // Don't reply to webhooks with embeds. The bot might have sent them
         if (e.Message.WebhookMessage && e.Message.Embeds.Count > 0) {
-            return;
-        }
-
-        // Wolfy wanted "/s" to everything he posts. NOW HE GOT IT
-        // but keep it separate from the wiltery shit so the rest of the stupid jokes don't leak into the wild
-        const ulong sarcasmVictim = 1279919118925041705;
-        if (false && e.Author.Id == sarcasmVictim && !e.Message.WebhookMessage
-            && e.Message.Content is { Length: > 0 } wolfyMsg
-            && !wolfyMsg.StartsWith('.') && !wolfyMsg.StartsWith('/')
-            && e.Message.Embeds.Count == 0 && e.Message.Attachments.Count == 0
-            && !wolfyMsg.Contains("@everyone") && !wolfyMsg.Contains("@here")
-            && !wolfyMsg.TrimEnd().EndsWith("/s", StringComparison.Ordinal)) {
-            await wiltery.editMessage(e.Message, wolfyMsg, $"{wolfyMsg} /s");
             return;
         }
 
@@ -508,61 +513,8 @@ public class Program {
             }
         }
 
-        // Only run funny replies/replacements on our server
+        // Only run the spam filter on our server
         if (e.Guild?.Id != MY_GUILD) return;
-
-        // conquest
-
-        var lizardry = new List<string> {
-            "ą",
-            "Ą",
-            "ć",
-            "Ć",
-            "ę",
-            "Ę",
-            "ł",
-            "Ł",
-            "ń",
-            "Ń",
-            "ó",
-            "Ó",
-            "ś",
-            "Ś",
-            "ź",
-            "Ź",
-            "Ś",
-            "ż",
-            "Ż"
-        };
-
-        // Cringe
-        if ((e.Channel.Id != POLISH_CHANNEL && e.Channel.Id != ZOO && e.Channel.Id != HUNGARY_CHANNEL) && lizardry.Any(
-                word =>
-                    e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase))) {
-            await tryDiscord("reacting with a lizard",
-                () => e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":lizard:")));
-        }
-
-        var cute = new List<string> {
-            "skull",
-            "cringe",
-            "\ud83d\udc80" // skull emoji
-        };
-
-        // Hoholness
-
-        var hohol = "hohol";
-        // NOTE: the author isn't necessarily a member (webhooks, users who already left), so no hard cast
-        if (e.Message.Content.Contains(hohol, StringComparison.OrdinalIgnoreCase) && e.Author is DiscordMember hoholer) {
-            await tryDiscord($"timing out {hoholer.Id}",
-                () => hoholer.TimeoutAsync(DateTimeOffset.Now + TimeSpan.FromHours(1), "russian simp"));
-        }
-
-        // Lizardry
-        if (cute.Any(word =>
-                e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase))) {
-            await tryDiscord("calling someone a meanie", () => e.Message.RespondAsync("You are a meanie >.<"));
-        }
 
         // Spam detection
 
@@ -573,61 +525,7 @@ public class Program {
             e.Message.Content.Contains(word1, StringComparison.OrdinalIgnoreCase)) {
             // routinely 404s: automod or a ban wave usually got there first
             await tryDiscord($"deleting spam message {e.Message.Id}", () => e.Message.DeleteAsync());
-            // it's spam and it's gone - everything below would just be poking at a dead message
-            return;
         }
-
-        // Ukrainian language promotion handler, don't trigger if it's a quote
-        if (e.Channel.Id == UKRAYINSKIJ_KANAL && !e.Message.Content.Contains('"') && e.Message.Content.Length > 10) {
-            // third-party API, it falls over on its own schedule and that's not our problem
-            try {
-                var results = await languageClient.DetectAsync(e.Message.Content);
-                bool isRussian = results.Any(r => r.language == "ru" && r.score > 1);
-                bool isNotUkrainian = results.All(r => r.language != "uk");
-                logger.info($"Language analysis:");
-                foreach (var result in results) {
-                    logger.info($"    {result.language}, {result.score}");
-
-                }
-
-                if (isRussian && isNotUkrainian) {
-                    await tryDiscord("calling someone a москаль",
-                        () => e.Message.RespondAsync("москальська свиня"));
-                }
-            }
-            catch (Exception ex) {
-                logger.warn($"Language detection failed: {describe(ex)}");
-            }
-        }
-
-        // Toxicity handler
-        if (!e.Message.Content.StartsWith('.') && !e.Message.Content.StartsWith('/') && e.Message.Embeds.Count == 0 &&
-            e.Message.Attachments.Count == 0) {
-            await toxicity.handleMessage(client, e.Message);
-            await wiltery.handleMessage(client, e.Message);
-        }
-
-        if (e.Author.Id == 947229156448538634) {
-            await tryDiscord("reacting with a pinkpill",
-                () => e.Message.CreateReactionAsync(DiscordEmoji.FromName(client, ":pinkpill:")));
-        }
-
-        var meowList = new List<string> {
-            "cat",
-            "kitty",
-            "kitten",
-            "meow",
-            "purr",
-            "feline",
-            "nya",
-            "miau"
-        };
-        // Meowing is too common
-        /*if (meowList.Any(word =>
-                e.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase) ||
-                e.Message.Attachments.Any(a => a.Url.Contains(word, StringComparison.OrdinalIgnoreCase)))) {
-            await e.Message.RespondAsync("*meow*");
-        }*/
     }
 
     private static async Task setup(DiscordClient client, LavalinkExtension lavalink,
@@ -643,9 +541,7 @@ public class Program {
         musicService = new MusicService(lavalink, LavalinkNode);
         lavalinkInit = true;
         imagesModule = new ImagesModule();
-        toxicity = new ToxicityHandler();
         wiltery = new WilteryHandler(Program.client);
-        languageClient = new DetectLanguageClient(Constants.detectlanguagetoken);
 
         cube = await (await client.GetGuildAsync(838843082110664756)).GetEmojiAsync(839202645734457384);
 

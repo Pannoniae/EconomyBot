@@ -18,12 +18,8 @@ public static class Constants {
     public static string? redditrefreshtoken;
     public static string? redditappsecret;
     public static string? apikey;
-    public static string? apikey_huggingface;
-    public static string? apikey_cloudflareAI;
-    public static string? apikey_cloudflareAIaccount;
     public static string? spotifytoken;
     public static string? spotifytoken2;
-    public static string? detectlanguagetoken;
 
     public static void init() {
 
@@ -40,13 +36,10 @@ public static class Constants {
         if (token is null) {
             logger.warn("Discord API token not found.");
         }
-        (apikey, apikey_huggingface) = (json["google"]?.Value<string>(), json["huggingface"]?.Value<string>());
-        if (apikey is null || apikey_huggingface is null) {
-            logger.warn("Google/Perspective tokens not found.");
-        }
-        (apikey_cloudflareAI, apikey_cloudflareAIaccount) = (json["cloudflareAI"]?.Value<string>(), json["cloudflareAIaccount"]?.Value<string>());
-        if (apikey_cloudflareAI is null || apikey_cloudflareAIaccount is null) {
-            logger.warn("CloudFlare AI token not found.");
+        // youtube search
+        apikey = json["google"]?.Value<string>();
+        if (apikey is null) {
+            logger.warn("Google API key not found.");
         }
         (spotifytoken, spotifytoken2) = (json["spotify1"]?.Value<string>(), json["spotify2"]?.Value<string>());
         if (spotifytoken is null || spotifytoken2 is null) {
@@ -59,10 +52,6 @@ public static class Constants {
             logger.warn("Reddit tokens not found.");
         }
 
-        detectlanguagetoken = json["detecttoken"]?.Value<string>();
-        if (detectlanguagetoken is null) {
-            logger.warn("Language detection API token not found.");
-        }
         logger.info("Constants setup!");
     }
 

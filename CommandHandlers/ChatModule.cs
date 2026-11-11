@@ -1,167 +1,66 @@
-﻿using System.Collections.Immutable;
-using DisCatSharp;
-using DisCatSharp.CommandsNext;
+﻿using DisCatSharp.CommandsNext;
 using DisCatSharp.CommandsNext.Attributes;
 using DisCatSharp.Entities;
-using DisCatSharp.Enums;
-using EconomyBot.CommandHandlers;
 
 namespace EconomyBot;
 
-[ModuleLifespan(ModuleLifespan.Singleton)]
+/// Text versions of the chat/admin commands. The commands themselves live in <see cref="ChatCommands"/>; anything
+/// added here needs its twin in <see cref="ChatModuleSlash"/>.
 public class ChatModule : BaseCommandModule {
-    public const ulong ZEROX = 1091089609234059316;
+    [Command]
+    public Task purge(CommandContext ctx, int amt) => Run.prefix(ctx, c => ChatCommands.purge(c, amt));
 
-    private MusicService? Music { get; set; }
+    [Command]
+    public Task role(CommandContext ctx, DiscordRole role) => Run.prefix(ctx, c => ChatCommands.role(c, role));
+
+    [Command]
+    public Task get(CommandContext ctx, DiscordRole role) => Run.prefix(ctx, c => ChatCommands.get(c, role));
+
+    [Command("joinlog"), Priority(1)]
+    public Task joinLog(CommandContext ctx, DiscordChannel channel) =>
+        Run.prefix(ctx, c => ChatCommands.joinLogSet(c, channel));
 
     /// <summary>
-    /// I know the name is bad, will refactor.
+    /// ".joinlog off" turns it off, ".joinlog" on its own says where it currently goes.
     /// </summary>
-    public GuildMusicData? GuildMusic { get; set; }
-
-    public override async Task BeforeExecutionAsync(CommandContext ctx) {
-        Music = Program.musicService;
-        GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild!);
-    }
-
-    static IEnumerable<string> ChunksUpTo(string str, int maxChunkSize) {
-        for (int i = 0; i < str.Length; i += maxChunkSize)
-            yield return str.Substring(i, Math.Min(maxChunkSize, str.Length - i));
-    }
+    [Command("joinlog")]
+    public Task joinLog(CommandContext ctx, [RemainingText] string? arg = null) => Run.prefix(ctx,
+        c => string.Equals(arg?.Trim(), "off", StringComparison.OrdinalIgnoreCase)
+            ? ChatCommands.joinLogOff(c)
+            : ChatCommands.joinLogShow(c));
 
     /// <summary>
-    /// Retards abused it so it's manage messages-only. Thank you.
+    /// The category has to be given by ID, there's no way to mention one.
     /// </summary>
-    /// <param name="ctx"></param>
-    /// <param name="amt">How many messages to purge.</param>
-    [Command]
-    [RequirePermissions(Permissions.ManageMessages)]
-    public async Task purge(CommandContext ctx, int amt) {
-        IReadOnlyList<DiscordMessage> messages;
-        // the library is stupid
-        if (ctx.Message.Reference != null) {
-            await Console.Out.WriteLineAsync("Purging from given message!");
-            messages = await ctx.Channel.GetMessagesBeforeAsync(ctx.Message.Reference.Message.Id, amt);
-        }
-        else {
-            messages = await ctx.Channel.GetMessagesAsync(amt);
-        }
+    [Command("ticketsetup")]
+    public Task ticketSetup(CommandContext ctx, DiscordChannel category, DiscordRole staff,
+        DiscordChannel transcripts) => Run.prefix(ctx, c => ChatCommands.ticketSetup(c, category, staff, transcripts));
 
-        if (ctx.Channel.Id != Program.LOG) {
-            var message = string.Join("\n",
-                messages.Select(m => $"{m.Timestamp} {m.Author.Username}#{m.Author.Discriminator}: {m.Content}")
-                    .Reverse());
-            var logMessages = ChunksUpTo(message, 1984);
-            foreach (var msg in logMessages) {
-                await (await ctx.Client.GetGuildAsync(838843082110664756)!).GetChannel(Program.LOG)!
-                    .SendMessageAsync(msg);
-            }
-        }
-
-        await ctx.Channel.DeleteMessagesAsync(messages);
-        await ctx.RespondAsync($"Deleted {amt} messages!");
-    }
-
-    /// <summary>
-    /// ALL users of the server
-    /// </summary>
-    [Command]
-    [RequirePermissions(Permissions.Administrator)]
-    public async Task role(CommandContext ctx, DiscordRole role) {
-        var members = await ctx.Guild!.GetAllMembersAsync();
-        foreach (var member in members) {
-            await member.GrantRoleAsync(role);
-        }
-        await ctx.RespondAsync($"{members.Count}");
-    }
+    [Command("ticketpanel")]
+    public Task ticketPanel(CommandContext ctx, [RemainingText] string? text = null) =>
+        Run.prefix(ctx, c => ChatCommands.ticketPanel(c, text));
 
     [Command]
-    public async Task get(CommandContext ctx, DiscordRole role) {
-        var totalMembers = (await ctx.Guild!.GetAllMembersAsync()).ToList();
-        var members = totalMembers.Where(member => member.Roles.Contains(role)).ToList();
-
-        await ctx.RespondAsync($"{members.Count} / {totalMembers.Count}");
-    }
+    public Task roll(CommandContext ctx) => Run.prefix(ctx, c => ChatCommands.roll(c, 6));
 
     [Command]
-    [RequirePermissions(Permissions.ManageMessages)]
-    public async Task test2(CommandContext ctx) {
-        await ChatHandler.test2(ctx.Guild!);
-    }
-
-    [Command]
-    public async Task roll(CommandContext ctx) {
-        await roll(ctx, 6);
-    }
-
-    [Command]
-    public async Task roll(CommandContext ctx, int sides) {
-        var num = new Random().Next(1, sides + 1);
-        await ctx.RespondAsync($"You rolled {num}!");
-    }
-
-    [Command]
-    public async Task save(CommandContext ctx) {
-        var names = (await ctx.Guild!.GetAllMembersAsync()).Select(member => member.ToString());
-        await File.WriteAllLinesAsync(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/names.txt",
-            names);
-    }
-
-    [Command("bishop")]
-    [RequirePermissions(Permissions.ManageMessages)]
-    public async Task saveBishop(CommandContext ctx) {
-        var messages = (await ctx.Channel.GetMessagesAsync(2000))
-            .Where(msg => msg.Author.Id == 540265036141297676)
-            .Select(msg => msg.Content);
-        await File.WriteAllLinesAsync(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/bishop.txt",
-            messages);
-    }
-
-    [Command("postbishop")]
-    [RequirePermissions(Permissions.ManageMessages)]
-    public async Task postBishop(CommandContext ctx) {
-        var messages =
-            await File.ReadAllLinesAsync(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/bishop.txt");
-        foreach (var message in messages) {
-            if (!string.IsNullOrWhiteSpace(message)) {
-                await ctx.Channel.SendMessageAsync(message);
-            }
-        }
-    }
+    public Task roll(CommandContext ctx, int sides) => Run.prefix(ctx, c => ChatCommands.roll(c, sides));
 
     [Command("webhook")]
-    public async Task sendWebhook(CommandContext ctx, [RemainingText] string message) {
-        await Program.wiltery.sendWebhookToChannel(ctx.Channel, message);
-    }
+    public Task sendWebhook(CommandContext ctx, [RemainingText] string message) =>
+        Run.prefix(ctx, c => ChatCommands.webhook(c, message));
 
     [Command("user")]
-    public async Task userWebhook(CommandContext ctx, [RemainingText] string message) {
-        await Program.wiltery.sendWebhookToChannelAsUser(ctx.Channel, message, ctx.Member);
-    }
+    public Task userWebhook(CommandContext ctx, [RemainingText] string message) =>
+        Run.prefix(ctx, c => ChatCommands.userWebhook(c, message));
 
     [Command("squish")]
-    public async Task squish(CommandContext ctx, DiscordMember member) {
-        var cat = "https://cdn.discordapp.com/attachments/1101712131222683659/1128320701456195594/image.png";
-        await ctx.Message.DeleteAsync();
-        await Program.wiltery.sendWebhookToChannelWithCustomUser(ctx.Channel, new DiscordMessageBuilder()
-            .WithContent($"{member.DisplayName} was squished by a giant kitten.").AddEmbed(
-                new DiscordEmbedBuilder().WithImageUrl(
-                    cat)), cat, "Giant cat");
-    }
+    public Task squish(CommandContext ctx, DiscordMember member) =>
+        Run.prefix(ctx, c => ChatCommands.squish(c, member));
 
     [Command("0x")]
-    public async Task love0x(CommandContext ctx) {
-        var zerox = "https://tenor.com/view/girl-anime-kiss-anime-i-love-you-girl-kiss-gif-14375355";
-        await ctx.RespondAsync(new DiscordMessageBuilder()
-            .WithContent($"{(await ctx.Guild!.GetMemberAsync(ZEROX)).Mention} is amazing and I love them so much!"));
-        await ctx.Channel.SendMessageAsync(zerox);
-    }
+    public Task love0x(CommandContext ctx) => Run.prefix(ctx, ChatCommands.love0x);
 
     [Command("panno")]
-    public async Task lovepanno(CommandContext ctx) {
-        var panno = "https://tenor.com/view/hug-gif-25588769";
-        await ctx.RespondAsync(new DiscordMessageBuilder()
-            .WithContent($"Pannoniae is a 12/10 human being that deserves love and appreciation <3"));
-        await ctx.Channel.SendMessageAsync(panno);
-    }
+    public Task lovepanno(CommandContext ctx) => Run.prefix(ctx, ChatCommands.lovepanno);
 }

@@ -1,262 +1,155 @@
-﻿using DisCatSharp;
-using DisCatSharp.Entities;
-using DisCatSharp.Interactivity;
-using DisCatSharp.Interactivity.Enums;
-using DisCatSharp.Interactivity.Extensions;
-using DisCatSharp.ApplicationCommands;
+﻿using DisCatSharp.ApplicationCommands;
 using DisCatSharp.ApplicationCommands.Attributes;
 using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.ApplicationCommands.Enums;
-using DisCatSharp.Enums;
-using DisCatSharp.Interactivity.Entities;
-using DisCatSharp.Interactivity.EventHandling;
 
 namespace EconomyBot;
 
-[ApplicationCommandModuleLifespan(ApplicationCommandModuleLifespan.Singleton)]
+/// Slash versions of the music commands. The commands themselves live in <see cref="MusicCommands"/>; anything added
+/// here needs its twin in <see cref="MusicModule"/>.
+///
+/// Differences from the text side, all forced by how slash commands work: no overloads (so optional parameters
+/// instead), no "!!" prefix (so a front option), no aliases.
 public class MusicModuleSlash : ApplicationCommandsModule {
-    private MusicService Music { get; }
-    private YouTubeSearchProvider YouTube { get; }
+    private const string FRONT = "Play it next instead of adding it to the end of the queue.";
 
-    public required GuildMusicData GuildMusic { get; set; }
+    private static Task music(InteractionContext ctx, Func<MusicCommands, Task> body, bool voiceChecks = true,
+        bool front = false) =>
+        Run.slash(ctx, c => {
+            c.front = front;
+            return MusicCommands.run(c, body, voiceChecks);
+        });
 
-    public required MusicCommon common;
-
-    public MusicModuleSlash(YouTubeSearchProvider yt) {
-        Music = Program.musicService;
-        YouTube = yt;
-    }
-
-    private static DiscordChannel? getChannel(InteractionContext ctx) {
-        return ctx.Member!.VoiceState?.Channel;
-    }
-
-    public override async Task<bool> BeforeSlashExecutionAsync(InteractionContext ctx) {
-        if (ctx.CommandName == "join") {
-            GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild!);
-            GuildMusic.CommandChannel = ctx.Channel;
-            return false;
+    /// For the commands taking a time: slash commands have no TimeSpan, so it comes in as text.
+    private static async Task timed(InteractionContext ctx, string text, Func<MusicCommands, TimeSpan, Task> body) {
+        var parsed = await new CustomTimeSpanConverter().ConvertAsync(text.Trim(), null);
+        if (!parsed.HasValue) {
+            await Run.slash(ctx, c => c.respond("I can't read that as a time. Try something like `1m30s` or `2:15`."));
+            return;
         }
 
-        var chn = getChannel(ctx);
-        if (chn! == null!) {
-            await CreateResponseAsync(ctx,
-                $"{Program.cube} You need to be in a voice channel.");
-            throw new IdiotException("user error");
-        }
-
-        var mbr = ctx.Guild?.CurrentMember?.VoiceState?.Channel;
-        if (mbr! != null! && chn != mbr) {
-            await CreateResponseAsync(ctx,
-                $"{Program.cube} You need to be in the same voice channel.");
-            throw new IdiotException("user error");
-        }
-
-        GuildMusic = await Music.GetOrCreateDataAsync(ctx.Guild!);
-        GuildMusic.CommandChannel = ctx.Channel;
-
-        return true;
+        await music(ctx, m => body(m, parsed.Value));
     }
 
-    private async Task CreateResponseAsync(InteractionContext ctx, string text) {
-        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(text));
-    }
+    [SlashCommand("eq", "Toggles the EQ.")]
+    public Task eq(InteractionContext ctx) => music(ctx, m => m.eq());
+
+    [SlashCommand("reset", "Resets the voice state.")]
+    public Task reset(InteractionContext ctx) => music(ctx, m => m.resetPlayer());
 
     [SlashCommand("join", "Joins the voice channel.")]
-    public async Task JoinAsync(InteractionContext ctx) {
-        // yeet the bot in 
-        var chn = getChannel(ctx);
-        await GuildMusic.CreatePlayerAsync(chn!);
-        await CreateResponseAsync(ctx, $"{Program.cube} Joined the channel.");
-    }
+    public Task join(InteractionContext ctx) => music(ctx, m => m.join(), false);
 
     [SlashCommand("jazz", "Plays some jazz. :3")]
-    public async Task PlayJazzAsync(InteractionContext ctx) {
-        // yeet the bot in
-        GuildMusic.queue.addToQueue("_fats");
-        await GuildMusic.queue.seedQueue();
-        var vs = ctx.Member?.VoiceState;
-        var chn = vs?.Channel;
-        await GuildMusic.CreatePlayerAsync(chn!);
-        await GuildMusic.queue.PlayAsync();
-        await CreateResponseAsync(ctx, $"{Program.cube} Started playing jazz.");
-    }
+    public Task jazz(InteractionContext ctx,
+        [Option("search", "A specific track to look for, or \"all\". Leave empty for the usual.")]
+        string search = "",
+        [Option("front", FRONT)] bool front = false) =>
+        music(ctx, m => string.IsNullOrWhiteSpace(search) ? m.jazz() : m.jazz(search), front: front);
+
+    [SlashCommand("live", "Live music! :3")]
+    public Task live(InteractionContext ctx) => music(ctx, m => m.live());
+
+    [SlashCommand("analyse", "Analyses the frequency of artists.")]
+    public Task analyse(InteractionContext ctx) => music(ctx, m => m.analyse());
+
+    [SlashCommand("rl", "Reloads music data.")]
+    public Task reload(InteractionContext ctx) => music(ctx, m => m.reload());
 
     [SlashCommand("stopjazz", "Stops jazz.")]
-    public async Task StopJazzAsync(InteractionContext ctx) {
-        GuildMusic.queue.clearQueue();
-        GuildMusic.queue.EmptyQueue();
-        await GuildMusic.queue.StopAsync();
-        await CreateResponseAsync(ctx, $"{Program.cube} Stopped jazz.");
-    }
+    public Task stopJazz(InteractionContext ctx) => music(ctx, m => m.stopJazz());
+
+    [SlashCommand("play", "Plays a URL, or searches for the given keywords.")]
+    public Task play(InteractionContext ctx,
+        [Option("query", "A link, or what to search for.")]
+        string query,
+        [Option("front", FRONT)] bool front = false) =>
+        music(ctx,
+            m => Uri.TryCreate(query.Trim(), UriKind.Absolute, out var uri) && uri.Scheme is "http" or "https"
+                ? m.play(uri)
+                : m.play(query), front: front);
+
+    [SlashCommand("soulseek", "Searches Soulseek and plays what you pick.")]
+    public Task soulseek(InteractionContext ctx,
+        [Option("query", "What to search for.")]
+        string query,
+        [Option("front", FRONT)] bool front = false) => music(ctx, m => m.soulseek(query), front: front);
+
+    [SlashCommand("soulseekuser", "Searches one Soulseek user's files and plays what you pick.")]
+    public Task soulseekUser(InteractionContext ctx,
+        [Option("user", "The user to search.")]
+        string user,
+        [Option("query", "What to search for.")]
+        string query,
+        [Option("front", FRONT)] bool front = false) => music(ctx, m => m.soulseekUser(user, query), front: front);
+
+    [SlashCommand("artist", "Plays tracks from an artist.")]
+    public Task artist(InteractionContext ctx, [Option("artist", "Who to play.")] string artist) =>
+        music(ctx, m => m.artist(artist));
+
+    [SlashCommand("stopartist", "Stops playing tracks from an artist.")]
+    public Task stopArtist(InteractionContext ctx) => music(ctx, m => m.stopArtist());
 
     [SlashCommand("stop", "Stops playback and quits the voice channel.")]
-    public async Task StopAsync(InteractionContext ctx) {
-        int rmd = GuildMusic.queue.EmptyQueue();
-        await GuildMusic.queue.StopAsync();
-        await GuildMusic.DestroyPlayerAsync();
+    public Task stop(InteractionContext ctx) => music(ctx, m => m.stop());
 
-        await CreateResponseAsync(ctx,
-            $"{Program.cube} Removed {rmd:#,##0} tracks from the queue.");
-    }
+    [SlashCommand("repeat", "Toggles repeat of the queue.")]
+    public Task repeat(InteractionContext ctx) => music(ctx, m => m.repeat());
+
+    [SlashCommand("earrape", "Toggles annoying users.")]
+    public Task earrape(InteractionContext ctx) => music(ctx, m => m.earrape());
 
     [SlashCommand("clear", "Clears the queue.")]
-    public async Task ClearAsync(InteractionContext ctx) {
-        int rmd = GuildMusic.queue.EmptyQueue();
-
-        await CreateResponseAsync(ctx,
-            $"{Program.cube} Removed {rmd:#,##0} tracks from the queue uwu");
-    }
+    public Task clear(InteractionContext ctx) => music(ctx, m => m.clear());
 
     [SlashCommand("pause", "Pauses playback.")]
-    public async Task PauseAsync(InteractionContext ctx) {
-        await GuildMusic.PauseAsync();
-        await CreateResponseAsync(ctx,
-            $"{Program.cube} Playback paused. Use {Formatter.InlineCode($"/resume")} to resume playback.");
-    }
+    public Task pause(InteractionContext ctx) => music(ctx, m => m.pause());
 
     [SlashCommand("resume", "Resumes playback.")]
-    public async Task ResumeAsync(InteractionContext ctx) {
-        await GuildMusic.ResumeAsync();
-        await CreateResponseAsync(ctx, $"{Program.cube} Playback resumed.");
-    }
+    public Task resume(InteractionContext ctx) => music(ctx, m => m.resume());
 
-    [SlashCommand("skip", "Skips current track.")]
-    public async Task SkipAsync(InteractionContext ctx) {
-        var track = GuildMusic.queue.NowPlaying?.track;
-        await GuildMusic.queue.StopAsync();
-        await CreateResponseAsync(ctx,
-            $"{Program.cube} {track.ToLimitedTrackString()} skipped.");
-    }
+    [SlashCommand("shuffle", "Shuffles the queue.")]
+    public Task shuffle(InteractionContext ctx) => music(ctx, m => m.shuffle());
 
-    [SlashCommand("skipnum", "Skips current track.")]
-    public async Task SkipAsync(InteractionContext ctx, [Option("tracks", "How many tracks to skip.")] long num) {
-        for (int i = 0; i < num; i++) {
-            var track = GuildMusic.queue.NowPlaying?.track;
-            await GuildMusic.queue.StopAsync();
-            await CreateResponseAsync(ctx,
-                $"{Program.cube} {track.ToLimitedTrackString()} skipped.");
-            await Task.Delay(500); // wait for the next one
-        }
-    }
+    [SlashCommand("skip", "Skips the current track.")]
+    public Task skip(InteractionContext ctx,
+        [Option("tracks", "How many tracks to skip."), MinimumValue(1), MaximumValue(50)]
+        long tracks = 1) => music(ctx, m => m.skip((int)tracks));
 
-    [SlashCommand("seek", "Seeks to specified time in current track.")]
-    public async Task SeekAsync(InteractionContext ctx,
-        [Option("seek", "Which time point to seek to.")]
-        string position) {
-        var pos = (await new CustomTimeSpanConverter().ConvertAsync(position, null)).Value;
-        await GuildMusic.SeekAsync(pos, false);
-    }
+    [SlashCommand("seek", "Seeks to the specified time in the current track.")]
+    public Task seek(InteractionContext ctx,
+        [Option("position", "Which time point to seek to, like 1m30s or 2:15.")]
+        string position) => timed(ctx, position, (m, t) => m.seek(t));
 
-    [SlashCommand("forward", "Forwards the track by specified amount of time.")]
-    public async Task ForwardAsync(InteractionContext ctx,
-        [Option("forward", "By how much to forward.")]
-        string offset) {
-        var o = (await new CustomTimeSpanConverter().ConvertAsync(offset, null)).Value;
-        await GuildMusic.SeekAsync(o, true);
-    }
+    [SlashCommand("forward", "Forwards the track by the specified amount of time.")]
+    public Task forward(InteractionContext ctx,
+        [Option("offset", "By how much to forward, like 30s.")]
+        string offset) => timed(ctx, offset, (m, t) => m.forward(t));
 
-    [SlashCommand("rewind", "Rewinds the track by specified amount of time.")]
-    public async Task RewindAsync(InteractionContext ctx,
-        [Option("rewind", "By how much to rewind.")]
-        string offset) {
-        var o = (await new CustomTimeSpanConverter().ConvertAsync(offset, null)).Value;
-        await GuildMusic.SeekAsync(-o, true);
-    }
+    [SlashCommand("rewind", "Rewinds the track by the specified amount of time.")]
+    public Task rewind(InteractionContext ctx,
+        [Option("offset", "By how much to rewind, like 30s.")]
+        string offset) => timed(ctx, offset, (m, t) => m.rewind(t));
 
-    [SlashCommand("setvolume", "Sets playback volume.")]
-    public async Task SetVolumeAsync(InteractionContext ctx,
-        [Option("volume", "Volume to set. Can be 0-150. Default 100.")]
-        long volume) {
-        if (volume is < 0 or > 1000) {
-            await CreateResponseAsync(ctx,
-                $"{Program.cube} Volume must be greater than 0, and less than or equal to 1000.");
-            return;
-        }
-
-        await GuildMusic.SetVolumeAsync((int)volume);
-        await CreateResponseAsync(ctx, $"{Program.cube} Volume set to {volume}%.");
-    }
-
-    [SlashCommand("volume", "Gets playback volume.")]
-    public async Task GetVolumeAsync(InteractionContext ctx) {
-        await CreateResponseAsync(ctx, $"{Program.cube} Volume is {GuildMusic.volume}%.");
-    }
+    [SlashCommand("volume", "Shows the playback volume, or sets it.")]
+    public Task volume(InteractionContext ctx,
+        [Option("volume", "Volume to set, 100 is normal. Leave empty to see the current one."), MinimumValue(0),
+         MaximumValue(1000)]
+        long volume = -1) => music(ctx, m => volume < 0 ? m.getVolume() : m.setVolume((int)volume));
 
     [SlashCommand("restart", "Restarts the playback of the current track.")]
-    public async Task RestartAsync(InteractionContext ctx) {
-        var track = GuildMusic.queue.NowPlaying?.track;
-        await GuildMusic.queue.RestartAsync();
-        if (track == null) {
-            return;
-        }
-        await CreateResponseAsync(ctx,
-            $"{Program.cube} {track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} restarted.");
-    }
+    public Task restart(InteractionContext ctx) => music(ctx, m => m.restart());
 
-    [SlashCommand("remove", "Removes a track from playback queue.")]
-    public async Task RemoveAsync(InteractionContext ctx,
-        [Option("remove", "Which track to remove.")]
-        long index) {
-        var itemN = GuildMusic.queue.Remove((int)(index - 1));
-        if (itemN == null) {
-            await CreateResponseAsync(ctx, $"{Program.cube} No such track.");
-            return;
-        }
+    [SlashCommand("remove", "Removes a track from the playback queue.")]
+    public Task remove(InteractionContext ctx,
+        [Option("index", "Which track to remove (its number in the queue)."), MinimumValue(1)]
+        long index) => music(ctx, m => m.remove((int)index));
 
-        var track = itemN;
-        await CreateResponseAsync(ctx,
-            $"{Program.cube} {track.Info.Title.Sanitize().Bold()} by {track.Info.Author.Sanitize().Bold()} removed.");
-    }
+    [SlashCommand("queue", "Displays the current playback queue.")]
+    public Task queue(InteractionContext ctx) => music(ctx, m => m.queue(), false);
 
-    [SlashCommand("queue", "Displays current playback queue.")]
-    public async Task QueueAsync(InteractionContext ctx) {
-        var interactivity = ctx.Client.GetInteractivity();
+    [SlashCommand("nowplaying", "Displays information about the currently played track.")]
+    public Task nowPlaying(InteractionContext ctx) => music(ctx, m => m.nowPlaying());
 
-        var pageCount = GuildMusic.queue.Queue.Count / 10 + 1;
-        if (GuildMusic.queue.Queue.Count % 10 == 0) {
-            pageCount--;
-        }
-        var pages = GuildMusic.queue.Queue.Select(x => x.track.ToTrackString())
-            .Select((s, i) => new { str = s, index = i })
-            .GroupBy(x => x.index / 10)
-            .Select(xg =>
-                new Page(
-                    $"Now playing: {GuildMusic.queue.NowPlaying?.track.ToTrackString()}\n\n{string.Join("\n", xg.Select(xa => $"`{xa.index + 1:00}` {xa.str}"))}\n\nPage {xg.Key + 1}/{pageCount}"))
-            .ToArray();
-
-        var trk = GuildMusic.queue.NowPlaying;
-        if (!pages.Any()) {
-            if (trk?.track.Info.Identifier == null) {
-                await CreateResponseAsync(ctx, "Queue is empty!");
-            }
-            else {
-                await CreateResponseAsync(ctx, $"Now playing: {GuildMusic.queue.NowPlaying?.track.ToTrackString()}");
-            }
-
-            return;
-        }
-
-        _ = interactivity.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages, TimeSpan.FromMinutes(2),
-            PaginationBehaviour.Ignore,
-            ButtonPaginationBehavior.Ignore);
-    }
-
-    [SlashCommand("nowplaying", "Displays information about currently-played track.")]
-    public async Task NowPlayingAsync(InteractionContext ctx) {
-        var track = GuildMusic.queue.NowPlaying;
-        if (track == null || GuildMusic.queue.NowPlaying?.track.Info.Identifier == null) {
-            await CreateResponseAsync(ctx, "Not playing.");
-        }
-        else {
-            await CreateResponseAsync(ctx,
-                $"Now playing: {track.track.Info.Title.Sanitize().Bold()} by {track.track.Info.Author.Sanitize().Bold()} [{GuildMusic.GetCurrentPosition().ToDurationString()}/{GuildMusic.queue.NowPlaying.track.Info.Length.ToDurationString()}].");
-        }
-    }
-
-    [SlashCommand("playerinfo", "Displays information about current player.")]
-    public async Task PlayerInfoAsync(InteractionContext ctx) {
-        await CreateResponseAsync(ctx,
-            $"Queue length: {GuildMusic.queue.Queue.Count}\nVolume: {GuildMusic.volume}%");
-    }
+    [SlashCommand("playerinfo", "Displays information about the current player.")]
+    public Task playerInfo(InteractionContext ctx) => music(ctx, m => m.playerInfo());
 }
