@@ -75,7 +75,7 @@ public sealed class PrefixCmd : Cmd {
 
     public PrefixCmd(CommandContext ctx) {
         this.ctx = ctx;
-        front = ctx.Prefix == "!!";
+        front = ctx.Prefix.EndsWith("!!", StringComparison.Ordinal);
     }
 
     public override DiscordClient client => ctx.Client;

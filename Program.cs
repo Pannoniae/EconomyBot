@@ -79,10 +79,16 @@ public class Program {
             Token = Constants.token,
             // the two privileged ones we need: members (join role, GetAllMembersAsync) and message content
             // (prefix commands, deletion log, spam filters). No presences.
-            Intents = DiscordIntents.AllUnprivileged | DiscordIntents.GuildMembers | DiscordIntents.MessageContent,
+            Intents = Constants.privilegedIntents
+                ? DiscordIntents.AllUnprivileged | DiscordIntents.GuildMembers | DiscordIntents.MessageContent
+                : DiscordIntents.AllUnprivileged,
             ReconnectIndefinitely = true
         });
         client = discord;
+        if (!Constants.privilegedIntents) {
+            logger.warn("Running WITHOUT privileged intents: slash commands and ticket buttons only. No text " +
+                        "commands, join log, join role, deletion log, spam filter or ticket transcripts.");
+        }
 
         // error handling
 
@@ -99,7 +105,9 @@ public class Program {
 
         var lavalink = discord.UseLavalink();
         var commands = discord.UseCommandsNext(new CommandsNextConfiguration {
-            StringPrefixes = [".", "!!"],
+            // a test bot (BOT_PROFILE) gets its own prefixes, so it can sit in the same server as the real one
+            // without both answering every ".something"
+            StringPrefixes = Constants.profile == null ? [".", "!!"] : ["t.", "t!!"],
         });
         var slashCommands = discord.UseApplicationCommands();
         try {
@@ -126,8 +134,17 @@ public class Program {
             PollBehaviour = PollBehaviour.KeepEmojis,
             AckPaginationButtons = true
         });
-        discord.MessageCreated += messageHandler;
-        discord.MessagesBulkDeleted += messageDeleteHandler;
+        // NOTE: without the privileged intents these would either never fire or fire with empty messages, and
+        // an empty message is worse than no message (a deletion log full of blanks, a spam filter matching nothing)
+        if (Constants.privilegedIntents) {
+            discord.MessageCreated += messageHandler;
+            discord.MessagesBulkDeleted += messageDeleteHandler;
+            discord.MessageDeleted += messageDeleteHandler;
+            discord.GuildMemberAdded += roleHandler;
+            discord.GuildMemberAdded += joinLogHandler;
+            discord.GuildMemberRemoved += leaveLogHandler;
+        }
+
         discord.Ready += async (sender, _) => {
             await setup(sender, lavalink, lavalinkConfig);
             if (needsLavalinkReconnection) {
@@ -142,9 +159,6 @@ public class Program {
             }
         };
         //discord.GuildDownloadCompleted += (sender, _) => setupB(sender, lavalink, lavalinkConfig);
-        discord.MessageDeleted += messageDeleteHandler;
-        discord.GuildMemberAdded += roleHandler;
-        discord.GuildMemberAdded += joinLogHandler;
         discord.ComponentInteractionCreated += Tickets.onComponent;
 
         discord.GetCommandsNext().UnregisterConverter<TimeSpan>();
@@ -357,6 +371,34 @@ public class Program {
         await flush();
     }
 
+    /// Post a "User left" embed to the same channel as the joins. Covers leaving, kicks and bans alike - discord
+    /// doesn't tell us which it was.
+    private static async Task leaveLogHandler(DiscordClient sender, GuildMemberRemoveEventArgs e) {
+        if (e.Member is not { } member) {
+            return;
+        }
+
+        if (GuildSettingsStore.read(e.Guild.Id, s => s.joinLogChannel) is not { } channelId ||
+            e.Guild.GetChannel(channelId) is not { } channel) {
+            return;
+        }
+
+        var embed = new DiscordEmbedBuilder()
+            .WithTitle("\U0001F44B User left")
+            .WithColor(DiscordColor.Red)
+            .WithDescription($"**User:** `{member.Username} ({member.Id})`\n**User count:** `{e.Guild.MemberCount}`")
+            .WithThumbnail(member.AvatarUrl)
+            .WithTimestamp(DateTimeOffset.UtcNow);
+
+        // NOTE: only known if the member was in the cache; a default date means it wasn't
+        if (member.JoinedAt.Year > 2015) {
+            var joined = member.JoinedAt.ToUnixTimeSeconds();
+            embed.AddField(new DiscordEmbedField("Joined", $"<t:{joined}:f> (<t:{joined}:R>)"));
+        }
+
+        await tryDiscord($"logging the departure of {member.Id}", () => channel.SendMessageAsync(embed.Build()));
+    }
+
     private static async Task messageDeleteHandler(DiscordClient sender, MessageBulkDeleteEventArgs e) {
         if (deleteLogFor(e.Channel) is not { } log) {
             return;
@@ -545,6 +587,12 @@ public class Program {
             return;
         }
 
+        // a test bot doesn't moderate: the real one is doing that already, and two bots nagging about the same
+        // crashlog is one too many
+        if (Constants.profile != null) {
+            return;
+        }
+
         // gore protection
         if (e.Author is DiscordMember m && e.Guild is { } goreGuild &&
             (e.Message.Content.Contains("Screenshot_20230901_160903") ||
@@ -610,18 +658,30 @@ public class Program {
         LavalinkConfiguration lavalinkConfig) {
         // Wait a bit with lavalink init, Lavalink seems to start slower than the bot. Lazy solution is pretty much a sleep
         await Task.Delay(2000);
-        LavalinkNode = await lavalink.ConnectAsync(lavalinkConfig);
-        
-        
-        // dispose slsk client!!
-        musicService?.slsk?.Dispose();
-        
-        musicService = new MusicService(lavalink, LavalinkNode);
-        lavalinkInit = true;
+        // NOTE: neither of these may take the rest of the bot down with it. No lavalink means no music, a missing
+        // emoji means no cube in front of the replies - tickets and logs have to work regardless.
+        try {
+            LavalinkNode = await lavalink.ConnectAsync(lavalinkConfig);
+
+            // dispose slsk client!!
+            musicService?.slsk?.Dispose();
+
+            musicService = new MusicService(lavalink, LavalinkNode);
+            lavalinkInit = true;
+        }
+        catch (Exception e) {
+            logger.error($"Couldn't connect to Lavalink, music is off: {describe(e)}");
+        }
+
         imagesModule = new ImagesModule();
         wiltery = new WilteryHandler(Program.client);
 
-        cube = await (await client.GetGuildAsync(838843082110664756)).GetEmojiAsync(839202645734457384);
+        try {
+            cube = await (await client.GetGuildAsync(838843082110664756)).GetEmojiAsync(839202645734457384);
+        }
+        catch (Exception e) {
+            logger.warn($"Couldn't fetch the cube emoji: {describe(e)}");
+        }
 
         hasSetup = true;
 

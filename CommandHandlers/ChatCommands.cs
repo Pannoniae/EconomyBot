@@ -84,7 +84,7 @@ public static class ChatCommands {
         }
 
         GuildSettingsStore.update(c.guild.Id, s => s.joinLogChannel = channel.Id);
-        await c.respond($"Join log set to {channel.Mention}.");
+        await c.respond($"Join/leave log set to {channel.Mention}.");
     }
 
     public static async Task joinLogOff(Cmd c) {

@@ -14,6 +14,22 @@ public static class Constants {
     public static ulong server = 828296966324224020;
 
     public static string? token;
+
+    /// Whether to ask discord for the privileged intents (server members, message content). On by default; set
+    /// "privilegedIntents": false in the config to run without them while the bot isn't approved for them - asking
+    /// for an intent we don't have makes discord refuse the connection outright.
+    /// Without them: no text commands (slash ones still work), no join log/role, no deletion log, no transcripts.
+    public static bool privilegedIntents = true;
+
+    /// BOT_PROFILE=dev makes the bot read config.dev.json and guilds.dev.json, so a test bot can run from the same
+    /// folder without touching the real bot's files.
+    public static readonly string? profile = Environment.GetEnvironmentVariable("BOT_PROFILE") is { Length: > 0 } p
+        ? p
+        : null;
+
+    /// "config.json" normally, "config.dev.json" under BOT_PROFILE=dev.
+    public static string profileFile(string name) =>
+        profile == null ? $"{name}.json" : $"{name}.{profile}.json";
     public static string? redditappid;
     public static string? redditrefreshtoken;
     public static string? redditappsecret;
@@ -24,12 +40,14 @@ public static class Constants {
 
         JObject json;
         try {
-            json = JObject.Parse(File.ReadAllText("config.json"));
+            json = JObject.Parse(File.ReadAllText(profileFile("config")));
         }
         catch (FileNotFoundException) {
-            logger.error("The bot doesn't work without a config.json file, please create one.");
+            logger.error($"The bot doesn't work without a {profileFile("config")} file, please create one.");
             return;
         }
+
+        privilegedIntents = json["privilegedIntents"]?.Value<bool>() ?? true;
 
         token = json["token"]?.Value<string>();
         if (token is null) {

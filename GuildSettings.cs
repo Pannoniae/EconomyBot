@@ -30,7 +30,7 @@ public record struct TicketConfig(ulong category, ulong staffRole, ulong transcr
 /// Everything goes through <see cref="read{T}"/> / <see cref="update"/> so nobody holds onto a settings object
 /// while another thread is rewriting it.
 public static class GuildSettingsStore {
-    private const string FILE = "guilds.json";
+    private static readonly string FILE = Constants.profileFile("guilds");
 
     private static readonly Logger logger = Logger.getClassLogger("GuildSettings");
     private static readonly Lock sync = new();
@@ -51,7 +51,7 @@ public static class GuildSettingsStore {
                 }
             }
 
-            if (!settings.ContainsKey(Program.MY_GUILD)) {
+            if (Constants.profile == null && !settings.ContainsKey(Program.MY_GUILD)) {
                 settings[Program.MY_GUILD] = new GuildSettings {
                     deleteLogChannel = Program.LOG,
                     joinRole = 1352463350533197989

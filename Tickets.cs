@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.RegularExpressions;
 using DisCatSharp;
 using DisCatSharp.Entities;
 using DisCatSharp.Enums;
@@ -148,6 +149,15 @@ public static class Tickets {
             return;
         }
 
+        // without message content a transcript would be a list of blank lines, and the channel is the only copy
+        if (!Constants.privilegedIntents) {
+            await e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
+                new DiscordInteractionResponseBuilder().WithContent(
+                    "I can't save transcripts right now, so I'm not deleting this ticket. A moderator can delete " +
+                    "the channel by hand once it's dealt with."));
+            return;
+        }
+
         lock (sync) {
             if (!closing.Add(channel.Id)) {
                 return;
@@ -158,6 +168,8 @@ public static class Tickets {
             await e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource,
                 new DiscordInteractionResponseBuilder().WithContent(
                     $"Closed by {e.User.Mention}, saving the transcript..."));
+            // our own "closing" notice isn't part of the conversation
+            var notice = (await e.Interaction.GetOriginalResponseAsync()).Id;
 
             if (guild.GetChannel(cfg.transcriptChannel) is not { } target) {
                 await reply(e.Interaction, "The transcript channel is gone, so I'm not deleting anything. Poke an admin.");
@@ -165,6 +177,7 @@ public static class Tickets {
             }
 
             var messages = await fetchAll(channel);
+            messages.RemoveAll(m => m.Id == notice);
             var saved = await Program.tryDiscord($"posting the transcript of {channel.Name}", async () => {
                 await using var file = new MemoryStream(Encoding.UTF8.GetBytes(render(guild, channel, owner, e.User, messages)));
                 await target.SendMessageAsync(new DiscordMessageBuilder()
@@ -227,7 +240,9 @@ public static class Tickets {
 
         foreach (var m in messages) {
             sb.Append($"[{m.Timestamp.UtcDateTime:yyyy-MM-dd HH:mm:ss}] {m.Author?.Username ?? "unknown"}: ");
-            sb.AppendLine(string.IsNullOrEmpty(m.Content) ? "" : m.Content.ReplaceLineEndings("\n    "));
+            sb.AppendLine(string.IsNullOrEmpty(m.Content)
+                ? ""
+                : readable(guild, m).ReplaceLineEndings("\n    "));
             foreach (var a in m.Attachments) {
                 sb.AppendLine($"    [attachment: {savedName(a)}]");
             }
@@ -243,6 +258,21 @@ public static class Tickets {
 
         return sb.ToString();
     }
+
+    /// Message text with mentions spelled out: a transcript full of <@395573709525745666> is no use to anyone.
+    private static string readable(DiscordGuild guild, DiscordMessage m) =>
+        Regex.Replace(m.Content, @"<(@!?|@&|#)(\d{15,21})>", match => {
+            if (!ulong.TryParse(match.Groups[2].Value, out var id)) {
+                return match.Value;
+            }
+
+            return match.Groups[1].Value switch {
+                "@&" => guild.GetRole(id) is { } role ? $"@{role.Name}" : match.Value,
+                "#" => guild.GetChannel(id) is { } channel ? $"#{channel.Name}" : match.Value,
+                _ => m.MentionedUsers?.FirstOrDefault(u => u.Id == id) is { } user ? $"@{user.Username}" :
+                    guild.Members.TryGetValue(id, out var member) ? $"@{member.Username}" : match.Value
+            };
+        });
 
     private static IEnumerable<(DiscordUser author, int count)> participants(List<DiscordMessage> messages) =>
         messages.Where(m => m.Author != null)
